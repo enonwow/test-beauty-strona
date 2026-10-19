@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wybór terminu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
+.sec{padding:22px 20px 0;display:flex;flex-direction:column;gap:10px}
+.sec h2{margin:0;font-size:14px;font-weight:700;font-family:inherit}
+.chip{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.chip[aria-pressed=true]::before,.slot[aria-pressed=true] b::before{content:"\2713\00a0";content:"\2713\00a0" / ""}
+.day[aria-pressed=true]::before{content:"\2713";content:"\2713" / "";position:absolute;top:3px;right:5px;font-size:11px}
+.day{position:relative;min-height:60px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:0}
+.day small{font-size:12px;color:#625860}
+.day[aria-pressed=true]{border:2px solid #9E1F50;background:#9E1F50;color:#fff}
+.day[aria-pressed=true] small{color:#fff}
+.day.brak b{text-decoration:line-through}
+.day:disabled{background:#FAF6F8;border-color:#F0E8EC;color:#8A7F86;cursor:default}
+.day:disabled small{color:#8A7F86}
+.slot{min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.slot b{font-weight:inherit}
+.slot .pr{font-size:12px;font-weight:700;color:#9E1F50}
+.slot[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.stp{width:44px;height:44px;border-radius:12px;border:1px solid #C9B6BF;background:#fff;color:#1E1A1D;font:inherit;font-size:22px;cursor:pointer;padding:0}
+.stp:disabled{color:#8A7F86;background:#FAF6F8;cursor:default}
+.err{color:#A3262A;font-size:13px;line-height:1.35}
+.inp[aria-invalid=true]{border:2px solid #A3262A}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label{font-size:13px;color:#625860}
+.inp{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;box-sizing:border-box;width:100%}
+.btn{min-height:52px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;gap:4px}
+.btn:hover{background:#7A173D;color:#fff}
+.btn:disabled{background:#C9B6BF;cursor:default}
+.btn-o{min-height:48px;padding:0 16px;border-radius:12px;border:1px solid #1E1A1D;background:#fff;color:#1E1A1D;font:inherit;font-weight:500;cursor:pointer}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.d-cols{flex:1}
+.d-cols>.d-main,.d-cols>.d-aside{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}
+@media (min-width:1024px){
+  .d-cols>.d-main,.d-cols>.d-aside{display:block}
+  .d-cols{flex:none;padding-bottom:32px}
+  .d-aside{order:1;flex-basis:380px !important;top:16px}
+  .d-main{order:0}
+  .d-cols .o1,.d-cols .o2,.d-cols .o3,.d-cols .o4,.d-cols .o5,.d-cols .o6{order:0}
+  .d-aside>div{margin-left:0 !important;margin-right:0 !important}
+  .d-aside>.bar{margin-top:12px !important;padding:16px !important;border:1px solid #E4D9DE;border-radius:16px}
+  .d-aside>.o1{margin-top:16px !important}
+  #sloty{grid-template-columns:repeat(6,minmax(0,1fr))}
+  #krok{margin-left:0 !important;margin-right:0 !important}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
+    <a id="wstecz" href="paznokcie.html" aria-label="Wróć do kreatora" class="back">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <h1 id="tytul" style="margin:0;font-size:20px;font-weight:700">Wybierz termin</h1>
+  </header>
+
+  <div class="d-cols">
+  <!-- phone: wrappers vanish and "order" keeps the old sequence; desktop: summary + button stick on the right -->
+  <div class="d-aside">
+  <div class="o1" style="margin:16px 20px 0;padding:14px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div aria-hidden="true" style="width:44px;height:44px;border-radius:10px;background:#5B1630;flex:none"></div>
+      <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+        <span id="opis-sum" style="font-weight:500" data-bind="booking.opis">Manicure hybrydowy · M · velvet × 10</span>
+        <span style="color:#625860;font-size:13px"><span id="cena-txt">200 zł</span> · <span id="czas-txt">1 h 50 min</span> · <span data-bind="booking.studio">[Studio 1]</span></span>
+      </div>
+      <a id="zmien" href="paznokcie.html" style="font-size:14px;font-weight:500;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center">Zmień</a>
+    </div>
+    <ul id="lista-uslug" hidden style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px"></ul>
+    <p id="powod" hidden style="margin:0;font-size:13px;line-height:1.4;color:#625860"></p>
+    <div id="linie" hidden style="padding-top:10px;border-top:1px solid #E4D9DE;display:flex;flex-direction:column;gap:4px;font-size:13px"></div>
+    <div id="promo-box" hidden style="padding-top:10px;border-top:1px solid #E4D9DE;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;justify-content:space-between;gap:10px;font-size:14px;color:#9E1F50;font-weight:700"><span id="promo-nazwa"></span><span id="promo-kwota" style="white-space:nowrap"></span></div>
+      <span id="promo-omnibus" style="font-size:12px;color:#625860;line-height:1.4"></span>
+    </div>
+  </div>
+
+  <div id="uwagi-box" class="o2" hidden style="margin:12px 20px 0;padding:12px 14px;border-radius:12px;border:1px solid #E4D9DE;font-size:13px;line-height:1.45">
+    <b>Uwagi do wizyty</b>
+    <ul id="uwagi" style="margin:6px 0 0;padding-left:18px"></ul>
+  </div>
+
+  <div id="blok" class="o3" hidden style="margin:16px 20px 0;padding:14px;border-radius:12px;background:#FFF1E0;color:#8A3B12;font-size:14px;line-height:1.45">
+    Ten zabieg nie jest teraz dostępny do rezerwacji online. <a href="paznokcie.html" style="color:#8A3B12;font-weight:500">Wróć do kreatora</a> albo <a href="wywiad.html?kat=kosmetologia" style="color:#8A3B12;font-weight:500">umów konsultację</a>.
+  </div>
+
+  <div class="o6 bar" style="margin-top:auto;padding:16px 20px 24px;border-top:1px solid #F0E8EC;display:flex;flex-direction:column;gap:10px">
+    <label id="zad-lab" style="display:flex;gap:10px;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;background:#FAF6F8;font-size:13px;line-height:1.35">
+      <input id="zad" type="checkbox" checked style="width:22px;height:22px;margin:0;flex:none">
+      <span>Makieta: studio wymaga zaliczki (<b id="zad-kw">60</b> zł, przykładowo 30% ceny)</span>
+    </label>
+    <span style="color:#625860;font-size:12px;line-height:1.4">Bez konta i bez aplikacji. Zasady odwołania: [zasady studia]. Reszta płatna w studiu. Gdy studio wymaga zaliczki, następny krok to <a href="zadatek.html">płatność BLIK</a>.</span>
+    <button id="rez-btn" type="submit" form="rez" class="btn"><span id="btn-txt">Rezerwuję · 200 zł</span></button>
+  </div>
+  </div>
+
+  <div class="d-main">
+  <div id="krok" class="o4" hidden style="margin:16px 20px 0;padding:12px 14px;border-radius:12px;background:#FAF6F8;font-size:14px;line-height:1.45;display:flex;flex-direction:column;gap:8px">
+    <span id="krok-txt"></span>
+    <button type="button" id="krok-zmien" class="btn-o" hidden style="align-self:flex-start;min-height:44px">Zmień termin testu</button>
+  </div>
+
+  <form id="rez" class="o5" style="display:flex;flex-direction:column" novalidate>
+  <section class="sec" id="sec-osoby" hidden>
+    <h2 id="osoby-h">Liczba osób</h2>
+    <div role="group" aria-labelledby="osoby-h" style="display:flex;align-items:center;gap:10px">
+      <button type="button" id="os-minus" class="stp" aria-label="Mniej osób">−</button>
+      <output id="os-n" aria-live="polite" style="min-width:32px;text-align:center;font-size:20px;font-weight:700">1</output>
+      <button type="button" id="os-plus" class="stp" aria-label="Więcej osób">+</button>
+    </div>
+    <span id="os-note" style="color:#625860;font-size:12px;line-height:1.4"></span>
+  </section>
+
+  <section class="sec" id="sec-miejsce" hidden>
+    <h2 id="miejsce-h">Miejsce wizyty</h2>
+    <div id="miejsce" data-choice role="group" aria-labelledby="miejsce-h" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="chip" aria-pressed="true" data-value="studio">W studiu</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="dojazd">Dojazd do mnie</button>
+    </div>
+    <div id="dojazd-box" hidden style="display:flex;flex-direction:column;gap:10px">
+      <div class="fld"><label for="d-adres">Adres wizyty</label><input id="d-adres" class="inp" type="text" autocomplete="street-address" placeholder="[ulica, numer, miasto]" aria-describedby="d-adres-err">
+        <span id="d-adres-err" class="err" hidden></span></div>
+      <div class="fld"><label for="d-strefa">Strefa dojazdu (opłata za dojazd, przykładowo)</label>
+        <select id="d-strefa" class="inp"><option value="0">do 10 km · 30 zł</option><option value="1">do 20 km · 50 zł</option></select></div>
+      <span style="color:#625860;font-size:12px;line-height:1.4">Opłata za dojazd jest osobną pozycją i nie podlega rabatom.</span>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>Stylistka</h2>
+    <div id="styl" data-choice role="group" aria-label="Stylistka" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="chip" aria-pressed="true" data-value="Dowolna">Dowolna</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="[Stylistka 1]">[Stylistka 1]</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="[Stylistka 2]">[Stylistka 2]</button>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>Październik 2026</h2>
+    <div id="dni" data-choice role="group" aria-label="Dzień" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px">
+      <button type="button" class="day" aria-pressed="false" data-value="19"><small>pon</small><b>19</b></button>
+      <button type="button" class="day" aria-pressed="true" data-value="20"><small>wt</small><b>20</b></button>
+      <button type="button" class="day" aria-pressed="false" data-value="21"><small>śr</small><b>21</b></button>
+      <button type="button" class="day brak" aria-pressed="false" data-value="22" aria-label="czwartek 22, brak wolnych godzin"><small>czw</small><b>22</b></button>
+      <button type="button" class="day" aria-pressed="false" data-value="23"><small>pt</small><b>23</b></button>
+      <button type="button" class="day" aria-pressed="false" data-value="24"><small>sob</small><b>24</b></button>
+      <button type="button" class="day" aria-pressed="false" data-value="26"><small>pon</small><b>26</b></button>
+      <button type="button" class="day" aria-pressed="false" data-value="27"><small>wt</small><b>27</b></button>
+      <button type="button" class="day" aria-pressed="false" data-value="28"><small>śr</small><b>28</b></button>
+    </div>
+    <span id="dni-note" style="color:#625860;font-size:12px">Przekreślone dni nie mają okna na <span id="czas-txt2">1 h 50 min</span>. Kliknij, żeby zapisać się na listę oczekujących.</span>
+  </section>
+
+  <section class="sec">
+    <h2 id="dzien-tyt" style="font-size:14px">Wtorek, 20 października</h2>
+    <p style="margin:0;color:#625860;font-size:13px;line-height:1.4">Pokazujemy tylko godziny, w których zmieści się cała wizyta.</p>
+    <div id="sloty" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px"></div>
+    <p id="slot-err" class="err" role="alert" tabindex="-1" hidden style="margin:0"></p>
+    <p id="t-info" role="status" hidden style="margin:0;padding:10px 12px;border-radius:10px;background:#FFF1E0;color:#8A3B12;font-size:13px;line-height:1.4"></p>
+    <span id="hh-note" hidden style="color:#625860;font-size:13px;line-height:1.4">Godziny z rabatem są oznaczone. Wizyta musi zacząć się w przedziale happy hours.</span>
+    <div id="brak" hidden style="padding:14px;border-radius:12px;background:#FFF1E0;color:#8A3B12;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
+      <span id="brak-txt">Tego dnia nie ma wolnego okna na całą wizytę.</span>
+      <button type="button" id="brak-lista" class="btn-o" data-open="#lista">Zapisz się na listę oczekujących</button>
+    </div>
+    <span id="wizyta" style="font-size:13px;font-weight:500">Wizyta: 11:15–13:05</span>
+  </section>
+
+  <section class="sec" style="gap:12px">
+    <h2>Twoje dane</h2>
+    <div class="fld">
+      <label for="imie">Imię</label>
+      <input id="imie" class="inp" type="text" autocomplete="given-name" required aria-describedby="imie-err">
+      <span id="imie-err" class="err" hidden></span>
+    </div>
+    <div class="fld">
+      <label for="tel">Telefon (SMS z potwierdzeniem i przypomnieniem)</label>
+      <input id="tel" class="inp" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="tel-err">
+      <span id="tel-err" class="err" hidden></span>
+    </div>
+    <div id="dla-w" class="fld">
+      <span id="dla-h" style="font-size:13px;color:#625860">Dla kogo jest wizyta?</span>
+      <div id="dla" data-choice role="group" aria-labelledby="dla-h" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="chip" aria-pressed="true" data-value="ja">Dla mnie</button>
+        <button type="button" class="chip" aria-pressed="false" data-value="inna">Dla kogoś innego</button>
+      </div>
+    </div>
+    <div id="inna" hidden style="display:flex;flex-direction:column;gap:12px">
+      <div id="bliski-w" hidden class="fld"><label for="bliski">Z listy bliskich</label><select id="bliski" class="inp"></select></div>
+      <div class="fld">
+        <label for="innaimie">Imię osoby, która przyjdzie na wizytę</label>
+        <input id="innaimie" class="inp" type="text" aria-describedby="innaimie-err">
+        <span id="innaimie-err" class="err" hidden></span>
+      </div>
+      <div class="fld">
+        <label for="innatel">Jej telefon (opcjonalnie)</label>
+        <input id="innatel" class="inp" type="tel" autocomplete="off">
+      </div>
+      <label id="zapisz-bliska" style="display:flex;gap:10px;align-items:center;min-height:44px;font-size:14px"><input id="zapisz-b" type="checkbox" style="width:22px;height:22px;margin:0;flex:none">Zapisz w moich bliskich (konto)</label>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <input id="mkt" type="checkbox" style="width:22px;height:22px;margin:0;flex:none">
+      <label for="mkt" style="font-size:13px;line-height:1.4;color:#625860">Chcę dostawać od studia informacje o nowościach i promocjach (opcjonalnie, nie wpływa na przypomnienia)</label>
+    </div>
+  </section>
+  </form>
+  </div>
+  </div>
+</div>
+
+<dialog id="lista" aria-labelledby="lista-t">
+  <form data-mock data-toast="Zapisano na listę oczekujących. Damy znać SMS-em, gdy zwolni się termin." style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="lista-t" style="margin:0;font-size:18px">Lista oczekujących</h2>
+    <p id="lista-txt" style="margin:0;color:#625860;font-size:14px;line-height:1.45">Damy znać SMS-em, gdy w tym dniu zwolni się okno na Twoją wizytę.</p>
+    <div class="fld"><label for="lista-tel">Telefon</label><input id="lista-tel" class="inp" type="tel" required pattern="[0-9 +\-]{9,16}" title="Numer telefonu"></div>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Zapisz mnie</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const DEF = { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy · M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: '[Studio 1]' };
+  const qp = new URLSearchParams(location.search);
+  const B0 = Mock.get('booking', {}) || {}, qs = qp.get('s');
+  const B = qs && qs !== B0.studio ? { ...(B0.uslugi ? {} : B0), studio: qs } : B0; // another studio than the cart: start without the cart
+  if (B !== B0) Mock.set('booking', B);
+  const b = { ...DEF, ...B, cena: B.cena != null ? Number(B.cena) : DEF.cena, czas: Number(B.czas) || DEF.czas };
+  if (B !== B0) { $('#opis-sum').textContent = b.opis; document.querySelector('[data-bind="booking.studio"]').textContent = b.studio; } // mock.js already bound the old booking
+  const user = Mock.get('user', {}) || {};
+  const przeloz = new URLSearchParams(location.search).has('przeloz');
+  // v2 fields from the creators; missing -> behave as before
+  const sciezka = przeloz ? 'rezerwacja' : (B.sciezka || 'rezerwacja');
+  const konsult = sciezka === 'konsultacja', test48 = sciezka === 'test48h', blokada = sciezka === 'blokada';
+  // cenaMin/cenaMax = regular price of the services for ONE person. On re-entry the booking already carries people, home visit and discount,
+  // so we start again from "bazaCena" (or from the old promo fields); a reschedule keeps the saved totals untouched.
+  const tot = { max: B.cenaMax != null ? Number(B.cenaMax) : b.cena };
+  tot.min = B.cenaMin != null ? Number(B.cenaMin) : tot.max;
+  const baza = przeloz ? tot : B.bazaCena || (B.promo ? { min: B.promo.cenaMinPrzed, max: B.promo.cenaMaxPrzed } : tot);
+  const cenaMax = baza.max, cenaMin = baza.min;
+  const testMin = Number(B.testMin) || 10;
+  const fmtMin = n => { const h = Math.floor(n / 60), m = n % 60; return h ? (m ? `${h} h ${m} min` : `${h} h`) : `${m} min`; };
+  const czasTekst = konsult ? fmtMin(b.czas) : (b.czasTekst || fmtMin(b.czas));
+  const cenaTxt = konsult ? '0 zł' : (cenaMax > cenaMin ? `${cenaMin}–${cenaMax} zł` : `${cenaMax} zł`);
+
+  const DN = { 19: ['pon', 'Poniedziałek'], 20: ['wt', 'Wtorek'], 21: ['śr', 'Środa'], 22: ['czw', 'Czwartek'], 23: ['pt', 'Piątek'], 24: ['sob', 'Sobota'], 26: ['pon', 'Poniedziałek'], 27: ['wt', 'Wtorek'], 28: ['śr', 'Środa'] };
+  const SLOTS = { 19: ['12:00', '14:30', '15:00', '16:40', '17:30', '18:00', '19:15'], 20: ['9:00', '11:15', '14:30', '16:40'], 21: ['10:00', '12:30', '15:00'], 22: [], 23: ['9:30', '13:00', '16:00'], 24: ['10:00', '12:00'], 26: ['10:00', '13:00'], 27: ['9:00', '12:00', '15:30'], 28: ['11:00', '14:00'] };
+  const toMin = s => { const [h, m] = s.split(':'); return h * 60 + +m; };
+  const toStr = n => Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0');
+  const sel = { styl: B.stylistka || 'Dowolna', day: 20, slot: '11:15', osoby: 1, dla: 'ja', dojazd: false, strefa: 0 };
+  // services chosen on the studio page (cart); several services = one visit with the summed time
+  const uslugi = Array.isArray(B.uslugi) && B.uslugi.length ? B.uslugi : null;
+  const mozna = !przeloz && uslugi && !konsult && !test48;
+  const osobyMax = mozna ? Math.min(...uslugi.map(u => u.osobyMax || 1)) : 1;
+  const dojazdOk = !!mozna && uslugi.every(u => u.dojazd);
+  const STREFY = [{ strefa: 'do 10 km', oplata: 30 }, { strefa: 'do 20 km', oplata: 50 }]; // example zones
+  const bliscy = Mock.get('bliscy', []) || [];
+  const miejsca = (d, s) => 1 + Math.floor(d + toMin(s) / 15) % 4; // fixed mock availability: free stylists at a start time
+  const zadatek = Math.ceil((B.seria && B.seria.zaZabieg || cenaMax) * 0.3); // for a series the deposit covers one treatment
+  let sent = false, step = 1, test = null; // test48h: step 1 = test slot, step 2 = treatment slot
+  const dur = () => (test48 && step === 1 ? testMin : b.czas);
+  const minStart = () => (test && step === 2 ? test.day * 1440 + toMin(test.slot) + 48 * 60 : 0);
+  const valid = d => SLOTS[d].filter(s => toMin(s) + dur() <= 20 * 60 && d * 1440 + toMin(s) >= minStart() && miejsca(d, s) >= sel.osoby);
+
+  // happy hours: only for the treatment itself (no test, consultation, reschedule or series); day 19.10 is a Monday
+  // with several services the discount applies only when the offer covers every category in the cart (the lowest rate wins)
+  const promoAll = (d, s) => {
+    const hits = [...new Set(uslugi ? uslugi.map(u => u.kategoria) : [b.kategoria])].map(k => Mock.promoFor(k, (d - 19) % 7, s.padStart(5, '0')));
+    return hits.includes(null) ? null : hits.sort((x, y) => x.rabat - y.rabat)[0];
+  };
+  const promoAt = (d, s) => (konsult || przeloz || B.seria || (test48 && step === 1) ? null : promoAll(d, s));
+  const rng = (lo, hi) => (lo === hi ? `${lo} zł` : `${lo}–${hi} zł`);
+  // price = services x people, minus happy hours, plus the home-visit fee (a separate line, never discounted)
+  function pricing() {
+    const o = przeloz ? 1 : sel.osoby, D = !przeloz && sel.dojazd ? STREFY[sel.strefa].oplata : 0;
+    const rMin = cenaMin * o, rMax = cenaMax * o, p = sel.slot ? promoAt(sel.day, sel.slot) : null;
+    const f = n => (p ? Mock.priceAfter(n, p.rabat) : n) + D;
+    return { min: f(rMin), max: f(rMax), p, rMin, rMax, D, o };
+  }
+
+  $('#cena-txt').textContent = cenaTxt;
+  $('#czas-txt').textContent = czasTekst; $('#czas-txt2').textContent = czasTekst;
+  $('#zad-kw').textContent = zadatek;
+  $('#zad').checked = Mock.get('studioZadatek', true);
+  $('#zad').addEventListener('change', e => Mock.set('studioZadatek', e.target.checked));
+  if (user.imie) $('#imie').value = user.imie;
+  if (user.tel) $('#tel').value = user.tel;
+  if (cenaMax > cenaMin && !konsult && B.powodPrzedzialu && !przeloz) { $('#powod').hidden = false; $('#powod').textContent = `Dlaczego widełki: ${String(B.powodPrzedzialu).replace(/[.\s]+$/, '')}.`; }
+  // back/"Zmień" return to the creator of this category (it remembers the choice); old bookings go to the nails creator
+  const KREATOR = { rzesy: 'rzesy.html', brwi: 'brwi.html', fryzjer: 'fryzjer.html', kosmetologia: 'kosmetyka.html' }[B.kat];
+  if (KREATOR) { $('#wstecz').href = KREATOR; $('#zmien').href = KREATOR; }
+  if (przeloz) {
+    $('#tytul').textContent = 'Przełóż wizytę';
+    $('#wstecz').href = 'potwierdzenie.html'; $('#wstecz').setAttribute('aria-label', 'Wróć do potwierdzenia');
+    $('#rez-btn').textContent = 'Przełóż na ten termin';
+    $('#zad-lab').hidden = true;
+  } else if (konsult) {
+    $('#tytul').textContent = 'Umów konsultację';
+    $('#opis-sum').textContent = 'Konsultacja przed zabiegiem · ' + b.opis;
+    $('#zad-lab').hidden = true;
+    $('#uwagi-box').hidden = true;
+  }
+  if (!przeloz && Array.isArray(B.uwagi) && B.uwagi.length) {
+    $('#uwagi-box').hidden = false;
+    B.uwagi.forEach(u => { const li = document.createElement('li'); li.textContent = u; $('#uwagi').appendChild(li); });
+  }
+  if (blokada && !przeloz) { $('#blok').hidden = false; $('#rez-btn').disabled = true; }
+  if (test48 && !przeloz) $('#krok').hidden = false;
+  if (cenaMax === 0 || konsult) $('#zad-lab').hidden = true;
+
+  // several services in one visit
+  if (uslugi) {
+    $('#wstecz').href = $('#zmien').href = 'salon.html?s=' + encodeURIComponent(b.studio);
+    $('#wstecz').setAttribute('aria-label', 'Wróć do studia');
+    if (uslugi.length > 1) {
+      $('#opis-sum').textContent = `${Mock.plural(uslugi.length, ['usługa', 'usługi', 'usług'])} w jednej wizycie`;
+      $('#lista-uslug').hidden = false;
+      uslugi.forEach(u => {
+        const li = document.createElement('li'); li.style.cssText = 'display:flex;justify-content:space-between;gap:10px';
+        const a = document.createElement('span'); a.textContent = `${u.usluga} · ${fmtMin(u.czas)}`;
+        const c = document.createElement('span'); c.textContent = u.cenaMin != null && u.cenaMax > u.cenaMin ? `${u.cenaMin}–${u.cenaMax} zł` : `${u.cena} zł`; c.style.whiteSpace = 'nowrap';
+        li.append(a, c); $('#lista-uslug').appendChild(li);
+      });
+    }
+  }
+  // people counter and home visit (only when every chosen service allows it)
+  $('#sec-osoby').hidden = osobyMax < 2; $('#sec-miejsce').hidden = !dojazdOk;
+  const osobyUi = () => {
+    $('#os-n').textContent = sel.osoby; $('#os-minus').disabled = sel.osoby <= 1; $('#os-plus').disabled = sel.osoby >= osobyMax;
+    $('#os-note').textContent = sel.osoby > 1 ? `Cena razy ${sel.osoby}. Pokazujemy tylko godziny, w których jest wolnych tyle stylistek: ${sel.osoby}.` : `Te usługi można zarezerwować dla maksymalnie ${osobyMax} osób naraz.`;
+  };
+  $('#os-minus').addEventListener('click', () => { sel.osoby--; osobyUi(); draw(); });
+  $('#os-plus').addEventListener('click', () => { sel.osoby++; osobyUi(); draw(); });
+  $('#miejsce').addEventListener('mock:choice', e => { sel.dojazd = e.detail.value === 'dojazd'; $('#dojazd-box').hidden = !sel.dojazd; draw(); });
+  $('#d-strefa').addEventListener('change', e => { sel.strefa = +e.target.value; draw(); });
+  osobyUi();
+  // booking for someone else (people saved in the account are offered as a list)
+  if (przeloz) $('#dla-w').hidden = true;
+  if (bliscy.length) {
+    $('#bliski-w').hidden = false;
+    const o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Inna osoba'; $('#bliski').appendChild(o0);
+    bliscy.forEach((x, i) => { const o = document.createElement('option'); o.value = i; o.textContent = x.imie; $('#bliski').appendChild(o); });
+    $('#bliski').addEventListener('change', e => {
+      const x = bliscy[e.target.value];
+      $('#innaimie').value = x ? x.imie : ''; $('#innatel').value = x ? x.tel || '' : ''; $('#zapisz-bliska').hidden = !!x;
+    });
+  }
+  $('#dla').addEventListener('mock:choice', e => { sel.dla = e.detail.value; $('#inna').hidden = sel.dla !== 'inna'; });
+
+  const chip = [...document.querySelectorAll('#styl .chip')].find(c => c.dataset.value === sel.styl);
+  if (chip) document.querySelectorAll('#styl .chip').forEach(c => c.setAttribute('aria-pressed', String(c === chip)));
+  else sel.styl = 'Dowolna';
+
+  const label = () => (test48 && !przeloz ? (step === 1 ? 'Test' : 'Zabieg') : 'Wizyta');
+  function setBtn() {
+    if (przeloz) return;
+    const pr = pricing();
+    $('#btn-txt').textContent = konsult ? 'Rezerwuję konsultację · 0 zł' : test48 && step === 1 ? 'Dalej: termin zabiegu' : `Rezerwuję · ${rng(pr.min, pr.max)}`;
+    $('#zad-kw').textContent = Math.ceil((B.seria && B.seria.zaZabieg || pr.max) * 0.3);
+    // price line + discount box in the summary
+    if (!konsult) $('#cena-txt').innerHTML = pr.p ? `<s>${rng(pr.rMin + pr.D, pr.rMax + pr.D)}</s> <b>${rng(pr.min, pr.max)}</b>` : rng(pr.min, pr.max);
+    const L = [];
+    if (pr.o > 1) L.push(['Liczba osób', `× ${pr.o}`]);
+    if (pr.D) L.push([`Dojazd do klientki (${STREFY[sel.strefa].strefa})`, `+${pr.D} zł`]);
+    $('#linie').hidden = !L.length;
+    $('#linie').innerHTML = L.map(([a, c]) => `<div style="display:flex;justify-content:space-between;gap:10px"><span>${a}</span><b>${c}</b></div>`).join('');
+    $('#promo-box').hidden = !pr.p;
+    if (pr.p) {
+      const lo = pr.rMin - (pr.min - pr.D), hi = pr.rMax - (pr.max - pr.D);
+      $('#promo-nazwa').textContent = `Happy hours „${pr.p.nazwa}” −${pr.p.rabat}%`;
+      $('#promo-kwota').textContent = lo === hi ? `−${hi} zł` : `−${lo}–${hi} zł`;
+      $('#promo-omnibus').textContent = `Najniższa cena z 30 dni przed obniżką: ${rng(pr.rMin, pr.rMax)}`;
+    }
+  }
+  function stepInfo() {
+    if (!test48 || przeloz) return;
+    $('#krok-zmien').hidden = step === 1;
+    if (step === 1) $('#krok-txt').innerHTML = `<b>Krok 1 z 2: test uczuleniowy (${testMin} min).</b> Najpierw krótki test na skórze. Zabieg zarezerwujesz najwcześniej 48 h po teście.`;
+    else {
+      const m = minStart(), d = Math.floor(m / 1440);
+      $('#krok-txt').innerHTML = `<b>Krok 2 z 2: zabieg.</b> Test: ${DN[test.day][0]} ${test.day}.10, ${test.slot}–${toStr(toMin(test.slot) + testMin)}. Zabieg najwcześniej ${DN[d] ? DN[d][0] : ''} ${d}.10, ${toStr(m % 1440)}; wcześniejsze terminy są wyszarzone.`;
+    }
+  }
+  function draw() {
+    document.querySelectorAll('#dni .day').forEach(btn => {
+      const d = +btn.dataset.value, ok = valid(d).length > 0;
+      btn.classList.toggle('brak', !ok && !minStart());
+      btn.disabled = !ok && !!minStart();
+    });
+    if (minStart() && !valid(sel.day).length) {
+      const first = [...document.querySelectorAll('#dni .day')].find(x => !x.disabled);
+      if (first) { sel.day = +first.dataset.value; sel.slot = null; }
+    }
+    document.querySelectorAll('#dni .day').forEach(btn => btn.setAttribute('aria-pressed', String(+btn.dataset.value === sel.day)));
+    const list = valid(sel.day);
+    if (!list.includes(sel.slot)) sel.slot = null;
+    $('#dzien-tyt').textContent = `${DN[sel.day][1]}, ${sel.day} października`;
+    $('#sloty').innerHTML = list.map(s => { const p = promoAt(sel.day, s); return `<button type="button" class="slot" data-t="${s}" aria-pressed="${s === sel.slot}"${p ? ` aria-label="${s}, rabat ${p.rabat}%"` : ''}><b>${s}</b>${p ? `<span class="pr">−${p.rabat}%</span>` : ''}</button>`; }).join('');
+    $('#hh-note').hidden = !list.some(s => promoAt(sel.day, s));
+    $('#brak').hidden = list.length > 0;
+    $('#brak-lista').hidden = !!minStart();
+    $('#brak-txt').textContent = minStart() ? 'Brak wolnych godzin w terminach dostępnych po teście. Zmień termin testu.' : `${DN[sel.day][1]}, ${sel.day}.10: brak wolnego okna na ${fmtMin(dur())}.`;
+    $('#lista-txt').textContent = `Damy znać SMS-em, gdy w dniu ${DN[sel.day][0]} ${sel.day}.10 zwolni się okno na ${fmtMin(dur())}.`;
+    $('#dni-note').hidden = !!minStart();
+    $('#czas-txt2').textContent = fmtMin(dur());
+    const dla = sel.styl === 'Dowolna' ? '' : ' · ' + sel.styl;
+    $('#wizyta').textContent = sel.slot ? `${label()}: ${DN[sel.day][0]} ${sel.day}.10, ${sel.slot}–${toStr(toMin(sel.slot) + dur())}${dla}` : 'Wybierz godzinę.';
+    setBtn(); stepInfo();
+  }
+  $('#sloty').addEventListener('click', e => {
+    const s = e.target.closest('.slot'); if (!s) return;
+    sel.slot = s.dataset.t; draw();
+  });
+  $('#dni').addEventListener('mock:choice', e => { sel.day = +e.detail.value; draw(); });
+  $('#styl').addEventListener('mock:choice', e => { sel.styl = e.detail.value; draw(); });
+  // an hour clicked on the results page (?t=14:30&d=19): select it, or explain and jump to the nearest free one
+  const qt = qp.get('t');
+  if (qt && !przeloz) {
+    const d0 = DN[+qp.get('d')] ? +qp.get('d') : 19, t0 = qt.replace(/^0/, '');
+    sel.day = d0;
+    if (valid(d0).includes(t0)) sel.slot = t0;
+    else {
+      const wanted = d0 * 1440 + toMin(t0);
+      let best = null;
+      for (const d of Object.keys(SLOTS).map(Number)) for (const t of valid(d)) { const m = d * 1440 + toMin(t); if (m >= wanted && (!best || m < best.m)) best = { d, t, m }; }
+      if (!best) for (const d of Object.keys(SLOTS).map(Number)) for (const t of valid(d)) { const m = d * 1440 + toMin(t); if (!best || m > best.m) best = { d, t, m }; }
+      const powod = SLOTS[d0].includes(t0) ? 'nie zmieści się z całą wizytą' : 'jest już zajęta';
+      sel.slot = null;
+      if (best) { sel.day = best.d; sel.slot = best.t; }
+      $('#t-info').hidden = false;
+      $('#t-info').textContent = best ? `Godzina ${t0} ${powod}. Zaznaczyliśmy najbliższy wolny termin: ${DN[best.d][0]} ${best.d}.10, ${best.t}.` : `Godzina ${t0} ${powod}. Wybierz inny dzień.`;
+    }
+  }
+  ['imie', 'tel', 'innaimie', 'd-adres'].forEach(id => $('#' + id).addEventListener('input', () => { $('#' + id + '-err').hidden = true; $('#' + id).setAttribute('aria-invalid', 'false'); }));
+  $('#krok-zmien').addEventListener('click', () => { step = 1; sel.slot = null; test = null; draw(); });
+  draw();
+
+  $('#rez').addEventListener('submit', e => {
+    e.preventDefault();
+    if (sent) return;
+    if (blokada && !przeloz) return Mock.toast('Ten zabieg nie jest dostępny do rezerwacji online');
+    // errors sit under the fields (aria-describedby + aria-invalid), the first invalid field gets focus
+    const inna0 = !przeloz && sel.dla === 'inna';
+    const pola = [
+      ['d-adres', !przeloz && sel.dojazd, () => ($('#d-adres').value.trim() ? '' : 'Wpisz adres, pod który mamy dojechać.')],
+      ['slot', true, () => (sel.slot ? '' : 'Wybierz godzinę wizyty.')],
+      ['imie', true, () => ($('#imie').value.trim() ? '' : 'Wpisz imię.')],
+      ['tel', true, () => { const n = $('#tel').value.replace(/[^0-9]/g, '').length; return n >= 9 && n <= 12 ? '' : 'Wpisz numer telefonu, np. 600 100 200.'; }],
+      ['innaimie', inna0, () => ($('#innaimie').value.trim() ? '' : 'Wpisz imię osoby, która przyjdzie.')]
+    ];
+    let pierwszy = null;
+    pola.forEach(([id, aktywne, test]) => {
+      const msg = aktywne ? test() : '', err = $('#' + id + '-err'), el = id === 'slot' ? null : $('#' + id);
+      err.textContent = msg; err.hidden = !msg;
+      if (el) el.setAttribute('aria-invalid', String(!!msg));
+      if (msg && !pierwszy) pierwszy = id === 'slot' ? err : el;
+    });
+    if (pierwszy) return pierwszy.focus();
+    if (test48 && !przeloz && step === 1) {
+      test = { day: sel.day, slot: sel.slot }; step = 2; sel.slot = null;
+      Mock.toast('Test zaplanowany. Wybierz termin zabiegu, najwcześniej 48 h po teście.');
+      draw(); scrollTo(0, 0); return;
+    }
+    const inna = inna0, imie = $('#imie').value.trim(), adres = $('#d-adres').value.trim();
+    sent = true; // one click = one visit
+    $('#rez-btn').disabled = true; $('#rez-btn').setAttribute('aria-busy', 'true'); $('#btn-txt').textContent = przeloz ? 'Przekładam…' : 'Rezerwuję…';
+    const dzien = `${DN[sel.day][0]} ${sel.day}.10`, godzina = sel.slot, koniec = toStr(toMin(godzina) + dur());
+    const klientka = inna ? $('#innaimie').value.trim() : (przeloz && B.klientka) || imie;
+    const dlaKogo = przeloz ? B.dlaKogo || null : inna ? { imie: klientka, tel: $('#innatel').value.trim() } : null;
+    const dojazd = przeloz ? B.dojazd || null : sel.dojazd ? { adres, oplata: STREFY[sel.strefa].oplata, strefa: STREFY[sel.strefa].strefa } : null;
+    const osoby = przeloz ? B.osoby || 1 : sel.osoby;
+    if (inna && $('#zapisz-b').checked && !$('#zapisz-bliska').hidden) Mock.set('bliscy', [...bliscy, { imie: klientka, tel: dlaKogo.tel }]);
+    const visits = Mock.get('visits', []);
+    const kontakt = { imie, tel: $('#tel').value.trim() }; // who booked (not necessarily who comes): used to create an account from the confirmation
+    const base = { kategoria: b.kategoria, studio: b.studio, stylistka: sel.styl, klientka, kontakt, dlaKogo, osoby, dojazd, status: 'nadchodząca' };
+    const pr = pricing();
+    const promo = pr.p ? { id: pr.p.id, nazwa: pr.p.nazwa, rabat: pr.p.rabat, kwota: pr.rMax - (pr.max - pr.D), cenaMinPrzed: pr.rMin, cenaMaxPrzed: pr.rMax } : null;
+    const price = { cena: pr.max, cenaMin: pr.min, cenaMax: pr.max, ...(przeloz ? {} : { promo, bazaCena: { min: cenaMin, max: cenaMax } }) }; // prices already after the discount
+    const extra = { uslugi: B.uslugi || null, bazaCena: { min: cenaMin, max: cenaMax }, cenaMin: pr.min, cenaMax: pr.max, promo, powodPrzedzialu: B.powodPrzedzialu || '', pozycje: B.pozycje || [], uwagi: B.uwagi || [], seria: B.seria || null, sciezka };
+    let main, bk = { ...b, stylistka: sel.styl, dzien, godzina, koniec, klientka, kontakt, dlaKogo, osoby, dojazd };
+    if (konsult && !przeloz) {
+      main = { ...base, usluga: 'Konsultacja', opis: 'Konsultacja przed zabiegiem · ' + b.opis, cena: 0, czasTekst: czasTekst, czas: b.czas, typ: 'konsultacja', dzien, godzina, koniec };
+      bk = { ...bk, opis: main.opis, cena: 0, cenaMin: 0, cenaMax: 0, powodPrzedzialu: '', pozycje: [{ nazwa: 'Konsultacja', cena: 0, min: b.czas }], czasTekst, seria: null };
+    } else {
+      main = { ...base, ...extra, usluga: b.usluga, opis: b.opis, cena: pr.max, czasTekst: b.czasTekst, czas: b.czas, dzien, godzina, koniec };
+      bk = { ...bk, ...price };
+    }
+    // update in place when this booking already has a visit (reschedule or coming back to this page)
+    const idx = visits.findIndex(v => v.id === B.visitId);
+    const t0 = Date.now();
+    if (idx >= 0) {
+      Object.assign(visits[idx], { dzien, godzina, koniec, stylistka: sel.styl, status: 'nadchodząca' }, przeloz || konsult ? {} : { cena: pr.max, cenaMin: pr.min, cenaMax: pr.max, promo, osoby, dlaKogo, dojazd, klientka });
+      main.id = visits[idx].id;
+    } else {
+      main.id = t0 + 1; visits.unshift(main);
+    }
+    if (test48 && !przeloz && test) {
+      const tv = { ...base, usluga: 'Test uczuleniowy', opis: 'Test uczuleniowy przed: ' + b.opis, cena: 0, czasTekst: fmtMin(testMin), czas: testMin, typ: 'test', dzien: `${DN[test.day][0]} ${test.day}.10`, godzina: test.slot, koniec: toStr(toMin(test.slot) + testMin), zabiegId: main.id };
+      const ti = visits.findIndex(v => v.id === B.testVisitId);
+      if (ti >= 0) { Object.assign(visits[ti], tv); tv.id = visits[ti].id; } else { tv.id = t0; visits.unshift(tv); }
+      bk = { ...bk, testDzien: tv.dzien, testGodzina: tv.godzina, testKoniec: tv.koniec, testVisitId: tv.id };
+      const mi = visits.findIndex(v => v.id === main.id); if (mi >= 0) visits[mi].testId = tv.id;
+    }
+    Mock.set('visits', visits);
+    Mock.set('booking', { ...bk, visitId: main.id });
+    if (uslugi && !przeloz) Mock.set('koszyk', { studio: b.studio, uslugi: [] }); // the cart is spent
+    const needZad = !przeloz && !konsult && pr.max > 0 && $('#zad').checked && !B.zadatek;
+    Mock.toast(przeloz ? 'Wizyta przełożona' : konsult ? 'Konsultacja zarezerwowana' : 'Termin zarezerwowany');
+    setTimeout(() => (location.href = needZad ? 'zadatek.html' : 'potwierdzenie.html'), 600);
+  });
+});
+for (const a of document.querySelectorAll('a[href="paznokcie.html"]')) a.href = "paznokcie.html" + location.hash;
+</script>
+</body>
+</html>

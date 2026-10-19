@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kreator brwi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="d-page" style="min-height: 100vh; background: #FFFFFF; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 15px; display: flex; flex-direction: column">
+  <header style="padding: 16px 20px 12px; display: flex; align-items: center; gap: 12px">
+    <a href="start.html" data-back aria-label="Wróć" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4D9DE; display: flex; align-items: center; justify-content: center; color: #1E1A1D; flex: none">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column; flex: 1">
+      <span style="color: #625860; font-size: 12px">Brwi · [Nazwa studia]</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Kreator brwi</h1>
+    </div>
+    <button type="button" id="odNowa" style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #625860; font: inherit; font-size: 13px; cursor: pointer">Od nowa</button>
+  </header>
+  <nav id="kroki" aria-label="Kroki" style="padding: 0 20px 12px; display: grid; gap: 4px; border-bottom: 1px solid #F0E8EC"></nav>
+  <div class="d-cols" style="flex: 1">
+    <div class="d-main" style="padding: 0 20px; display: flex; flex-direction: column">
+      <div id="przymierz" style="display: contents"></div><!-- outside #kreator: Kreator.ui replaces its content on every click -->
+      <div id="kreator" style="display: flex; flex-direction: column"></div>
+    </div>
+    <div id="kreator-bar" class="d-aside"></div>
+  </div>
+</div>
+<script src="kreator.js"></script>
+<script>
+// Brow shape illustrations: one arch per style, drawn in the chosen tone. Shape and tone never change the price.
+const ARCH = { naturalny_prosty: 'M10 40 Q60 31 136 34', lagodny_luk: 'M10 42 Q72 18 136 34', wyrazny_luk: 'M10 44 Q86 4 136 36', laminowane_fluffy: 'M10 42 Q72 18 136 34' };
+function browSvg(style, colour, w = 146) {
+  const fluffy = style === 'laminowane_fluffy'
+    ? [24, 40, 56, 72, 88, 104, 120].map((x, i) => `<line x1="${x}" y1="${38 - Math.sin((i + 1) / 8 * Math.PI) * 12}" x2="${x + 2}" y2="${26 - Math.sin((i + 1) / 8 * Math.PI) * 12}" stroke="${colour}" stroke-width="2" stroke-linecap="round"></line>`).join('') : '';
+  return `<svg aria-hidden="true" width="${w}" height="${w * 52 / 146}" viewBox="0 0 146 52"><path d="${ARCH[style]}" fill="none" stroke="${colour}" stroke-width="${style === 'laminowane_fluffy' ? 9 : 7}" stroke-linecap="round"></path>${fluffy}</svg>`;
+}
+const plural = n => `${n} ${n === 1 ? 'pytanie' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'pytania' : 'pytań'}`;
+const by = (list, id) => list.find(x => x.id === id);
+
+Kreator.ui({
+  kat: 'brwi', nazwa: 'Brwi',
+  preview: (w, c) => `${browSvg(w.styl, by(c.preferencje.ton, w.ton).kolor, 280)}<div style="margin-top: 8px; color: #625860; font-size: 13px">${Kreator.esc(by(c.preferencje.styl, w.styl).nazwa)} · ${Kreator.esc(by(c.preferencje.ton, w.ton).nazwa)}</div>`,
+  defaults: () => ({ styl: 'laminowane_fluffy', ton: 'cieply_braz', zabieg: 'laminacja', dodatki: ['lifting_rzes'] }),
+  dalej: (r, c) => `Dalej: ${plural(Kreator.pytania(c, r.zakres).length)} przed zabiegiem`,
+  steps: c => [
+    { key: 'styl', title: 'Jaki efekt?', nav: 'Efekt', aside: 'w cenie', layout: 'cards',
+      options: (c2, w) => c.preferencje.styl.map(s => ({ id: s.id, label: s.nazwa, meta: null, svg: () => browSvg(s.id, by(c.preferencje.ton, w.ton).kolor) })) },
+    { key: 'ton', sub: true, title: 'Odcień (dobierze stylistka)', layout: 'chips',
+      options: () => c.preferencje.ton.map(t => ({ id: t.id, label: t.nazwa, meta: null })),
+      html: w => `<div aria-hidden="true" style="display: flex; gap: 8px">${c.preferencje.ton.map(t => `<span style="width: 28px; height: 28px; border-radius: 50%; background: ${t.kolor}; box-shadow: 0 0 0 ${t.id === w.ton ? 3 : 1}px ${t.id === w.ton ? '#9E1F50' : '#E4D9DE'}"></span>`).join('')}</div>`,
+      note: 'Styl i odcień nie zmieniają ceny. Kształt wyznacza się nicią przy fotelu.' },
+    { key: 'zabieg', title: 'Zabieg', layout: 'list',
+      options: () => c.warianty.map(v => ({ id: v.id, label: v.nazwa, hint: v.zawiera.join(', '), meta: `${Kreator.zl(v.cena)} · ${Kreator.dur(v.min)}` })),
+      onChange: w => { w.dodatki = w.dodatki.filter(id => { const d = by(c.dodatki, id); return !d.dotyczy || d.dotyczy.includes(w.zabieg); }); } },
+    { key: 'dodatki', title: 'Dodatki', layout: 'list', multi: true,
+      options: (c2, w) => c.dodatki.filter(d => !d.dotyczy || d.dotyczy.includes(w.zabieg)).map(d => ({ id: d.id, label: d.nazwa })),
+      note: (w, c2, r) => (r.zakres.includes('koloryzacja') ? 'Jeśli to Twoja pierwsza koloryzacja u nas, w wywiadzie zaproponujemy test uczuleniowy 48 h wcześniej.' : '') },
+  ],
+});
+</script>
+<script type="module">
+// Brow try-on: the client's own hairs keep their place (we never erase them). We recolour them to the chosen tone when the
+// treatment colours, add a light henna/tint shadow on the skin, and draw new hairs that fill the chosen shape along the
+// brow's growth direction. Without a selfie it runs on a stock brow (zdjecia/brwi-1.jpg), which also feeds the style thumbnails.
+import { przymierzalnia, naZmiane } from './twarz.js';
+const ARCH_K = { naturalny_prosty: 0.3, lagodny_luk: 1, wyrazny_luk: 1.7, laminowane_fluffy: 1 }; // scales the detected arch height
+const HAIRS = 320; // candidate hairs per brow (a real brow has roughly 250-300)
+const SS = 2; // hairs are drawn at 2x and scaled down: anti-aliased instead of jagged
+// Stock brow: the person's right brow, head on the right. Top and bottom edge traced by hand, head first, in pixels of the 1600 x 968 file.
+const DEMO = { src: 'zdjecia/brwi-1.jpg', crop: { x: 60, y: 0, w: 1500, h: 640 }, thumb: { x: 140, y: 30, w: 1400, h: 420 },
+  top: [[1420, 185], [1150, 108], [880, 98], [560, 160], [230, 262]], bottom: [[1420, 335], [1150, 292], [880, 292], [560, 315], [230, 350]] };
+const choice = () => window.Mock?.get('kreator_brwi', null) || {};
+const rnd = (...k) => { const x = Math.sin(k.reduce((s, v, i) => s + (v + 1) * [12.9898, 78.233, 37.719, 4.581][i], 0)) * 43758.5453; return x - Math.floor(x); }; // fixed per hair: no flicker
+const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+let c, stock = null;
+try { c = await (await fetch('cenniki/brwi.json')).json(); } catch { /* Kreator.ui already shows the price-list error */ }
+
+// Catmull-Rom through the five landmarks, clamped at the ends
+function spline(pts, t) {
+  const z = t * (pts.length - 1), i = Math.min(pts.length - 2, Math.floor(z)), f = z - i, P = k => pts[Math.max(0, Math.min(pts.length - 1, k))];
+  const [a, b, d, e] = [P(i - 1), P(i), P(i + 1), P(i + 2)];
+  return [0, 1].map(x => 0.5 * (2 * b[x] + (d[x] - a[x]) * f + (2 * a[x] - 5 * b[x] + 4 * d[x] - e[x]) * f * f + (3 * b[x] - a[x] - 3 * d[x] + e[x]) * f * f * f));
+}
+console.assert(spline([[0, 0], [10, 0], [20, 0]], 0.5)[0] === 10, 'brwi.html spline');
+// Samples a brow along t in [0, 1] (head to tail): centre p, unit "up" normal nn, unit tangent towards the tail tt, half thickness.
+function frame(centre, half, n, S = 40) {
+  return Array.from({ length: S + 1 }, (_, i) => {
+    const t = i / S, p = spline(centre, t), q = spline(centre, Math.min(1, t + 0.01)), r = spline(centre, Math.max(0, t - 0.01));
+    const tl = Math.hypot(q[0] - r[0], q[1] - r[1]) || 1, tt = [(q[0] - r[0]) / tl, (q[1] - r[1]) / tl];
+    const nn = tt[1] * n[0] - tt[0] * n[1] > 0 ? [tt[1], -tt[0]] : [-tt[1], tt[0]]; // the side of the tangent that points up
+    return { t, p, nn, tt, half: half(t) };
+  });
+}
+const edge = (F, side) => F.map(f => [f.p[0] + f.nn[0] * f.half * side, f.p[1] + f.nn[1] * f.half * side]);
+const outline = F => [...edge(F, 1), ...edge(F, -1).reverse()];
+function fillPath(g, pts) { g.beginPath(); pts.forEach((p, i) => g[i ? 'lineTo' : 'moveTo'](...p)); g.fill(); }
+
+// Original brow from the landmarks and the target shape for the chosen style.
+function shapes(b, styl) {
+  const mid = b.top.map((p, i) => [(p[0] + b.bottom[i][0]) / 2, (p[1] + b.bottom[i][1]) / 2]);
+  const thick = b.top.map((p, i) => Math.hypot(p[0] - b.bottom[i][0], p[1] - b.bottom[i][1]) / 2), mean = thick.reduce((a, v) => a + v) / 5;
+  const head = mid[0], tail = mid[4], len = Math.hypot(tail[0] - head[0], tail[1] - head[1]), u = [(tail[0] - head[0]) / len, (tail[1] - head[1]) / len];
+  const s = (b.top[2][0] - b.bottom[2][0]) * u[1] - (b.top[2][1] - b.bottom[2][1]) * u[0] > 0 ? 1 : -1, n = [u[1] * s, -u[0] * s]; // n points up, out of the brow
+  // scale the arch around its mean height, so the new shape still overlaps the real brow instead of floating above it
+  const hs = mid.map(p => (p[0] - head[0]) * n[0] + (p[1] - head[1]) * n[1]), hm = hs.reduce((a, v) => a + v) / 5;
+  const shaped = mid.map((p, i) => { const k = (ARCH_K[styl] - 1) * (hs[i] - hm); return [p[0] + n[0] * k, p[1] + n[1] * k]; });
+  const own = t => { const z = t * 4, i = Math.min(3, Math.floor(z)); return thick[i] + (thick[i + 1] - thick[i]) * (z - i); };
+  const profile = t => (t < 0.2 ? 0.85 + 0.75 * t : 1 - 0.65 * ((t - 0.2) / 0.8) ** 1.5); // full head, tapered tail
+  return { n, mean, orig: frame(mid, own, n), target: frame(shaped, t => (own(t) * 0.4 + mean * profile(t) * 0.6) * (styl === 'laminowane_fluffy' ? 1.15 : 1), n) };
+}
+
+// The real brow's colour, averaged over its darkest 8% of pixels (a thin brow's box is mostly skin) (used for new hairs when the treatment does not colour).
+function natural(data, b) {
+  if (data.natural?.[data.brows.indexOf(b)]) return data.natural[data.brows.indexOf(b)];
+  const pts = [...b.top, ...b.bottom], x0 = Math.min(...pts.map(p => p[0])), y0 = Math.min(...pts.map(p => p[1]));
+  const w = Math.max(...pts.map(p => p[0])) - x0 | 0, h = Math.max(...pts.map(p => p[1])) - y0 | 0;
+  const cv = Object.assign(document.createElement('canvas'), { width: Math.max(1, w), height: Math.max(1, h) }), g = cv.getContext('2d', { willReadFrequently: true });
+  g.drawImage(data.photo, x0, y0, w, h, 0, 0, cv.width, cv.height);
+  const d = g.getImageData(0, 0, cv.width, cv.height).data, px = [];
+  for (let i = 0; i < d.length; i += 16) px.push([d[i], d[i + 1], d[i + 2]]);
+  px.sort((a, q) => lum(...a) - lum(...q));
+  const dark = px.slice(0, Math.max(1, px.length * 0.08 | 0)), avg = [0, 1, 2].map(k => dark.reduce((s, p) => s + p[k], 0) / dark.length);
+  (data.natural ??= [])[data.brows.indexOf(b)] = avg;
+  return avg;
+}
+
+// Pulls the real hairs (pixels darker than the skin around them) towards the tone, keeping each pixel's light and shade.
+const patches = new Map(); // recoloured patch per view and choice, so dragging before/after does not redo the pixels
+function recolour(ctx, photo, F, rgb, strength) {
+  const T = ctx.getTransform(), key = [T.a, T.b, T.e, T.f, ctx.canvas.width, rgb, strength, F[0].p, F.at(-1).p].join();
+  const hit = patches.get(key);
+  if (hit) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(hit.cv, hit.x0, hit.y0); ctx.restore(); return; }
+  const dev = outline(F).map(([x, y]) => [T.a * x + T.c * y + T.e, T.b * x + T.d * y + T.f]);
+  const pad = 12, x0 = Math.max(0, Math.floor(Math.min(...dev.map(p => p[0]))) - pad), y0 = Math.max(0, Math.floor(Math.min(...dev.map(p => p[1]))) - pad);
+  const w = Math.min(ctx.canvas.width, Math.ceil(Math.max(...dev.map(p => p[0]))) + pad) - x0, h = Math.min(ctx.canvas.height, Math.ceil(Math.max(...dev.map(p => p[1]))) + pad) - y0;
+  if (w < 2 || h < 2) return;
+  const mask = Object.assign(document.createElement('canvas'), { width: w, height: h }), mg = mask.getContext('2d', { willReadFrequently: true });
+  mg.filter = `blur(${Math.max(1, h * 0.04)}px)`; mg.fillStyle = '#fff'; fillPath(mg, dev.map(([x, y]) => [x - x0, y - y0]));
+  // read the photo from our own copy, not from the preview canvas (repeated readbacks there are slow)
+  const src = Object.assign(document.createElement('canvas'), { width: w, height: h }), sg = src.getContext('2d', { willReadFrequently: true });
+  sg.setTransform(T.a, T.b, T.c, T.d, T.e - x0, T.f - y0); sg.drawImage(photo, 0, 0);
+  const m = mg.getImageData(0, 0, w, h).data, img = sg.getImageData(0, 0, w, h), d = img.data;
+  const ls = []; for (let i = 0; i < d.length; i += 4) ls.push(lum(d[i], d[i + 1], d[i + 2]));
+  const skin = [...ls].sort((a, b) => a - b)[ls.length * 0.8 | 0];
+  for (let i = 0, k = 0; i < d.length; i += 4, k++) {
+    const hair = Math.min(1, Math.max(0, (skin - ls[k]) / (skin * 0.4))), a = hair * m[i + 3] / 255 * strength;
+    if (a < 0.01) continue;
+    const shade = Math.min(1.7, Math.max(0.35, ls[k] / (skin * 0.55))) * 0.8; // darker pixels stay darker
+    const tc = rgb.map(q => Math.min(255, q * shade)), cap = Math.min(1, ls[k] / (lum(...tc) || 1)); // tint never lightens a hair, it only shifts the hue
+    for (let q = 0; q < 3; q++) d[i + q] += (tc[q] * cap - d[i + q]) * a;
+  }
+  sg.putImageData(img, 0, 0);
+  if (patches.size > 12) patches.clear();
+  patches.set(key, { cv: src, x0, y0 });
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(src, x0, y0); ctx.restore(); // drawImage keeps the before/after clip
+}
+
+// One tapered, slightly curved hair from root along angle a (from "up" towards the tail).
+function hair(o, f, root, a, bend, L, w0, colour) {
+  const dir = x => [f.nn[0] * Math.cos(x) + f.tt[0] * Math.sin(x), f.nn[1] * Math.cos(x) + f.tt[1] * Math.sin(x)];
+  const k = dir(a), e = dir(a + bend), c1 = [root[0] + k[0] * L * 0.5, root[1] + k[1] * L * 0.5], tip = [root[0] + e[0] * L, root[1] + e[1] * L];
+  const left = [], right = [];
+  for (let m = 0; m <= 6; m++) {
+    const s = m / 6, x = (1 - s) ** 2 * root[0] + 2 * (1 - s) * s * c1[0] + s * s * tip[0], y = (1 - s) ** 2 * root[1] + 2 * (1 - s) * s * c1[1] + s * s * tip[1];
+    const dx = 2 * (1 - s) * (c1[0] - root[0]) + 2 * s * (tip[0] - c1[0]), dy = 2 * (1 - s) * (c1[1] - root[1]) + 2 * s * (tip[1] - c1[1]), dl = Math.hypot(dx, dy) || 1;
+    const hw = w0 / 2 * (1 - 0.85 * s ** 1.2);
+    left.push([x - dy / dl * hw, y + dx / dl * hw]); right.unshift([x + dy / dl * hw, y - dx / dl * hw]);
+  }
+  o.fillStyle = colour; fillPath(o, [...left, ...right]);
+}
+
+const buffers = new Map();
+function buffer(w, h) {
+  let b = buffers.get(w + 'x' + h);
+  if (!b) buffers.set(w + 'x' + h, b = Object.assign(document.createElement('canvas'), { width: w, height: h }));
+  return b;
+}
+// Paints choice `w` on every brow of `data` into ctx (photo-pixel transform already set by the caller).
+// quick: thumbnails skip the pixel recolouring (they show the shape; 4 recolours per click cost ~100 ms).
+function drawBrows(ctx, data, w, quick = false) {
+  const styl = w.styl in ARCH_K ? w.styl : 'lagodny_luk', fluffy = styl === 'laminowane_fluffy';
+  const zabieg = c.warianty.find(v => v.id === w.zabieg), colours = !!zabieg?.koloryzacja, tone = hexRgb(by(c.preferencje.ton, w.ton)?.kolor ?? '#7A5032');
+  const T = ctx.getTransform(), scale = Math.hypot(T.a, T.b), W = ctx.canvas.width, H = ctx.canvas.height;
+  const buf = buffer(W * SS, H * SS), o = buf.getContext('2d');
+  o.setTransform(1, 0, 0, 1, 0, 0); o.clearRect(0, 0, buf.width, buf.height);
+  o.setTransform(T.a * SS, T.b * SS, T.c * SS, T.d * SS, T.e * SS, T.f * SS);
+  data.brows.forEach((b, e) => {
+    const { orig, target, mean } = shapes(b, styl);
+    // tint and henna darken far better than they lighten: with a tone lighter than the brow, the new hairs keep the
+    // brow's own darkness and only take the tone's hue
+    const own = natural(data, b), lighter = lum(...tone) > lum(...own) + 15;
+    const base = !colours ? own : lighter ? tone.map(q => q * lum(...own) / lum(...tone)) : tone;
+    if (colours) {
+      if (!quick) recolour(ctx, data.photo, orig, tone, 0.6);
+      // henna stains the skin, tint only a little: a soft shadow of colour between the hairs, never a flat patch
+      ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = (w.zabieg === 'henna' ? 0.22 : 0.1) * (lighter ? 0.4 : 1);
+      ctx.filter = `blur(${Math.max(1, mean * 0.5 * scale)}px)`; ctx.fillStyle = `rgb(${tone})`; fillPath(ctx, outline(target)); ctx.restore();
+    }
+    // new hairs: fill the target shape where the brow is missing, and only a few over the real hairs (darkens slightly)
+    const wTrue = mean * 2 * 0.035, w0 = Math.max(1.1 / scale, wTrue), ink = Math.min(1, Math.max(0.45, wTrue * scale / 1.1));
+    for (let i = 0; i < HAIRS; i++) {
+      const t = Math.min(1, (i + rnd(e, i, 1)) / HAIRS), f = target[Math.round(t * (target.length - 1))], g = orig[Math.round(t * (orig.length - 1))];
+      const v = rnd(e, i, 2) * 2 - 1, root = [f.p[0] + f.nn[0] * f.half * v * 0.92, f.p[1] + f.nn[1] * f.half * v * 0.92];
+      const off = (root[0] - g.p[0]) * g.nn[0] + (root[1] - g.p[1]) * g.nn[1], inside = Math.abs(off) < g.half * 0.85;
+      if (rnd(e, i, 3) > (inside ? (fluffy ? 0.7 : 0.3) : 1)) continue;
+      // flow field: upright at the head, sloping along the arch, upper and lower hairs converging towards the tail;
+      // lamination brushes everything up and spreads it
+      const flow = t < 0.15 ? 0.15 + t * 2 : Math.min(1.45, 0.45 + (t - 0.15) * 2.2);
+      const a = fluffy ? 0.45 + 0.45 * t + (rnd(e, i, 4) - 0.5) * 0.25 : flow + v * 0.35 * Math.min(1, t * 3) + (rnd(e, i, 4) - 0.5) * 0.25;
+      const L = f.half * 2 * (fluffy ? 0.6 : t < 0.15 ? 0.45 : 0.7) * (0.7 + 0.6 * rnd(e, i, 5));
+      const sh = 0.72 + 0.35 * rnd(e, i, 6), soft = 0.5 + 0.5 * Math.min(1, t / 0.25); // per-hair shade; the head stays softer, like real brows
+      hair(o, f, root, a, fluffy ? 0.1 : 0.2, L, w0, `rgba(${base.map(q => Math.min(255, q * sh * 0.85) | 0)}, ${0.75 * ink * soft})`);
+    }
+  });
+  // a touch of blur: brows in photos are rarely razor sharp, and crisp drawn hairs look stuck on
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingQuality = 'high'; ctx.filter = 'blur(0.5px)'; ctx.drawImage(buf, 0, 0, W, H); ctx.restore();
+}
+
+async function demo() {
+  const photo = new Image();
+  await new Promise((ok, bad) => { photo.onload = ok; photo.onerror = bad; photo.src = DEMO.src; }); // not decode(): it can stall in a background tab
+  return { photo, crop: { ...DEMO.crop }, brows: [{ top: DEMO.top, bottom: DEMO.bottom }] };
+}
+// Small realistic thumbnail of every shape on the stock brow, above the drawing in the style cards (re-added after each render)
+function thumbs() {
+  const w = choice(), T = DEMO.thumb;
+  if (!stock || !w.styl) return;
+  for (const b of document.querySelectorAll('#kreator button[data-k="styl"]')) {
+    const cv = Object.assign(document.createElement('canvas'), { width: 280, height: Math.round(280 * T.h / T.w) }), g = cv.getContext('2d'), k = cv.width / T.w;
+    cv.setAttribute('aria-hidden', 'true'); cv.style.cssText = 'display: block; width: 100%; height: auto; border-radius: 8px';
+    g.drawImage(stock.photo, T.x, T.y, T.w, T.h, 0, 0, cv.width, cv.height);
+    g.setTransform(k, 0, 0, k, -T.x * k, -T.y * k); drawBrows(g, stock, { ...w, styl: b.dataset.v }, true);
+    b.querySelector('svg')?.remove(); // the realistic thumbnail replaces the drawn line (kept only if the photo fails)
+    b.prepend(cv);
+  }
+}
+if (c) {
+  const stockReady = demo().then(d => { stock = d; thumbs(); return d; });
+  const { redraw } = przymierzalnia(document.getElementById('przymierz'), {
+    co: 'brwi', draw: (ctx, data) => drawBrows(ctx, data, choice()), demo: () => stockReady,
+    demoTekst: 'Przykładowa brew ze zdjęcia stockowego. Podgląd orientacyjny, nie zmienia ceny. Zrób selfie, żeby zobaczyć efekt na sobie.',
+    extra: '<span style="font-size: 12px; line-height: 1.45">Podgląd dorysowuje włoski do nowego kształtu i nie usuwa Twoich. Nadmiar wyreguluje stylistka przy fotelu.</span>',
+    label: () => { const w = choice(); return `${by(c.preferencje.styl, w.styl)?.nazwa ?? ''}, odcień ${by(c.preferencje.ton, w.ton)?.nazwa ?? ''}`; },
+  });
+  naZmiane(() => { redraw(); thumbs(); });
+}
+</script>
+</body>
+</html>

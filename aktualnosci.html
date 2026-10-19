@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aktualności beauty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif;margin:0}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:none;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.tr-lista{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px}
+.tr{flex:0 0 220px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D;scroll-snap-align:start;border:1px solid #E4D9DE;border-radius:16px;padding:10px}
+.tr img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:10px}
+.tr small{color:#625860;font-size:13px;line-height:1.4}
+.tr:hover b{color:#9E1F50}
+.lista{display:flex;flex-direction:column;gap:10px}
+.nw{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid #E4D9DE;border-radius:16px;text-decoration:none;color:#1E1A1D}
+.nw:hover{background:#FAF6F8;color:#1E1A1D}
+.nw-m{color:#625860;font-size:13px}
+.nw-t{font-size:16px;line-height:1.35}
+.nw-l{color:#625860;font-size:14px;line-height:1.45}
+.nw-go{color:#9E1F50;font-size:14px;font-weight:700}
+.sk{height:118px;border-radius:16px;background:linear-gradient(90deg,#F6EDF1,#FAF6F8,#F6EDF1);background-size:200% 100%;animation:sk 1.2s linear infinite}
+@keyframes sk{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}}
+.info{padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.45}
+.btn{min-height:44px;padding:0 16px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.nav a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#625860;font-size:12px}
+@media (min-width:1024px){
+  .tr-lista{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible}
+  .lista{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:18px 20px 4px;display:flex;flex-direction:column;gap:6px">
+    <h1 style="font-size:26px">Aktualności beauty</h1>
+    <span style="color:#625860;font-size:14px;line-height:1.45">Trendy z naszych kreatorów i nagłówki z portali o urodzie. Odświeżamy co 4 godziny.</span>
+  </header>
+
+  <section aria-labelledby="tr-h" style="padding:16px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <h2 id="tr-h" style="font-size:20px">Trendy z kreatorów</h2>
+    <span style="color:#625860;font-size:13px">Najczęściej układane w tym tygodniu. Dane przykładowe.</span>
+    <div class="tr-lista">
+      <a class="tr" href="paznokcie.html"><img src="zdjecia/k-paznokcie.jpg" alt="" width="480" height="360" loading="lazy"><b>Mleczny róż, krótki migdał</b><small>Paznokcie · [x]% stylizacji</small></a>
+      <a class="tr" href="rzesy.html"><img src="zdjecia/k-rzesy.jpg" alt="" width="480" height="360" loading="lazy"><b>Kocie oko 3D</b><small>Rzęsy · [x]% stylizacji</small></a>
+      <a class="tr" href="brwi.html"><img src="zdjecia/k-brwi.jpg" alt="" width="480" height="360" loading="lazy"><b>Laminacja „fluffy”</b><small>Brwi · [x]% stylizacji</small></a>
+      <a class="tr" href="fryzjer.html"><img src="zdjecia/k-fryzjer.jpg" alt="" width="480" height="360" loading="lazy"><b>Karmelowy balejaż</b><small>Włosy · [x]% stylizacji</small></a>
+    </div>
+  </section>
+
+  <section aria-labelledby="nw-h" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:12px">
+    <h2 id="nw-h" style="font-size:20px">Z portali o urodzie</h2>
+    <div class="chips" role="group" aria-label="Temat" id="chips"></div>
+    <p id="przyklad" class="info" hidden style="margin:0;background:#FFF1E0;color:#8A3B12">Tu lokalnie automat nie działa, więc widzisz przykładowe wpisy. Na stronie publicznej są prawdziwe nagłówki.</p>
+    <div id="stan" role="status" aria-live="polite" class="lista"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+    <div id="lista" class="lista"></div>
+    <p id="pusto" class="info" hidden style="margin:0;background:#FAF6F8;color:#625860">W tym temacie nie ma teraz nowych nagłówków. Wybierz inny temat albo zajrzyj później.</p>
+    <div id="blad" class="info" hidden style="background:#FDECEC;color:#A3262A;display:flex;flex-direction:column;gap:8px;align-items:flex-start"><span>Nie udało się wczytać aktualności. Sprawdź połączenie.</span><button type="button" class="btn" id="ponow">Spróbuj ponownie</button></div>
+  </section>
+
+  <footer style="padding:24px 20px 24px;color:#625860;font-size:13px;line-height:1.5;display:flex;flex-direction:column;gap:6px">
+    <span>Pokazujemy tylko tytuł, krótki opis i link do artykułu u wydawcy. Treść i zdjęcia należą do wydawców.</span>
+    <span id="zrodla"></span>
+    <span>Jesteś wydawcą i chcesz zmienić sposób prezentacji albo wyłączyć swój kanał? Napisz: [adres e-mail].</span>
+  </footer>
+
+  <nav class="nav d-tabbar" aria-label="Menu główne" style="margin-top:auto">
+    <a href="start.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Start</a>
+    <a href="wyniki.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Szukaj</a>
+    <a href="wizyty.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Wizyty</a>
+    <a href="konto.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profil</a>
+  </nav>
+</div>
+<script type="module">
+import { TEMATY, wczytajNewsy, karta } from './aktualnosci.js';
+const $ = id => document.getElementById(id);
+let dane = null, temat = 'all';
+
+function pokaz() {
+  const items = dane.items.filter(i => temat === 'all' || i.topics?.includes(temat));
+  $('lista').replaceChildren(...items.map(i => karta(i)).filter(Boolean));
+  $('pusto').hidden = items.length > 0;
+}
+function chipy() {
+  const obecne = Object.keys(TEMATY).filter(t => dane.items.some(i => i.topics?.includes(t)));
+  $('chips').replaceChildren(...[['all', 'Wszystkie'], ...obecne.map(t => [t, TEMATY[t]])].map(([k, n]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = n; b.setAttribute('aria-pressed', String(k === temat));
+    b.addEventListener('click', () => { temat = k; chipy(); pokaz(); });
+    return b;
+  }));
+}
+async function start() {
+  $('blad').hidden = true; $('stan').hidden = false;
+  try { dane = await wczytajNewsy(); }
+  catch { $('stan').hidden = true; $('blad').hidden = false; return; }
+  $('stan').hidden = true;
+  $('przyklad').hidden = !dane.przyklad;
+  $('zrodla').textContent = dane.sources?.length ? 'Źródła: ' + dane.sources.map(s => s.name).join(', ') + '.' : '';
+  chipy(); pokaz();
+}
+$('ponow').addEventListener('click', start);
+start();
+</script>
+</body>
+</html>

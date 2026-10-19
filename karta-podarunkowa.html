@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Karta podarunkowa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
+.sec{padding:20px 20px 0;display:flex;flex-direction:column;gap:8px}
+.lab{margin:0;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif}
+.chip{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.seg{flex:1;min-height:44px;border:0;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.seg+.seg{border-left:1px solid #E4D9DE}
+.seg[aria-pressed=true]{background:#1E1A1D;color:#fff;font-weight:700}
+.inp{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;box-sizing:border-box;width:100%}
+.btn{min-height:52px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;padding:0 16px}
+.btn:hover{background:#7A173D;color:#fff}
+.btn-o{min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;padding:0 16px}
+.btn-o:hover{color:#1E1A1D;background:#FAF6F8}
+.pay{min-height:52px;padding:0 14px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;width:100%}
+.pay::before{content:"";width:20px;height:20px;border-radius:50%;border:2px solid #C9B6BF;box-sizing:border-box;flex:none}
+.pay[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1}
+.pay[aria-pressed=true]::before{border:6px solid #9E1F50;background:#fff}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.d-cols{flex:1}
+.d-main{display:flex;flex-direction:column;flex:1}
+@media (min-width:1024px){
+  .d-cols{flex:none;padding-bottom:32px;justify-content:center}
+  .d-main{display:block;max-width:640px}
+  .d-aside{order:1;flex-basis:380px !important;top:16px}
+  .d-aside>section{margin-left:0 !important;margin-right:0 !important}
+  #ok{max-width:640px;margin:0 auto;width:100%;box-sizing:border-box}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
+    <a href="salon.html" data-back data-studio aria-label="Wróć do studia" class="back">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <h1 style="margin:0;font-size:20px;font-weight:700">Karta podarunkowa</h1>
+  </header>
+
+  <form id="kf" style="display:flex;flex-direction:column;flex:1" novalidate>
+    <div class="d-cols">
+    <div class="d-aside">
+    <section aria-label="Podgląd karty" style="margin:16px 20px 0;padding:20px;border-radius:18px;background:#9E1F50;color:#FFFFFF;display:flex;flex-direction:column;gap:14px;min-height:150px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span id="p-studio" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:16px">[Studio 1]</span><span style="font-size:12px;opacity:.9">Karta podarunkowa</span></div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:38px;line-height:1"><span id="p-kwota">150</span> zł</div>
+      <div style="font-size:14px;line-height:1.4">Dla: <b id="p-dla">Ciebie</b><span id="p-od-w" hidden> · od: <b id="p-od"></b></span></div>
+      <div id="p-zyczenia" style="font-size:14px;line-height:1.4;font-style:italic;min-height:1.4em"></div>
+    </section>
+    </div>
+
+    <div class="d-main">
+    <section class="sec">
+      <h2 class="lab">Kwota</h2>
+      <div id="kwota" data-choice role="group" aria-label="Kwota karty" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="chip" aria-pressed="false" data-value="100">100 zł</button>
+        <button type="button" class="chip" aria-pressed="true" data-value="150">150 zł</button>
+        <button type="button" class="chip" aria-pressed="false" data-value="200">200 zł</button>
+        <button type="button" class="chip" aria-pressed="false" data-value="300">300 zł</button>
+        <button type="button" class="chip" aria-pressed="false" data-value="wlasna">Własna</button>
+      </div>
+      <div id="wlasna-box" hidden style="display:flex;flex-direction:column;gap:6px">
+        <label for="wlasna" style="font-size:13px;color:#625860">Własna kwota (20–1000 zł)</label>
+        <input id="wlasna" class="inp" type="number" inputmode="numeric" min="20" max="1000" step="10" placeholder="np. 250">
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2 class="lab">Dla kogo?</h2>
+      <div id="dla" data-choice role="group" aria-label="Dla kogo" style="display:flex;border:1px solid #E4D9DE;border-radius:12px;overflow:hidden">
+        <button type="button" class="seg" aria-pressed="false" data-value="siebie">Dla siebie</button>
+        <button type="button" class="seg" aria-pressed="true" data-value="kogos">Dla kogoś</button>
+      </div>
+      <div id="kogos-box" style="display:flex;flex-direction:column;gap:6px">
+        <label for="kto" style="font-size:13px;color:#625860">Imię obdarowanej osoby</label>
+        <input id="kto" class="inp" type="text" autocomplete="off">
+        <label for="kto-tel" style="font-size:13px;color:#625860;margin-top:6px">Jej telefon (karta przyjdzie SMS-em)</label>
+        <input id="kto-tel" class="inp" type="tel" inputmode="numeric" placeholder="600 100 200">
+        <label for="od" style="font-size:13px;color:#625860;margin-top:6px">Od kogo</label>
+        <input id="od" class="inp" type="text" autocomplete="given-name">
+      </div>
+    </section>
+
+    <section class="sec">
+      <label class="lab" for="zyczenia">Życzenia (opcjonalnie)</label>
+      <textarea id="zyczenia" rows="3" maxlength="140" placeholder="Np. Wszystkiego najlepszego!" style="padding:12px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;resize:vertical"></textarea>
+      <span style="color:#625860;font-size:12px"><span id="licz">0</span>/140 znaków</span>
+    </section>
+
+    <div style="margin-top:auto;padding:20px 20px 24px;display:flex;flex-direction:column;gap:10px">
+      <span style="color:#625860;font-size:12px;line-height:1.4">Karta jest ważna w [okres ważności] i do wykorzystania w studiu <span id="ws">[Studio 1]</span>. Płatność obsługuje [operator płatności].</span>
+      <button type="submit" class="btn">Kup kartę · <span id="k-btn" style="margin:0 4px">150</span> zł</button>
+    </div>
+    </div>
+    </div>
+  </form>
+
+  <section id="ok" hidden style="padding:32px 20px 24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start;flex:1">
+    <div aria-hidden="true" style="width:52px;height:52px;border-radius:50%;background:#E6F2EC;display:flex;align-items:center;justify-content:center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F6B47" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+    </div>
+    <h2 style="margin:0;font-size:24px">Karta kupiona</h2>
+    <p id="ok-txt" style="margin:0;line-height:1.5"></p>
+    <div style="padding:14px 16px;border-radius:14px;background:#F6EDF1;width:100%;box-sizing:border-box"><span style="color:#625860;font-size:12px">Kod karty</span><div id="ok-kod" style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:700;letter-spacing:.04em"></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:8px">
+      <a href="konto.html" class="btn">Zobacz w profilu</a>
+      <a href="salon.html" data-studio class="btn-o">Wróć do studia</a>
+    </div>
+  </section>
+</div>
+
+<dialog id="platnosc" aria-labelledby="pl-t">
+  <form id="pf" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="pl-t" style="margin:0;font-size:18px">Płatność</h2>
+    <p style="margin:0;font-size:14px">Do zapłaty: <b><span id="pl-kwota">150</span> zł</b></p>
+    <div id="metody" data-choice style="display:flex;flex-direction:column;gap:8px">
+      <button type="button" class="pay" aria-pressed="true" data-value="BLIK">BLIK</button>
+      <button type="button" class="pay" aria-pressed="false" data-value="Karta płatnicza">Karta płatnicza</button>
+      <button type="button" class="pay" aria-pressed="false" data-value="Apple Pay / Google Pay">Apple Pay / Google Pay</button>
+    </div>
+    <div id="blik-box" style="display:flex;flex-direction:column;gap:6px">
+      <label for="blik" style="font-size:13px;color:#625860">Kod BLIK z aplikacji banku (6 cyfr)</label>
+      <input id="blik" class="inp" inputmode="numeric" maxlength="7" placeholder="000 000" autocomplete="off" style="min-height:56px;font-size:22px;letter-spacing:.2em;text-align:center">
+    </div>
+    <p id="inna-met" hidden style="margin:0;padding:12px 14px;border-radius:12px;background:#FAF6F8;color:#625860;font-size:14px;line-height:1.45">W makiecie płatność zatwierdza się od razu.</p>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Zapłać</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? '');
+  const studio = new URLSearchParams(location.search).get('s') || (Mock.get('booking', {}) || {}).studio || '[Studio 1]';
+  document.querySelectorAll('[data-studio]').forEach(a => (a.href = 'salon.html?s=' + encodeURIComponent(studio)));
+  $('#p-studio').textContent = studio; $('#ws').textContent = studio;
+  const st = { kwota: 150, dla: 'kogos', metoda: 'BLIK' };
+
+  const kwota = () => (st.kwota === 'wlasna' ? Math.round(+$('#wlasna').value) || 0 : st.kwota);
+  function draw() {
+    const k = kwota();
+    $('#p-kwota').textContent = k || '–'; $('#k-btn').textContent = k || '–'; $('#pl-kwota').textContent = k;
+    const kogos = st.dla === 'kogos';
+    $('#kogos-box').hidden = !kogos;
+    $('#p-dla').textContent = kogos ? ($('#kto').value.trim() || '[imię]') : 'Ciebie';
+    $('#p-od-w').hidden = !kogos || !$('#od').value.trim(); $('#p-od').textContent = $('#od').value.trim();
+    $('#p-zyczenia').textContent = $('#zyczenia').value.trim() ? `„${$('#zyczenia').value.trim()}”` : '';
+    $('#licz').textContent = $('#zyczenia').value.length;
+  }
+  $('#kwota').addEventListener('mock:choice', e => {
+    st.kwota = e.detail.value === 'wlasna' ? 'wlasna' : +e.detail.value;
+    $('#wlasna-box').hidden = st.kwota !== 'wlasna';
+    if (st.kwota === 'wlasna') $('#wlasna').focus();
+    draw();
+  });
+  $('#dla').addEventListener('mock:choice', e => { st.dla = e.detail.value; draw(); });
+  ['#wlasna', '#kto', '#od', '#zyczenia'].forEach(s => $(s).addEventListener('input', draw));
+  draw();
+
+  $('#metody').addEventListener('mock:choice', e => {
+    st.metoda = e.detail.value;
+    $('#blik-box').hidden = st.metoda !== 'BLIK'; $('#inna-met').hidden = st.metoda === 'BLIK';
+  });
+  $('#blik').addEventListener('input', e => {
+    const d = e.target.value.replace(/\D/g, '').slice(0, 6);
+    e.target.value = d.length > 3 ? d.slice(0, 3) + ' ' + d.slice(3) : d;
+  });
+
+  $('#kf').addEventListener('submit', e => {
+    e.preventDefault();
+    const k = kwota();
+    if (!(k >= 20 && k <= 1000)) { $('#wlasna').focus(); return Mock.toast('Kwota karty: od 20 do 1000 zł'); }
+    if (st.dla === 'kogos' && !$('#kto').value.trim()) { $('#kto').focus(); return Mock.toast('Wpisz imię obdarowanej osoby'); }
+    $('#platnosc').showModal();
+  });
+  $('#pf').addEventListener('submit', e => {
+    e.preventDefault();
+    if (st.metoda === 'BLIK' && $('#blik').value.replace(/\D/g, '').length !== 6) { $('#blik').focus(); return Mock.toast('Wpisz 6-cyfrowy kod BLIK'); }
+    const k = kwota(), kod = 'KP-' + String(Date.now()).slice(-6);
+    const dla = st.dla === 'kogos' ? $('#kto').value.trim() : '';
+    const l = Mock.get('giftcards', []);
+    l.unshift({ kod, kwota: k, dla, od: $('#od').value.trim(), zyczenia: $('#zyczenia').value.trim(), studio, status: 'do zrealizowania' });
+    Mock.set('giftcards', l);
+    $('#platnosc').close();
+    $('#ok-kod').textContent = kod;
+    $('#ok-txt').textContent = dla ? `Karta na ${k} zł (dla: ${dla}) została wysłana SMS-em${$('#kto-tel').value.trim() ? ' na numer ' + $('#kto-tel').value.trim() : ''}.` : `Karta na ${k} zł jest w Twoim profilu.`;
+    $('#kf').hidden = true; $('#ok').hidden = false;
+    Mock.toast('Płatność zatwierdzona'); scrollTo(0, 0);
+  });
+});
+</script>
+</body>
+</html>

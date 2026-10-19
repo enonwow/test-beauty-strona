@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wyniki wyszukiwania</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
+.chip{min-height:44px;padding:0 12px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed=true]{border-color:#1E1A1D;background:#1E1A1D;color:#fff;font-weight:700}
+.chip[aria-pressed=true]:not(#chip-kiedy):not(#mapa-btn)::before{content:"\2713\00a0";content:"\2713\00a0" / ""}
+.card{position:relative;border:1px solid #E4D9DE;border-radius:16px;overflow:hidden}
+.card>a.main{display:flex;gap:12px;padding:14px 56px 14px 14px;text-decoration:none;color:#1E1A1D}
+.card>a.main:hover{color:#1E1A1D}
+.heart{position:absolute;top:6px;right:6px;width:44px;height:44px;border:0;background:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9E1F50}
+.heart path{fill:none;stroke:#9E1F50;stroke-width:2;stroke-linejoin:round}
+.heart[aria-pressed=true] path{fill:#9E1F50}
+.slots{padding:0 14px 14px;display:flex;gap:6px;flex-wrap:wrap}
+.slots a{min-height:44px;padding:0 14px;border-radius:10px;background:#F6EDF1;color:#1E1A1D;text-decoration:none;font-weight:700;font-size:14px;display:flex;align-items:center}
+.slots a.o{background:#fff;border:1px solid #E4D9DE;font-weight:400}
+.slots a:hover{color:#1E1A1D;background:#EBD9E1}
+.mapa-wrap{position:relative;aspect-ratio:9/10;border-radius:16px;overflow:hidden;border:1px solid #E4D9DE;background:#F1EEE6}
+.mapa-wrap>svg{width:100%;height:100%;display:block}
+#piny{position:absolute;inset:0;pointer-events:none}
+.pin{position:absolute;width:44px;height:48px;padding:0;border:0;background:none;color:#9E1F50;cursor:pointer;transform:translate(-50%,-100%);display:flex;align-items:flex-end;justify-content:center;pointer-events:auto;z-index:1}
+.pin svg{filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.pin .lab{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:-8px;white-space:nowrap;padding:3px 8px;border-radius:999px;background:#fff;color:#9E1F50;border:1px solid #9E1F50;font-size:11px;font-weight:700}
+.pin.l .lab{left:calc(50% - 16px);transform:none}
+.pin.r .lab{left:auto;right:calc(50% - 16px);transform:none}
+.pin[aria-pressed=true]{color:#1E1A1D;z-index:3}
+.pin[aria-pressed=true] .lab{background:#1E1A1D;color:#fff;border-color:#1E1A1D}
+.map-note{position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:8px;background:rgba(255,255,255,.88);color:#625860;font-size:11px}
+.zoom{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.28);background:#fff}
+.zoom button{width:44px;height:44px;border:0;background:#fff;color:#1E1A1D;font:inherit;font-size:22px;cursor:pointer}
+.zoom button+button{border-top:1px solid #E4D9DE}
+.card.sel{border-color:#9E1F50;box-shadow:0 0 0 1px #9E1F50}
+.sel{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;font:inherit;font-size:13px}
+.fl{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px}
+.fl input{width:22px;height:22px;margin:0}
+.inp{min-height:44px;padding:0 12px;border-radius:10px;border:1px solid #C9B6BF;font:inherit;width:100%;box-sizing:border-box}
+.btn{min-height:48px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0 16px}
+.btn:hover{background:#7A173D}
+.btn-o{min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer;padding:0 16px}
+.nav{margin-top:auto;border-top:1px solid #F0E8EC;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px 8px 10px}
+.nav a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#625860;font-size:12px}
+.nav a[aria-current]{color:#9E1F50;font-weight:700}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+/* phone: the column wrappers disappear and "order" keeps the original sequence */
+.d-cols>.d-main,.d-cols>.d-aside{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}
+@media (min-width:1024px){
+  .nav{margin-top:0 !important;grid-template-columns:repeat(4,auto);justify-content:start;gap:8px;border-top:0;border-bottom:1px solid #F0E8EC;padding:6px 20px}
+  .nav a{flex-direction:row;gap:8px;padding:0 16px;font-size:14px;min-height:48px}
+  .d-cols>.d-main,.d-cols>.d-aside{display:block}
+  .d-cols{padding:8px 0 32px;gap:16px}
+  .d-aside-left{flex-basis:280px !important;position:sticky;top:64px}
+  .d-aside:not(.d-aside-left){flex-basis:380px !important;top:64px}
+  .d-cols .o1,.d-cols .o2,.d-cols .o3,.d-cols .o4,.d-cols .o5,.d-cols .o6{order:0}
+  #mapa[hidden]{display:flex !important}
+  #mapa{margin:12px 0 0 !important}
+  #lista{padding-top:4px !important}
+  #filtry{flex-direction:column;align-items:flex-start}
+  #filtry .chip,#wiecej,.d-aside-left .sel{min-height:44px}
+  .d-aside-left .sel{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F0E8EC">
+    <a href="start.html" aria-label="Wróć" class="back">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <a href="start.html" aria-label="Zmień wyszukiwanie" style="flex:1;min-width:0;min-height:44px;padding:0 14px;border-radius:12px;background:#F6EDF1;color:#1E1A1D;text-decoration:none;display:flex;flex-direction:column;justify-content:center">
+      <h1 id="h1" style="margin:0;font-family:inherit;font-weight:700;font-size:14px">Paznokcie · Dziś</h1>
+      <span id="h2" style="color:#625860;font-size:12px">[miasto, dzielnica]</span>
+    </a>
+  </header>
+
+  <div class="d-cols">
+  <!-- on the phone the wrappers vanish (display:contents) and "order" restores the original sequence -->
+  <div class="d-aside d-aside-left">
+  <div id="filtry" class="o1" data-choice="multi" role="group" aria-label="Filtry" style="padding:12px 20px 0;display:flex;gap:6px;flex-wrap:wrap">
+    <button type="button" class="chip" aria-pressed="true" data-f="kiedy" id="chip-kiedy">Dziś ✕</button>
+    <button type="button" class="chip" aria-pressed="false" data-f="po16">Po 16:00</button>
+    <button type="button" class="chip" aria-pressed="false" data-f="do200">Do 200 zł</button>
+    <button type="button" class="chip" aria-pressed="false" data-f="blik">BLIK / karta</button>
+    <button type="button" class="chip" aria-pressed="false" data-f="km2">Do 2 km</button>
+    <button type="button" class="chip" aria-pressed="false" data-f="hh" id="chip-hh">Happy hours</button>
+  </div>
+  <div class="o2" style="padding:6px 20px 0"><button type="button" id="wiecej" class="chip" data-open="#dlg-filtry">Więcej filtrów</button></div>
+  <div class="o4" style="padding:8px 20px 0;display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <span id="szukano" hidden style="color:#625860;font-size:12px"></span>
+    <label for="sort" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Sortuj</label>
+    <select id="sort" class="sel" style="margin-left:auto"><option value="slot">Najbliższy termin</option><option value="km">Najbliżej</option><option value="cena">Najtaniej</option></select>
+  </div>
+  </div>
+
+  <div class="d-main">
+  <div class="o3" style="padding:12px 20px 0;display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <span id="licznik" style="font-size:14px"><b><span id="n">5</span> <span id="n-s">studiów</span></b> z wolnym terminem <span id="kiedy-t">dziś</span></span>
+    <button type="button" id="mapa-btn" class="chip m-only" style="font-size:13px;white-space:nowrap" aria-pressed="false">Pokaż mapę</button>
+  </div>
+
+  <section id="lista" class="o6" style="padding:12px 20px 0;display:flex;flex-direction:column;gap:12px">
+
+    <article class="card" data-n="[Studio 1]" data-kat="paznokcie rzęsy" data-cena="140" data-km="1.2" data-slot="870" data-po16="1" data-pay="blik karta gotówka" data-udog="parking klimatyzacja" data-px="24" data-py="34">
+      <a class="main" href="salon.html?s=%5BStudio%201%5D">
+        <img src="zdjecia/k-paznokcie.jpg" alt="Stylizacja paznokci w [Studio 1]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+        <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span style="font-weight:700;font-size:16px">[Studio 1]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,9</b> · 128 opinii</span></span>
+          <span style="font-size:13px">Manicure hybrydowy od 140 zł · od 1 h 15</span>
+        </span>
+      </a>
+      <button type="button" class="heart" aria-label="Dodaj [Studio 1] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <div class="slots"><a href="termin.html">14:30</a><a href="termin.html">16:40</a><a href="termin.html" class="o">Inne dni</a></div>
+    </article>
+
+    <article class="card" data-n="[Studio 3]" data-kat="paznokcie kosmetyka" data-cena="230" data-km="2.4" data-slot="1080" data-po16="1" data-pay="blik karta" data-udog="klimatyzacja bez-schodow" data-px="68" data-py="78">
+      <div style="padding:8px 14px;background:#FAF6F8;font-size:12px;color:#625860;display:flex;justify-content:space-between;gap:8px;align-items:center"><span><b style="color:#1E1A1D">Reklama</b> · studio płaci za wyróżnienie</span><a href="#dlaczego" data-open="#dlg-reklama" style="font-size:12px;min-height:44px;display:flex;align-items:center">Dlaczego to widzę?</a></div>
+      <a class="main" href="salon.html?s=%5BStudio%203%5D">
+        <img src="zdjecia/dlon-2-mini.jpg" alt="Dłoń z manicure w [Studio 3]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+        <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span style="font-weight:700;font-size:16px">[Studio 3]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,7</b> · 86 opinii</span></span>
+          <span style="font-size:13px">Manicure hybrydowy od [cena]</span>
+        </span>
+      </a>
+      <button type="button" class="heart" aria-label="Dodaj [Studio 3] do ulubionych" aria-pressed="false" style="top:44px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <div class="slots"><a href="termin.html">18:00</a><a href="termin.html" class="o">Inne dni</a></div>
+    </article>
+
+    <article class="card" data-n="[Studio 2]" data-kat="paznokcie rzęsy brwi" data-cena="170" data-km="1.9" data-slot="1155" data-po16="1" data-pay="karta gotówka" data-udog="parking" data-px="84" data-py="34">
+      <a class="main" href="salon.html?s=%5BStudio%202%5D">
+        <img src="zdjecia/dlon-1-mini.jpg" alt="Dłoń z żelowym manicure w [Studio 2]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+        <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span style="font-weight:700;font-size:16px">[Studio 2]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,8</b> · 64 opinii</span></span>
+          <span style="font-size:13px">Żel na naturalnej płytce od [cena]</span>
+        </span>
+      </a>
+      <button type="button" class="heart" aria-label="Dodaj [Studio 2] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <div class="slots"><a href="termin.html">19:15</a><a href="termin.html" class="o">Inne dni</a></div>
+    </article>
+
+    <article class="card" data-n="[Studio 4]" data-kat="rzęsy brwi" data-cena="160" data-km="3.1" data-slot="720" data-po16="1" data-pay="blik karta gotówka" data-udog="bez-schodow wifi" data-px="16" data-py="72">
+      <a class="main" href="salon.html?s=%5BStudio%204%5D">
+        <img src="zdjecia/k-rzesy.jpg" alt="Rzęsy po przedłużaniu w [Studio 4]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+        <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span style="font-weight:700;font-size:16px">[Studio 4]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,6</b> · 203 opinii</span></span>
+          <span style="font-size:13px">Rzęsy 2D–3D od [cena]</span>
+        </span>
+      </a>
+      <button type="button" class="heart" aria-label="Dodaj [Studio 4] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <div class="slots"><a href="termin.html">12:00</a><a href="termin.html">17:30</a><a href="termin.html" class="o">Inne dni</a></div>
+    </article>
+
+    <article class="card" data-n="[Studio 5]" data-kat="fryzjer" data-cena="120" data-km="4.2" data-slot="900" data-po16="0" data-pay="gotówka" data-udog="" data-px="38" data-py="19">
+      <a class="main" href="salon.html?s=%5BStudio%205%5D">
+        <img src="zdjecia/k-fryzjer.jpg" alt="Fryzura po koloryzacji w [Studio 5]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+        <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span style="font-weight:700;font-size:16px">[Studio 5]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,9</b> · 41 opinii</span></span>
+          <span style="font-size:13px">Strzyżenie od [cena]</span>
+        </span>
+      </a>
+      <button type="button" class="heart" aria-label="Dodaj [Studio 5] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <div class="slots"><a href="termin.html">15:00</a><a href="termin.html" class="o">Inne dni</a></div>
+    </article>
+
+    <div id="pusto" hidden style="padding:16px;border-radius:12px;background:#FFF1E0;color:#8A3B12;font-size:14px;line-height:1.45">Żadne studio nie spełnia tych filtrów. Poluzuj filtry albo <button type="button" id="wyczysc" style="border:0;background:none;color:#8A3B12;font:inherit;text-decoration:underline;cursor:pointer;padding:0;min-height:44px">wyczyść wszystkie</button>.</div>
+    <p style="margin:4px 0 0;color:#625860;font-size:12px;line-height:1.45">Kolejność zależy od wybranego sortowania. Odległości, ceny i oceny są przykładowe. Reklamy są zawsze podpisane i nie zastępują wyników, których szukasz.</p>
+  </section>
+  </div>
+
+  <div class="d-aside">
+  <section id="mapa" class="o5" hidden style="margin:12px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <h2 id="mapa-h" style="font-size:16px;margin:0">Mapa <span style="font-family:'DM Sans',sans-serif;font-weight:400;font-size:12px;color:#625860">· mapa poglądowa</span></h2>
+    <div class="mapa-wrap">
+      <svg viewBox="0 0 360 400" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Mapa poglądowa okolicy: ulice, park i rzeka, w środku znacznik Tu jesteś. Studia z wolnym terminem są pinezkami nad mapą.">
+        <rect width="360" height="400" fill="#F1EEE6"/>
+        <g fill="#E8E2D6">
+          <rect x="12" y="12" width="52" height="40" rx="4"/><rect x="72" y="14" width="50" height="46" rx="4"/><rect x="160" y="10" width="40" height="52" rx="4"/>
+          <rect x="14" y="104" width="46" height="50" rx="4"/><rect x="74" y="108" width="48" height="44" rx="4"/><rect x="170" y="108" width="62" height="40" rx="4"/>
+          <rect x="16" y="196" width="54" height="46" rx="4"/><rect x="82" y="194" width="40" height="52" rx="4"/><rect x="162" y="268" width="44" height="40" rx="4"/>
+          <rect x="278" y="196" width="60" height="30" rx="4"/><rect x="284" y="262" width="56" height="34" rx="4"/><rect x="20" y="276" width="86" height="30" rx="4"/>
+        </g>
+        <path d="M-10 346 C70 312 150 372 236 330 S350 292 380 306 L380 340 C350 330 280 360 236 366 C150 410 70 352 -10 380Z" fill="#BFD9EA"/>
+        <text x="30" y="368" font-size="10" font-style="italic" fill="#5C8BAA" transform="rotate(-9 30 368)">[rzeka]</text>
+        <rect x="206" y="44" width="124" height="70" rx="18" fill="#CDE3C2"/>
+        <text x="236" y="84" font-size="10" fill="#4F7A45">[park]</text>
+        <g fill="none" stroke-linecap="round">
+          <path d="M-10 176 L370 164" stroke="#DCD5C6" stroke-width="16"/><path d="M-10 176 L370 164" stroke="#FFFFFF" stroke-width="12"/>
+          <path d="M136 -10 L152 410" stroke="#DCD5C6" stroke-width="14"/><path d="M136 -10 L152 410" stroke="#FFFFFF" stroke-width="10"/>
+          <path d="M-10 84 L370 98" stroke="#DCD5C6" stroke-width="10"/><path d="M-10 84 L370 98" stroke="#FFFFFF" stroke-width="7"/>
+          <path d="M266 -10 L250 300" stroke="#DCD5C6" stroke-width="10"/><path d="M266 -10 L250 300" stroke="#FFFFFF" stroke-width="7"/>
+          <path d="M-10 258 L370 236" stroke="#DCD5C6" stroke-width="10"/><path d="M-10 258 L370 236" stroke="#FFFFFF" stroke-width="7"/>
+        </g>
+        <g font-size="9" fill="#625860">
+          <text x="16" y="170" transform="rotate(-1.8 16 170)">[ulica]</text>
+          <text x="156" y="128" transform="rotate(87 156 128)">[ulica]</text>
+          <text x="290" y="96" transform="rotate(2.2 290 96)">[ulica]</text>
+          <text x="30" y="252" transform="rotate(-3.4 30 252)">[ulica]</text>
+        </g>
+        <circle cx="190" cy="212" r="18" fill="#2F5A86" fill-opacity=".18"/>
+        <circle cx="190" cy="212" r="7" fill="#2F5A86" stroke="#FFFFFF" stroke-width="2.5"/>
+        <rect x="160" y="224" width="60" height="16" rx="8" fill="#FFFFFF" stroke="#2F5A86"/>
+        <text x="190" y="235.5" font-size="10" font-weight="700" fill="#2F5A86" text-anchor="middle">Tu jesteś</text>
+        <g stroke="#1E1A1D" stroke-width="2" fill="none"><path d="M16 386 V380 H76 V386"/></g>
+        <text x="16" y="374" font-size="10" fill="#1E1A1D">500 m</text>
+      </svg>
+      <div id="piny"></div>
+      <span class="map-note">mapa poglądowa</span>
+      <div class="zoom">
+        <button type="button" aria-label="Przybliż mapę" data-toast="Mapa poglądowa: przybliżanie jest niedostępne w makiecie">+</button>
+        <button type="button" aria-label="Oddal mapę" data-toast="Mapa poglądowa: oddalanie jest niedostępne w makiecie">−</button>
+      </div>
+    </div>
+    <div id="pin-info" style="padding:12px 14px;border-radius:12px;background:#FAF6F8;font-size:14px;line-height:1.45;color:#625860">Kliknij pinezkę, żeby zobaczyć studio i najbliższe terminy.</div>
+  </section>
+  </div>
+  </div>
+
+  <nav class="nav d-tabbar" aria-label="Menu główne">
+    <a href="start.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Start</a>
+    <a href="wyniki.html" aria-current="page"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Szukaj</a>
+    <a href="wizyty.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Wizyty</a>
+    <a href="konto.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profil</a>
+  </nav>
+</div>
+
+<dialog id="dlg-filtry" aria-labelledby="dlg-f-t">
+  <form id="f-form" style="display:flex;flex-direction:column;gap:14px">
+    <h2 id="dlg-f-t" style="margin:0;font-size:18px">Więcej filtrów</h2>
+    <fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:6px">
+      <legend style="font-weight:700;font-size:14px;padding:0;margin-bottom:6px">Cena usługi od–do (zł)</legend>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input class="inp" id="cena-od" type="number" min="0" inputmode="numeric" placeholder="od" aria-label="Cena od">
+        <span aria-hidden="true">–</span>
+        <input class="inp" id="cena-do" type="number" min="0" inputmode="numeric" placeholder="do" aria-label="Cena do">
+      </div>
+    </fieldset>
+    <fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column">
+      <legend style="font-weight:700;font-size:14px;padding:0;margin-bottom:4px">Płatność</legend>
+      <label class="fl"><input type="checkbox" name="pay" value="blik">BLIK</label>
+      <label class="fl"><input type="checkbox" name="pay" value="karta">Karta</label>
+      <label class="fl"><input type="checkbox" name="pay" value="gotówka">Gotówka</label>
+    </fieldset>
+    <fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column">
+      <legend style="font-weight:700;font-size:14px;padding:0;margin-bottom:4px">Udogodnienia</legend>
+      <label class="fl"><input type="checkbox" name="udog" value="parking">Parking</label>
+      <label class="fl"><input type="checkbox" name="udog" value="klimatyzacja">Klimatyzacja</label>
+      <label class="fl"><input type="checkbox" name="udog" value="bez-schodow">Wejście bez schodów</label>
+      <label class="fl"><input type="checkbox" name="udog" value="wifi">Wi‑Fi</label>
+    </fieldset>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" id="f-reset" style="flex:1">Wyczyść</button>
+      <button type="submit" class="btn" style="flex:1">Pokaż wyniki</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-reklama" aria-labelledby="dlg-r-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="dlg-r-t" style="margin:0;font-size:18px">Dlaczego to widzę?</h2>
+    <p style="margin:0;font-size:14px;line-height:1.5">To studio zapłaciło za wyróżnienie w wynikach. Reklamy są zawsze podpisane i nie wypierają wyników, których szukasz. Ocen i opinii nie da się kupić.</p>
+    <button type="button" class="btn" data-close>Rozumiem</button>
+  </div>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const cards = [...document.querySelectorAll('article.card')];
+  const search = Mock.get('search', {}) || {};
+  const CATS = ['paznokcie', 'rzęsy', 'brwi', 'fryzjer', 'kosmetyka'];
+  const kiedy = search.kiedy || 'Dziś';
+  const q = (search.q || '').trim();
+  const kat = CATS.find(c => c === q.toLowerCase());
+  // studios with a happy-hours offer today (mock today = Monday 19.10.2026): [Studio 1] from the studio's offers, [Studio 2] is a fixed example
+  const HH_STUDIA = Mock.happyToday(new Date(2026, 9, 19)).length ? ['[Studio 1]', '[Studio 2]'] : [];
+  const F = { po16: false, do200: false, blik: false, km2: false, hh: false, od: null, do: null, pay: [], udog: [] };
+  let favs = Mock.get('favorites', []);
+
+  $('#h1').textContent = `${q || 'Wszystkie usługi'} · ${kiedy}`;
+  $('#h2').textContent = search.miasto || '[miasto, dzielnica]';
+  $('#chip-kiedy').textContent = `${kiedy} ✕`;
+  $('#kiedy-t').textContent = kiedy === 'Dziś' ? 'dziś' : kiedy === 'Jutro' ? 'jutro' : kiedy === 'Ten tydzień' ? 'w tym tygodniu' : `(${kiedy})`;
+  const kt0 = $('#kiedy-t').textContent;
+  if (q && !kat) { $('#szukano').hidden = false; $('#szukano').textContent = `Szukano: „${q}”. Pokazujemy wszystkie studia.`; }
+
+  const plural = n => (n === 1 ? 'studio' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'studia' : 'studiów');
+  const fmt = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+
+  function ok(c) {
+    const d = c.dataset;
+    if (kat && !d.kat.split(' ').includes(kat)) return false;
+    if (F.po16 && d.po16 !== '1') return false;
+    if (F.do200 && +d.cena > 200) return false;
+    if (F.blik && !/blik|karta/.test(d.pay)) return false;
+    if (F.km2 && +d.km > 2) return false;
+    if (F.hh && !HH_STUDIA.includes(d.n)) return false;
+    if (F.od !== null && +d.cena < F.od) return false;
+    if (F.do !== null && +d.cena > F.do) return false;
+    if (F.pay.length && !F.pay.some(p => d.pay.split(' ').includes(p))) return false;
+    if (F.udog.length && !F.udog.every(u => d.udog.split(' ').includes(u))) return false;
+    return true;
+  }
+  function apply() {
+    const key = $('#sort').value;
+    const sorted = [...cards].sort((a, b) => key === 'slot' ? a.dataset.slot - b.dataset.slot : key === 'km' ? a.dataset.km - b.dataset.km : a.dataset.cena - b.dataset.cena);
+    const anchor = $('#pusto');
+    sorted.forEach(c => $('#lista').insertBefore(c, anchor));
+    let n = 0;
+    cards.forEach(c => { const v = ok(c); c.hidden = !v; if (v) n++; });
+    $('#n').textContent = n; $('#n-s').textContent = plural(n);
+    $('#pusto').hidden = n > 0;
+    const extra = (F.od !== null) + (F.do !== null) + F.pay.length + F.udog.length;
+    $('#wiecej').textContent = extra ? `Więcej filtrów (${extra})` : 'Więcej filtrów';
+    drawPins();
+    return n;
+  }
+
+  // chips
+  $('#filtry').addEventListener('mock:choice', e => {
+    const b = e.detail.button, on = b.getAttribute('aria-pressed') === 'true', f = b.dataset.f;
+    if (f !== 'kiedy') F[f] = on;
+    else $('#kiedy-t').textContent = on ? kt0 : 'w dowolnym dniu';
+    apply();
+  });
+  $('#sort').addEventListener('change', apply);
+
+  // more filters dialog
+  $('#f-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const num = id => (document.getElementById(id).value === '' ? null : +document.getElementById(id).value);
+    F.od = num('cena-od'); F.do = num('cena-do');
+    F.pay = [...document.querySelectorAll('[name=pay]:checked')].map(i => i.value);
+    F.udog = [...document.querySelectorAll('[name=udog]:checked')].map(i => i.value);
+    $('#dlg-filtry').close();
+    const n = apply();
+    Mock.toast(`Zastosowano filtry · ${n} ${plural(n)}`);
+  });
+  const clearDialog = () => { document.querySelectorAll('#f-form input').forEach(i => (i.type === 'checkbox' ? (i.checked = false) : (i.value = ''))); F.od = F.do = null; F.pay = []; F.udog = []; };
+  $('#f-reset').addEventListener('click', () => { clearDialog(); apply(); Mock.toast('Wyczyszczono dodatkowe filtry'); });
+  $('#wyczysc').addEventListener('click', () => {
+    clearDialog(); ['po16', 'do200', 'blik', 'km2', 'hh'].forEach(k => (F[k] = false));
+    document.querySelectorAll('#filtry [data-f]').forEach(b => { if (b.dataset.f !== 'kiedy') b.setAttribute('aria-pressed', 'false'); });
+    apply();
+  });
+
+  // favourites
+  const paintHearts = () => cards.forEach(c => c.querySelector('.heart').setAttribute('aria-pressed', String(favs.includes(c.dataset.n))));
+  paintHearts();
+  document.addEventListener('click', e => {
+    const h = e.target.closest('.heart'); if (!h) return;
+    const n = h.closest('.card').dataset.n;
+    favs = favs.includes(n) ? favs.filter(x => x !== n) : [...favs, n];
+    Mock.set('favorites', favs); paintHearts();
+    Mock.toast(favs.includes(n) ? `Dodano ${n} do ulubionych` : `Usunięto ${n} z ulubionych`);
+  });
+
+  // slot links carry studio, day and hour: termin.html?s=[Studio 1]&t=14:30&d=19 (mock "today" = Monday 19.10, "Jutro" = 20.10)
+  const dzienSzukania = search.kiedy === 'Jutro' ? 20 : 19, DNI = { 19: 'pon 19.10', 20: 'wt 20.10' };
+  document.querySelectorAll('.slots a').forEach(a => {
+    const studio = a.closest('.card').dataset.n, godzina = a.classList.contains('o') ? '' : a.textContent.trim();
+    a.href = `termin.html?s=${encodeURIComponent(studio)}` + (godzina ? `&t=${godzina}&d=${dzienSzukania}` : '');
+    a.addEventListener('click', () => {
+      let b = Mock.get('booking', {}) || {};
+      if (b.uslugi && b.studio !== studio) b = {}; // a cart belongs to one studio
+      Mock.set('booking', { ...b, studio, ...(godzina ? { dzien: DNI[dzienSzukania], godzina } : {}) });
+    });
+  });
+
+  // map
+  let mapOn = false, pinned = null;
+  const DROP = '<svg aria-hidden="true" width="28" height="36" viewBox="0 0 28 36"><path d="M14 35C14 35 2 21 2 13.5a12 12 0 0 1 24 0C26 21 14 35 14 35z" fill="currentColor" stroke="#fff" stroke-width="2"/><circle cx="14" cy="13.5" r="4.5" fill="#fff"/></svg>';
+  function drawPins() {
+    $('#piny').innerHTML = cards.filter(c => !c.hidden).map(c => {
+      const n = c.dataset.n, px = +c.dataset.px, t = fmt(+c.dataset.slot);
+      // labels of pins near the edge extend inwards so they stay inside the map
+      return `<button type="button" class="pin${px < 40 ? ' l' : px > 60 ? ' r' : ''}" data-n="${n}" aria-pressed="${n === pinned}" aria-label="${n}, najbliższy termin ${t}, od ${c.dataset.cena} zł" style="left:${px}%;top:${c.dataset.py}%"><span class="lab">${n} · ${t}</span>${DROP}</button>`;
+    }).join('');
+    cards.forEach(c => c.classList.toggle('sel', c.dataset.n === pinned)); // the pinned studio is marked in the list too
+  }
+  function pick(n, fromPin) {
+    pinned = n;
+    const c = cards.find(x => x.dataset.n === n);
+    const sl = [...c.querySelectorAll('.slots a:not(.o)')].map(a => a.textContent).join(', ');
+    $('#pin-info').innerHTML = `<b style="color:#1E1A1D">${n}</b> · od ${c.dataset.cena} zł (przykładowo) · wolne: ${sl}<br><a href="salon.html?s=${encodeURIComponent(n)}" style="font-weight:500">Zobacz studio</a>`;
+    drawPins();
+    if (fromPin) { c.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); $('#piny').querySelector(`[data-n="${n}"]`)?.focus(); }
+  }
+  $('#piny').addEventListener('click', e => { const p = e.target.closest('.pin'); if (p) pick(p.dataset.n, true); });
+  // list -> map: hovering or focusing a card selects its pin (only while the map is on screen)
+  cards.forEach(c => ['mouseenter', 'focusin'].forEach(ev => c.addEventListener(ev, () => { if ($('#mapa').offsetParent && pinned !== c.dataset.n) pick(c.dataset.n, false); })));
+  $('#mapa-btn').addEventListener('click', () => {
+    mapOn = !mapOn;
+    $('#mapa').hidden = !mapOn; $('#lista').hidden = mapOn;
+    $('#mapa-btn').textContent = mapOn ? 'Pokaż listę' : 'Pokaż mapę';
+    $('#mapa-btn').setAttribute('aria-pressed', String(mapOn));
+  });
+  if (search.hh) { F.hh = true; $('#chip-hh').setAttribute('aria-pressed', 'true'); Mock.set('search', { ...search, hh: false }); } // arrived from "Happy hours dziś" on the start page
+  apply();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "kategoria": "rzesy",
+  "brutto": true,
+  "waluta": "PLN",
+  "obowiazujeOd": "2026-10-01",
+  "zrodlo": "ÈLLE Studio Wrocław (Booksy, X 2026); dopłaty za kolor i skręt: Salon Rzęs Warszawa",
+  "ustawieniaSalonu": { "testPierwszaWizyta": true, "granicaTyg": 4 },
+  "style": [
+    { "id": "naturalny", "nazwa": "Naturalny", "opis": "7–10 mm, równo", "mapaMm": [7, 9, 10, 10, 9] },
+    { "id": "kocie_oko", "nazwa": "Kocie oko", "opis": "rośnie do zewnątrz", "mapaMm": [7, 8, 10, 12, 13], "odradzaj": ["opadajaca_powieka"] },
+    { "id": "lalka", "nazwa": "Lalka", "opis": "najdłuższe na środku", "mapaMm": [8, 10, 12, 10, 9] },
+    { "id": "wiewiorka", "nazwa": "Wiewiórka", "opis": "szczyt pod łukiem brwi", "mapaMm": [7, 9, 11, 12, 10] }
+  ],
+  "warianty": [
+    { "id": "1:1", "nazwa": "1:1 klasyczna", "cena": 180, "min": 105 },
+    { "id": "2D", "nazwa": "2D", "cena": 190, "min": 115 },
+    { "id": "3D", "nazwa": "3D", "cena": 200, "min": 120 },
+    { "id": "4D", "nazwa": "4D", "cena": 210, "min": 125 },
+    { "id": "5D", "nazwa": "5D", "cena": 220, "min": 130 },
+    { "id": "6-8D", "nazwa": "6–8D", "cena": 240, "min": 140 },
+    { "id": "8-10D", "nazwa": "Mega volume", "cena": 250, "min": 145 }
+  ],
+  "uzupelnienie": {
+    "ceny": {
+      "1:1": { "do3": [150, 95], "do4": [160, 100] },
+      "2D": { "do3": [160, 110], "do4": [170, 110] },
+      "3D": { "do3": [170, 115], "do4": [180, 115] },
+      "4D": { "do3": [180, 120], "do4": [190, 120] },
+      "5D": { "do3": [190, 125], "do4": [200, 125] },
+      "6-8D": { "do3": [210, 130], "do4": [220, 130] },
+      "8-10D": { "do3": [220, 135], "do4": [230, 135] }
+    },
+    "minutyInterpolowane": ["3D", "5D", "6-8D", "8-10D"],
+    "zalozenie": true,
+    "minProcentZostalo": 50,
+    "obcaAplikacja": "nowa_aplikacja+zdjecie_przed"
+  },
+  "dodatki": [
+    { "id": "kim", "nazwa": "Efekt Kim (kolce)", "cena": 20, "min": 10 },
+    { "id": "wet", "nazwa": "Wet look", "cena": 20, "min": 5 },
+    { "id": "anime", "nazwa": "Anime", "cena": 30, "min": 20 },
+    { "id": "kolor", "nazwa": "Brązowe / kolorowy akcent", "cena": 20, "min": 5 },
+    { "id": "dolne", "nazwa": "Rzęsy dolne", "cena": 50, "min": 30 },
+    { "id": "zdjecie_przed", "nazwa": "Zdjęcie poprzedniej aplikacji", "cena": 20, "min": 20, "automatyczny": true },
+    { "id": "skretL", "nazwa": "Skręt L/M, jeśli stylistka zaleci", "cena": 20, "min": 5, "typ": "warunkowa" }
+  ],
+  "osobneUslugi": [
+    { "id": "zdjecie", "nazwa": "Zdjęcie rzęs bez nowej aplikacji", "cena": 40, "min": 20 },
+    { "id": "lifting", "nazwa": "Lifting z laminacją (laminacja + farbka + botoks)", "cena": 150, "min": 60, "trwalosc": "6–8 tyg." }
+  ],
+  "konsultacja": { "cena": 0, "min": 15, "zalozenie": true },
+  "test": { "cena": 0, "min": 10, "godzinPrzed": 48, "zalozenie": true },
+  "wywiad": [
+    { "id": "infekcja", "pytanie": "Masz teraz infekcję lub stan zapalny oka?", "skutek": "blokada", "komunikat": "Przy infekcji oka przedłużanie może ją pogłębić. Wróć, gdy minie." },
+    { "id": "alergiaKlej", "pytanie": "Miałaś reakcję na klej do rzęs?", "skutek": "blokada", "dotyczy": ["nowa", "uzupelnienie"], "komunikat": "Po reakcji na klej nie przedłużamy rzęs. Rozważ lifting z laminacją." },
+    { "id": "ciaza", "pytanie": "Jesteś w ciąży lub karmisz?", "skutek": "konsultacja", "komunikat": "Stylistka dobierze bezpieczny klej. Zarezerwuj bezpłatną konsultację, a zabieg umówicie na miejscu." },
+    { "id": "lifting6tyg", "pytanie": "Lifting rzęs w ostatnich 6 tygodniach?", "skutek": "ostrzezenie", "dotyczy": ["nowa", "uzupelnienie"], "uwaga": "Stylistka oceni rzęsy po liftingu przed aplikacją." },
+    { "id": "soczewki", "pytanie": "Nosisz soczewki kontaktowe?", "skutek": "ostrzezenie", "uwaga": "Weź pojemnik na soczewki, zdejmiesz je na czas zabiegu." },
+    { "id": "pierwszaWizyta", "pytanie": "To Twoja pierwsza wizyta u nas?", "skutek": "test48h", "wlaczaSalon": "testPierwszaWizyta" }
+  ]
+}

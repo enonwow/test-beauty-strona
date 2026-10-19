@@ -1,0 +1,18 @@
+/* Shared base for the static mockups (salon, rzesy, termin, potwierdzenie, panel); screen styles stay inline. */
+body { margin:0; background:#F4EEF1; color:#1E1A1D; font-family:'DM Sans', system-ui, sans-serif; }
+h1, h2 { font-family:'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif; }
+a { color:#9E1F50; } a:hover { color:#7A173D; }
+.mock-bar { padding:6px 16px; background:#1E1A1D; color:#FFFFFF; font-size:12px; text-align:center; }
+.mock-bar a { color:#F6EDF1; }
+/* Bottom tab bar (same look as the copies in start, wyniki, wizyty, konto, stylizacja); stays on screen on phones,
+   from 1024px desktop.css moves it to the top. */
+.nav.d-tabbar { margin-top:auto; border-top:1px solid #F0E8EC; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); padding:6px 8px 10px; }
+.nav.d-tabbar a { min-height:52px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; text-decoration:none; color:#625860; font-size:12px; }
+.nav.d-tabbar a[aria-current] { color:#9E1F50; font-weight:700; }
+@media (min-width:1024px) {
+  .nav.d-tabbar { margin-top:0; grid-template-columns:repeat(4,auto); justify-content:start; gap:8px; border-top:0; border-bottom:1px solid #F0E8EC; padding:6px 20px; }
+  .nav.d-tabbar a { flex-direction:row; gap:8px; padding:0 16px; font-size:14px; min-height:48px; }
+}
+@media (max-width:1023px) {
+  .nav.d-tabbar { position:sticky; bottom:0; z-index:10; background:#FFFFFF; padding-bottom:max(10px, env(safe-area-inset-bottom)); }
+}

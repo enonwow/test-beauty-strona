@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – ustawienia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 1400px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">Ustawienia</h1>
+      <button type="button" data-toast="Zapisano ustawienia" style="min-height: 40px; padding: 0 16px; border-radius: 10px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700">Zapisz</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px; align-items: start">
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Zasady rezerwacji online</h2>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Najwcześniej na<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>1 h przed</option><option selected>3 h przed</option><option>dzień przed</option></select></label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Najdalej do<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>4 tygodnie</option><option selected>8 tygodni</option><option>6 miesięcy</option></select></label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Przerwa między wizytami<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>0 min</option><option selected>10 min</option><option>15 min</option></select></label>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Potwierdzam nowe rezerwacje ręcznie</label>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Odwołania i zadatki</h2>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Bezpłatne odwołanie do<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>12 h przed</option><option selected>24 h przed</option><option>48 h przed</option></select></label>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Zadatek od nowych klientek</label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Kwota zadatku<input data-toast-change="Zapisano" value="[x] zł" style="min-height: 38px; width: 100px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
+        <span style="color: #625860; font-size: 12px; line-height: 1.45">Klientka widzi zasady przed płatnością, a nie dopiero przy odwołaniu. Zwrot zadatku jest automatyczny, jeśli odwoła w terminie.</span>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Powiadomienia SMS</h2>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Potwierdzenie rezerwacji</label>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Przypomnienie 24 h przed</label>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Przypomnienie o uzupełnieniu po <select data-toast-change="Zapisano" aria-label="Po ilu tygodniach" style="min-height: 34px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option selected>3 tyg.</option><option>4 tyg.</option></select></label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Nadawca SMS<input data-toast-change="Zapisano" value="[NazwaStudia]" style="min-height: 38px; width: 140px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>SMS w tym miesiącu</span><b>[x] z [y] w abonamencie</b></div>
+        <span style="color: #625860; font-size: 12px">Gdy SMS nie dotrze, zobaczysz alarm przy wizycie w kalendarzu.</span>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Integracje</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Google Calendar</b><span style="color: #625860; font-size: 12px">Kopiuje wizyty. Booksy importuje ten kalendarz jako zajęte godziny.</span></span><span style="padding: 4px 10px; border-radius: 999px; background: #E6F2EC; color: #1F6B47; font-size: 12px; font-weight: 700">połączono</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Import kalendarza</b><span style="color: #625860; font-size: 12px">Wizyty z Kalendarza Google lub Apple jako zajęte terminy i wizyty w panelu</span></span><button type="button" id="calimp" style="min-height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Importuj</button></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Kanały rezerwacji</b><span style="color: #625860; font-size: 12px">Widżet na stronę www, kod QR i rezerwacje przez Google</span></span><a href="profil-studia.html#kanaly" class="p-btn sm">Otwórz</a></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Instagram</b><span style="color: #625860; font-size: 12px">Link do bio i portfolio ze zdjęć profilu</span></span><button type="button" id="copylink" style="min-height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Kopiuj link</button></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Facebook</b><span style="color: #625860; font-size: 12px">Przycisk „Zarezerwuj” na stronie firmowej</span></span><button type="button" id="fbhelp" style="min-height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Instrukcja</button></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><label for="pixel" style="display: flex; flex-direction: column"><b>Meta Pixel</b><span style="color: #625860; font-size: 12px">Mierzysz rezerwacje z reklam</span></label><input data-toast-change="Zapisano" id="pixel" placeholder="ID pixela" style="min-height: 38px; width: 150px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0"><span style="display: flex; flex-direction: column"><b>Twoje dane</b><span style="color: #625860; font-size: 12px">Klientki, wizyty i cennik w CSV</span></span><button type="button" data-toast="Przygotowano pliki CSV: klientki, wizyty, cennik" style="min-height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Eksportuj</button></div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Strona dla klientek</h2>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Języki<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option selected>polski, ukraiński, rosyjski</option><option>tylko polski</option></select></label>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Pokazuj studio w wyszukiwarce</label>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Przyjmuj zdjęcia inspiracji do wyceny</label>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between; gap: 10px"><span style="color: #625860">Twój link</span><b>[adres]/[nazwa-studia]</b></div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 2px solid #1E1A1D; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Abonament</h2>
+        <div id="end-banner" class="p-banner" role="status" hidden></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><b style="font-size: 18px">[Nazwa planu]</b><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">[cena] zł / mies.</span></div>
+        <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; line-height: 1.4">
+          <li>0% prowizji od klientek, także z wyszukiwarki</li>
+          <li>[x] SMS miesięcznie w cenie</li>
+          <li>Opłacone do [data]</li>
+        </ul>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <button type="button" id="card" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Zmień kartę</button>
+          <button type="button" data-toast="Karta została usunięta z konta" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Usuń kartę</button>
+          <button type="button" id="cancel" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #A3262A; background: #FFFFFF; color: #A3262A; font: inherit; font-weight: 700">Zrezygnuj</button>
+        </div>
+        <span style="color: #625860; font-size: 12px; line-height: 1.45">Bez okresu wypowiedzenia i bez telefonu do nas. Po rezygnacji korzystasz do końca opłaconego miesiąca, potem pobierzesz swoje dane w CSV.</span>
+      </section>
+
+      <section id="dodatki" aria-labelledby="dod-h" style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 id="dod-h" style="margin: 0; font-size: 16px; font-weight: 700">Dodatki</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
+          <label for="dod-podpisy" style="display: flex; flex-direction: column; gap: 2px"><b>Podpisy elektroniczne · [cena] zł / mies.</b><span style="color: #625860; font-size: 12px; line-height: 1.4">Klientki podpisują zgody i wywiady w telefonie przed wizytą. Opcja płatna, poza abonamentem.</span></label>
+          <input type="checkbox" id="dod-podpisy" role="switch" style="width: 44px; height: 28px; flex: none; accent-color: #9E1F50">
+        </div>
+        <span id="dod-stan" class="p-mut" role="status"></span>
+      </section>
+    </div>
+  </main>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const banner = document.getElementById('end-banner');
+  const end = Mock.get('ustawienia.koniec', null);
+  if (end) { banner.textContent = 'Abonament aktywny do ' + end; banner.hidden = false; }
+  const dod = document.getElementById('dod-podpisy'), dstan = document.getElementById('dod-stan');
+  const showDod = () => { dod.checked = PS.addon('podpisy'); dstan.textContent = dod.checked ? 'Włączone. Rozliczane razem z abonamentem.' : 'Wyłączone.'; };
+  showDod();
+  dod.addEventListener('change', () => {
+    if (!dod.checked) { PS.setAddon('podpisy', false); showDod(); Mock.toast('Dodatek wyłączony: podpisy elektroniczne'); return; }
+    dod.checked = false; // włącza dopiero potwierdzenie
+    PS.modal({
+      title: 'Włączyć podpisy elektroniczne?', ok: 'Włączam za [cena] zł / mies.',
+      body: '<p style="margin:0;line-height:1.45">Dodatek kosztuje <b>[cena] zł miesięcznie</b> i jest doliczany do abonamentu od następnego okresu rozliczeniowego. Wyłączysz go w każdej chwili, bez okresu wypowiedzenia.</p>',
+      onOk: () => { PS.setAddon('podpisy', true); showDod(); },
+      toast: 'Dodatek włączony: podpisy elektroniczne'
+    });
+  });
+  if (location.hash === '#dodatki') document.getElementById('dodatki').scrollIntoView();
+  document.getElementById('cancel').addEventListener('click', () => PS.modal({
+    title: 'Zrezygnować z abonamentu?', ok: 'Potwierdzam rezygnację', cls: 'dark',
+    body: '<p style="margin:0;line-height:1.45">Abonament będzie aktywny do końca opłaconego miesiąca. Do tego dnia wszystko działa jak dotąd, potem pobierzesz swoje dane w CSV.</p><div class="p-box"><span>Koniec abonamentu</span><b>30 listopada 2026</b></div><span class="p-mut">Bez okresu wypowiedzenia i bez telefonu do nas.</span>',
+    onOk: () => { Mock.set('ustawienia.koniec', '30 listopada 2026'); banner.textContent = 'Abonament aktywny do 30 listopada 2026'; banner.hidden = false; },
+    toast: 'Rezygnacja zapisana. Abonament aktywny do 30 listopada 2026'
+  }));
+  document.getElementById('card').addEventListener('click', () => PS.modal({
+    title: 'Zmień kartę', ok: 'Zapisz kartę',
+    body: '<label class="p-lab">Numer karty<input class="p-in" inputmode="numeric" placeholder="0000 0000 0000 0000" required></label><div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Ważna do<input class="p-in" placeholder="MM/RR" required></label><label class="p-lab" style="flex:1">CVC<input class="p-in" inputmode="numeric" placeholder="000" required></label></div><span class="p-mut">Makieta: nie wpisuj prawdziwych danych karty.</span>',
+    toast: 'Karta zmieniona'
+  }));
+  document.getElementById('calimp').addEventListener('click', () => PS.modal({ title: 'Importuj z Kalendarza Google lub Apple', noOk: true, body: '<div id="cal-mount" style="display:flex;flex-direction:column;gap:12px"></div>', onOpen: f => PS.calImport(f.querySelector('#cal-mount')) }));
+  document.getElementById('copylink').addEventListener('click', () => { navigator.clipboard?.writeText('[adres]/[nazwa-studia]').catch(() => {}); Mock.toast('Skopiowano link do profilu'); });
+  document.getElementById('fbhelp').addEventListener('click', () => PS.modal({
+    title: 'Przycisk „Zarezerwuj” na Facebooku', noOk: true,
+    body: '<ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;line-height:1.4"><li>Otwórz stronę firmową i wybierz „Dodaj przycisk”.</li><li>Wybierz „Zarezerwuj”.</li><li>Wklej link do profilu studia z sekcji „Strona dla klientek”.</li></ol>'
+  }));
+});
+</script>
+</body>
+</html>

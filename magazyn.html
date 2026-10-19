@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – magazyn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Magazyn</h1><span class="p-mut">Produkty zużywane na zabiegach. Stany i progi są przykładowe.</span></div>
+      <div class="p-acts">
+        <button type="button" class="p-btn pri" id="deliv">Przyjmij dostawę</button>
+        <button type="button" class="p-btn" id="newp">+ Produkt</button>
+      </div>
+    </div>
+
+    <div class="p-top">
+      <div id="filtr" data-choice role="group" aria-label="Filtr" class="p-pills">
+        <button type="button" class="p-pill" data-value="all" aria-pressed="true">Wszystkie</button>
+        <button type="button" class="p-pill" data-value="low" aria-pressed="false">Do zamówienia <span id="lowc"></span></button>
+      </div>
+      <label class="p-sr" for="q">Szukaj produktu</label>
+      <input id="q" type="search" class="p-in" placeholder="Szukaj produktu" style="min-width: 220px">
+    </div>
+
+    <section class="p-card">
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Produkt</th><th>Kategoria</th><th>Stan</th><th>Próg alertu</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+      <span id="pusto" class="p-mut" hidden>Brak produktów do zamówienia.</span>
+    </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc;
+  const SEED = [
+    { n: 'Lakier hybrydowy, burgund', k: 'Paznokcie', s: 6, p: 2, u: 'szt.' }, { n: 'Żel budujący, przezroczysty', k: 'Paznokcie', s: 2, p: 3, u: 'szt.' },
+    { n: 'Baza hybrydowa', k: 'Paznokcie', s: 4, p: 2, u: 'szt.' }, { n: 'Top bez przemywania', k: 'Paznokcie', s: 3, p: 2, u: 'szt.' }, { n: 'Velvet, puder', k: 'Paznokcie', s: 5, p: 2, u: 'szt.' },
+    { n: 'Klej do rzęs', k: 'Rzęsy', s: 3, p: 2, u: 'szt.' }, { n: 'Rzęsy 0,07 C 12 mm', k: 'Rzęsy', s: 8, p: 3, u: 'taśm' }, { n: 'Płatki hydrożelowe', k: 'Rzęsy', s: 10, p: 4, u: 'par' },
+    { n: 'Henna do brwi, brąz', k: 'Brwi', s: 4, p: 2, u: 'szt.' }];
+  let P = Mock.get('magazyn', SEED), filt = 'all', q = '';
+  const save = () => Mock.set('magazyn', P);
+  const low = x => x.s <= x.p;
+
+  function render() {
+    document.getElementById('lowc').textContent = '(' + P.filter(low).length + ')';
+    const v = P.map((x, i) => ({ ...x, i })).filter(x => (filt === 'all' || low(x)) && x.n.toLowerCase().includes(q));
+    document.getElementById('rows').innerHTML = v.map(x => `<tr>
+      <td><b>${E(x.n)}</b></td><td>${E(x.k)}</td>
+      <td><span style="display:inline-flex;gap:6px;align-items:center"><span id="st-${x.i}" data-min="0" style="min-width:28px;text-align:center;font-weight:700">${x.s}</span> <span class="p-mut">${E(x.u)}</span></span></td>
+      <td><input class="p-in s" type="number" min="0" value="${x.p}" style="width:72px" data-p="${x.i}" aria-label="Próg alertu: ${E(x.n)}"></td>
+      <td>${low(x) ? '<span class="p-badge warn">do zamówienia</span>' : '<span class="p-badge ok">w normie</span>'}</td>
+      <td style="white-space:nowrap"><button type="button" class="p-btn sm" data-use="${x.i}" aria-label="Zużyj 1: ${E(x.n)}" ${x.s <= 0 ? 'disabled' : ''}>Zużyj −1</button> ${low(x) ? `<button type="button" class="p-btn sm dark" data-order="${x.i}">Zamów</button>` : ''}</td></tr>`).join('');
+    document.getElementById('pusto').hidden = v.length > 0;
+  }
+  const rows = document.getElementById('rows');
+  rows.addEventListener('click', e => {
+    const u = e.target.closest('[data-use]'), o = e.target.closest('[data-order]');
+    if (u) {
+      const x = P[+u.dataset.use]; if (x.s <= 0) return;
+      x.s -= 1; save(); render();
+      Mock.toast(low(x) ? `${x.n}: zostało ${x.s}, poniżej progu. Zamów` : `Zużyto 1: ${x.n}, zostało ${x.s}`);
+    }
+    if (o) Mock.toast('Dodano do listy zamówień: ' + P[+o.dataset.order].n);
+  });
+  rows.addEventListener('change', e => { const i = e.target.dataset.p; if (i === undefined) return; P[+i].p = Math.max(0, +e.target.value || 0); save(); render(); Mock.toast('Zapisano próg alertu'); });
+  document.getElementById('filtr').addEventListener('mock:choice', e => { filt = e.detail.button.dataset.value; render(); });
+  document.getElementById('q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); render(); });
+  document.getElementById('deliv').addEventListener('click', () => PS.modal({
+    title: 'Przyjmij dostawę', ok: 'Przyjmij',
+    body: `<label class="p-lab">Produkt<select class="p-in" name="p">${P.map((x, i) => `<option value="${i}">${E(x.n)} (stan ${x.s})</option>`).join('')}</select></label><label class="p-lab">Ilość<input class="p-in" type="number" min="1" name="n" value="5" required></label><label class="p-lab">Numer dokumentu (opcjonalnie)<input class="p-in" name="d" placeholder="np. FV/…"></label>`,
+    onOk: f => { P[+f.p.value].s += +f.n.value; save(); render(); },
+    toast: f => `Przyjęto dostawę: +${f.n.value} ${P[+f.p.value].u}`
+  }));
+  document.getElementById('newp').addEventListener('click', () => PS.modal({
+    title: 'Nowy produkt', ok: 'Dodaj',
+    body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required></label><label class="p-lab">Kategoria<select class="p-in" name="k"><option>Paznokcie</option><option>Rzęsy</option><option>Brwi</option><option>Inne</option></select></label><div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Stan<input class="p-in" type="number" min="0" name="s" value="0"></label><label class="p-lab" style="flex:1">Próg alertu<input class="p-in" type="number" min="0" name="p" value="2"></label></div>`,
+    onOk: f => { P.push({ n: f.n.value.trim(), k: f.k.value, s: +f.s.value, p: +f.p.value, u: 'szt.' }); save(); render(); },
+    toast: f => 'Dodano produkt: ' + f.n.value.trim()
+  }));
+  render();
+});
+</script>
+</body>
+</html>

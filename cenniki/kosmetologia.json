@@ -1,0 +1,58 @@
+{
+  "kategoria": "kosmetologia",
+  "brutto": true,
+  "waluta": "PLN",
+  "obowiazujeOd": "2026-10-01",
+  "zrodlo": "kwasy, wodorowe, dodatki: Esthe Lublin; mikroigłowa i czasy: Estetyczne Terapie Płock; RF i serie: New-Derm Wrocław; Kobido: Centrum Estetica, Aspalia",
+  "flagiSalonu": { "urzadzenie_dopuszczone_dla_kosmetologa": false },
+  "trybyObszaru": "tabela = cena za T / TS / TSD; doplata = cena twarzy + stała dopłata za szyję lub szyję i dekolt; okolice = cena za liczbę okolic (1 twarz, 2 + szyja, 3 + dekolt)",
+  "obszary": [
+    { "id": "T", "nazwa": "Twarz" },
+    { "id": "TS", "nazwa": "Twarz i szyja" },
+    { "id": "TSD", "nazwa": "Twarz, szyja i dekolt" }
+  ],
+  "osobneObszary": [
+    { "id": "oczy", "nazwa": "Okolice oczu" },
+    { "id": "plecy", "nazwa": "Plecy" }
+  ],
+  "zabiegi": [
+    { "id": "wodorowe", "nazwa": "Oczyszczanie wodorowe", "trybObszaru": "okolice", "okolice": { "1": { "cena": 250, "min": 45 }, "2": { "cena": 280, "min": 60 }, "3": { "cena": 320, "min": 75 } }, "zalozenieMin": true, "ciaza": "od_II_trymestru" },
+    { "id": "kwas_migdalowy", "nazwa": "Peeling kwasem migdałowym", "opis": "łagodny, można cały rok", "trybObszaru": "tabela", "ceny": { "T": 300, "TS": 340, "TSD": 410 }, "min": { "T": 45, "TS": 60, "TSD": 75 }, "zalozenieMin": true, "plecy": { "cena": 400, "min": 60, "zalozenieMin": true }, "ostrzezenieSezon": false, "kwas": true },
+    { "id": "mikroiglowa", "nazwa": "Mezoterapia mikroigłowa", "opis": "ampułka kosmetyczna", "trybObszaru": "tabela", "ceny": { "T": 450, "TS": 500, "TSD": 550 }, "min": { "T": 75, "TS": 80, "TSD": 90 }, "oczy": { "cena": 300, "min": 60 },
+      "konsultacja": { "tryb": "platna_odliczana", "cena": 199, "min": 30, "odliczanaDni": 30, "zrodlo": "MN Kosmetologia Swarzędz", "zalozenieMin": true } },
+    { "id": "rf", "nazwa": "RF bezigłowa (thermolifting)", "trybObszaru": "doplata", "cena": 250, "min": 70, "doplaty": { "TS": { "nazwa": "szyja", "cena": 50, "min": 0 }, "TSD": { "nazwa": "szyja i dekolt", "cena": 100, "min": 0 } }, "zalozenieMinDoplat": true, "zrodloDoplat": "New-Derm Wrocław", "seria": { "5": 1100, "10": 1900 }, "seriaTylkoObszar": "T" },
+    { "id": "kobido", "nazwa": "Masaż Kobido", "warianty": [{ "min": 60, "cena": 220 }, { "min": 90, "cena": 250 }], "seria": { "3": 528 }, "ciaza": "od_II_trymestru" },
+    { "id": "rf_mikroiglowa", "nazwa": "RF mikroigłowa", "ceny": { "T": 1290, "TS": 1490, "TSD": 1830 }, "min": 60, "wymagaFlagiSalonu": "urzadzenie_dopuszczone_dla_kosmetologa" }
+  ],
+  "dodatki": [
+    { "id": "warstwa_kwasu", "nazwa": "Dodatkowa warstwa kwasu", "ceny": { "T": 60, "TS": 80, "TSD": 100 }, "min": 10, "zalozenieMin": true, "dotyczy": ["kwas_migdalowy"] }
+  ],
+  "seriaDomyslnie": { "rabat": { "3": 0.10, "5": 0.10, "10": 0.20 }, "waznoscMies": 4, "platnosc": "z_gory", "odstepDni": null },
+  "konsultacja": { "tryb": "bezplatna_z_zabiegiem", "cena": 0, "min": 30, "odliczanaDni": 30 },
+  "wykluczone": ["toksyna botulinowa", "wypełniacze", "mezoterapia igłowa", "PRP", "nici", "peelingi średnio głębokie i głębokie", "lasery wysokoenergetyczne", "HIFU", "IPL", "lipoliza iniekcyjna"],
+  "ankieta": {
+    "cel": [
+      { "id": "oczyszczenie", "nazwa": "oczyszczenie", "polec": "wodorowe", "alternatywa": "kwas_migdalowy" },
+      { "id": "blask", "nazwa": "nawilżenie i blask", "polec": "wodorowe", "alternatywa": "mikroiglowa" },
+      { "id": "przebarwienia", "nazwa": "przebarwienia", "polec": "kwas_migdalowy", "alternatywa": "wodorowe" },
+      { "id": "jedrnosc", "nazwa": "jędrność", "polec": "mikroiglowa", "alternatywa": "rf" },
+      { "id": "relaks", "nazwa": "relaks", "polec": "kobido", "alternatywa": "wodorowe" }
+    ],
+    "skora": [
+      { "id": "normalna", "nazwa": "normalna" },
+      { "id": "sucha", "nazwa": "sucha" },
+      { "id": "mieszana", "nazwa": "mieszana" },
+      { "id": "wrazliwa", "nazwa": "wrażliwa", "unikaj": ["mikroiglowa"] }
+    ],
+    "zalozenie": true
+  },
+  "wywiad": [
+    { "id": "ciaza", "pytanie": "Jesteś w ciąży lub karmisz?", "skutek": "wg_zabiegu", "komunikat": "W ciąży część zabiegów jest niedostępna. Kosmetolożka dobierze bezpieczny zabieg na konsultacji." },
+    { "id": "izotretynoina", "pytanie": "Przyjmujesz izotretynoinę lub retinoidy doustne?", "skutek": "konsultacja", "komunikat": "Okres przerwy po leczeniu ustala kosmetolożka na konsultacji." },
+    { "id": "opryszczka", "pytanie": "Masz teraz opryszczkę lub inną infekcję skóry twarzy?", "skutek": "blokada", "komunikat": "Przy aktywnej infekcji nie wykonujemy zabiegu. Wróć, gdy minie." },
+    { "id": "antykoagulanty", "pytanie": "Przyjmujesz leki przeciwzakrzepowe?", "skutek": "blokada", "dotyczy": ["mikroiglowa"], "komunikat": "Przy lekach przeciwzakrzepowych nie wykonujemy zabiegów mikroigłowych. Możesz wybrać inny zabieg." },
+    { "id": "rozrusznikICD", "pytanie": "Masz rozrusznik serca, ICD lub metalowy implant w twarzy?", "skutek": "blokada", "dotyczy": ["rf", "rf_mikroiglowa"], "komunikat": "RF nie wykonujemy przy rozruszniku, ICD ani metalowych implantach w obszarze zabiegu." },
+    { "id": "onkologia", "pytanie": "Jesteś w trakcie lub do 5 lat po leczeniu onkologicznym?", "skutek": "konsultacja", "komunikat": "Porozmawiajmy przed zabiegiem, czasem potrzebna jest zgoda lekarza." },
+    { "id": "opalenizna", "pytanie": "Opalałaś się w ostatnich 2 tygodniach?", "skutek": "ostrzezenie", "uwaga": "Po zabiegu chroń skórę kremem SPF 50 przez 2 tygodnie." }
+  ]
+}

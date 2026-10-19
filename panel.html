@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – kalendarz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+<script src="panel-drag.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 940px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <h1 class="p-h1">Wtorek, 20 października</h1>
+      <div class="p-acts">
+        <div role="group" aria-label="Widok" style="display: flex; border: 1px solid #E4D9DE; border-radius: 10px; overflow: hidden; background: #FFFFFF">
+          <span aria-current="page" style="min-height: 44px; padding: 0 14px; background: #1E1A1D; color: #FFFFFF; display: flex; align-items: center">Dzień</span>
+          <a href="panel-tydzien.html" style="min-height: 44px; padding: 0 14px; background: #FFFFFF; color: #1E1A1D; text-decoration: none; display: flex; align-items: center">Tydzień</a>
+        </div>
+        <button type="button" class="p-btn pri" id="add-visit">+ Wizyta</button>
+      </div>
+    </div>
+    <p class="p-mut" style="margin:0">Przeciągnij wizytę, żeby ją przenieść na inną godzinę lub do innej stylistki (na telefonie przytrzymaj blok). Z klawiatury: zaznacz blok i naciśnij Alt + strzałki albo „Przenieś” w szczegółach.</p>
+
+    <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; overflow-x: auto">
+      <div style="min-width: 520px; display: grid; grid-template-columns: 56px minmax(0, 1fr) minmax(0, 1fr)">
+        <div style="border-bottom: 1px solid #F0E8EC"></div>
+        <div style="padding: 12px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC; font-weight: 700">[Stylistka 1] <span style="color: #625860; font-weight: 400">· paznokcie</span></div>
+        <div style="padding: 12px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC; font-weight: 700">[Stylistka 2] <span style="color: #625860; font-weight: 400">· rzęsy, brwi, paznokcie</span></div>
+
+        <div style="position: relative; height: 576px; color: #625860; font-size: 12px">
+          <span style="position: absolute; top: 2px; right: 8px">9:00</span>
+          <span style="position: absolute; top: 66px; right: 8px">10:00</span>
+          <span style="position: absolute; top: 130px; right: 8px">11:00</span>
+          <span style="position: absolute; top: 194px; right: 8px">12:00</span>
+          <span style="position: absolute; top: 258px; right: 8px">13:00</span>
+          <span style="position: absolute; top: 322px; right: 8px">14:00</span>
+          <span style="position: absolute; top: 386px; right: 8px">15:00</span>
+          <span style="position: absolute; top: 450px; right: 8px">16:00</span>
+          <span style="position: absolute; top: 514px; right: 8px">17:00</span>
+        </div>
+        <div id="col1" data-col="1" style="position: relative; height: 576px; border-left: 1px solid #F0E8EC"></div>
+        <div id="col2" data-col="2" style="position: relative; height: 576px; border-left: 1px solid #F0E8EC">
+          <div style="position: absolute; top: 450px; left: 6px; right: 6px; height: 60px; box-sizing: border-box; padding: 8px 10px; border-radius: 10px; border: 1px dashed #A99BA2; background: #FFFFFF; color: #625860; display: flex; align-items: center">Blokada ręczna · wizyta z Booksy</div>
+        </div>
+      </div>
+    </div>
+
+    <section id="nowe" class="p-card" aria-labelledby="nowe-h">
+      <div class="p-top"><h2 id="nowe-h" class="p-h2">Nowe rezerwacje</h2><a href="paznokcie.html" class="p-btn sm">Zrób rezerwację w kreatorze</a></div>
+      <div id="nowe-list" style="display: flex; flex-direction: column; gap: 8px"></div>
+      <span class="p-mut">Rezerwacje klientek z kreatora i wyszukiwarki pojawiają się tu od razu po wyborze terminu. Wiersz „przykład” jest stały.</span>
+    </section>
+
+    <section class="p-card" aria-labelledby="wyc-h">
+      <div class="p-top"><h2 id="wyc-h" class="p-h2">Wyceny do odesłania</h2><a href="wyceny.html" class="p-btn sm">Wszystkie wyceny</a></div>
+      <div id="wyc-list" style="display: flex; flex-direction: column; gap: 8px"></div>
+    </section>
+
+    <section class="p-card" aria-labelledby="wait-h">
+      <h2 id="wait-h" class="p-h2">Lista oczekujących</h2>
+      <div id="wait-list" style="display: flex; flex-direction: column; gap: 8px"></div>
+    </section>
+  </main>
+
+  <aside id="detail" aria-label="Szczegóły wizyty" aria-live="polite" style="flex: 1 1 320px; max-width: 400px; box-sizing: border-box; padding: 24px; background: #FFFFFF; border-left: 1px solid #F0E8EC; display: flex; flex-direction: column; gap: 16px"></aside>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, KC = { p: ['#F6EDF1', '#625860'], r: ['#EAF0F7', '#4E5A66'], b: ['#EEF3EA', '#4E5A66'] };
+  const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const fmt = KalDrag.fmt;
+  const SLOTS = PS.SLOTS, PPM = 64 / 60, DAY0 = 540, DAY1 = 1080;
+  const techMin = () => (Mock.get('kalendarz', { techMin: 10 }) || {}).techMin ?? 10; // przerwa po każdej wizycie, ustawiana w cenniku
+  const parseDur = s => { const h = /(\d+)\s*h/.exec(s || ''), m = /(\d+)\s*min/.exec(s || ''); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0); };
+  // gaps: [{od, dl}] = luka w bloku (np. działanie farby): od minut od startu wizyty, dl minut wolnych
+  const BASE = {
+    a: { col: 1, t: '9:00', dur: 75, name: '[Klientka A]', phone: '[telefon]', info: '2. wizyta · ostatnio 5 tyg. temu', kind: 'p', svc: 'Hybryda jednolita', items: [['Manicure hybrydowy', 140]], hist: ['17.10, 18:30 · rezerwacja z wyszukiwarki', '17.10, 18:30 · SMS z potwierdzeniem doręczony', '19.10, 9:00 · przypomnienie SMS (zaplanowane)'] },
+    j: { col: 1, t: '10:25', dur: 40, name: '[Klientka J] i [Klientka J2]', phone: '[telefon]', info: 'dwie osoby naraz', kind: 'p', svc: 'Mini manicure', osoby: 2, items: [['Mini manicure × 2 osoby', 70]], przyklad: true, hist: ['16.10, 19:00 · rezerwacja dla dwóch osób z wyszukiwarki'] },
+    b: { col: 1, t: '11:15', dur: 110, name: '[Klientka B]', phone: '[telefon]', info: '4. wizyta · ostatnio 3 tyg. temu', kind: 'p', svc: 'Hybryda M · velvet × 10', items: [['Manicure hybrydowy', 140], ['Długość M', 10], ['Velvet × 10 paz.', 50]], note: 'Lakier: [marka, kod odcienia]', hist: ['18.10, 21:04 · rezerwacja z linku na Instagramie', '18.10, 21:04 · SMS z potwierdzeniem doręczony', '19.10, 11:15 · przypomnienie SMS (zaplanowane)'] },
+    c: { col: 1, t: '14:00', dur: 175, name: '[Klientka C]', phone: '[telefon]', info: '1. wizyta', kind: 'p', svc: 'Przedłużanie L · french', items: [['Przedłużanie (tipsy / szablon)', 200], ['Długość L', 20], ['French', 20]], smsFail: true, hist: ['16.10, 12:40 · rezerwacja z wyszukiwarki', '19.10, 8:00 · przypomnienie SMS NIE DOTARŁO (numer poza zasięgiem)'] },
+    k: { col: 1, t: '17:05', dur: 40, name: '[Klientka K2]', phone: '[telefon]', info: 'wizyta u klientki', kind: 'p', svc: 'Zdjęcie hybrydy u klientki', dojazd: { adres: '[ulica, miasto]', oplata: 30, strefa: 'do 10 km' }, items: [['Zdjęcie hybrydy', 20]], hist: ['17.10, 8:20 · rezerwacja z dojazdem'] },
+    d: { col: 2, t: '9:30', dur: 90, name: '[Klientka D]', phone: '[telefon]', info: '3. wizyta · ostatnio 3 tyg. temu', kind: 'r', svc: 'Rzęsy 1:1 · uzupełnienie', items: [['Uzupełnienie rzęs 1:1', 150]], przyklad: true, hist: ['15.10, 20:10 · rezerwacja z linku na Instagramie', '15.10, 20:10 · SMS z potwierdzeniem doręczony'] },
+    m: { col: 2, t: '11:15', dur: 50, name: '[Klientka M]', phone: '[telefon]', info: 'trzy usługi w jednej wizycie', kind: 'p', svc: '3 usługi', items: [['Zdjęcie hybrydy', 20], ['Naprawa paznokcia (cena przykładowa)', 15], ['Regulacja brwi (cena przykładowa)', 40]], przyklad: true, hist: ['17.10, 20:40 · rezerwacja z koszyka usług'] },
+    g: { col: 2, t: '12:15', dur: 60, name: '[Klientka I]', phone: '[telefon]', info: '2. wizyta', kind: 'b', svc: 'Brwi: henna + regulacja', items: [['Henna + regulacja brwi', 70]], gaps: [{ od: 30, dl: 15 }], przyklad: true, hist: ['14.10, 9:15 · rezerwacja telefoniczna'] },
+    e: { col: 2, t: '13:30', dur: 120, name: '[Klientka E]', phone: '[telefon]', info: '5. wizyta · ostatnio 4 tyg. temu', kind: 'p', svc: 'Żel · french', items: [['Żel na naturalnej płytce', 170], ['French', 20]], hist: ['12.10, 17:55 · rezerwacja z wyszukiwarki', '12.10, 17:55 · SMS z potwierdzeniem doręczony'] }
+  };
+  const LOCK = [{ col: 2, a: 960, b: 1016, name: 'Blokada ręczna' }]; // stała blokada w kolumnie 2
+  const SHORT = [['Zdjęcie hybrydy', 15, 20], ['Naprawa paznokcia (cena przykładowa)', 10, 15], ['Parafina na dłonie (cena przykładowa)', 15, 25]]; // [nazwa, minuty, zł]
+  let S = Mock.get('panel.state', {}); // {id: {t, col, extras, paid, ok}}
+  const save = () => Mock.set('panel.state', S);
+  const st = id => (S[id] = S[id] || {});
+  let sel = 'b';
+
+  // Wizyta klientki z Mock "visits" (także kilka usług, osoby, dojazd) -> wpis kalendarza
+  function fromVisit(v) {
+    const us = Array.isArray(v.uslugi) && v.uslugi.length ? v.uslugi : null;
+    const price = u => Number(u.cena ?? u.cenaMin ?? 0) || 0;
+    const items = us ? us.map(u => [u.opis || u.usluga || 'Usługa', price(u)]) : [[v.opis || v.usluga || 'Wizyta', Number(v.cena) || 0]];
+    const gaps = []; let cum = 0;
+    (us || [{ czas: v.czas || parseDur(v.czasTekst) || 60, przerwaMin: v.przerwaMin }]).forEach(u => {
+      const c = Number(u.czas) || 0;
+      if (u.przerwaMin > 0 && c > u.przerwaMin) gaps.push({ od: cum + Math.round((c - u.przerwaMin) / 2 / 5) * 5, dl: u.przerwaMin });
+      cum += c;
+    });
+    const dur = (us ? cum : 0) || v.czas || parseDur(v.czasTekst) || 60;
+    const k = (us ? us[0].kategoria : v.kategoria) === 'Rzęsy' ? 'r' : (us ? us[0].kategoria : v.kategoria) === 'Brwi' ? 'b' : 'p';
+    if (v.dojazd) items.push([`Dojazd (${v.dojazd.strefa || 'strefa'})`, Number(v.dojazd.oplata) || 0]);
+    return { col: v.stylistka === '[Stylistka 2]' ? 2 : 1, t: v.godzina, dur, name: v.klientka || 'Klientka online', phone: v.tel || '[telefon]', info: [v.zrodlo === 'panel' ? 'dodana ręcznie w panelu' : 'rezerwacja online', v.dlaKogo && v.dlaKogo.imie ? 'dla: ' + v.dlaKogo.imie : ''].filter(Boolean).join(' · '),
+      kind: k, svc: us && us.length > 1 ? us.length + ' usługi' : items[0][0], items, gaps, osoby: v.osoby > 1 ? v.osoby : 0, dojazd: v.dojazd || null, przyklad: k !== 'p' || v.zrodlo === 'panel', hist: [v.zrodlo === 'panel' ? 'dodana w panelu ręcznie' : 'rezerwacja online od klientki'] };
+  }
+  function all() {
+    const out = {};
+    Object.entries(BASE).forEach(([id, b]) => { out[id] = { gaps: [], ...b }; });
+    Mock.get('visits', []).forEach(v => {
+      const m = /(\d{1,2})\.(\d{1,2})/.exec(v.dzien || '');
+      if (!m || +m[1] !== 20 || +m[2] !== 10 || !v.godzina || v.status === 'odwołana' || v.status === 'odbyta') return;
+      out['v' + v.id] = fromVisit(v);
+    });
+    Mock.get('panel.mini', []).forEach(x => { out[x.id] = { col: x.col, t: x.t, dur: x.dur, name: x.name, phone: '[telefon]', info: 'w luce po przerwie w usłudze', kind: 'p', svc: x.svc, items: [[x.svc, x.price]], gaps: [], przyklad: true, hist: ['dodana w luce w wizycie ' + x.host] }; });
+    Object.entries(out).forEach(([id, o]) => { const s = st(id); if (s.t) o.t = s.t; if (s.col) o.col = s.col; });
+    return out;
+  }
+  const total = (id, v) => v.items.reduce((s, i) => s + i[1], 0) + (st(id).extras || []).reduce((s, i) => s + i[1], 0);
+
+  // Zajęte odcinki wizyty (bez luk); po ostatnim odcinku doliczamy przerwę techniczną, gdy tech = true
+  const segs = (o, tech) => { const a = toMin(o.t), pts = [0, ...o.gaps.flatMap(g => [g.od, g.od + g.dl]), o.dur], out = []; for (let i = 0; i < pts.length; i += 2) out.push([a + pts[i], a + pts[i + 1] + (i + 2 >= pts.length ? tech : 0)]); return out; };
+  function check(id, colEl, start, dur) {
+    const col = +colEl.dataset.col, V = all();
+    if (start < DAY0 || start + dur > DAY1) return 'poza godzinami kalendarza (9:00–18:00).';
+    const inGap = Object.entries(V).some(([k, o]) => k !== id && o.col === col && o.gaps.some(g => start >= toMin(o.t) + g.od && start + dur <= toMin(o.t) + g.od + g.dl));
+    for (const tech of [0, techMin()]) {
+      const end = start + dur + (tech && !inGap ? tech : 0);
+      for (const [k, o] of Object.entries(V)) {
+        if (k === id || o.col !== col) continue;
+        const hit = segs(o, tech).find(([a, b]) => start < b && end > a);
+        if (hit) return tech ? `za mało przerwy po wizycie: ${o.name} (${fmt(toMin(o.t))}–${fmt(toMin(o.t) + o.dur)}) wymaga ${tech} min odstępu.` : `termin zajęty przez wizytę ${o.name} (${fmt(toMin(o.t))}–${fmt(toMin(o.t) + o.dur)}).`;
+      }
+      const l = LOCK.find(x => x.col === col && start < x.b && end > x.a);
+      if (l) return `${l.name} ${fmt(l.a)}–${fmt(l.b)}.`;
+    }
+    return '';
+  }
+
+  const colEl = n => document.getElementById('col' + n);
+  function renderBlocks() {
+    const V = all();
+    ['1', '2'].forEach(c => document.querySelectorAll('#col' + c + ' [data-id],#col' + c + ' .gap').forEach(n => n.remove()));
+    Object.entries(V).forEach(([id, v]) => {
+      const top = (toMin(v.t) - DAY0) * PPM + 2, h = Math.max(44, v.dur * PPM - 4), [bg, mut] = KC[v.kind];
+      const b = document.createElement('button');
+      b.type = 'button'; b.dataset.id = id; b.className = 'kal-item';
+      b.setAttribute('aria-pressed', String(id === sel));
+      b.setAttribute('aria-keyshortcuts', 'Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight');
+      b.title = 'Przeciągnij albo Alt + strzałki, żeby przenieść';
+      b.style.cssText = `position:absolute;top:${top}px;left:6px;right:6px;height:${h}px;box-sizing:border-box;padding:6px 10px;border-radius:10px;border:0;background:${bg};color:#1E1A1D;font:inherit;text-align:left;cursor:grab;display:flex;flex-direction:column;gap:1px;overflow:hidden;${id === sel ? 'box-shadow:0 0 0 2px #9E1F50;' : ''}`;
+      const tags = [v.osoby ? v.osoby + ' os.' : '', v.dojazd ? 'dojazd' : '', st(id).paid ? 'rozliczona' : ''].filter(Boolean);
+      const names = v.items.filter(i => !/^Dojazd/.test(i[0])).map(i => i[0]);
+      const lines = names.length > 1 ? names : [v.svc];
+      let cap = Math.max(0, Math.floor((h - 12) / 17) - 1);
+      if (v.gaps.length) cap = Math.min(cap, Math.max(0, Math.floor((v.gaps[0].od * PPM - 6) / 17) - 1)); // tekst nie wchodzi w lukę
+      const shown = lines.length <= cap ? lines : cap < 1 ? [] : cap === 1 ? [v.svc] : lines.slice(0, cap - 1).concat('+' + (lines.length - cap + 1) + ' więcej');
+      b.innerHTML = `<span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fmt(toMin(v.t))} · ${E(v.name)}${tags.length ? ' · ' + tags.join(' · ') : ''}</span>` + shown.map(l => `<span style="color:${mut};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(l)}</span>`).join('');
+      colEl(v.col).append(b);
+      v.gaps.forEach(g => {
+        const gd = document.createElement('div'); gd.className = 'gap';
+        gd.style.cssText = `position:absolute;left:10px;right:10px;top:${top + g.od * PPM}px;height:${g.dl * PPM}px;box-sizing:border-box;border:1px dashed #A99BA2;border-radius:6px;background:#FFFFFF;color:#625860;font-size:12px;padding:0 6px;display:flex;align-items:center;pointer-events:none;overflow:hidden;white-space:nowrap`;
+        gd.textContent = `wolne ${g.dl} min`; colEl(v.col).append(gd);
+      });
+    });
+  }
+
+  function renderDetail() {
+    const V = all(), v = V[sel] || V.b, s = st(sel), t = v.t, end = fmt(toMin(t) + v.dur), tot = total(sel, v);
+    const rows = v.items.map(i => `<div style="display:flex;justify-content:space-between;gap:8px"><span>${E(i[0])}</span><span>${i[1]} zł</span></div>`).join('') +
+      (s.extras || []).map(i => `<div style="display:flex;justify-content:space-between;gap:8px"><span>${E(i[0])}<br><small style="color:#625860">powód: ${E(i[2])}</small></span><span>${i[1] > 0 ? '+' : ''}${i[1]} zł</span></div>`).join('');
+    const gap = v.gaps[0];
+    document.getElementById('detail').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="color:#625860;font-size:13px">${fmt(toMin(t))}–${end} · [Stylistka ${v.col}] ${s.paid ? '<span class="p-badge ok">rozliczona</span>' : ''}${v.osoby ? ` <span class="p-badge blue">${v.osoby} os.</span>` : ''}${v.dojazd ? ' <span class="p-badge warn">dojazd</span>' : ''}</span>
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;overflow-wrap:anywhere">${E(v.name)}</h2>
+      <span style="color:#625860">${E(v.phone)} · ${E(v.info)}</span>
+      ${v.dojazd ? `<span style="color:#625860">Dojazd: ${E(v.dojazd.adres)}, ${E(v.dojazd.strefa || '')}, opłata ${E(v.dojazd.oplata)} zł</span>` : ''}
+    </div>
+    ${v.smsFail ? `<div class="p-row" style="background:#FFF1E0;color:#8A3B12"><span><b>SMS nie dotarł.</b> Numer poza zasięgiem.</span><button type="button" class="p-btn sm" data-act="sms">Wyślij ponownie</button></div>` : ''}
+    <div style="border:1px solid #E4D9DE;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px">
+      <h3 style="margin:0;font-size:14px;font-weight:700">${v.items.length > 1 ? 'Usługi w wizycie' : 'Karta stylizacji'}</h3>${rows}
+      <hr class="p-sep"><div style="display:flex;justify-content:space-between;font-weight:700"><span>Razem</span><span>${tot} zł</span></div>
+      ${v.note ? `<span style="color:#625860;font-size:12px">${E(v.note)}</span>` : ''}
+      ${v.przyklad ? '<span style="color:#625860;font-size:12px">Cena przykładowa.</span>' : ''}
+    </div>
+    ${gap ? `<div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:14px;font-weight:700">Przerwa w usłudze</h3>
+      <span>${fmt(toMin(t) + gap.od)}–${fmt(toMin(t) + gap.od + gap.dl)} · ${gap.dl} min wolnych (np. działanie farby)</span>
+      <button type="button" class="p-btn" data-act="gap">Wstaw krótką usługę w lukę</button></div>` : ''}
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h3 style="margin:0;font-size:14px;font-weight:700">Zmiany na wizycie</h3>
+      <button type="button" class="p-btn dash" style="justify-content:flex-start" data-act="extra">+ Dodaj lub usuń pozycję z powodem</button>
+      <span style="color:#625860;font-size:12px;line-height:1.4">Np. „onycholiza, tylko zdjęcie materiału”. Klientka zobaczy zmianę w swojej karcie.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h3 style="margin:0;font-size:14px;font-weight:700">Historia wizyty</h3>
+      <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;color:#625860;font-size:13px">${v.hist.concat(s.t ? ['teraz · przeniesiona na ' + fmt(toMin(s.t))] : []).map(h => `<li>${E(h)}</li>`).join('')}</ol>
+    </div>
+    <div style="margin-top:auto;display:flex;gap:8px">
+      <button type="button" class="p-btn dark" style="flex:1" data-act="pay"${s.paid ? ' disabled' : ''}>${s.paid ? 'Rozliczona' : 'Rozlicz'}</button>
+      <button type="button" class="p-btn" style="flex:1" data-act="move">Przenieś</button>
+    </div>`;
+  }
+
+  function renderNew() {
+    const vs = Mock.get('visits', []).filter(v => v.status === 'nadchodząca' && !v.zrodlo);
+    const row = (v, ex) => {
+      const ok = st('v' + v.id).ok, n = Array.isArray(v.uslugi) && v.uslugi.length > 1 ? v.uslugi.length : 0;
+      return `<div class="p-row" data-vid="${E(v.id)}"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span><b>${E(v.klientka || 'Klientka online')}</b> ${ex ? '<span class="p-badge blue">przykład</span>' : '<span class="p-badge">z kreatora</span>'}${n ? ` <span class="p-badge">${n} usługi</span>` : ''}${v.osoby > 1 ? ` <span class="p-badge blue">${v.osoby} os.</span>` : ''}${v.dojazd ? ' <span class="p-badge warn">dojazd</span>' : ''}${ok ? ' <span class="p-badge ok">potwierdzona</span>' : ''}</span>
+        <span>${E(v.opis || v.usluga || 'Wizyta')}${v.cena ? ' · ' + E(v.cena) + ' zł' : ''}${v.czasTekst ? ' · ' + E(v.czasTekst) : ''}</span>
+        <span style="color:#625860;font-size:13px">${E([v.dzien, v.godzina].filter(Boolean).join(', ') || 'termin do ustalenia')} · ${E(v.stylistka || '[Stylistka]')} · ${E(v.studio || '[Studio 1]')}</span></div>
+        <div class="p-acts">${ok ? '' : '<button type="button" class="p-btn sm dark" data-act="ok">Potwierdź</button>'}<button type="button" class="p-btn sm" data-act="no">Odrzuć</button></div></div>`;
+    };
+    document.getElementById('nowe-list').innerHTML = vs.map(v => row(v)).join('') +
+      row({ id: 'ex', klientka: '[Klientka G]', opis: 'Hybryda M', cena: 150, czasTekst: '1 h 20 min', dzien: 'śr 21.10', godzina: '9:00', stylistka: '[Stylistka 1]' }, true);
+  }
+
+  function renderQuotes() {
+    const stt = PS.quoteState();
+    const list = PS.QUOTES.filter(q => !(stt[q.id] && stt[q.id].status === 'wysłana')).map(q => ({ k: q.klientka, o: q.opis, c: q.kolor }))
+      .concat(Mock.get('quotes', []).filter(q => q.status !== 'wysłana' && !(stt[q.id] && stt[q.id].status === 'wysłana')).map(q => ({ k: q.klientka || 'Klientka online', o: q.opis || 'zdjęcie inspiracji', c: '#C98C8C' })));
+    document.getElementById('wyc-list').innerHTML = list.slice(0, 3).map(q => `<div class="p-row"><div style="display:flex;gap:12px;align-items:center"><div role="img" aria-label="Zdjęcie inspiracji od klientki" style="width:48px;height:48px;border-radius:10px;background:${q.c};flex:none"></div><div style="display:flex;flex-direction:column;gap:2px"><b>${E(q.k)}</b><span style="color:#625860">„${E(q.o)}”</span></div></div><a class="p-btn" href="paznokcie.html">Odtwórz w kreatorze</a></div>`).join('') || '<span class="p-mut">Wszystkie wyceny odesłane.</span>';
+  }
+
+  const WAIT = [['[Klientka K]', 'hybryda, chce sobotę przed południem'], ['[Klientka L]', 'rzęsy 2D, dowolny dzień po 16:00']];
+  function renderWait() {
+    const sent = Mock.get('panel.wait', []);
+    document.getElementById('wait-list').innerHTML = WAIT.map((w, i) => `<div class="p-row"><span><b>${E(w[0])}</b><br><span style="color:#625860">${E(w[1])}</span></span>${sent.includes(i) ? '<span class="p-badge ok">propozycja wysłana</span>' : `<button type="button" class="p-btn sm" data-wait="${i}">Zaproponuj termin</button>`}</div>`).join('');
+  }
+
+  function renderAll() { renderBlocks(); renderDetail(); renderNew(); renderQuotes(); renderWait(); }
+
+  // --- przeciąganie i przenoszenie ---
+  const kal = KalDrag.attach({
+    root: document.querySelector('main'), attr: 'id', cols: () => [colEl(1), colEl(2)], ppm: PPM, top0: 2, startMin: DAY0, endMin: DAY1, snap: 15,
+    place: id => { const v = all()[id]; return { col: colEl(v.col), start: toMin(v.t), dur: v.dur }; },
+    check, label: id => all()[id].name, colName: c => ` · [Stylistka ${c.dataset.col}]`,
+    commit: (id, c, start) => { const s = st(id); s.t = fmt(start); s.col = +c.dataset.col; save(); renderAll(); }
+  });
+
+  document.getElementById('detail').addEventListener('click', e => {
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    const V = all(), v = V[sel], s = st(sel), tot = total(sel, v);
+    if (a.dataset.act === 'sms') { Mock.toast('SMS wysłany ponownie'); }
+    if (a.dataset.act === 'pay') PS.modal({
+      title: 'Rozlicz wizytę', ok: 'Rozlicz',
+      body: `<fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Metoda płatności</legend>${['gotówka', 'karta', 'BLIK'].map((m, i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="metoda" value="${m}"${i ? '' : ' checked'}>${m}</label>`).join('')}</fieldset>
+        <label class="p-lab">Rabat (%)<input class="p-in" name="rabat" type="number" min="0" max="100" value="0"></label>
+        <div class="p-box"><span>Do zapłaty</span><b id="do-zaplaty">${tot} zł</b></div>`,
+      onOpen: f => f.rabat.addEventListener('input', () => { f.querySelector('#do-zaplaty').textContent = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100)) + ' zł'; }),
+      onOk: f => {
+        const kwota = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100));
+        s.paid = { metoda: f.metoda.value, kwota }; save();
+        const tx = Mock.get('panel.tx', []); tx.push({ id: Date.now(), t: s.t || v.t, klientka: v.name, opis: v.svc, metoda: f.metoda.value, kwota }); Mock.set('panel.tx', tx);
+        renderAll(); Mock.toast(`Wizyta rozliczona: ${kwota} zł, ${f.metoda.value}`); return true;
+      }
+    });
+    if (a.dataset.act === 'move') PS.modal({
+      title: 'Przenieś wizytę', ok: 'Przenieś',
+      body: `<label class="p-lab">Stylistka<select class="p-in" name="c"><option value="1"${v.col === 1 ? ' selected' : ''}>[Stylistka 1]</option><option value="2"${v.col === 2 ? ' selected' : ''}>[Stylistka 2]</option></select></label>
+        <label class="p-lab">Nowa godzina (wtorek 20.10)<select class="p-in" name="t">${SLOTS.map(x => `<option${toMin(x) === toMin(v.t) ? ' selected' : ''}>${x}</option>`).join('')}</select></label>
+        <p class="hh-err" id="move-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p><span class="p-mut">Klientka dostanie SMS z nową godziną. Zmianę da się cofnąć.</span>`,
+      onOk: f => {
+        const reason = check(sel, colEl(+f.c.value), toMin(f.t.value), v.dur), err = f.querySelector('#move-err');
+        if (reason) { err.textContent = 'Nie można przenieść: ' + reason; err.hidden = false; return false; }
+        kal.tryMove(sel, colEl(+f.c.value), toMin(f.t.value));
+      }
+    });
+    if (a.dataset.act === 'gap') {
+      const g = v.gaps[0], at = toMin(v.t) + g.od;
+      PS.modal({
+        title: 'Krótka usługa w luce', ok: 'Wstaw',
+        body: `<span class="p-mut">Luka ${fmt(at)}–${fmt(at + g.dl)} (${g.dl} min) w wizycie ${E(v.name)}.</span>
+          <label class="p-lab">Usługa<select class="p-in" name="s">${SHORT.map((x, i) => `<option value="${i}"${x[1] > g.dl ? ' disabled' : ''}>${E(x[0])} · ${x[1]} min · ${x[2]} zł${x[1] > g.dl ? ' (za długa)' : ''}</option>`).join('')}</select></label>
+          <label class="p-lab">Klientka<input class="p-in" name="k" required placeholder="Imię i nazwisko"></label>`,
+        onOk: f => {
+          const x = SHORT[+f.s.value], reason = check('new', colEl(v.col), at, x[1]);
+          if (reason) { Mock.toast('Nie można wstawić: ' + reason); return false; }
+          const l = Mock.get('panel.mini', []); l.push({ id: 'x' + Date.now(), col: v.col, t: fmt(at), dur: x[1], name: f.k.value.trim(), svc: x[0], price: x[2], host: v.name }); Mock.set('panel.mini', l); renderAll();
+        },
+        toast: f => `Wstawiono w lukę: ${SHORT[+f.s.value][0]} o ${fmt(at)}`
+      });
+    }
+    if (a.dataset.act === 'extra') PS.modal({
+      title: 'Zmiana na wizycie',
+      body: `<div role="group" aria-label="Rodzaj zmiany" style="display:flex;gap:6px">${['Dodaj', 'Usuń'].map((m, i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="typ" value="${m}"${i ? '' : ' checked'}>${m} pozycję</label>`).join('')}</div>
+        <label class="p-lab">Pozycja<input class="p-in" name="nazwa" required placeholder="np. Zdjęcie hybrydy"></label>
+        <label class="p-lab">Kwota (zł)<input class="p-in" name="kwota" type="number" min="0" required value="20"></label>
+        <label class="p-lab">Powód (widzi klientka)<input class="p-in" name="powod" required placeholder="np. onycholiza, tylko zdjęcie materiału"></label>`,
+      onOk: f => { const k = Math.abs(+f.kwota.value || 0) * (f.typ.value === 'Usuń' ? -1 : 1); (s.extras = s.extras || []).push([(f.typ.value === 'Usuń' ? 'Usunięto: ' : 'Dodano: ') + f.nazwa.value, k, f.powod.value]); save(); renderDetail(); },
+      toast: 'Zapisano zmianę, klientka zobaczy ją w swojej karcie'
+    });
+  });
+
+  document.addEventListener('click', e => {
+    const blk = e.target.closest('[data-id]');
+    if (blk) { sel = blk.dataset.id; renderBlocks(); renderDetail(); const n = document.querySelector(`[data-id="${sel}"]`); if (n && document.activeElement !== n && e.detail === 0) n.focus(); return; }
+    const w = e.target.closest('[data-wait]');
+    if (w) PS.modal({
+      title: 'Zaproponuj termin', ok: 'Wyślij SMS',
+      body: `<label class="p-lab">Wolne okno<select class="p-in" name="slot"><option>pn 15:00</option><option>śr 9:00</option><option>sob 13:30</option></select></label>`,
+      onOk: f => { const l = Mock.get('panel.wait', []); l.push(+w.dataset.wait); Mock.set('panel.wait', l); renderWait(); Mock.toast(`Propozycja wysłana SMS-em: ${WAIT[+w.dataset.wait][0]}, ${f.slot.value}`); }
+    });
+    const n = e.target.closest('[data-act="ok"],[data-act="no"]');
+    if (n) {
+      const id = n.closest('[data-vid]').dataset.vid;
+      if (id === 'ex') { Mock.toast('To wiersz przykładowy'); return; }
+      if (n.dataset.act === 'ok') { st('v' + id).ok = true; save(); renderNew(); Mock.toast('Rezerwacja potwierdzona, klientka dostała SMS'); }
+      else { Mock.set('visits', Mock.get('visits', []).map(v => String(v.id) === id ? { ...v, status: 'odwołana' } : v)); renderAll(); Mock.toast('Rezerwacja odrzucona, klientka dostała SMS'); }
+    }
+  });
+
+  document.getElementById('add-visit').addEventListener('click', () => PS.visitModal({ done: renderAll }));
+
+  if (location.hash === '#nowe') document.getElementById('nowe').scrollIntoView();
+  renderAll();
+  window.addEventListener('storage', () => { S = Mock.get('panel.state', {}); renderAll(); });
+});
+</script>
+</body>
+</html>

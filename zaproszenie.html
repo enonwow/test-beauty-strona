@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zaproszenie do zespołu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+<style>
+.wrap{min-height:calc(100vh - 28px);box-sizing:border-box;padding:24px 16px;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:15px;color:#1E1A1D}
+.card{width:100%;max-width:460px;box-sizing:border-box;background:#fff;border:1px solid #F0E8EC;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.lg-in{min-height:52px;width:100%;box-sizing:border-box;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:16px;background:#fff;color:#1E1A1D}
+.lg-in[aria-invalid="true"]{border-color:#A3262A}
+.lg-err{margin:0;color:#A3262A;font-size:13px}
+.lg-lab{display:flex;flex-direction:column;gap:6px;font-weight:500}
+.lg-btn{min-height:52px;padding:0 16px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box}.lg-btn:hover{background:#7A173D;color:#fff}
+.perm{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.perm li{display:flex;gap:8px;line-height:1.35}
+.perm li::before{content:"";width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none;background:#1F6B47}
+.perm.no li::before{background:#A3262A}
+.req li{color:#625860}.req li.ok{color:#1F6B47}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<main class="wrap">
+  <div class="card" id="ok">
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">NS</div><span style="font-weight:700">[Nazwa studia]</span></div>
+    <h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:24px;line-height:1.2"><span>[Nazwa studia]</span> zaprasza Cię do zespołu jako <span id="rola-nazwa">stylistka</span></h1>
+
+    <div style="padding:14px;border-radius:14px;background:#FAF6F8;display:flex;flex-direction:column;gap:10px">
+      <b>Co zobaczysz w panelu</b>
+      <ul class="perm" id="yes"></ul>
+      <b>Czego nie zobaczysz</b>
+      <ul class="perm no" id="no"></ul>
+    </div>
+
+    <form id="f" novalidate style="display:flex;flex-direction:column;gap:14px">
+      <label class="lg-lab" for="imie">Imię<input id="imie" class="lg-in" autocomplete="given-name"></label>
+      <label class="lg-lab" for="tel">Telefon<input id="tel" class="lg-in" type="tel" autocomplete="tel" inputmode="tel" placeholder="+48 …"></label>
+      <div class="lg-lab"><label for="pw">Hasło</label>
+        <input id="pw" class="lg-in" type="password" autocomplete="new-password" aria-describedby="req-h">
+        <span id="req-h" style="font-weight:400;font-size:13px;color:#625860">Hasło musi mieć:</span>
+        <ul class="perm req" id="req" aria-live="polite" style="gap:2px;font-weight:400;font-size:13px"></ul>
+      </div>
+      <div class="lg-lab" style="font-weight:400"><label style="display:flex;gap:12px;align-items:center;min-height:44px"><input type="checkbox" id="reg" style="width:22px;height:22px;flex:none;accent-color:#9E1F50">Akceptuję regulamin korzystania z panelu</label></div>
+      <button type="submit" class="lg-btn">Dołącz</button>
+      <span style="color:#625860;font-size:12px">Makieta: dane nie są nigdzie wysyłane.</span>
+    </form>
+  </div>
+
+  <div class="card" id="exp" hidden>
+    <h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:24px">Zaproszenie wygasło</h1>
+    <p style="margin:0;line-height:1.5">Link do zaproszenia jest ważny 7 dni i ten czas już minął. Poproś <b>[Nazwa studia]</b> o wysłanie nowego zaproszenia.</p>
+    <a class="lg-btn" href="panel-logowanie.html">Przejdź do logowania</a>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const q = new URLSearchParams(location.search);
+  if (q.get('wygaslo') === '1') { $('#ok').hidden = true; $('#exp').hidden = false; document.title = 'Zaproszenie wygasło'; return; }
+  const rola = q.get('rola') === 'recepcja' ? 'recepcja' : 'stylistka';
+  const R = {
+    stylistka: { n: 'stylistka', yes: ['Swój kalendarz i swoje wizyty', 'Karty stylizacji klientek, które obsługujesz', 'Własny grafik i wnioski o urlop'], no: ['Telefonów i danych kontaktowych klientek', 'Kasy, raportów i ustawień studia', 'Cennika i abonamentu'] },
+    recepcja: { n: 'osoba na recepcji', yes: ['Kalendarz całego zespołu', 'Klientki z telefonami, żeby umawiać wizyty', 'Kasę i rozliczanie wizyt'], no: ['Raportów i wyników finansowych', 'Ustawień studia i abonamentu', 'Zmian w cenniku'] }
+  }[rola];
+  $('#rola-nazwa').textContent = R.n;
+  $('#yes').innerHTML = R.yes.map(t => `<li>${PS.esc(t)}</li>`).join('');
+  $('#no').innerHTML = R.no.map(t => `<li>${PS.esc(t)}</li>`).join('');
+
+  const RULES = [['co najmniej 8 znaków', v => v.length >= 8], ['jedną cyfrę', v => /\d/.test(v)], ['jedną wielką literę', v => /[A-ZĄĆĘŁŃÓŚŹŻ]/.test(v)]];
+  function req() { const v = $('#pw').value; $('#req').innerHTML = RULES.map(([t, f]) => `<li class="${f(v) ? 'ok' : ''}">${f(v) ? 'Spełnione: ' : 'Do spełnienia: '}${t}</li>`).join(''); return RULES.every(([, f]) => f(v)); }
+  $('#pw').addEventListener('input', req); req();
+
+  function err(input, msg) {
+    const id = input.id + '-err', old = document.getElementById(id); if (old) old.remove();
+    input.removeAttribute('aria-invalid');
+    if (!msg) return false;
+    const p = document.createElement('p'); p.className = 'lg-err'; p.id = id; p.setAttribute('role', 'alert'); p.textContent = msg;
+    (input.closest('.lg-lab') || input.parentElement).append(p); input.setAttribute('aria-invalid', 'true'); return true;
+  }
+  $('#f').addEventListener('submit', e => {
+    e.preventDefault();
+    const bad = [
+      [$('#imie'), $('#imie').value.trim() ? '' : 'Wpisz imię.'],
+      [$('#tel'), $('#tel').value.replace(/\D/g, '').length >= 9 ? '' : 'Wpisz numer telefonu, co najmniej 9 cyfr.'],
+      [$('#pw'), req() ? '' : 'Hasło nie spełnia wymagań.'],
+      [$('#reg'), $('#reg').checked ? '' : 'Zaakceptuj regulamin, żeby dołączyć.']
+    ].filter(([i, m]) => { const r = err(i, m); return r; });
+    if (bad.length) { bad[0][0].focus(); return; }
+    Mock.set('studioUser', { imie: $('#imie').value.trim(), email: '', tel: $('#tel').value.trim(), rola });
+    Mock.set('flash', 'Witaj w zespole'); // panel pokaże komunikat po przejściu
+    location.href = 'panel.html';
+  });
+});
+</script>
+</body>
+</html>

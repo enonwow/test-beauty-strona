@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profil klientki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+h2{margin:0 0 6px;font-size:18px;font-weight:700}
+.sec{padding:22px 20px 0;display:flex;flex-direction:column;gap:4px}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:52px;border-bottom:1px solid #F0E8EC}
+.tg input{width:22px;height:22px;flex:none}
+.rw{min-height:52px;width:100%;display:flex;align-items:center;border:0;border-bottom:1px solid #F0E8EC;background:none;color:#1E1A1D;font:inherit;text-align:left;text-decoration:none;cursor:pointer;padding:0}
+.rw:hover{color:#1E1A1D;background:#FAF6F8}
+.fav{border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center}
+.fav a.l{display:flex;gap:12px;align-items:center;flex:1;min-width:0;text-decoration:none;color:#1E1A1D}
+.fav a.l:hover{color:#1E1A1D}
+.fav button{width:44px;height:44px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.st{width:34px;height:34px;border-radius:50%;border:2px dashed #C9B6BF;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:12px;color:#625860}
+.st.on{border:2px solid #9E1F50;background:#9E1F50;color:#fff}
+.btn{min-height:48px;padding:0 18px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
+.btn:hover{background:#7A173D;color:#fff}
+.btn-o{min-height:48px;padding:0 18px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.nav{margin-top:auto;border-top:1px solid #F0E8EC;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px 8px 10px}
+.nav a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#625860;font-size:12px}
+.nav a[aria-current]{color:#9E1F50;font-weight:700}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.smenu{display:flex;flex-direction:column;gap:4px;margin-top:22px}
+.smenu a{min-height:44px;display:flex;align-items:center;padding:0 14px;border-radius:10px;color:#1E1A1D;text-decoration:none}
+.smenu a:hover{background:#F6EDF1;color:#1E1A1D}
+@media (min-width:1024px){
+  .nav{margin-top:0 !important;grid-template-columns:repeat(4,auto);justify-content:start;gap:8px;border-top:0;border-bottom:1px solid #F0E8EC;padding:6px 20px}
+  .nav a{flex-direction:row;gap:8px;padding:0 16px;font-size:14px;min-height:48px}
+  .d-cols{padding-bottom:32px}
+  .d-aside-left{flex-basis:260px !important;top:64px}
+  .d-main{max-width:720px}
+  html{scroll-padding-top:70px}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:22px 20px 6px;display:flex;gap:14px;align-items:center">
+    <span id="inicjal" aria-hidden="true" style="width:56px;height:56px;border-radius:50%;background:#F6EDF1;color:#9E1F50;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px">K</span>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <h1 data-bind="user.imie" id="imie" style="margin:0;font-size:24px;font-weight:700">Klientka</h1>
+      <span style="color:#625860;font-size:14px" data-bind-if="user.tel">+48 <span data-bind="user.tel"></span></span>
+      <span id="email-w" style="color:#625860;font-size:14px" data-bind-if="user.email"><span data-bind="user.email"></span></span>
+    </div>
+    <button type="button" id="edytuj" class="btn-o" data-bind-if="user.zalogowana" data-open="#dlg-edycja" style="margin-left:auto">Edytuj dane</button>
+  </header>
+
+  <div data-bind-unless="user.zalogowana" style="margin:12px 20px 0;padding:14px;border-radius:14px;background:#FFF1E0;color:#8A3B12;font-size:14px;line-height:1.45;display:flex;flex-direction:column;gap:8px">
+    <span>Nie jesteś zalogowana. Załóż konto numerem telefonu, bez hasła, żeby zachować historię wizyt, ulubione studia i bliskich. Masz już konto? Zaloguj się tym samym numerem.</span>
+    <a href="logowanie.html?wroc=konto.html" class="btn" style="align-self:flex-start">Załóż konto lub zaloguj się</a>
+  </div>
+
+  <div class="d-cols" data-bind-if="user.zalogowana">
+  <aside class="d-aside d-aside-left d-only" aria-label="Sekcje konta">
+    <nav class="smenu" aria-label="Sekcje konta">
+      <a href="#lojal">Karta lojalnościowa</a>
+      <a href="#ulub">Ulubione studia</a>
+      <a href="#bliscy">Bliscy</a>
+      <a href="#powiad">Powiadomienia</a>
+      <a href="#konto-sek">Konto</a>
+    </nav>
+  </aside>
+  <div class="d-main">
+  <section class="sec" aria-labelledby="lojal">
+    <h2 id="lojal">Karta lojalnościowa</h2>
+    <div style="border:1px solid #E4D9DE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px">
+      <div id="pieczatki" style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;justify-items:center"></div>
+      <span style="font-size:14px"><b id="pcz-n">3</b> z 8 pieczątek. Po 8. wizycie dostajesz [nagroda].</span>
+      <span style="color:#625860;font-size:12px">Pieczątkę dostajesz za każdą odbytą wizytę w studiach z programem lojalnościowym. Wartości przykładowe.</span>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="ulub">
+    <h2 id="ulub">Ulubione studia</h2>
+    <div id="ulubione" style="display:flex;flex-direction:column;gap:10px"></div>
+  </section>
+
+  <section class="sec" id="bliscy" aria-labelledby="bliscy-h">
+    <h2 id="bliscy-h">Bliscy</h2>
+    <span style="color:#625860;font-size:13px;line-height:1.4">Osoby, dla których rezerwujesz wizyty. Przy rezerwacji wybierzesz je z listy.</span>
+    <ul id="bliscy-lista" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px"></ul>
+    <button type="button" class="btn-o" data-open="#dlg-bliski" style="align-self:flex-start">+ Dodaj bliską osobę</button>
+  </section>
+
+  <section class="sec" id="powiad">
+    <h2>Powiadomienia</h2>
+    <label class="tg"><span style="display:flex;flex-direction:column"><span>Przypomnienia o wizytach</span><span style="color:#625860;font-size:12px">SMS dzień przed</span></span><input type="checkbox" data-z="przyp" checked data-toast-change="Zapisano"></label>
+    <label class="tg"><span style="display:flex;flex-direction:column"><span>Czas na uzupełnienie</span><span style="color:#625860;font-size:12px">od studiów, w których byłam</span></span><input type="checkbox" data-z="uzup" checked data-toast-change="Zapisano"></label>
+    <label class="tg"><span style="display:flex;flex-direction:column"><span>Promocje i nowości</span><span style="color:#625860;font-size:12px">osobno dla każdego studia</span></span><input type="checkbox" data-z="promo" data-toast-change="Zapisano"></label>
+    <span style="color:#625860;font-size:12px;line-height:1.45;padding-top:6px">Wyłączenie promocji nie wyłącza przypomnień. Każda wiadomość ma link do wypisania.</span>
+  </section>
+
+  <section class="sec" id="konto-sek">
+    <h2>Konto</h2>
+    <label class="tg" style="min-height:52px">Język<select data-toast-change="Zapisano język (makieta: tłumaczenia jeszcze nie ma)" style="min-height:44px;border-radius:10px;border:1px solid #C9B6BF;font:inherit;padding:0 8px"><option selected>Polski</option><option>Українська</option><option>Русский</option><option>English</option></select></label>
+    <button type="button" class="rw" data-open="#dlg-karty">Karty podarunkowe i saldo</button>
+    <button type="button" class="rw" data-toast="Wysłaliśmy link do pobrania Twoich danych SMS-em">Pobierz moje dane</button>
+    <button type="button" class="rw" data-open="#dlg-pomoc">Pomoc i kontakt</button>
+    <button type="button" class="rw" id="wyloguj" data-toast="Wylogowano" data-go="start.html">Wyloguj</button>
+    <button type="button" class="rw" style="color:#A3262A;border-bottom:0" data-open="#dlg-usun">Usuń konto</button>
+  </section>
+  </div>
+  </div>
+
+  <nav class="nav d-tabbar" aria-label="Menu główne">
+    <a href="start.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Start</a>
+    <a href="wyniki.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Szukaj</a>
+    <a href="wizyty.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Wizyty</a>
+    <a href="konto.html" aria-current="page"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profil</a>
+  </nav>
+</div>
+
+<dialog id="dlg-karty" aria-labelledby="dk-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="dk-t" style="margin:0">Karty podarunkowe</h2>
+    <p style="margin:0;font-size:14px">Saldo: <b id="saldo">0</b> zł</p>
+    <ul id="karty" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px"></ul>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" data-close style="flex:1">Zamknij</button>
+      <a href="karta-podarunkowa.html" class="btn" style="flex:1">Kup kartę</a>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlg-pomoc" aria-labelledby="dp-t">
+  <form data-mock data-toast="Wysłano zgłoszenie. Odpowiemy SMS-em lub e-mailem." style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="dp-t" style="margin:0">Pomoc i kontakt</h2>
+    <label for="pomoc-txt" style="font-size:13px;color:#625860">W czym możemy pomóc?</label>
+    <textarea id="pomoc-txt" rows="4" required style="padding:12px;border-radius:12px;border:1px solid #C9B6BF;font:inherit"></textarea>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Wyślij</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-bliski" aria-labelledby="db-t">
+  <form id="bliski-form" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="db-t" style="margin:0">Dodaj bliską osobę</h2>
+    <label for="b-imie" style="font-size:13px;color:#625860">Imię (wymagane)</label>
+    <input id="b-imie" required autocomplete="off" style="min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit">
+    <label for="b-tel" style="font-size:13px;color:#625860">Telefon (opcjonalnie, na SMS z przypomnieniem)</label>
+    <input id="b-tel" type="tel" autocomplete="off" style="min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit">
+    <span id="b-err" role="alert" hidden style="color:#A3262A;font-size:13px">Wpisz imię.</span>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Dodaj</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-edycja" aria-labelledby="de-t">
+  <form id="edycja" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="de-t" style="margin:0">Edytuj dane</h2>
+    <label for="e-imie" style="font-size:13px;color:#625860">Imię (wymagane)</label>
+    <input id="e-imie" required autocomplete="given-name" style="min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit">
+    <label for="e-email" style="font-size:13px;color:#625860">E-mail (opcjonalnie, na kopie zgód i potwierdzeń)</label>
+    <input id="e-email" type="email" autocomplete="email" style="min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit">
+    <label for="e-jezyk" style="font-size:13px;color:#625860">Język</label>
+    <select id="e-jezyk" style="min-height:48px;padding:0 10px;border-radius:12px;border:1px solid #C9B6BF;font:inherit"><option>Polski</option><option>Українська</option><option>Русский</option><option>English</option></select>
+    <span id="e-err" role="alert" hidden style="color:#A3262A;font-size:13px">Wpisz imię.</span>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Zapisz</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-usun" aria-labelledby="du-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="du-t" style="margin:0">Usunąć konto?</h2>
+    <p style="margin:0;font-size:14px;line-height:1.5">Usuniemy historię stylizacji, ulubione i dane konta. Nadchodzące wizyty zostaną w studiach, dopóki ich nie odwołasz.</p>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn-o" data-close style="flex:1">Zostaw konto</button>
+      <button type="button" id="usun-ok" class="btn" style="flex:1;background:#A3262A">Usuń konto</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const KOL = { '[Studio 1]': '#9E1F50', '[Studio 2]': '#2F5A86', '[Studio 3]': '#5B1630', '[Studio 4]': '#3F6B2E', '[Studio 5]': '#8A4B12' };
+  const WOLNE = { '[Studio 1]': 'wt 14:30', '[Studio 2]': 'śr 9:00', '[Studio 3]': 'pt 17:00', '[Studio 4]': 'wt 12:00', '[Studio 5]': 'wt 15:00' };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const u = Mock.get('user', {}) || {};
+  if (!u.imie || !u.zalogowana) $('#imie').textContent = 'Klientka';
+  $('#inicjal').textContent = (u.zalogowana && u.imie ? u.imie : 'K')[0].toUpperCase();
+  if (u.jezyk) document.querySelector('.tg select').value = u.jezyk;
+
+  // people the client books for (offered on the date page)
+  function bliscy() {
+    const l = Mock.get('bliscy', []) || [];
+    $('#bliscy-lista').innerHTML = '';
+    if (!l.length) { const li = document.createElement('li'); li.style.cssText = 'color:#625860;font-size:14px'; li.textContent = 'Nie dodałaś jeszcze nikogo.'; $('#bliscy-lista').appendChild(li); }
+    l.forEach((x, i) => {
+      const li = document.createElement('li'); li.className = 'fav';
+      const t = document.createElement('span'); t.style.cssText = 'display:flex;flex-direction:column;gap:2px;flex:1;min-width:0';
+      const n = document.createElement('b'); n.textContent = x.imie; t.appendChild(n);
+      if (x.tel) { const tl = document.createElement('span'); tl.style.cssText = 'color:#625860;font-size:13px'; tl.textContent = '+48 ' + x.tel; t.appendChild(tl); }
+      const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Usuń ' + x.imie); b.style.cssText = 'width:auto;padding:0 12px;color:#A3262A;font:inherit'; b.textContent = 'Usuń';
+      b.addEventListener('click', () => { Mock.set('bliscy', l.filter((_, j) => j !== i)); bliscy(); Mock.toast('Usunięto z bliskich'); });
+      li.append(t, b); $('#bliscy-lista').appendChild(li);
+    });
+  }
+  bliscy();
+  $('#bliski-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const imie = $('#b-imie').value.trim();
+    $('#b-err').hidden = !!imie; if (!imie) return $('#b-imie').focus();
+    Mock.set('bliscy', [...(Mock.get('bliscy', []) || []), { imie, tel: $('#b-tel').value.trim() }]);
+    $('#b-imie').value = ''; $('#b-tel').value = ''; $('#dlg-bliski').close(); bliscy(); Mock.toast('Dodano do bliskich');
+  });
+
+  // edit profile
+  $('#dlg-edycja').addEventListener('close', () => $('#e-err').hidden = true);
+  $('#edytuj').addEventListener('click', () => { $('#e-imie').value = u.imie || ''; $('#e-email').value = u.email || ''; $('#e-jezyk').value = u.jezyk || 'Polski'; });
+  $('#edycja').addEventListener('submit', e => {
+    e.preventDefault();
+    const imie = $('#e-imie').value.trim();
+    $('#e-err').hidden = !!imie; $('#e-imie').setAttribute('aria-invalid', String(!imie));
+    if (!imie) return $('#e-imie').focus();
+    Object.assign(u, { imie, email: $('#e-email').value.trim(), jezyk: $('#e-jezyk').value });
+    Mock.set('user', u);
+    $('#imie').textContent = imie; $('#inicjal').textContent = imie[0].toUpperCase();
+    $('#email-w').hidden = !u.email; $('#email-w').textContent = u.email;
+    document.querySelector('.tg select').value = u.jezyk;
+    $('#dlg-edycja').close(); Mock.toast('Zapisano');
+  });
+
+  const N = 3;
+  $('#pieczatki').innerHTML = Array.from({ length: 8 }, (_, i) => `<span class="st${i < N ? ' on' : ''}" aria-hidden="true">${i + 1}</span>`).join('');
+  $('#pcz-n').textContent = N;
+
+  function ulub() {
+    const f = Mock.get('favorites', []);
+    $('#ulubione').innerHTML = f.length ? f.map(n => `<div class="fav"><a class="l" href="salon.html?s=${encodeURIComponent(n)}"><span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:${KOL[n] || '#625860'};flex:none"></span><span style="display:flex;flex-direction:column;gap:2px"><b>${esc(n)}</b>${WOLNE[n] ? `<span style="color:#625860;font-size:13px">najbliżej wolne: ${WOLNE[n]}</span>` : ''}</span></a><button type="button" data-rm="${esc(n)}" aria-label="Usuń ${esc(n)} z ulubionych"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="#9E1F50" stroke="#9E1F50" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button></div>`).join('')
+      : '<p style="margin:0;color:#625860;font-size:14px;line-height:1.45">Nie masz jeszcze ulubionych. Kliknij serduszko przy studiu w <a href="wyniki.html">wynikach</a>.</p>';
+  }
+  ulub();
+  $('#ulubione').addEventListener('click', e => {
+    const b = e.target.closest('[data-rm]'); if (!b) return;
+    Mock.set('favorites', Mock.get('favorites', []).filter(x => x !== b.dataset.rm)); ulub();
+    Mock.toast('Usunięto z ulubionych');
+  });
+
+  // consents persist
+  const z = Mock.get('zgody', { przyp: true, uzup: true, promo: false });
+  if (u.zgody && 'marketing' in u.zgody) z.promo = !!u.zgody.marketing; // what was ticked while creating the profile
+  document.querySelectorAll('[data-z]').forEach(i => {
+    i.checked = !!z[i.dataset.z];
+    i.addEventListener('change', () => {
+      z[i.dataset.z] = i.checked; Mock.set('zgody', z);
+      if (i.dataset.z === 'promo' && u.zalogowana) { u.zgody = { ...u.zgody, marketing: i.checked }; Mock.set('user', u); }
+    });
+  });
+
+  // gift cards
+  const k = Mock.get('giftcards', []);
+  $('#saldo').textContent = k.filter(c => c.status !== 'zrealizowana').reduce((s, c) => s + (+c.kwota || 0), 0);
+  $('#karty').innerHTML = k.length ? k.map(c => `<li style="padding:10px 12px;border:1px solid #E4D9DE;border-radius:10px"><b>${esc(c.kwota)} zł</b> · kod ${esc(c.kod)}<br><span style="color:#625860">${esc(c.dla || 'dla mnie')} · ${esc(c.status)}</span></li>`).join('') : '<li style="color:#625860">Nie masz jeszcze żadnej karty.</li>';
+
+  $('#wyloguj').addEventListener('click', () => Mock.set('user', { ...u, zalogowana: false })); // the profile stays, so the next login skips the profile step
+  $('#usun-ok').addEventListener('click', () => {
+    Mock.set('user', {}); Mock.set('favorites', []); Mock.set('reviews', []);
+    Mock.toast('Konto usunięte'); setTimeout(() => (location.href = 'start.html'), 700);
+  });
+});
+</script>
+</body>
+</html>

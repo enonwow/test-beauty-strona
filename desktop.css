@@ -1,0 +1,32 @@
+/* Desktop layout for the client screens. Phone stays the default (inline styles);
+   from 1024px these classes widen the page and split it into columns. */
+
+/* page container: replaces the 390px phone column */
+.d-page { width: 100%; max-width: 390px; margin: 0 auto; box-sizing: border-box; }
+
+/* main + sticky side column (summary, filters, salon info) */
+.d-cols { display: flex; flex-direction: column; }
+.d-main { min-width: 0; }
+.d-aside { min-width: 0; }
+
+/* card lists that become a grid on desktop */
+.d-grid { display: flex; flex-direction: column; gap: 10px; }
+
+/* phone-only / desktop-only bits */
+.d-only { display: none !important; }
+
+@media (min-width: 1024px) {
+  .d-page { max-width: 1200px; padding: 0 32px; }
+  .d-cols { flex-direction: row; align-items: flex-start; gap: 32px; }
+  .d-main { flex: 1 1 0; }
+  .d-aside { flex: 0 0 360px; position: sticky; top: 24px; }
+  .d-aside-left { order: -1; flex-basis: 300px; }
+  .d-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .d-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .m-only { display: none !important; }
+  .d-only { display: revert !important; }
+  /* bottom tab bar becomes a top bar */
+  .d-tabbar { position: sticky; top: 0; z-index: 10; order: -1; background: #FFFFFF; }
+  /* sticky price bar of the creators sits in the side column, not over the content */
+  .d-sticky-off { position: static !important; box-shadow: none !important; }
+}

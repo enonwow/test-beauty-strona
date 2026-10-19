@@ -1,0 +1,56 @@
+{
+  "kategoria": "fryzjer",
+  "brutto": true,
+  "waluta": "PLN",
+  "obowiazujeOd": "2026-10-01",
+  "zrodlo": "ceny i gramy: Royal Hair Warszawa (ceny orientacyjne); czasy: Siwy Studio, Julia Auhlis; usługi męskie: Siwy Studio",
+  "dlugosc": {
+    "pasma": [
+      { "id": "ucho", "nazwa": "do ucha" },
+      { "id": "ramiona", "nazwa": "do ramion" },
+      { "id": "za_ramiona_lopatki", "nazwa": "do łopatek" },
+      { "id": "za_lopatki_pas", "nazwa": "do pasa" },
+      { "id": "ponizej_pasa", "nazwa": "poniżej pasa" }
+    ],
+    "mapowanie": { "ucho": "K", "ramiona": "S", "za_ramiona_lopatki": "D", "za_lopatki_pas": "D+", "ponizej_pasa": "konsultacja" }
+  },
+  "gestosc": { "cienkie": 0.8, "normalne": 1.0, "geste": 1.3, "zalozenie": true },
+  "mnoznikDPlus": 1.5,
+  "minutyDPlus": 15,
+  "zalozenieDPlus": true,
+  "cenaZaGram": 3,
+  "stylista": { "fryzjer": { "nazwa": "Fryzjerka", "mnoznik": 1.0 }, "top": { "nazwa": "Top stylistka", "mnoznik": 1.6, "zalozenie": true } },
+  "warianty": [
+    { "id": "strzyzenie", "nazwa": "Strzyżenie", "opis": "z myciem i modelowaniem", "ceny": { "K": 220, "S": 240, "D": 270 }, "min": 60, "zawiera": ["mycie", "strzyżenie", "modelowanie"] },
+    { "id": "kolor", "nazwa": "Kolor jednolity", "opis": "cała długość", "koloryzacja": true, "ceny": { "K": 410, "S": 430, "D": 480 }, "gramy": { "K": 30, "S": 50, "D": 80 }, "min": { "K": 105, "S": 120, "D": 135 }, "zalozenieMin": true, "zawiera": ["mycie", "modelowanie", "farba"], "bezStrzyzenia": true },
+    { "id": "odrost", "nazwa": "Odrost", "opis": "do 2 cm", "koloryzacja": true, "cena": 320, "gramy": 30, "min": 90, "bezDlugosci": true, "zawiera": ["mycie", "modelowanie", "farba"], "bezStrzyzenia": true },
+    { "id": "tonowanie", "nazwa": "Tonowanie", "opis": "odświeżenie koloru", "koloryzacja": true, "ceny": { "K": 320, "S": 320, "D": 320 }, "min": 85, "zawiera": ["mycie", "modelowanie"], "bezStrzyzenia": true },
+    { "id": "balayage", "nazwa": "Balayage", "opis": "3–4 h", "koloryzacja": true, "jasniej": true, "ceny": { "K": 600, "S": 650, "D": 700 }, "gramy": { "K": 60, "S": 80, "D": 100 }, "min": { "K": 180, "S": 210, "D": 240 }, "zawiera": ["mycie", "tonowanie", "modelowanie", "farba"], "bezStrzyzenia": true },
+    { "id": "airtouch", "nazwa": "Airtouch", "opis": "najpierw konsultacja", "koloryzacja": true, "jasniej": true, "ceny": { "K": 700, "S": 800, "D": 900 }, "gramy": { "K": 100, "S": 120, "D": 140 }, "min": { "K": 270, "S": 300, "D": 330 }, "wymagaKonsultacji": true, "orientacyjnie": "700–900 zł zależnie od długości, 4,5–5,5 h" },
+    { "id": "dekoloryzacja", "nazwa": "Z ciemnego na blond", "opis": "plan na 2–4 wizyty", "koloryzacja": true, "sciezka": "konsultacja", "orientacyjnie": "1500–3000 zł w 2–4 sesjach po 4–6 h" }
+  ],
+  "meskie": [
+    { "id": "meskie", "nazwa": "Strzyżenie męskie", "cena": 100, "min": 30, "zawiera": ["mycie", "strzyżenie", "stylizacja"] },
+    { "id": "broda", "nazwa": "Broda", "cena": 90, "min": 30, "zawiera": ["trymowanie", "konturowanie", "olejek"] },
+    { "id": "meskie_broda", "nazwa": "Strzyżenie i broda", "cena": 160, "min": 55, "zawiera": ["mycie", "strzyżenie", "broda"] }
+  ],
+  "historia": [
+    { "id": "henna", "nazwa": "farbowałam henną" },
+    { "id": "ciemnaFarba", "nazwa": "farbowałam ciemną farbą z drogerii" },
+    { "id": "rozjasnianie", "nazwa": "rozjaśniałam lub robiłam keratynę" },
+    { "id": "jasniejNiz2", "nazwa": "chcę kolor jaśniejszy o więcej niż 2 tony" }
+  ],
+  "dodatki": [
+    { "id": "plex", "nazwa": "Olaplex / plex", "cena": 90, "min": 5, "dotyczy": ["koloryzacja"] },
+    { "id": "strzyzenie_do_koloru", "nazwa": "Strzyżenie do koloru", "cena": 120, "min": 30, "dotyczy": ["koloryzacja"], "zalozenie": true },
+    { "id": "test_pasma", "nazwa": "Test pasma", "cena": 50, "min": 20, "dotyczy": ["koloryzacja"] }
+  ],
+  "konsultacja": { "cena": 0, "min": 30 },
+  "test": { "cena": 0, "min": 10, "godzinPrzed": 48, "zalozenie": true },
+  "wycenaPoZdjeciu": { "godzin": 24, "link": "wycena.html" },
+  "wywiad": [
+    { "id": "reakcjaNaFarbe", "pytanie": "Miałaś reakcję alergiczną na farbę do włosów?", "skutek": "blokada", "dotyczy": ["koloryzacja"], "komunikat": "Po reakcji na farbę nie wykonujemy koloryzacji. Możesz zarezerwować strzyżenie albo tonowanie bez amoniaku po konsultacji." },
+    { "id": "skoraGlowy", "pytanie": "Masz teraz podrażnioną lub zranioną skórę głowy?", "skutek": "konsultacja", "dotyczy": ["koloryzacja"], "komunikat": "Farba może podrażnić skórę. Porozmawiajmy przed koloryzacją.", "zalozenie": true },
+    { "id": "nowaKlientkaKolor", "pytanie": "To Twoja pierwsza koloryzacja u nas?", "skutek": "test48h", "dotyczy": ["koloryzacja"] }
+  ]
+}

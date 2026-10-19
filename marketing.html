@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 1000px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">Marketing</h1>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px; align-items: start">
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Automaty</h2>
+        <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Czas na uzupełnienie</b><span style="color: #625860; font-size: 12px">SMS po 3 tyg. z przyciskiem „Powtórz stylizację”</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>włączone</span></label></div>
+        <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Wróć do nas</b><span style="color: #625860; font-size: 12px">gdy klientka nie była od 8 tygodni</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>wyłączone</span></label></div>
+        <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Zwolnił się termin</b><span style="color: #625860; font-size: 12px">do osób z listy oczekujących</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>włączone</span></label></div>
+        <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0"><span style="display: flex; flex-direction: column"><b>Prośba o opinię</b><span style="color: #625860; font-size: 12px">raz, 2 h po wizycie</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>włączone</span></label></div>
+        <span style="color: #625860; font-size: 12px">„Czas na uzupełnienie” i „Zwolnił się termin” to wiadomości o wizytach. Pozostałe idą tylko do klientek ze zgodą marketingową.</span>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Nowa kampania SMS</h2>
+        <label for="tresc" style="color: #625860; font-size: 13px">Treść</label>
+        <textarea id="tresc" rows="4" class="p-in">[NazwaStudia]: nowa kolekcja jesień 2026 już w kreatorze. Sprawdź cenę i wolne terminy: [link]</textarea>
+        <div style="display: flex; justify-content: space-between; color: #625860; font-size: 12px"><span id="cnt" aria-live="polite">0 znaków · 1 SMS</span><span>stopka z wypisem dodawana automatycznie</span></div>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Odbiorczynie<select id="grupa" class="p-in" data-toast-change="Zmieniono grupę odbiorczyń"><option selected>Wszystkie ze zgodą</option><option>Paznokcie, ostatnie 3 miesiące</option><option>Rzęsy</option></select></label>
+        <div class="p-box"><span>Wyślemy do</span><b id="odb">[liczba] klientek ze zgodą</b></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><span class="p-mut">Podgląd na telefonie klientki</span><div style="max-width: 280px; padding: 12px 14px; border-radius: 16px 16px 16px 4px; background: #F0E8EC"><span id="prev" style="white-space: pre-wrap; word-break: break-word; line-height: 1.4"></span><br><span class="p-mut">Wypis: odpowiedz STOP</span></div></div>
+        <button type="button" id="plan" class="p-btn pri">Zaplanuj wysyłkę</button>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Kanały rezerwacji</h2>
+        <span style="color: #625860; font-size: 12px; line-height: 1.45">Więcej sposobów na rezerwację: widżet na Twoją stronę www, kod QR do wydruku i przycisk „Zarezerwuj” w Google.</span>
+        <a class="p-btn" href="profil-studia.html#kanaly">Ustaw kanały rezerwacji</a>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Kolekcje sezonowe</h2>
+        <p style="margin: 0; color: #625860; line-height: 1.45">Gotowe stylizacje z ceną, widoczne na Twoim profilu i w wyszukiwarce. Klientka wybiera i od razu rezerwuje.</p>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <div style="display: flex; flex-direction: column; gap: 4px"><span aria-hidden="true" style="height: 64px; border-radius: 10px; background: #5B1630"></span><span style="font-size: 13px">Velvet burgund · 190 zł</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><span aria-hidden="true" style="height: 64px; border-radius: 10px; background: #3E2A4A"></span><span style="font-size: 13px">Kocie oko śliwka · 180 zł</span></div>
+          <a href="paznokcie.html" style="display: flex; flex-direction: column; gap: 4px; color: #1E1A1D; text-decoration: none"><span aria-hidden="true" style="height: 64px; border-radius: 10px; border: 1px dashed #A99BA2; display: flex; align-items: center; justify-content: center; color: #625860; font-size: 20px">+</span><span style="font-size: 13px">Dodaj z kreatora</span></a>
+        </div>
+        <label class="p-chk"><input type="checkbox" checked id="kol" data-toast-change="Zapisano">Kolekcja „Jesień 2026” opublikowana</label>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Karty podarunkowe</h2>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+          <div data-choice="multi" role="group" aria-label="Kwoty kart" style="display: flex; gap: 8px; flex-wrap: wrap">
+            <button type="button" aria-pressed="true" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #1E1A1D; background: #1E1A1D; color: #FFFFFF; font: inherit">100 zł</button>
+            <button type="button" aria-pressed="true" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #1E1A1D; background: #1E1A1D; color: #FFFFFF; font: inherit">200 zł</button>
+            <button type="button" aria-pressed="false" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Na konkretną stylizację</button>
+          </div>
+          <button type="button" id="kwota" class="p-btn dash">+ Kwota</button>
+        </div>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Ważność<select data-toast-change="Zapisano ważność kart" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>6 miesięcy</option><option selected>12 miesięcy</option></select></label>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>Sprzedane w październiku</span><b>[liczba] · [kwota]</b></div>
+        <span style="color: #625860; font-size: 12px">Karta działa tylko w Twoim studiu. Klientka widzi saldo i datę ważności w swoim profilu.</span>
+      </section>
+    </div>
+  </main>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-auto]').forEach(c => c.addEventListener('change', () => {
+    c.nextElementSibling.textContent = c.checked ? 'włączone' : 'wyłączone';
+    Mock.toast(c.checked ? 'Automat włączony' : 'Automat wyłączony');
+  }));
+  const t = document.getElementById('tresc'), cnt = document.getElementById('cnt'), prev = document.getElementById('prev');
+  // shortcut: polskie litery wymuszają kodowanie Unicode (70 znaków w SMS, 67 w wielu); bez nich 160/153, nie liczymy znaków rozszerzonych GSM.
+  function upd() {
+    const v = t.value, n = v.length, uni = /[^\x20-\x7E\n]/.test(v), one = uni ? 70 : 160, multi = uni ? 67 : 153;
+    cnt.textContent = n + ' znaków · ' + (n <= one ? 1 : Math.ceil(n / multi)) + ' SMS' + (uni ? ' (polskie litery)' : '');
+    prev.textContent = v || 'Wpisz treść wiadomości';
+  }
+  t.addEventListener('input', upd); upd();
+  document.getElementById('grupa').addEventListener('change', e => { document.getElementById('odb').textContent = '[liczba] klientek: ' + e.target.selectedOptions[0].text.toLowerCase(); });
+  document.getElementById('plan').addEventListener('click', () => PS.modal({
+    title: 'Zaplanuj wysyłkę', ok: 'Zaplanuj',
+    body: '<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Data<input class="p-in" type="date" name="d" value="2026-10-22" required></label><label class="p-lab" style="flex:1">Godzina<input class="p-in" type="time" name="g" value="11:00" required></label></div><span class="p-mut">SMS dostaną tylko klientki z aktywną zgodą marketingową. Wiadomość będzie można odwołać do chwili wysyłki.</span>',
+    toast: f => 'Kampania zaplanowana na ' + f.d.value.split('-').reverse().join('.') + ', ' + f.g.value
+  }));
+  document.getElementById('kwota').addEventListener('click', () => PS.modal({
+    title: 'Własna kwota karty', ok: 'Dodaj',
+    body: '<label class="p-lab">Kwota (zł)<input class="p-in" type="number" min="10" step="10" name="k" required></label>',
+    onOk: f => {
+      const g = document.querySelector('[aria-label="Kwoty kart"]'), b = g.firstElementChild.cloneNode(true);
+      b.textContent = f.k.value + ' zł'; b.setAttribute('aria-pressed', 'true'); g.insertBefore(b, g.lastElementChild);
+      b.title = 'Kliknij, żeby usunąć kwotę'; b.addEventListener('click', () => { b.remove(); Mock.toast('Usunięto kwotę'); });
+    },
+    toast: f => 'Dodano kartę na ' + f.k.value + ' zł'
+  }));
+});
+</script>
+</body>
+</html>

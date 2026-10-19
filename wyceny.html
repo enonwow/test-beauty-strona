@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – wyceny</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Wyceny</h1><span class="p-mut">Klientki wysyłają zdjęcie inspiracji ze strony studia. Odtwórz stylizację w kreatorze i odeślij cenę SMS-em.</span></div>
+    </div>
+
+    <div id="filtr" data-choice role="group" aria-label="Filtr statusu" class="p-pills">
+      <button type="button" class="p-pill" data-value="nowa" aria-pressed="true">Do odesłania <span id="c-nowa"></span></button>
+      <button type="button" class="p-pill" data-value="wysłana" aria-pressed="false">Wysłane <span id="c-wyslana"></span></button>
+      <button type="button" class="p-pill" data-value="all" aria-pressed="false">Wszystkie</button>
+    </div>
+
+    <div id="lista" style="display: flex; flex-direction: column; gap: 12px"></div>
+    <span id="pusto" class="p-mut" hidden>Nic tu nie ma. Gdy klientka wyśle zdjęcie ze strony studia, pojawi się na tej liście.</span>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc;
+  const PAGE = { Paznokcie: 'paznokcie.html', Rzęsy: 'rzesy.html', Brwi: 'brwi.html', Fryzjer: 'fryzjer.html', Kosmetyka: 'kosmetyka.html' };
+  let filt = 'nowa';
+  const all = () => {
+    const st = PS.quoteState();
+    const own = Mock.get('quotes', []).map(q => ({ id: q.id, k: q.klientka || 'Klientka online', o: q.opis || 'zdjęcie inspiracji', z: 'wysłane ze strony studia', c: '#C98C8C', kat: q.kategoria, tel: q.tel || q.telefon, foto: q.foto || q.zdjecie, nowa: true }));
+    return PS.QUOTES.map(q => ({ id: q.id, k: q.klientka, o: q.opis, z: q.zrodlo, c: q.kolor, kat: 'Paznokcie' })).concat(own).map(q => ({ ...q, st: st[q.id] }));
+  };
+  function render() {
+    const l = all(), sent = x => x.st && x.st.status === 'wysłana';
+    document.getElementById('c-nowa').textContent = '(' + l.filter(x => !sent(x)).length + ')';
+    document.getElementById('c-wyslana').textContent = '(' + l.filter(sent).length + ')';
+    const v = l.filter(x => filt === 'all' || (filt === 'wysłana') === !!sent(x));
+    document.getElementById('lista').innerHTML = v.map(q => `
+      <article class="p-card" data-id="${E(q.id)}">
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+          ${q.foto && String(q.foto).startsWith('data:') ? `<img src="${E(q.foto)}" alt="Zdjęcie inspiracji od klientki" style="width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none">` : `<div role="img" aria-label="Zdjęcie inspiracji od klientki" style="width:72px;height:72px;border-radius:12px;background:${E(q.c)};flex:none"></div>`}
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:200px">
+            <span><b>${E(q.k)}</b> ${sent(q) ? '<span class="p-badge ok">wysłana</span>' : '<span class="p-badge warn">do odesłania</span>'}</span>
+            <span style="color:#625860">${E(q.z)}${q.tel ? ' · ' + E(q.tel) : ''}</span>
+            <span>„${E(q.o)}”</span>
+            ${sent(q) ? `<span style="color:#1F6B47;font-weight:700">Wycena: ${E(q.st.kwota)} zł · ${E(PS.min(+q.st.czas))}</span>` : ''}
+          </div>
+        </div>
+        <div class="p-acts">
+          <a class="p-btn" href="${PAGE[q.kat] || 'paznokcie.html'}">Odtwórz w kreatorze</a>
+          ${sent(q) ? '<button type="button" class="p-btn" data-a="again">Wyślij ponownie</button>' : '<button type="button" class="p-btn pri" data-a="send">Wyślij wycenę</button>'}
+        </div>
+      </article>`).join('');
+    document.getElementById('pusto').hidden = v.length > 0;
+    PS.refresh();
+  }
+  document.getElementById('filtr').addEventListener('mock:choice', e => { filt = e.detail.button.dataset.value; render(); });
+  document.getElementById('lista').addEventListener('click', e => {
+    const b = e.target.closest('[data-a]'); if (!b) return;
+    const q = all().find(x => x.id === b.closest('[data-id]').dataset.id);
+    PS.modal({
+      title: 'Wycena dla: ' + q.k, ok: 'Wyślij SMS',
+      body: `<label class="p-lab">Kwota (zł)<input class="p-in" type="number" min="0" name="k" required value="${q.st ? E(q.st.kwota) : ''}"></label>
+        <label class="p-lab">Czas wizyty (min)<input class="p-in" type="number" min="5" step="5" name="c" required value="${q.st ? E(q.st.czas) : 110}"></label>
+        <label class="p-lab">Wiadomość (opcjonalnie)<textarea class="p-in" name="m" rows="2" placeholder="np. Mogę w czwartek o 15:00"></textarea></label>`,
+      onOk: f => { const st = PS.quoteState(); st[q.id] = { status: 'wysłana', kwota: +f.k.value, czas: +f.c.value }; Mock.set('wyceny', st); render(); },
+      toast: f => `Wycena wysłana SMS-em: ${f.k.value} zł, ${PS.min(+f.c.value)}`
+    });
+  });
+  render();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Szukaj po stylizacji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed=true]{border-color:#1E1A1D;background:#1E1A1D;color:#fff}
+.seg{flex:1;min-height:44px;border:0;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.seg+.seg{border-left:1px solid #E4D9DE}
+.seg[aria-pressed=true]{background:#F6EDF1;font-weight:700}
+.st{border:1px solid #E4D9DE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.st.best{border:2px solid #9E1F50;padding:13px}
+.st .sl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.st .sl a{min-height:44px;padding:0 12px;border-radius:10px;background:#F6EDF1;color:#1E1A1D;text-decoration:none;font-weight:700;font-size:14px;display:flex;align-items:center}
+.st .sl a:hover{color:#1E1A1D;background:#EBD9E1}
+.st .nm{display:flex;flex-direction:column;justify-content:center;gap:2px;text-decoration:none;color:#1E1A1D;min-height:44px}
+.st .nm:hover{color:#1E1A1D}
+.pr{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700}
+.nav{margin-top:auto;border-top:1px solid #F0E8EC;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px 8px 10px}
+.nav a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#625860;font-size:12px}
+.nav a[aria-current]{color:#9E1F50;font-weight:700}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+@media (min-width:1024px){
+  .nav{margin-top:0 !important;grid-template-columns:repeat(4,auto);justify-content:start;gap:8px;border-top:0;border-bottom:1px solid #F0E8EC;padding:6px 20px}
+  .nav a{flex-direction:row;gap:8px;padding:0 16px;font-size:14px;min-height:48px}
+  .d-cols{padding:8px 0 32px}
+  .d-aside-left{flex-basis:320px !important;top:64px}
+  #lista{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-items:start}
+  #lista #pusto,#lista .note{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
+    <a href="start.html" aria-label="Wróć" class="back">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <h1 style="margin:0;font-size:20px;font-weight:700">Gdzie zrobię tę stylizację?</h1>
+  </header>
+
+  <div class="d-cols">
+  <div class="d-aside d-aside-left">
+  <section style="margin:16px 20px 0;padding:14px;border-radius:16px;background:#F6EDF1;display:flex;gap:14px;align-items:center">
+    <img id="miniStyl" src="zdjecia/styl-velvet-burgund.jpg" alt="Velvet burgund na migdałowych paznokciach" width="76" height="57" loading="lazy" style="width:76px;height:57px;object-fit:cover;border-radius:10px;flex:none">
+    <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+      <span id="nazwa" style="font-weight:700">Velvet burgund</span>
+      <span style="color:#625860;font-size:13px" data-bind="booking.opis">Hybryda · długość M · 10 paznokci</span>
+    </div>
+    <a href="paznokcie.html" style="font-size:14px;font-weight:500;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center">Zmień</a>
+  </section>
+
+  <div style="padding:14px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div id="kiedy" data-choice role="group" aria-label="Kiedy" style="display:flex;gap:6px;flex-wrap:wrap">
+      <button type="button" class="chip" aria-pressed="false" data-value="dzis">Dziś</button>
+      <button type="button" class="chip" aria-pressed="true" data-value="tydzien">Ten tydzień</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="miasto" id="chip-miasto">[miasto]</button>
+    </div>
+    <div id="sort" data-choice role="group" aria-label="Sortuj" style="display:flex;border:1px solid #E4D9DE;border-radius:12px;overflow:hidden">
+      <button type="button" class="seg" aria-pressed="true" data-value="cena">Najtaniej</button>
+      <button type="button" class="seg" aria-pressed="false" data-value="slot">Najwcześniej</button>
+      <button type="button" class="seg" aria-pressed="false" data-value="km">Najbliżej</button>
+    </div>
+  </div>
+
+  <p style="margin:14px 20px 0;color:#625860;font-size:13px;line-height:1.45">Każde studio wycenia tę samą stylizację według swojego cennika. Cena i czas to już cała wizyta, nie „od”.</p>
+  </div>
+
+  <div class="d-main">
+  <section id="lista" style="padding:12px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <article class="st" data-n="[Studio 1]" data-cena="200" data-slot="2115" data-km="3" data-dzis="0" data-miasto="1">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <a href="salon.html?s=%5BStudio%201%5D" class="nm">
+          <span style="font-weight:700;font-size:16px">[Studio 1]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · ★ [ocena]</span>
+        </a>
+        <span style="display:flex;flex-direction:column;align-items:flex-end">
+          <span class="pr"><span data-bind="booking.cena">200</span> zł</span>
+          <span style="color:#625860;font-size:12px" data-bind="booking.czasTekst">1 h 50 min</span>
+        </span>
+      </div>
+      <div class="sl"><span style="font-size:13px;color:#625860">Najbliżej:</span><a href="termin.html">wt 11:15</a><a href="termin.html">wt 14:30</a></div>
+    </article>
+
+    <article class="st" data-n="[Studio 2]" data-cena="210" data-slot="1110" data-km="1" data-dzis="1" data-miasto="1">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <a href="salon.html?s=%5BStudio%202%5D" class="nm">
+          <span style="font-weight:700;font-size:16px">[Studio 2]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · ★ [ocena]</span>
+        </a>
+        <span style="display:flex;flex-direction:column;align-items:flex-end">
+          <span class="pr">[cena]</span>
+          <span style="color:#625860;font-size:12px">[czas]</span>
+        </span>
+      </div>
+      <div class="sl"><span style="font-size:13px;color:#625860">Najbliżej:</span><a href="termin.html">dziś 18:30</a><a href="termin.html">śr 9:00</a></div>
+    </article>
+
+    <article class="st" data-n="[Studio 3]" data-cena="225" data-slot="6780" data-km="2" data-dzis="0" data-miasto="1">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <a href="salon.html?s=%5BStudio%203%5D" class="nm">
+          <span style="font-weight:700;font-size:16px">[Studio 3]</span>
+          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · ★ [ocena]</span>
+        </a>
+        <span style="display:flex;flex-direction:column;align-items:flex-end">
+          <span class="pr">[cena]</span>
+          <span style="color:#625860;font-size:12px">[czas]</span>
+        </span>
+      </div>
+      <div class="sl"><span style="font-size:13px;color:#625860">Najbliżej:</span><a href="termin.html">pt 17:00</a></div>
+    </article>
+
+    <div id="pusto" hidden style="padding:14px;border-radius:12px;background:#FFF1E0;color:#8A3B12;font-size:14px;line-height:1.45">Dziś nie ma wolnego okna na całą tę stylizację w żadnym studiu. Wybierz „Ten tydzień”.</div>
+    <div class="note" style="padding:12px 14px;border-radius:12px;background:#FAF6F8;color:#625860;font-size:13px;line-height:1.45">Nie widać studia, w którym bywasz? Pokazujemy tylko studia, które robią velvet i mają wolne okno na całą wizytę. Kolejność i ceny innych studiów są przykładowe.</div>
+  </section>
+  </div>
+  </div>
+
+  <nav class="nav d-tabbar" aria-label="Menu główne">
+    <a href="start.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Start</a>
+    <a href="wyniki.html" aria-current="page"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Szukaj</a>
+    <a href="wizyty.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Wizyty</a>
+    <a href="konto.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profil</a>
+  </nav>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const cards = [...document.querySelectorAll('article.st')];
+  const miasto = (Mock.get('search', {}) || {}).miasto;
+  if (miasto) $('#chip-miasto').textContent = miasto;
+  if (Mock.lookup('booking.opis')) { $('#nazwa').textContent = 'Twoja stylizacja'; $('#miniStyl').hidden = true; } // the photo shows the ready-made velvet only
+  let sort = 'cena', kiedy = 'tydzien';
+  function draw() {
+    const sorted = [...cards].sort((a, b) => a.dataset[sort] - b.dataset[sort]);
+    sorted.forEach(c => $('#lista').insertBefore(c, $('#pusto')));
+    const vis = sorted.filter(c => kiedy !== 'dzis' || c.dataset.dzis === '1');
+    cards.forEach(c => { c.hidden = !vis.includes(c); c.classList.remove('best'); });
+    if (vis[0]) vis[0].classList.add('best');
+    $('#pusto').hidden = vis.length > 0;
+  }
+  $('#sort').addEventListener('mock:choice', e => { sort = e.detail.button.dataset.value; draw(); });
+  $('#kiedy').addEventListener('mock:choice', e => { kiedy = e.detail.button.dataset.value; draw(); });
+  document.querySelectorAll('.sl a').forEach(a => a.addEventListener('click', () => {
+    Mock.set('booking', { ...(Mock.get('booking', {}) || {}), studio: a.closest('.st').dataset.n });
+  }));
+  draw();
+});
+</script>
+</body>
+</html>

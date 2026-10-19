@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – cennik i kreator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 1200px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <h1 class="p-h1">Cennik i kreator</h1>
+      <div class="p-acts">
+        <button type="button" class="p-btn sm" id="imp">Importuj z Booksy (CSV)</button>
+        <button type="button" class="p-btn sm pri" id="save">Zapisz zmiany</button>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center">
+      <div id="tabs" role="tablist" aria-label="Kategorie" class="p-pills"></div>
+      <button type="button" class="p-pill" id="addcat" style="border-style: dashed">+ Kategoria</button>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <div id="sections" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px"></div>
+
+      <aside aria-label="Podgląd dla klientki" style="flex: 1 1 280px; min-width: 0; background: #1E1A1D; color: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Tak zobaczy to klientka</h2>
+        <span id="pv-ex" style="color: #E9DEE3; font-size: 13px"></span>
+        <div id="pv-rows" style="display: flex; flex-direction: column; gap: 10px"></div>
+        <div style="height: 1px; background: #4A4247"></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span id="pv-price" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700"></span><span id="pv-time" style="color: #E9DEE3"></span></div>
+        <a href="paznokcie.html" style="min-height: 44px; border-radius: 10px; background: #FFFFFF; color: #1E1A1D; text-decoration: none; font-weight: 700; display: flex; align-items: center; justify-content: center">Otwórz kreator</a>
+        <span style="color: #E9DEE3; font-size: 12px; line-height: 1.4">Zmiana ceny w cenniku nie zmienia już zarezerwowanych wizyt. Klientka płaci kwotę z karty stylizacji.</span>
+        <span id="pv-note" style="color: #E9DEE3; font-size: 12px; line-height: 1.4"></span>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, PER = ['raz za zabieg', 'za paznokieć', 'za sztukę'];
+  // Ceny paznokci z pricing.json; pozostałe kategorie to ceny przykładowe. Pozycja bazowa: [nazwa, cena zł, minuty, online, czas działania (przerwa) min, osoby naraz, dojazd 0/1]; dopłata: [nazwa, cena, minuty, liczona]
+  const DEF = {
+    Paznokcie: { ex: 'hybryda, długość M, velvet na 10 paznokciach', base: [['Manicure hybrydowy', 140, 75, 1, 0, 2, 1], ['Żel na naturalnej płytce', 170, 105, 1, 0, 1, 1], ['Przedłużanie (tipsy / szablon)', 200, 150, 1, 0, 1, 0], ['Uzupełnienie żelu', 180, 120, 1, 0, 1, 0]],
+      len: [['S', 0, 0], ['M', 10, 5], ['L', 20, 10], ['XL', 30, 15], ['XXL', 50, 20]], lenIdx: 1, extra: [['French', 20, 15, 0], ['Velvet', 5, 3, 1], ['Chrome', 5, 3, 1], ['Cyrkonie', 1, 1, 2], ['Zdjęcie hybrydy', 20, 15, 0]], exIdx: 1 },
+    Rzęsy: { ex: 'rzęsy 1:1 z kocim okiem', base: [['Rzęsy 1:1', 250, 120, 1], ['Rzęsy 2D', 280, 135, 1], ['Uzupełnienie 1:1', 150, 90, 1], ['Zdjęcie rzęs', 40, 30, 1]], len: [['do 10 mm', 0, 0], ['10–12 mm', 20, 10], ['12 mm +', 40, 15]], lenIdx: 1, extra: [['Efekt kocie oko', 30, 10, 0], ['Kolorowe rzęsy', 20, 10, 0]], exIdx: 0 },
+    Brwi: { ex: 'henna z regulacją', base: [['Regulacja', 40, 30, 1], ['Henna + regulacja', 70, 60, 1, 15, 1, 0], ['Laminacja', 150, 60, 1], ['Botox brwi', 120, 50, 1]], len: null, extra: [['Korekta kształtu', 30, 15, 0]], exIdx: 0 },
+    Fryzjer: { ex: 'koloryzacja, włosy 15–30 cm, mycie i modelowanie', base: [['Strzyżenie damskie', 120, 60, 1], ['Koloryzacja', 280, 150, 1, 30, 1, 0], ['Refleksy / baleyage', 450, 240, 1, 40, 1, 0], ['Keratyna', 350, 180, 1], ['Upięcie', 200, 60, 1]], len: [['do 15 cm', 0, 0], ['15–30 cm', 30, 15], ['30–45 cm', 60, 30], ['45+ cm', 90, 45]], lenIdx: 1, extra: [['Mycie i modelowanie', 50, 30, 0]], exIdx: 0 },
+    Kosmetyka: { ex: 'peeling kwasowy z konsultacją', base: [['Oczyszczanie', 180, 60, 1], ['Peeling kwasowy', 220, 45, 1], ['Mezoterapia mikroigłowa', 350, 75, 1], ['Masaż twarzy', 120, 30, 1]], len: null, extra: [['Konsultacja przed pierwszym zabiegiem', 50, 20, 0]], exIdx: 0 }
+  };
+  const D = Mock.get('cennik.data', null) || DEF;
+  const Z = Mock.get('cennik.strefy', [['do 10 km', 30], ['do 20 km', 50]]); // strefy dojazdu: [nazwa, opłata zł], ceny przykładowe
+  const kal = () => Mock.get('kalendarz', { techMin: 10 }) || { techMin: 10 };
+  let cur = 'Paznokcie';
+  const num = v => Math.max(0, parseInt(String(v).replace(/\D/g, ''), 10) || 0);
+  const inp = (a, i, j, v, lab) => `<input class="p-in s" inputmode="numeric" style="width:84px" data-a="${a}" data-i="${i}" data-j="${j}" value="${v}" aria-label="${E(lab)}">`;
+
+  function renderTabs() {
+    document.getElementById('tabs').innerHTML = Object.keys(D).map(k => `<button type="button" role="tab" class="p-pill" aria-selected="${k === cur}">${E(k)}</button>`).join('');
+  }
+  function renderSections() {
+    const c = D[cur], box = document.getElementById('sections');
+    const tbl = (rows, a, third, head) => `<div class="p-tw"><table class="p-tbl"><thead><tr><th>${head}</th><th>Cena (zł)</th><th>Czas (min)</th>${a === 'base' ? '<th title="Minuty w środku usługi, w których możesz przyjąć kogoś innego">Czas działania (min)</th>' : ''}<th>${third}</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td>${E(r[0])}</td><td>${inp(a, i, 1, r[1], 'Cena: ' + r[0])}</td><td>${inp(a, i, 2, r[2], 'Czas: ' + r[0])}</td>${a === 'base' ? `<td>${inp(a, i, 4, r[4] || 0, 'Czas działania, min: ' + r[0])}<small hidden role="alert" style="display:block;color:#A3262A;font-size:12px"></small></td>` : ''}<td>${a === 'base'
+      ? `<input type="checkbox" data-a="on" data-i="${i}" ${r[3] ? 'checked' : ''} aria-label="Rezerwacja online: ${E(r[0])}" style="width:20px;height:20px;accent-color:#9E1F50" data-toast-change="Zapisano widoczność online">`
+      : `<select class="p-in s" data-a="per" data-i="${i}" aria-label="Sposób liczenia: ${E(r[0])}">${PER.map((p, k) => `<option value="${k}"${k === r[3] ? ' selected' : ''}>${p}</option>`).join('')}</select>`}</td></tr>`).join('')}</tbody></table></div>`;
+    box.innerHTML = `<section class="p-card"><h2>Kalendarz</h2><label class="p-lab" style="max-width:320px">Przerwa po każdej wizycie<select class="p-in" id="tech">${[0, 5, 10, 15].map(m => `<option value="${m}"${m === (kal().techMin ?? 10) ? ' selected' : ''}>${m} min</option>`).join('')}</select></label><span class="p-mut">Czas na sprzątanie i przygotowanie stanowiska. Kalendarz nie pozwoli ustawić następnej wizyty bliżej niż tyle minut.</span></section>` +
+      `<section class="p-card"><h2>Usługi bazowe</h2>${c.base.length ? tbl(c.base, 'base', 'Online', 'Usługa') : '<span class="p-mut">Brak pozycji. Dodaj pierwszą przyciskiem poniżej.</span>'}${c.base.length ? '<span class="p-mut">Czas działania (np. farba, henna): minuty w środku usługi, w których stylistka może przyjąć kogoś innego. W kalendarzu pojawia się jako luka w wizycie.</span>' : ''}</section>` +
+      (c.base.length ? `<section class="p-card"><h2>Osoby naraz i dojazd</h2><div class="p-tw"><table class="p-tbl"><thead><tr><th>Usługa</th><th>Ile osób naraz</th><th>Dojazd do klientki</th></tr></thead><tbody>${c.base.map((r, i) => `<tr><td>${E(r[0])}</td><td><select class="p-in s" data-a="osoby" data-i="${i}" aria-label="Ile osób naraz: ${E(r[0])}">${[1, 2, 3, 4].map(n => `<option value="${n}"${n === (r[5] || 1) ? ' selected' : ''}>${n}</option>`).join('')}</select></td><td><input type="checkbox" data-a="dojazd" data-i="${i}" ${r[6] ? 'checked' : ''} aria-label="Dojazd do klientki: ${E(r[0])}" style="width:20px;height:20px;accent-color:#9E1F50" data-toast-change="Zapisano dojazd"></td></tr>`).join('')}</tbody></table></div><span class="p-mut">„Ile osób naraz” to rezerwacja dla kilku osób w jednym terminie (np. dwie przyjaciółki), cena rośnie razy liczbę osób. Dojazd: usługa jest wykonywana u klientki, a opłata zależy od strefy.</span></section>` : '') +
+      (c.len ? `<section class="p-card"><h2>${cur === 'Fryzjer' ? 'Długość włosów' : cur === 'Rzęsy' ? 'Długość rzęs' : 'Długość (z wymiarem dla klientki)'}</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">${c.len.map((l, i) => `<div style="padding:10px;border-radius:12px;border:1px solid #E4D9DE;display:flex;flex-direction:column;gap:6px"><b>${E(l[0])}</b><label class="p-lab">+ zł${inp('len', i, 1, l[1], 'Dopłata zł: ' + l[0])}</label><label class="p-lab">+ min${inp('len', i, 2, l[2], 'Dopłata min: ' + l[0])}</label></div>`).join('')}</div></section>` : '') +
+      `<section class="p-card"><h2>Efekty, ozdoby i dopłaty</h2>${c.extra.length ? tbl(c.extra, 'extra', 'Liczona', 'Pozycja') : '<span class="p-mut">Brak pozycji.</span>'}<button type="button" class="p-btn sm dash" id="addrow" style="align-self:flex-start">+ Dodaj pozycję</button></section>` +
+      `<section class="p-card" id="strefy"><h2>Strefy dojazdu</h2><div class="p-tw"><table class="p-tbl" style="min-width:320px"><thead><tr><th>Strefa</th><th>Opłata (zł)</th><th></th></tr></thead><tbody>${Z.map((z, i) => `<tr><td>${E(z[0])}</td><td>${inp('strefa', i, 1, z[1], 'Opłata: ' + z[0])}</td><td><button type="button" class="p-btn sm dng" data-zdel="${i}" aria-label="Usuń strefę ${E(z[0])}">Usuń</button></td></tr>`).join('')}</tbody></table></div><button type="button" class="p-btn sm dash" id="addz" style="align-self:flex-start">+ Dodaj strefę</button><span class="p-mut">Opłaty są przykładowe. Klientka wybiera strefę przy rezerwacji usługi z dojazdem.</span></section>`;
+    preview();
+  }
+  function preview() {
+    const c = D[cur], b = c.base[0], bp = c.base.find(r => r[4] > 0), l = c.len && c.len[c.lenIdx], x = c.extra[c.exIdx];
+    const rows = []; let p = 0, m = 0;
+    if (b) { rows.push([b[0], b[1]]); p += b[1]; m += b[2]; }
+    if (l) { rows.push([c.len && cur === 'Paznokcie' ? 'Długość ' + l[0] : l[0], l[1]]); p += l[1]; m += l[2]; }
+    if (x) { const q = x[3] === 0 ? 1 : 10; rows.push([x[3] === 0 ? x[0] : `${x[0]} × 10 ${x[3] === 1 ? 'paz.' : 'szt.'}`, x[1] * q]); p += x[1] * q; m += x[2] * q; }
+    document.getElementById('pv-ex').textContent = 'Przykład: ' + c.ex;
+    document.getElementById('pv-rows').innerHTML = rows.map(r => `<div style="display:flex;justify-content:space-between"><span style="color:#E9DEE3">${E(r[0])}</span><span>${r[1]} zł</span></div>`).join('') || '<span style="color:#E9DEE3">Dodaj pierwszą pozycję.</span>';
+    document.getElementById('pv-price').textContent = p + ' zł';
+    document.getElementById('pv-time').textContent = PS.min(m);
+    document.getElementById('pv-note').textContent = [cur === 'Paznokcie' ? '' : 'Ceny tej kategorii są przykładowe.', bp ? `W trakcie usługi „${bp[0]}” jest ${bp[4]} min przerwy: stylistka może w tym czasie przyjąć kogoś innego.` : ''].filter(Boolean).join(' ');
+  }
+  renderTabs(); renderSections();
+
+  document.getElementById('tabs').addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { cur = t.textContent; renderTabs(); renderSections(); } });
+  const sec = document.getElementById('sections');
+  function edit(e) {
+    const t = e.target, a = t.dataset.a; if (!a) return;
+    const c = D[cur], i = +t.dataset.i, j = +t.dataset.j;
+    if (a === 'strefa') { Z[i][1] = num(t.value); return; }
+    if (a === 'osoby') { c.base[i][5] = +t.value; Mock.toast('Zapisano: ' + c.base[i][0] + ', ' + t.value + ' os. naraz'); return; }
+    if (a === 'dojazd') { c.base[i][6] = t.checked ? 1 : 0; return; }
+    if (a === 'base' && j === 4) { // czas działania: zostaje przy klientce min. 10 min
+      const max = Math.max(0, c.base[i][2] - 10), v = num(t.value), er = t.parentElement.querySelector('small');
+      if (v > max) { t.setAttribute('aria-invalid', 'true'); er.textContent = `Najwyżej ${max} min (czas usługi minus 10 min).`; er.hidden = false; return; }
+      t.removeAttribute('aria-invalid'); er.hidden = true; c.base[i][4] = v; preview(); return;
+    }
+    if (a === 'base' || a === 'extra') c[a][i][j] = num(t.value);
+    if (a === 'base' && j === 2 && (c.base[i][4] || 0) > Math.max(0, c.base[i][2] - 10)) { c.base[i][4] = Math.max(0, c.base[i][2] - 10); const w = t.closest('tr').querySelector('[data-j="4"]'); if (w) { w.value = c.base[i][4]; w.removeAttribute('aria-invalid'); } }
+    if (a === 'len') c.len[i][j] = num(t.value);
+    if (a === 'on') c.base[i][3] = t.checked ? 1 : 0;
+    if (a === 'per') c.extra[i][3] = +t.value;
+    preview();
+  }
+  sec.addEventListener('input', edit);
+  sec.addEventListener('change', edit);
+  sec.addEventListener('change', e => { if (e.target.id === 'tech') { Mock.set('kalendarz', { ...kal(), techMin: +e.target.value }); Mock.toast(`Zapisano: przerwa po każdej wizycie ${e.target.value} min`); } });
+  sec.addEventListener('click', e => {
+    const zd = e.target.closest('[data-zdel]');
+    if (zd) { Z.splice(+zd.dataset.zdel, 1); renderSections(); return; }
+    if (e.target.closest('#addz')) return PS.modal({
+      title: 'Nowa strefa dojazdu', ok: 'Dodaj',
+      body: '<label class="p-lab">Nazwa strefy<input class="p-in" name="n" required placeholder="np. do 30 km"></label><label class="p-lab">Opłata (zł)<input class="p-in" name="p" type="number" min="0" value="80" required></label>',
+      onOk: f => { Z.push([f.n.value.trim(), +f.p.value]); renderSections(); },
+      toast: f => 'Dodano strefę: ' + f.n.value.trim()
+    });
+    if (!e.target.closest('#addrow')) return;
+    PS.modal({
+      title: 'Nowa pozycja w kategorii ' + cur, ok: 'Dodaj',
+      body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required></label>
+        <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Cena (zł)<input class="p-in" name="p" type="number" min="0" value="0" required></label><label class="p-lab" style="flex:1">Czas (min)<input class="p-in" name="m" type="number" min="0" value="30" required></label></div>
+        <label class="p-lab">Gdzie<select class="p-in" name="g"><option value="base">Usługa bazowa</option><option value="extra">Efekt lub dopłata</option></select></label>`,
+      onOk: f => { D[cur][f.g.value].push(f.g.value === 'base' ? [f.n.value.trim(), +f.p.value, +f.m.value, 1, 0, 1, 0] : [f.n.value.trim(), +f.p.value, +f.m.value, 0]); renderSections(); },
+      toast: f => 'Dodano pozycję: ' + f.n.value.trim()
+    });
+  });
+  document.getElementById('save').addEventListener('click', () => { Mock.set('cennik.data', D); Mock.set('cennik.strefy', Z); Mock.toast('Zapisano cennik. Nowe ceny widać od razu w kreatorze'); });
+  document.getElementById('imp').addEventListener('click', () => PS.modal({
+    title: 'Import cennika z Booksy', ok: 'Importuj',
+    body: '<label class="p-lab">Plik CSV z usługami<input class="p-in" type="file" name="f" accept=".csv,text/csv" required></label><span class="p-mut">Kolumny: nazwa, cena, czas. Pozycje o tej samej nazwie zostaną zaktualizowane.</span>',
+    toast: 'Zaimportowano [x] pozycji'
+  }));
+  document.getElementById('addcat').addEventListener('click', () => PS.modal({
+    title: 'Nowa kategoria', ok: 'Dodaj',
+    body: '<label class="p-lab">Nazwa kategorii<input class="p-in" name="n" required placeholder="np. Makijaż"></label>',
+    onOk: f => { const n = f.n.value.trim(); if (D[n]) return false; D[n] = { ex: 'pusta kategoria', base: [], len: null, extra: [], exIdx: 0, lenIdx: 0 }; cur = n; renderTabs(); renderSections(); },
+    toast: f => 'Dodano kategorię: ' + f.n.value.trim()
+  }));
+});
+</script>
+</body>
+</html>

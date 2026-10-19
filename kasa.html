@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – kasa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Kasa</h1><span class="p-mut">Wtorek, 20 października. Wizyty rozliczone w kalendarzu trafiają tu od razu.</span></div>
+      <div class="p-acts">
+        <button type="button" class="p-btn sm" id="in">Wpłata do kasy</button>
+        <button type="button" class="p-btn sm" id="out">Wypłata z kasy</button>
+        <button type="button" class="p-btn sm dark" id="close">Zamknij dzień</button>
+      </div>
+    </div>
+
+    <div id="closed" class="p-banner" role="status" hidden></div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
+      <div class="p-stat"><span style="color: #625860">Utarg dnia</span><b id="s-utarg">0 zł</b><span class="p-mut" id="s-n"></span></div>
+      <div class="p-stat"><span style="color: #625860">Gotówka</span><b id="s-got">0 zł</b><span class="p-mut">tylko płatności gotówką</span></div>
+      <div class="p-stat"><span style="color: #625860">Karta, BLIK i karty podarunkowe</span><b id="s-bez">0 zł</b><span class="p-mut">nie wchodzą do szuflady</span></div>
+      <div class="p-stat"><span style="color: #625860">W szufladzie (powinno być)</span><b id="s-kasa">0 zł</b><span class="p-mut">fundusz startowy 200 zł (przykład)</span></div>
+    </div>
+
+    <section class="p-card" aria-labelledby="tx-h">
+      <h2 id="tx-h" class="p-h2">Transakcje dnia</h2>
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Godzina</th><th>Klientka</th><th>Za co</th><th>Metoda</th><th style="text-align: right">Kwota</th></tr></thead><tbody id="tx"></tbody></table></div>
+    </section>
+
+    <section class="p-card" aria-labelledby="gc-h">
+      <h2 id="gc-h" class="p-h2">Karty podarunkowe do zrealizowania</h2>
+      <form id="gcform" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end">
+        <label class="p-lab" style="flex: 1 1 220px">Kod karty<input class="p-in" id="gccode" placeholder="np. KARTA-DEMO-1" required></label>
+        <button class="p-btn dark">Sprawdź kartę</button>
+      </form>
+      <div id="gc" style="display: flex; flex-direction: column; gap: 8px"></div>
+      <span class="p-mut">Karta działa tylko w Twoim studiu. Kody poniżej są przykładowe.</span>
+    </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, FUND = 200;
+  const SEED = [
+    { t: '9:00', k: '[Klientka A]', o: 'Hybryda jednolita', m: 'gotówka', v: 140 },
+    { t: '9:30', k: '[Klientka D]', o: 'Rzęsy 1:1 · uzupełnienie (cena przykładowa)', m: 'karta', v: 150 }
+  ];
+  const CARDS = [{ code: 'KARTA-DEMO-1', v: 100, od: '[kupująca], na urodziny' }, { code: 'KARTA-DEMO-2', v: 200, od: '[kupująca], prezent' }];
+  const zl = n => n.toLocaleString('pl-PL') + ' zł';
+  const tx = () => SEED.concat(Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota })), Mock.get('kasa.gc', []).map(x => ({ t: x.t, k: '[klientka]', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })));
+  const ruch = () => Mock.get('kasa.ruch', []);
+
+  function render() {
+    const T = tx(), R = ruch();
+    const sum = f => T.filter(f).reduce((s, x) => s + x.v, 0);
+    const total = sum(() => true), got = sum(x => x.m === 'gotówka'), inn = R.filter(r => r.typ === 'wpłata').reduce((s, r) => s + r.v, 0), out = R.filter(r => r.typ === 'wypłata').reduce((s, r) => s + r.v, 0);
+    document.getElementById('s-utarg').textContent = zl(total);
+    document.getElementById('s-n').textContent = T.length + ' transakcji';
+    document.getElementById('s-got').textContent = zl(got);
+    document.getElementById('s-bez').textContent = zl(total - got);
+    document.getElementById('s-kasa').textContent = zl(FUND + got + inn - out);
+    document.getElementById('tx').innerHTML = T.map(x => `<tr><td>${E(x.t)}</td><td>${E(x.k)}</td><td>${E(x.o)}</td><td><span class="p-chip">${E(x.m)}</span></td><td style="text-align:right;font-weight:700">${zl(x.v)}</td></tr>`).join('') +
+      R.map(r => `<tr><td>${E(r.t)}</td><td colspan="2">${r.typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy'}: ${E(r.o)}</td><td><span class="p-chip">gotówka</span></td><td style="text-align:right;font-weight:700;color:${r.typ === 'wpłata' ? '#1F6B47' : '#A3262A'}">${r.typ === 'wpłata' ? '+' : '−'}${zl(r.v)}</td></tr>`).join('');
+    const used = Mock.get('kasa.gc', []).map(x => x.code);
+    document.getElementById('gc').innerHTML = CARDS.map(c => `<div class="p-row"><span><b>${E(c.code)}</b> · ${zl(c.v)}<br><span class="p-mut">${E(c.od)}</span></span>${used.includes(c.code) ? '<span class="p-badge ok">zrealizowana</span>' : `<button type="button" class="p-btn sm" data-code="${c.code}">Zrealizuj</button>`}</div>`).join('');
+    const closed = Mock.get('kasa.zamkniety', null), bn = document.getElementById('closed');
+    bn.hidden = !closed; if (closed) bn.textContent = `Dzień zamknięty o ${closed.t}. Utarg ${zl(total)}, w szufladzie ${closed.policzono} zł${closed.roznica ? ` (różnica ${closed.roznica > 0 ? '+' : ''}${closed.roznica} zł)` : ', bez różnicy'}.`;
+  }
+  const now = () => new Date().toTimeString().slice(0, 5);
+  function cash(typ) {
+    PS.modal({
+      title: typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy', ok: 'Zapisz',
+      body: '<label class="p-lab">Kwota (zł)<input class="p-in" type="number" min="1" name="v" required></label><label class="p-lab">Opis<input class="p-in" name="o" required placeholder="np. drobne na resztę"></label>',
+      onOk: f => { const r = ruch(); r.push({ typ, v: +f.v.value, o: f.o.value.trim(), t: now() }); Mock.set('kasa.ruch', r); render(); },
+      toast: f => `${typ === 'wpłata' ? 'Wpłacono' : 'Wypłacono'} ${f.v.value} zł`
+    });
+  }
+  document.getElementById('in').addEventListener('click', () => cash('wpłata'));
+  document.getElementById('out').addEventListener('click', () => cash('wypłata'));
+  document.getElementById('close').addEventListener('click', () => {
+    const exp = document.getElementById('s-kasa').textContent;
+    const want = parseInt(exp.replace(/\D/g, ''), 10);
+    PS.modal({
+      title: 'Zamknij dzień', ok: 'Zamknij dzień', cls: 'dark',
+      body: `<div class="p-box"><span>W szufladzie powinno być</span><b>${E(exp)}</b></div><label class="p-lab">Policzone w szufladzie (zł)<input class="p-in" type="number" min="0" name="c" required value="${want}"></label><span class="p-mut">Różnicę zapiszemy w raporcie dnia.</span>`,
+      onOk: f => { Mock.set('kasa.zamkniety', { t: now(), policzono: +f.c.value, roznica: +f.c.value - want }); render(); },
+      toast: 'Dzień zamknięty, raport zapisany'
+    });
+  });
+  function redeem(code) {
+    const c = CARDS.find(x => x.code === code.trim().toUpperCase());
+    if (!c) { Mock.toast('Nie znaleziono karty o kodzie ' + code.trim()); return; }
+    const used = Mock.get('kasa.gc', []);
+    if (used.some(u => u.code === c.code)) { Mock.toast('Ta karta została już zrealizowana'); return; }
+    PS.modal({
+      title: 'Zrealizuj kartę ' + c.code, ok: 'Zrealizuj',
+      body: `<div class="p-box"><span>Saldo karty</span><b>${zl(c.v)}</b></div><p style="margin:0" class="p-mut">${E(c.od)}. Kwota wejdzie do dzisiejszego utargu jako płatność kartą podarunkową.</p>`,
+      onOk: () => { used.push({ code: c.code, v: c.v, t: now() }); Mock.set('kasa.gc', used); render(); },
+      toast: `Karta ${c.code} zrealizowana: ${c.v} zł`
+    });
+  }
+  document.getElementById('gc').addEventListener('click', e => { const b = e.target.closest('[data-code]'); if (b) redeem(b.dataset.code); });
+  document.getElementById('gcform').addEventListener('submit', e => { e.preventDefault(); redeem(document.getElementById('gccode').value); });
+  render();
+  window.addEventListener('storage', render);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – zespół i grafik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 940px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <h1 class="p-h1">Zespół i grafik</h1>
+      <button type="button" class="p-btn pri" id="invite">+ Zaproś osobę</button>
+    </div>
+
+    <div data-choice role="tablist" aria-label="Sekcje" class="p-pills">
+      <button type="button" role="tab" class="p-pill" aria-selected="true" aria-controls="tab-zespol">Zespół i grafik</button>
+      <button type="button" role="tab" class="p-pill" aria-selected="false" aria-controls="tab-sprzet">Sprzęt i gabinety</button>
+    </div>
+
+    <div id="tab-zespol" style="display: flex; flex-direction: column; gap: 16px">
+      <div class="p-grid">
+        <section class="p-card">
+          <div style="display: flex; gap: 12px; align-items: center">
+            <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 50%; background: #9E1F50"></span>
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">[Stylistka 1]</b><span style="color: #625860">Właścicielka · paznokcie</span></div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap">
+            <span class="p-chip">Hybryda</span><span class="p-chip">Żel</span><span class="p-chip">Przedłużanie</span><span class="p-chip">Zdobienia</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px">
+            <label class="p-lab">Uprawnienia<select class="p-in" data-rl="1" data-toast-change="Zapisano uprawnienia"></select></label>
+            <label class="p-lab">Mnożnik ceny<select class="p-in" data-toast-change="Zapisano mnożnik ceny"><option selected>× 1,0 (cennik)</option><option>× 1,2</option><option>× 1,5</option></select></label>
+          </div>
+        </section>
+
+        <section class="p-card">
+          <div style="display: flex; gap: 12px; align-items: center">
+            <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 50%; background: #2F5A86"></span>
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">[Stylistka 2]</b><span style="color: #625860">Stylistka · rzęsy, brwi, paznokcie</span></div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap">
+            <span class="p-chip" style="background: #EAF0F7">Rzęsy 1:1–mega</span><span class="p-chip" style="background: #EEF3EA">Brwi</span><span class="p-chip">Hybryda</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px">
+            <label class="p-lab">Uprawnienia<select class="p-in" data-rl="2" data-toast-change="Zapisano uprawnienia"></select></label>
+            <label class="p-lab">Prowizja od usług<input class="p-in" value="[x] %" style="width: 100px" data-toast-change="Zapisano prowizję"></label>
+          </div>
+        </section>
+        <div id="invited" style="display: contents"></div>
+      </div>
+
+      <section class="p-card">
+        <div class="p-top">
+          <h2 id="gr-h">Grafik: 19–25 października</h2>
+          <div class="p-acts">
+            <button type="button" class="p-btn sm" id="copy">Kopiuj na następny tydzień</button>
+            <button type="button" class="p-btn sm" id="vac">+ Urlop</button>
+            <button type="button" class="p-btn sm" id="print">Drukuj</button>
+          </div>
+        </div>
+        <div class="p-tw">
+          <table id="gr" style="width: 100%; min-width: 760px; border-collapse: collapse; text-align: center"></table>
+        </div>
+        <span class="p-mut">Kliknij komórkę, żeby zmienić godziny. Wizyty w dniu urlopu system pokaże do przełożenia.</span>
+      </section>
+
+      <section class="p-card" aria-labelledby="kcw-h">
+        <h2 id="kcw-h">Kto co widzi</h2>
+        <div class="p-tw"><table class="p-tbl" id="kcw" style="min-width: 640px"></table></div>
+        <span class="p-mut">Tabela pokazuje pozycje menu panelu dla każdej roli. W makiecie menu chowa pozycje, ale adresy stron nie są blokowane.</span>
+      </section>
+    </div>
+
+    <div id="tab-sprzet" hidden style="display: flex; flex-direction: column; gap: 16px">
+      <div class="p-top"><h2 class="p-h2" style="font-size: 18px">Stanowiska i sprzęt</h2><button type="button" class="p-btn sm" id="addst">+ Dodaj stanowisko</button></div>
+      <div id="stan" class="p-grid"></div>
+      <span class="p-mut">Usługa przypisana do stanowiska nie zbierze się z inną usługą na tym samym stanowisku w tym samym czasie.</span>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, DAYS = ['pn', 'wt', 'śr', 'cz', 'pt', 'sb', 'nd'];
+  const P = { 1: '#F6EDF1', 2: '#EAF0F7' };
+  const DEF = { '[Stylistka 1]': ['9–18', '9–18', '9–18', 'urlop', '10–18', '9–14', '—'], '[Stylistka 2]': ['12–20', '9–17', '9–17', '9–17', '9–17', '—', '—'] };
+  let G = Mock.get('zespol.grafik', DEF);
+  let STAN = Mock.get('zespol.stan', [
+    { n: 'Stanowisko 1', o: 'Paznokcie · [Stylistka 1]', sp: 'Lampa UV/LED, frezarka, odciąg pyłu', us: ['Hybryda', 'Żel', 'Przedłużanie'] },
+    { n: 'Stanowisko 2', o: 'Rzęsy i brwi · [Stylistka 2]', sp: 'Leżanka, lampa z lupą, stolik na kleje', us: ['Rzęsy 1:1–mega', 'Brwi'] },
+    { n: 'Gabinet kosmetyczny', o: 'Kosmetyka (przykład)', sp: 'Leżanka, lampa, zestaw do peelingów', us: ['Oczyszczanie', 'Peeling kwasowy'] }]);
+  const saveG = () => Mock.set('zespol.grafik', G);
+  const cls = v => (v === 'urlop' ? 'background:#FFF1E0;color:#8A3B12' : v === '—' ? 'color:#625860' : '');
+
+  function renderGrafik() {
+    const rows = Object.keys(G);
+    document.getElementById('gr').innerHTML = `<thead><tr style="color:#625860;font-size:12px"><th style="padding:8px;text-align:left;font-weight:500">Osoba</th>${DAYS.map(d => `<th style="padding:8px;font-weight:500">${d}</th>`).join('')}</tr></thead><tbody>${rows.map((r, ri) => `<tr style="border-top:1px solid #F0E8EC"><td style="padding:10px 8px;text-align:left;font-weight:700">${E(r)}</td>${G[r].map((v, i) => `<td style="padding:4px"><button type="button" data-r="${E(r)}" data-i="${i}" aria-label="${E(r)}, ${DAYS[i]} ${19 + i}.10: ${E(v)}. Zmień godziny" style="display:block;width:100%;min-height:44px;padding:8px;border-radius:8px;border:0;font:inherit;cursor:pointer;background:${v === 'urlop' || v === '—' ? '#fff' : P[(ri % 2) + 1]};${cls(v)}">${E(v)}</button></td>`).join('')}</tr>`).join('')}</tbody>`;
+  }
+  const hrs = (sel) => Array.from({ length: 15 }, (_, i) => `<option${i + 7 === sel ? ' selected' : ''}>${i + 7}</option>`).join('');
+  document.getElementById('gr').addEventListener('click', e => {
+    const b = e.target.closest('[data-r]'); if (!b) return;
+    const r = b.dataset.r, i = +b.dataset.i, v = G[r][i], m = /^(\d+)–(\d+)$/.exec(v);
+    PS.modal({
+      title: `${r}: ${DAYS[i]} ${19 + i} października`, ok: 'Zapisz',
+      body: `<label class="p-lab">Dzień<select class="p-in" name="typ"><option value="p"${m ? ' selected' : ''}>Pracuje</option><option value="w"${v === '—' ? ' selected' : ''}>Dzień wolny</option><option value="u"${v === 'urlop' ? ' selected' : ''}>Urlop</option></select></label>
+        <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<select class="p-in" name="od">${hrs(m ? +m[1] : 9)}</select></label><label class="p-lab" style="flex:1">Do<select class="p-in" name="do">${hrs(m ? +m[2] : 18)}</select></label></div>`,
+      onOk: f => { if (f.typ.value === 'p' && +f.od.value >= +f.do.value) { Mock.toast('Godzina końca musi być po początku'); return false; } G[r][i] = f.typ.value === 'p' ? `${f.od.value}–${f.do.value}` : f.typ.value === 'w' ? '—' : 'urlop'; saveG(); renderGrafik(); },
+      toast: 'Zapisano godziny pracy'
+    });
+  });
+  document.getElementById('vac').addEventListener('click', () => PS.modal({
+    title: 'Nowy urlop', ok: 'Zapisz urlop',
+    body: `<label class="p-lab">Osoba<select class="p-in" name="o">${Object.keys(G).map(r => `<option>${E(r)}</option>`).join('')}</select></label>
+      <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" value="2026-10-22" required></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" value="2026-10-23" required></label></div>
+      <span class="p-mut">Wizyty w tych dniach pokażemy do przełożenia.</span>`,
+    onOk: f => { if (f.do.value < f.od.value) { Mock.toast('Data końca jest przed początkiem'); return false; } for (let i = 0; i < 7; i++) { const d = `2026-10-${19 + i}`; if (d >= f.od.value && d <= f.do.value) G[f.o.value][i] = 'urlop'; } saveG(); renderGrafik(); },
+    toast: f => `Zapisano urlop: ${f.o.value}`
+  }));
+  document.getElementById('copy').addEventListener('click', () => Mock.toast('Grafik skopiowany na 26 października – 1 listopada'));
+  document.getElementById('print').addEventListener('click', () => Mock.toast('Przygotowano grafik do wydruku (PDF)'));
+
+  let inv = Mock.get('zespol.inv', []);
+  const ROLE = { 'Stylistka': 'stylistka', 'Recepcja': 'recepcja', stylistka: 'stylistka', recepcja: 'recepcja' }; // podgląd zaproszenia istnieje tylko dla tych dwóch
+  const RN = k => (PS.ROLES.find(r => r.k === k) || { n: k }).n;
+  const ROPT = sel => PS.ROLES.map(r => `<option value="${r.k}"${r.k === sel ? ' selected' : ''}>${E(r.n)}</option>`).join('');
+  const RS = Mock.get('zespol.role', { 1: 'właścicielka', 2: 'stylistka' });
+  document.querySelectorAll('[data-rl]').forEach(sl => { sl.innerHTML = ROPT(RS[sl.dataset.rl]); sl.addEventListener('change', () => { RS[sl.dataset.rl] = sl.value; Mock.set('zespol.role', RS); }); });
+  const MENU = PS.NAV.flatMap(g => g[1]);
+  document.getElementById('kcw').innerHTML = `<thead><tr><th scope="col">Pozycja menu</th>${PS.ROLES.map(r => `<th scope="col">${E(r.n)}</th>`).join('')}</tr></thead><tbody>${MENU.map(it => `<tr><th scope="row" style="font-weight:500">${E(it[0])}</th>${PS.ROLES.map(r => { const ok = !r.hide.includes(it[1]); return `<td>${ok ? '<span class="p-badge ok">widzi</span>' : '<span class="p-mut">brak</span>'}</td>`; }).join('')}</tr>`).join('')}</tbody>`;
+  function renderInv() {
+    document.getElementById('invited').innerHTML = inv.map((c, i) => `<section class="p-card"><div style="display:flex;gap:12px;align-items:center"><span aria-hidden="true" style="width:48px;height:48px;border-radius:50%;background:#E4D9DE"></span><div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><b style="font-size:16px;overflow-wrap:anywhere">${E(c.k)}</b><span style="color:#625860">${E(RN(c.r))}</span></div><span class="p-badge warn">zaproszona</span></div>
+      <span class="p-mut">Osoba pojawi się w grafiku po przyjęciu zaproszenia. Link działa 7 dni.</span>
+      <div class="p-acts">${ROLE[c.r] ? `<a class="p-btn sm" href="zaproszenie.html?rola=${ROLE[c.r]}" target="_blank" rel="noopener">Podgląd zaproszenia</a>` : ''}<button type="button" class="p-btn sm" data-resend="${i}">Wyślij ponownie</button><button type="button" class="p-btn sm dng" data-cancel="${i}">Anuluj</button></div></section>`).join('');
+  }
+  document.getElementById('invited').addEventListener('click', e => {
+    const r = e.target.closest('[data-resend]'), c = e.target.closest('[data-cancel]');
+    if (r) Mock.toast('Zaproszenie wysłane ponownie: ' + inv[+r.dataset.resend].k);
+    if (c) { const x = inv[+c.dataset.cancel]; inv.splice(+c.dataset.cancel, 1); Mock.set('zespol.inv', inv); renderInv(); Mock.toast('Zaproszenie anulowane: ' + x.k); }
+  });
+  document.getElementById('invite').addEventListener('click', () => PS.modal({
+    title: 'Zaproś osobę', ok: 'Wyślij zaproszenie',
+    body: `<label class="p-lab">E-mail lub telefon<input class="p-in" name="k" required placeholder="np. imie@example.com lub +48 …"></label>
+      <label class="p-lab">Rola<select class="p-in" name="r">${ROPT('stylistka')}</select></label>`,
+    onOk: f => { inv.unshift({ k: f.k.value.trim(), r: f.r.value }); Mock.set('zespol.inv', inv); renderInv(); },
+    toast: f => `Zaproszenie wysłane: ${f.k.value.trim()}. Podgląd zaproszenia znajdziesz na liście niżej`
+  }));
+
+  function renderStan() {
+    document.getElementById('stan').innerHTML = STAN.map((s, i) => `<section class="p-card"><div class="p-top"><b style="font-size:16px">${E(s.n)}</b><button type="button" class="p-btn sm dng" data-del="${i}">Usuń</button></div><span style="color:#625860">${E(s.o)}</span><span>Sprzęt: ${E(s.sp)}</span><div style="display:flex;gap:6px;flex-wrap:wrap">${s.us.map(u => `<span class="p-chip">${E(u)}</span>`).join('') || '<span class="p-mut">Brak przypisanych usług</span>'}</div></section>`).join('');
+  }
+  document.getElementById('stan').addEventListener('click', e => {
+    const b = e.target.closest('[data-del]'); if (!b) return;
+    const s = STAN[+b.dataset.del];
+    PS.modal({ title: 'Usunąć stanowisko?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">${E(s.n)} zniknie z kalendarza. Przypisane usługi trzeba będzie przypisać do innego stanowiska.</p>`, onOk: () => { STAN.splice(+b.dataset.del, 1); Mock.set('zespol.stan', STAN); renderStan(); }, toast: 'Stanowisko usunięte' });
+  });
+  document.getElementById('addst').addEventListener('click', () => PS.modal({
+    title: 'Nowe stanowisko', ok: 'Dodaj',
+    body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. Stanowisko 3"></label>
+      <label class="p-lab">Sprzęt<input class="p-in" name="sp" placeholder="np. lampa, frezarka"></label>
+      <label class="p-lab">Przypisane usługi (po przecinku)<input class="p-in" name="us" placeholder="np. Hybryda, Żel"></label>`,
+    onOk: f => { STAN.push({ n: f.n.value.trim(), o: 'bez przypisanej osoby', sp: f.sp.value.trim() || 'bez opisu', us: f.us.value.split(',').map(x => x.trim()).filter(Boolean) }); Mock.set('zespol.stan', STAN); renderStan(); },
+    toast: f => `Dodano stanowisko: ${f.n.value.trim()}`
+  }));
+
+  renderGrafik(); renderInv(); renderStan();
+});
+</script>
+</body>
+</html>

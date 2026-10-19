@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moje wizyty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.tab{flex:1;min-height:44px;border:0;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.tab[aria-selected=true]{background:#1E1A1D;color:#fff;font-weight:700}
+.nv{width:44px;height:44px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cd{height:44px;min-width:44px;border-radius:10px;border:2px solid transparent;background:transparent;color:#1E1A1D;font:inherit;font-size:14px;padding:0;cursor:pointer}
+.cd.t{border-color:#1E1A1D;font-weight:700}
+.cd.v{background:#9E1F50;color:#fff;font-weight:700}
+.cd.u{border:2px dashed #9E1F50;color:#9E1F50;font-weight:700}
+.cd.s{box-shadow:0 0 0 2px #fff,0 0 0 4px #1E1A1D}
+.vc{border:1px solid #E4D9DE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.vc .top{display:flex;gap:12px;align-items:center}
+.vc .sw{width:48px;height:48px;border-radius:12px;flex:none}
+.vc .tx{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.vc small{color:#625860;font-size:13px}
+.vb{display:flex;gap:8px}
+.vb button,.vb a{flex:1;min-height:44px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.vb .dk{background:#1E1A1D;color:#fff;border-color:#1E1A1D;font-weight:500}
+.vb .rd{color:#A3262A}
+.vb a:hover{color:#1E1A1D}.vb a.dk:hover{color:#fff}
+.badge{align-self:flex-start;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.row-v{min-height:44px;border:1px solid #E4D9DE;border-radius:12px;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;text-align:left;padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
+.btn{min-height:44px;padding:0 16px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.btn:hover{background:#7A173D;color:#fff}
+.nav{margin-top:auto;border-top:1px solid #F0E8EC;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px 8px 10px}
+.nav a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#625860;font-size:12px}
+.nav a[aria-current]{color:#9E1F50;font-weight:700}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+@media (min-width:1024px){
+  .nav{margin-top:0 !important;grid-template-columns:repeat(4,auto);justify-content:start;gap:8px;border-top:0;border-bottom:1px solid #F0E8EC;padding:6px 20px}
+  .nav a{flex-direction:row;gap:8px;padding:0 16px;font-size:14px;min-height:48px}
+  header[style]{max-width:480px}
+  #p-nad{display:grid;grid-template-columns:400px minmax(0,1fr);column-gap:32px;align-items:start;padding-bottom:32px}
+  #p-nad>section:first-child{grid-row:1 / span 2;position:sticky;top:64px}
+  #p-nad>section:not(:first-child){grid-column:2}
+  #p-hist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px;align-items:start;padding-bottom:32px}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:18px 20px 8px;display:flex;flex-direction:column;gap:12px">
+    <h1 style="margin:0;font-size:26px;font-weight:700">Moje wizyty</h1>
+    <div role="tablist" aria-label="Wizyty" data-choice style="display:flex;border:1px solid #E4D9DE;border-radius:12px;overflow:hidden">
+      <button type="button" class="tab" role="tab" id="t-nad" aria-controls="p-nad" aria-selected="true">Nadchodzące</button>
+      <button type="button" class="tab" role="tab" id="t-hist" aria-controls="p-hist" aria-selected="false">Historia</button>
+    </div>
+  </header>
+
+  <div id="p-nad" role="tabpanel" aria-labelledby="t-nad">
+    <section aria-label="Kalendarz" style="margin:8px 20px 0;padding:14px 10px;border-radius:16px;border:1px solid #E4D9DE;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button type="button" id="m-prev" class="nv" aria-label="Poprzedni miesiąc"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+        <h2 id="m-nazwa" style="margin:0;font-size:16px;font-weight:700">Październik 2026</h2>
+        <button type="button" id="m-next" class="nv" aria-label="Następny miesiąc"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg></button>
+      </div>
+      <div aria-hidden="true" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;color:#625860;font-size:12px;text-align:center">
+        <span>pn</span><span>wt</span><span>śr</span><span>cz</span><span>pt</span><span>sb</span><span>nd</span>
+      </div>
+      <div id="kal" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0"></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#625860">
+        <span style="display:flex;gap:6px;align-items:center"><span aria-hidden="true" style="width:12px;height:12px;border-radius:4px;background:#9E1F50"></span>wizyta</span>
+        <span style="display:flex;gap:6px;align-items:center"><span aria-hidden="true" style="width:12px;height:12px;border-radius:4px;border:2px dashed #9E1F50;box-sizing:border-box"></span>czas na uzupełnienie</span>
+        <span style="display:flex;gap:6px;align-items:center"><span aria-hidden="true" style="width:12px;height:12px;border-radius:4px;border:2px solid #1E1A1D;box-sizing:border-box"></span>dziś</span>
+      </div>
+    </section>
+
+    <section style="padding:18px 20px 0;display:flex;flex-direction:column;gap:10px">
+      <h2 id="dzien-h" style="margin:0;font-size:18px;font-weight:700">Wtorek, 20 października</h2>
+      <div id="dzien-lista" style="display:flex;flex-direction:column;gap:10px"></div>
+    </section>
+
+    <section style="padding:22px 20px 0;display:flex;flex-direction:column;gap:8px">
+      <h2 style="margin:0;font-size:18px;font-weight:700">Wszystkie nadchodzące</h2>
+      <div id="wszystkie" style="display:flex;flex-direction:column;gap:8px"></div>
+    </section>
+  </div>
+
+  <div id="p-hist" role="tabpanel" aria-labelledby="t-hist" hidden>
+    <section style="padding:12px 20px 0;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:18px;font-weight:700">Odbyte i odwołane</h2>
+      <div id="hist-lista" style="display:flex;flex-direction:column;gap:10px"></div>
+    </section>
+
+    <section style="padding:22px 20px 0;display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:18px;font-weight:700">Moje stylizacje</h2>
+      <div style="border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center">
+        <span aria-hidden="true" style="width:44px;height:44px;border-radius:10px;background:#5B1630;flex:none"></span>
+        <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+          <span style="font-weight:500">Velvet burgund · 29 września</span>
+          <span style="color:#625860;font-size:13px">[Studio 1] · 200 zł · <a href="ocena.html?s=%5BStudio%201%5D&amp;o=Hybryda%20M%20%C2%B7%20velvet%20%C3%97%2010">Oceń</a></span>
+        </span>
+        <a href="paznokcie.html" class="btn" style="min-height:44px;padding:0 12px;font-size:14px;font-weight:500">Powtórz</a>
+      </div>
+      <div style="border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center">
+        <span aria-hidden="true" style="width:44px;height:44px;border-radius:10px;background:#2F5A86;flex:none"></span>
+        <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+          <span style="font-weight:500">Rzęsy 2D–3D, 11–12 mm, CC · 6 października</span>
+          <span style="color:#625860;font-size:13px">[Studio 2] · uzupełnienie za ok. 3 tyg.</span>
+        </span>
+        <a href="rzesy.html" style="min-height:44px;padding:0 12px;border-radius:10px;border:1px solid #1E1A1D;color:#1E1A1D;text-decoration:none;font-size:14px;font-weight:500;display:flex;align-items:center">Umów</a>
+      </div>
+    </section>
+  </div>
+
+  <nav class="nav d-tabbar" aria-label="Menu główne" style="margin-top:auto">
+    <a href="start.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Start</a>
+    <a href="wyniki.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Szukaj</a>
+    <a href="wizyty.html" aria-current="page"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Wizyty</a>
+    <a href="konto.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profil</a>
+  </nav>
+</div>
+
+<dialog id="odw" aria-labelledby="odw-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="odw-t" style="margin:0;font-size:18px">Odwołać wizytę?</h2>
+    <p id="odw-opis" style="margin:0;font-weight:500"></p>
+    <p id="odw-txt" style="margin:0;font-size:14px;line-height:1.5"></p>
+    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Zasady: odwołanie do 24 h przed wizytą zwraca zaliczkę; później zaliczki nie zwracamy. Gdy odwoła studio, zwrot jest zawsze pełny.</p>
+    <div style="display:flex;gap:8px">
+      <button type="button" data-close style="flex:1;min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer">Zostaw wizytę</button>
+      <button type="button" id="odw-ok" style="flex:1;min-height:48px;border-radius:12px;border:0;background:#A3262A;color:#fff;font:inherit;font-weight:700;cursor:pointer">Odwołaj wizytę</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const KOL = { Paznokcie: '#5B1630', 'Rzęsy': '#2F5A86', Brwi: '#3F6B2E', Fryzjer: '#8A4B12', Kosmetyka: '#5B3A86' };
+  const MIES = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
+  const MIESG = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+  const DNI = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+  const NOW = new Date(2026, 9, 19, 9, 0); // makieta: "dziś" to poniedziałek 19.10
+  const SAMPLE = { id: 'przyklad', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: '[Studio 1]', stylistka: '[Stylistka 1]', dzien: 'wt 20.10', godzina: '11:15', koniec: '13:05', klientka: '', status: 'nadchodząca' };
+  let pending = null;
+
+  const all = () => {
+    const v = Mock.get('visits', []);
+    return v.length ? v : [{ ...SAMPLE, ...(Mock.get('wizytyPrzyklad', {}) || {}) }];
+  };
+  const when = v => { const m = String(v.dzien || '').match(/(\d{1,2})\.(\d{2})/); return m ? { d: +m[1], m: +m[2] - 1 } : null; };
+  const stamp = v => { const w = when(v) || { d: 1, m: 0 }; const [h, mi] = String(v.godzina || '0:00').split(':'); return new Date(2026, w.m, w.d, +h, +mi); };
+  const czasMin = v => { if (v.czas) return +v.czas; const t = String(v.czasTekst || ''); const h = t.match(/(\d+)\s*h/), m = t.match(/(\d+)\s*min/); return (h ? h[1] * 60 : 0) + (m ? +m[1] : 0) || 110; };
+  const up = () => all().filter(v => v.status === 'nadchodząca').sort((a, b) => stamp(a) - stamp(b));
+  // a test and its treatment are one booking: cancelling one cancels the other
+  const partner = (l, v) => l.find(x => x.id === v.testId || x.id === v.zabiegId);
+  const setStatus = (id, status) => {
+    if (id === SAMPLE.id) return Mock.set('wizytyPrzyklad', { status });
+    const l = Mock.get('visits', []), v = l.find(x => x.id === id);
+    if (v) { v.status = status; const p = partner(l, v); if (p) p.status = status; Mock.set('visits', l); }
+  };
+  const toBooking = v => {
+    const t = v.testId && all().find(x => x.id === v.testId);
+    return { kategoria: v.kategoria, usluga: v.usluga, opis: v.opis, cena: v.cena, czas: czasMin(v), czasTekst: v.czasTekst, studio: v.studio, stylistka: v.stylistka, dzien: v.dzien, godzina: v.godzina, koniec: v.koniec, klientka: v.klientka, zadatek: v.zadatek, visitId: v.id,
+      cenaMin: v.cenaMin, cenaMax: v.cenaMax, powodPrzedzialu: v.powodPrzedzialu, pozycje: v.pozycje, uwagi: v.uwagi, seria: v.seria, sciezka: v.sciezka, promo: v.promo, kontakt: v.kontakt, uslugi: v.uslugi, osoby: v.osoby, dlaKogo: v.dlaKogo, dojazd: v.dojazd, bazaCena: v.bazaCena,
+      ...(t ? { testDzien: t.dzien, testGodzina: t.godzina, testKoniec: t.koniec, testMin: t.czas, testVisitId: t.id } : {}) };
+  };
+  const cenaTxt = v => (v.cenaMin != null && v.cenaMax > v.cenaMin ? `${v.cenaMin}–${v.cenaMax}` : v.cena);
+  const find = id => all().find(v => String(v.id) === String(id));
+
+  const KREATORY = { paznokcie: 'paznokcie.html', 'rzęsy': 'rzesy.html', brwi: 'brwi.html', fryzjer: 'fryzjer.html', kosmetologia: 'kosmetyka.html', kosmetyka: 'kosmetyka.html' };
+  const doStudia = v => 'salon.html?s=' + encodeURIComponent(v.studio || '[Studio 1]');
+  function card(v) {
+    const sty = v.stylistka && v.stylistka !== 'Dowolna' ? v.stylistka : 'Dowolna stylistka';
+    const id = esc(v.id);
+    let badge = '', btns;
+    const typ = { test: 'Test uczuleniowy', konsultacja: 'Konsultacja' }[v.typ];
+    const tag = typ ? `<span class="badge" style="background:#F6EDF1;color:#9E1F50">${typ}</span>` : v.testId ? '<span class="badge" style="background:#F6EDF1;color:#9E1F50">Zabieg po teście</span>' : '';
+    if (v.status === 'odwołana') {
+      badge = '<span class="badge" style="background:#FFF1E0;color:#8A3B12">Odwołana</span>';
+      btns = `<a href="${esc(doStudia(v))}" class="dk">Zarezerwuj ponownie</a><button type="button" data-a="karta">Karta</button>`;
+    } else if (v.status === 'odbyta') {
+      badge = '<span class="badge" style="background:#E6F2EC;color:#1F6B47">Odbyta</span>';
+      btns = `<a href="ocena.html?s=${encodeURIComponent(v.studio || '')}&o=${encodeURIComponent(v.opis || '')}">Oceń</a><a href="${esc(KREATORY[(v.kategoria || '').toLowerCase()] || doStudia(v))}" class="dk">Powtórz</a>`;
+    } else {
+      if (v.typ !== 'test') { // consents signed on podpis.html (Mock "podpisy")
+        const signed = new Set((Mock.get('podpisy', []) || []).map(p => p.doc));
+        const todo = ['rodo', ...(v.kategoria === 'Rzęsy' ? ['wywiad-rzesy'] : [])].filter(d => !signed.has(d));
+        badge = todo.length ? `<small>Zgody: <a href="podpis.html?doc=${todo[0]}" style="display:inline-block;padding:12px 0;font-weight:500">do podpisu${todo.length > 1 ? ` (${todo.length})` : ''}</a></small>` : '<small style="color:#1F6B47">Zgody: podpisane</small>';
+      }
+      btns = `<button type="button" data-a="przeloz">Przełóż</button><button type="button" data-a="odwolaj" class="rd">Odwołaj</button><button type="button" data-a="karta" class="dk">Karta</button>`;
+    }
+    return `<div class="vc" data-id="${id}"><div class="top"><span class="sw" aria-hidden="true" style="background:${KOL[v.kategoria] || '#5B1630'}"></span><span class="tx">
+      <b>${esc(v.dzien)}, ${esc(v.godzina)}${v.koniec ? '–' + esc(v.koniec) : ''} · ${esc(v.studio)}</b>
+      ${Array.isArray(v.uslugi) && v.uslugi.length > 1 ? v.uslugi.map(u => `<small>${esc(u.usluga)} · ${esc(Mock.dur(u.czas))}</small>`).join('') + `<small>Razem ${esc(cenaTxt(v))} zł</small>` : `<small>${esc(v.opis)} · ${esc(cenaTxt(v))} zł</small>`}
+      ${v.osoby > 1 || v.dojazd ? `<small>${v.osoby > 1 ? `${esc(v.osoby)} osoby naraz` : ''}${v.osoby > 1 && v.dojazd ? ' · ' : ''}${v.dojazd ? `dojazd do klientki (${esc(v.dojazd.strefa)}), ${esc(v.dojazd.adres)}` : ''}</small>` : ''}
+      <small>${esc(sty)}${v.klientka ? ' · dla: ' + esc(v.klientka) : ''}</small></span></div>${tag}${badge}<div class="vb">${btns}</div></div>`;
+  }
+
+  // calendar
+  const first = up()[0], w0 = first && when(first);
+  let cur = { y: 2026, m: w0 ? w0.m : 9 }, sel = w0 ? `${w0.d}.${w0.m}` : '19.9';
+
+  function renderCal() {
+    $('#m-nazwa').textContent = `${MIES[cur.m]} ${cur.y}`;
+    const off = (new Date(cur.y, cur.m, 1).getDay() + 6) % 7, dim = new Date(cur.y, cur.m + 1, 0).getDate();
+    const dnie = new Set(up().map(v => { const w = when(v); return w && `${w.d}.${w.m}`; }));
+    let h = '<span></span>'.repeat(off);
+    for (let d = 1; d <= dim; d++) {
+      const k = `${d}.${cur.m}`, t = cur.m === 9 && d === 19, vis = dnie.has(k), sug = cur.m === 9 && d === 27;
+      const cls = ['cd', t && 't', vis && 'v', !vis && sug && 'u', k === sel && 's'].filter(Boolean).join(' ');
+      const lab = `${d} ${MIESG[cur.m]}${t ? ', dziś' : ''}${vis ? ': wizyta' : sug ? ': proponowane uzupełnienie' : ''}`;
+      h += `<button type="button" class="${cls}" data-k="${k}" aria-label="${lab}" aria-pressed="${k === sel}">${d}</button>`;
+    }
+    $('#kal').innerHTML = h;
+  }
+  function renderDay() {
+    const [d, m] = sel.split('.').map(Number);
+    $('#dzien-h').textContent = `${DNI[new Date(2026, m, d).getDay()]}, ${d} ${MIESG[m]}`;
+    const items = up().filter(v => { const w = when(v); return w && w.d === d && w.m === m; });
+    let h = items.map(card).join('');
+    if (m === 9 && d === 27) h += `<div class="vc" style="border:2px dashed #9E1F50"><b>Proponowane uzupełnienie</b><small>Około 3 tygodnie po ostatniej stylizacji. Wolne terminy zależą od studia.</small><div class="vb"><a href="paznokcie.html" class="dk">Umów uzupełnienie</a></div></div>`;
+    if (!h) h = `<p style="margin:0;color:#625860;font-size:14px">Brak wizyt tego dnia.</p><div class="vb"><a href="wyniki.html">Znajdź wolny termin</a></div>`;
+    $('#dzien-lista').innerHTML = h;
+  }
+  function renderRest() {
+    const u = up();
+    $('#wszystkie').innerHTML = u.length ? u.map(v => `<button type="button" class="row-v" data-k="${(when(v) || {}).d}.${(when(v) || {}).m}"><span>${esc(v.dzien)}, ${esc(v.godzina)}</span><span style="color:#625860">${esc(v.studio)} · ${esc(v.cena)} zł</span></button>`).join('') : '<p style="margin:0;color:#625860;font-size:14px">Nie masz nadchodzących wizyt.</p>';
+    const past = all().filter(v => v.status !== 'nadchodząca');
+    $('#hist-lista').innerHTML = past.length ? past.map(card).join('') : '<p style="margin:0;color:#625860;font-size:14px">Odbyte i odwołane wizyty pojawią się tutaj.</p>';
+  }
+  const renderAll = () => { renderCal(); renderDay(); renderRest(); };
+  renderAll();
+
+  document.addEventListener('click', e => {
+    const k = e.target.closest('[data-k]');
+    if (k) { const [d, m] = k.dataset.k.split('.').map(Number); cur.m = m; sel = `${d}.${m}`; renderAll(); return; }
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    const v = find(a.closest('.vc').dataset.id); if (!v) return;
+    if (a.dataset.a === 'karta' || a.dataset.a === 'przeloz') {
+      Mock.set('booking', toBooking(v));
+      location.href = a.dataset.a === 'karta' ? 'potwierdzenie.html' : 'termin.html?przeloz=1';
+    } else {
+      pending = v;
+      $('#odw-opis').textContent = `${v.dzien}, ${v.godzina} · ${v.studio} · ${v.opis}`;
+      const wczesnie = stamp(v) - NOW >= 24 * 3600 * 1000;
+      const para = v.testId || v.zabiegId ? ' Odwołasz też powiązany ' + (v.testId ? 'test' : 'zabieg') + '.' : '';
+      $('#odw-txt').textContent = para + ' ' + (v.zadatek
+        ? (wczesnie ? `Odwołujesz więcej niż 24 h przed wizytą: zaliczka ${v.zadatek} zł wróci w ciągu 5 dni roboczych.` : `Do wizyty zostało mniej niż 24 h: zaliczki ${v.zadatek} zł nie zwracamy.`)
+        : 'Nie wpłacałaś zaliczki, więc odwołanie nic nie kosztuje.');
+      $('#odw').showModal();
+    }
+  });
+  $('#m-prev').addEventListener('click', () => { cur.m = (cur.m + 11) % 12; if (cur.m === 11) cur.y--; renderCal(); });
+  $('#m-next').addEventListener('click', () => { cur.m = (cur.m + 1) % 12; if (cur.m === 0) cur.y++; renderCal(); });
+  $('#odw-ok').addEventListener('click', () => {
+    if (pending) setStatus(pending.id, 'odwołana');
+    $('#odw').close(); pending = null; renderAll(); Mock.toast('Wizyta odwołana');
+  });
+});
+</script>
+</body>
+</html>

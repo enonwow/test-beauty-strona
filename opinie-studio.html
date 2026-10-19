@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – opinie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Opinie</h1><span class="p-mut">Średnia ocena studia: ★ [ocena] · [liczba] opinii. Odpowiedz klientce albo zgłoś opinię, która nie dotyczy wizyty.</span></div>
+
+    <div id="filtr" data-choice role="group" aria-label="Filtr opinii" class="p-pills">
+      <button type="button" class="p-pill" data-value="all" aria-pressed="true">Wszystkie</button>
+      <button type="button" class="p-pill" data-value="open" aria-pressed="false">Bez odpowiedzi</button>
+      <button type="button" class="p-pill" data-value="low" aria-pressed="false">Do 3 gwiazdek</button>
+    </div>
+
+    <div id="lista" style="display: flex; flex-direction: column; gap: 12px"></div>
+    <span id="pusto" class="p-mut" hidden>Brak opinii dla tego filtra.</span>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc;
+  const SEED = [
+    { id: 's1', k: '[Klientka A]', o: 5, t: 'Hybryda trzyma się już trzeci tydzień, a termin był od ręki.', u: 'Hybryda jednolita' },
+    { id: 's2', k: '[Klientka C]', o: 3, t: 'Efekt ładny, ale wizyta zaczęła się 20 minut po czasie.', u: 'Przedłużanie L · french' },
+    { id: 's3', k: '[Klientka E]', o: 5, t: 'Cena z kreatora zgodziła się co do złotówki.', u: 'Żel · french' },
+    { id: 's4', k: '[Klientka M]', o: 1, t: 'Nie byłam w tym salonie, ktoś pomylił studia.', u: '—' }];
+  let ST = Mock.get('opinie-studio', {}); // {id: {reply, photo, reported}}
+  let filt = 'all';
+  const all = () => Mock.get('reviews', []).map((r, i) => ({ id: 'r' + i, k: 'Klientka z kreatora', o: +r.ocena || 5, t: r.tekst || r.opis || '', u: r.opis && r.tekst ? r.opis : 'wizyta z rezerwacji online', nowa: true })).concat(SEED).map(r => ({ ...r, ...(ST[r.id] || {}) }));
+  const save = () => Mock.set('opinie-studio', ST);
+
+  function render() {
+    const v = all().filter(r => filt === 'all' || (filt === 'open' && !r.reply) || (filt === 'low' && r.o <= 3));
+    document.getElementById('lista').innerHTML = v.map(r => `<article class="p-card" data-id="${E(r.id)}">
+      <div class="p-top"><span><b>${E(r.k)}</b> <span class="p-mut">· ${E(r.u)}</span> ${r.nowa ? '<span class="p-badge">nowa</span>' : ''} ${r.reported ? '<span class="p-badge warn">zgłoszona do moderacji</span>' : ''}</span><b aria-label="Ocena ${r.o} na 5">★ ${r.o}/5</b></div>
+      <p style="margin:0;line-height:1.5">${E(r.t)}</p>
+      ${r.reply ? `<div style="padding:10px 12px;border-radius:10px;background:#F6EDF1"><b>Odpowiedź studia</b><p style="margin:4px 0 0;line-height:1.45">${E(r.reply)}</p>${r.photo ? '<span class="p-badge ok" style="margin-top:6px">dołączono zdjęcie pracy</span>' : ''}</div>` : ''}
+      <div class="p-acts"><button type="button" class="p-btn sm pri" data-a="reply">${r.reply ? 'Edytuj odpowiedź' : 'Odpowiedz'}</button>${r.reported ? '' : '<button type="button" class="p-btn sm" data-a="report">Zgłoś opinię</button>'}</div></article>`).join('');
+    document.getElementById('pusto').hidden = v.length > 0;
+  }
+  document.getElementById('filtr').addEventListener('mock:choice', e => { filt = e.detail.button.dataset.value; render(); });
+  document.getElementById('lista').addEventListener('click', e => {
+    const b = e.target.closest('[data-a]'); if (!b) return;
+    const r = all().find(x => x.id === b.closest('[data-id]').dataset.id), s = ST[r.id] = ST[r.id] || {};
+    if (b.dataset.a === 'reply') PS.modal({
+      title: 'Odpowiedź dla: ' + r.k, ok: 'Opublikuj',
+      body: `<label class="p-lab">Odpowiedź<textarea class="p-in" name="t" rows="4" required>${E(r.reply || '')}</textarea></label>
+        <label class="p-chk"><input type="checkbox" name="foto"${r.photo ? ' checked' : ''}> Dołącz zdjęcie pracy</label>
+        <label class="p-lab" id="fl" hidden>Zdjęcie<input class="p-in" type="file" accept="image/*"></label>`,
+      onOpen: f => { const fl = f.querySelector('#fl'); fl.hidden = !f.foto.checked; f.foto.addEventListener('change', () => { fl.hidden = !f.foto.checked; }); },
+      onOk: f => { s.reply = f.t.value.trim(); s.photo = f.foto.checked; save(); render(); },
+      toast: 'Odpowiedź opublikowana, klientka dostanie SMS'
+    });
+    if (b.dataset.a === 'report') PS.modal({
+      title: 'Zgłoś opinię', ok: 'Wyślij zgłoszenie',
+      body: `<label class="p-lab">Powód<select class="p-in" name="p"><option>Klientki nie było</option><option>Obraźliwa treść</option><option>Opinia o innym studiu</option><option>Spam</option></select></label><label class="p-lab">Opis (opcjonalnie)<textarea class="p-in" name="o" rows="3"></textarea></label><span class="p-mut">Moderacja sprawdzi zgłoszenie. Opinia zostaje widoczna do czasu decyzji.</span>`,
+      onOk: () => { s.reported = true; save(); render(); },
+      toast: 'Zgłoszenie wysłane do moderacji'
+    });
+  });
+  render();
+});
+</script>
+</body>
+</html>

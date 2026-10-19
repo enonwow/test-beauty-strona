@@ -1,0 +1,15 @@
+{
+  "updated": "2026-10-19T16:00:00Z",
+  "items": [
+    { "id": "p1", "title": "[Przykład] Mleczny róż i krótki migdał: manicure, który wraca tej jesieni", "lead": "Przykładowy wpis pokazujący, jak wygląda nagłówek z kanału RSS. Na stronie publicznej w tym miejscu są prawdziwe nagłówki portali.", "url": "https://example.com/paznokcie", "source": "Portal przykładowy", "published": "2026-10-19T14:30:00Z", "topics": ["paznokcie"] },
+    { "id": "p2", "title": "[Przykład] Kocie oko czy lalka? Jak dobrać styl rzęs do kształtu oka", "lead": "Krótki lead z kanału, maksymalnie około 200 znaków, bez treści artykułu.", "url": "https://example.com/rzesy", "source": "Portal przykładowy", "published": "2026-10-19T11:00:00Z", "topics": ["rzesy"] },
+    { "id": "p3", "title": "[Przykład] Laminacja brwi po raz pierwszy: ile trzyma i jak dbać", "lead": "Przykładowy lead.", "url": "https://example.com/brwi", "source": "Magazyn przykładowy", "published": "2026-10-19T08:15:00Z", "topics": ["brwi"] },
+    { "id": "p4", "title": "[Przykład] Karmelowy balejaż na ciemnych włosach: trzy wersje na jesień", "lead": "Przykładowy lead.", "url": "https://example.com/wlosy", "source": "Magazyn przykładowy", "published": "2026-10-18T19:40:00Z", "topics": ["wlosy"] },
+    { "id": "p5", "title": "[Przykład] Kwas migdałowy jesienią: dla kogo i jak często", "lead": "Przykładowy lead.", "url": "https://example.com/pielegnacja", "source": "Portal przykładowy", "published": "2026-10-18T12:00:00Z", "topics": ["pielegnacja", "zabiegi"] },
+    { "id": "p6", "title": "[Przykład] Podkład z efektem glass skin: na co patrzeć w składzie", "lead": "Przykładowy lead.", "url": "https://example.com/makijaz", "source": "Portal przykładowy", "published": "2026-10-17T09:00:00Z", "topics": ["makijaz", "pielegnacja"] }
+  ],
+  "sources": [
+    { "name": "Portal przykładowy", "url": "https://example.com", "ok": true },
+    { "name": "Magazyn przykładowy", "url": "https://example.com", "ok": true }
+  ]
+}

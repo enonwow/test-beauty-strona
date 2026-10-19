@@ -1,0 +1,56 @@
+{
+  "kategoria": "brwi",
+  "brutto": true,
+  "waluta": "PLN",
+  "obowiazujeOd": "2026-10-01",
+  "zrodlo": "Architektura Brwi Wrocław (Booksy, ceny regularne, X 2026); koloryzacja: Glam Plum; wosk i rzęsy: J'adore Kraków",
+  "preferencje": {
+    "styl": [
+      { "id": "naturalny_prosty", "nazwa": "Naturalna prosta" },
+      { "id": "lagodny_luk", "nazwa": "Łagodny łuk" },
+      { "id": "wyrazny_luk", "nazwa": "Wyraźny łuk" },
+      { "id": "laminowane_fluffy", "nazwa": "Laminowana „fluffy”" }
+    ],
+    "ton": [
+      { "id": "cieply_braz", "nazwa": "ciepły brąz", "kolor": "#7A5032" },
+      { "id": "chlodny_braz_taupe", "nazwa": "taupe", "kolor": "#8A7A6E" },
+      { "id": "grafit", "nazwa": "grafit", "kolor": "#4A4A4F" },
+      { "id": "czarny", "nazwa": "czarny", "kolor": "#1E1A1D" },
+      { "id": "blond", "nazwa": "blond", "kolor": "#B8955E" }
+    ]
+  },
+  "warianty": [
+    { "id": "regulacja", "nazwa": "Stylizacja i regulacja", "cena": 50, "min": 15, "zawiera": ["kształt", "regulacja pęsetą"] },
+    { "id": "henna", "nazwa": "Henna brwi", "cena": 40, "min": 15, "koloryzacja": true, "zawiera": ["koloryzacja włosków i skóry"] },
+    { "id": "architektura", "nazwa": "Architektura z henną lub farbką", "cena": 80, "min": 40, "koloryzacja": true, "zawiera": ["geometria nicią", "regulacja", "koloryzacja"] },
+    { "id": "laminacja", "nazwa": "Laminacja", "cena": 140, "min": 60, "koloryzacja": true, "laminacja": true, "zawiera": ["regulacja", "botox", "koloryzacja", "regeneracja"] },
+    { "id": "laminacja_bez", "nazwa": "Laminacja bez koloryzacji", "cena": 110, "min": 40, "laminacja": true, "zawiera": ["regulacja", "botox", "regeneracja"] }
+  ],
+  "dodatki": [
+    { "id": "lifting_rzes", "nazwa": "Lifting rzęs", "cena": 140, "min": 60, "laminacja": true },
+    { "id": "henna_rzes", "nazwa": "Henna / farbka rzęs", "cena": 40, "min": 10, "koloryzacja": true, "zalozenieMin": true },
+    { "id": "wosk", "nazwa": "Wosk zamiast pęsety", "cena": 10, "min": 15 },
+    { "id": "meska", "nazwa": "Regulacja męska", "cena": 10, "min": 15, "dotyczy": ["regulacja"] }
+  ],
+  "pakiety": [
+    { "id": "lami_combo", "nazwa": "Pakiet LAMI COMBO (brwi + rzęsy)", "sklad": ["laminacja", "lifting_rzes"], "cena": 240, "min": 90 }
+  ],
+  "reguly": {
+    "minOdstepLaminacjiTyg": 6,
+    "przypomnienieTyg": { "henna": 4, "architektura": 4, "laminacja": 7, "laminacja_bez": 7, "regulacja": 4 },
+    "testPrzedKoloryzacjaH": 48
+  },
+  "konsultacja": { "cena": 0, "min": 15, "zalozenie": true },
+  "test": { "cena": 0, "min": 10, "godzinPrzed": 48, "zalozenie": true },
+  "wywiad": [
+    { "id": "alergiaFarba", "pytanie": "Miałaś reakcję na hennę lub farbkę?", "skutek": "blokada", "dotyczy": ["koloryzacja"], "komunikat": "Po reakcji na farbkę lub hennę nie koloryzujemy. Możesz wybrać zabieg bez koloryzacji." },
+    { "id": "tatuazCzarnaHenna", "pytanie": "Miałaś kiedyś tatuaż z czarnej henny?", "skutek": "konsultacja", "dotyczy": ["koloryzacja"], "komunikat": "Czarna henna zwiększa ryzyko alergii na farby. Porozmawiajmy przed koloryzacją." },
+    { "id": "ponizej16", "pytanie": "Masz mniej niż 16 lat?", "skutek": "blokada", "dotyczy": ["koloryzacja"], "komunikat": "Farb do brwi i rzęs nie stosujemy u osób poniżej 16 lat." },
+    { "id": "izotretynoina", "pytanie": "Przyjmujesz izotretynoinę (np. na trądzik)?", "skutek": "konsultacja", "komunikat": "Skóra może być bardziej wrażliwa. Kosmetolożka dobierze metodę na konsultacji." },
+    { "id": "retinoidyKwasy", "pytanie": "Używasz retinolu lub kwasów na twarz?", "skutek": "zamien_wosk_na_nic", "dotyczy": ["wosk"], "uwaga": "Wosk zamieniony na nitkę, w tej samej cenie." },
+    { "id": "ciaza", "pytanie": "Jesteś w ciąży lub karmisz?", "skutek": "konsultacja", "dotyczy": ["laminacja", "henna", "architektura"], "komunikat": "Źródła różnią się co do zabiegów w ciąży. Zarezerwuj bezpłatną konsultację." },
+    { "id": "laminacja6tyg", "pytanie": "Laminacja lub lifting w ostatnich 6 tygodniach?", "skutek": "blokada", "dotyczy": ["laminacja"], "komunikat": "Laminację można powtórzyć najwcześniej po 6 tygodniach. Przypomnimy Ci o terminie." },
+    { "id": "stanZapalny", "pytanie": "Masz teraz stan zapalny lub opryszczkę w okolicy brwi?", "skutek": "blokada", "komunikat": "Przy stanie zapalnym nie wykonujemy zabiegu. Wróć, gdy minie." },
+    { "id": "pierwszaKoloryzacja", "pytanie": "To Twoja pierwsza koloryzacja brwi lub rzęs u nas?", "skutek": "test48h", "dotyczy": ["koloryzacja"] }
+  ]
+}

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Start – wyszukiwarka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+h2{margin:0;font-size:18px;font-weight:700}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border-color:#1E1A1D;background:#1E1A1D;color:#fff}
+.fld{display:flex;align-items:center;gap:10px;min-height:50px;padding:0 14px;border-radius:12px;background:#fff;border:1px solid #E4D9DE}
+.fld input{flex:1;min-width:0;border:0;outline-offset:4px;font:inherit;background:transparent;min-height:44px}
+.cat{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:#1E1A1D;font-size:12px;min-height:44px}
+.cat:hover{color:#1E1A1D}
+.cat span{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center}
+.btn{min-height:50px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
+.btn:hover{background:#7A173D;color:#fff}
+.salonk{border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;text-decoration:none;color:#1E1A1D}
+.salonk:hover{color:#1E1A1D;background:#FAF6F8}
+.nav{margin-top:auto;border-top:1px solid #F0E8EC;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px 8px 10px}
+.nav a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:#625860;font-size:12px}
+.nav a[aria-current]{color:#9E1F50;font-weight:700}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.sf{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:18px;background:#F6EDF1}
+.hh-lista{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px}
+.hh-card{flex:0 0 260px;box-sizing:border-box;border:1px solid #E4D9DE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D;scroll-snap-align:start}
+.hh-card:hover{color:#1E1A1D;background:#FAF6F8}
+.hh-badge{padding:3px 9px;border-radius:999px;background:#9E1F50;color:#FFFFFF;font-weight:700;font-size:13px}
+.hh-t{padding:6px 10px;border-radius:10px;background:#F6EDF1;font-weight:700;font-size:13px}
+.cats{padding:22px 20px 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.kr-lista{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px}
+.kr-card{flex:0 0 200px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D;scroll-snap-align:start}
+.kr-card img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:14px;background:#FAF6F8}
+.kr-card:hover b{color:#9E1F50}
+.nw{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid #E4D9DE;border-radius:14px;text-decoration:none;color:#1E1A1D}
+.nw:hover{background:#FAF6F8;color:#1E1A1D}
+.nw-m{color:#625860;font-size:13px}.nw-t{font-size:15px;line-height:1.35}.nw-go{color:#9E1F50;font-size:13px;font-weight:700}
+@media (min-width:1024px){
+  .hh-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;overflow:visible}
+  .kr-lista{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;overflow:visible}
+  #nw-lista{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .nav{margin-top:0 !important;grid-template-columns:repeat(4,auto);justify-content:start;gap:8px;border-top:0;border-bottom:1px solid #F0E8EC;padding:6px 20px}
+  .nav a{flex-direction:row;gap:8px;padding:0 16px;font-size:14px;min-height:48px}
+  .hero h1{font-size:46px}
+  .sf{flex-direction:row;flex-wrap:wrap;align-items:center;padding:16px;border-radius:20px}
+  .sf>.fld{flex:1 1 240px}
+  .sf>.btn{flex:0 0 220px}
+  .sf>#data-box{flex:0 0 auto}
+  .cats{grid-template-columns:repeat(5,120px);gap:24px;padding-top:28px}
+  .st-row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px;align-items:stretch;margin-top:12px}
+  .st-row>section{margin:24px 0 0 !important;padding-left:20px !important;padding-right:20px !important}
+  .st-row>.nov{margin-left:20px !important}
+  .pop-grid{grid-template-columns:repeat(6,minmax(0,1fr)) !important}
+  .pop-grid span[aria-hidden]{height:120px !important}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:18px 20px 8px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;color:#9E1F50">[Nazwa aplikacji]</span>
+    <span style="display:flex;align-items:center;gap:8px">
+    <a href="aktualnosci.html" style="min-height:44px;padding:0 12px;border-radius:999px;border:1px solid #E4D9DE;display:flex;align-items:center;gap:6px;color:#1E1A1D;text-decoration:none;font-size:14px;font-weight:500"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 9h3v8a2 2 0 0 1-2 2"></path><path d="M8 9h5M8 13h5"></path></svg>Aktualności</a>
+    <a id="konto-ikona" href="logowanie.html?wroc=start.html" aria-label="Zaloguj się lub załóż konto" style="width:44px;height:44px;border-radius:50%;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>
+    </a>
+    </span>
+  </header>
+
+  <section class="hero" style="padding:12px 20px 0;display:flex;flex-direction:column;gap:14px">
+    <h1 style="margin:0;font-size:30px;line-height:1.1;font-weight:700">Znajdź termin<br>i poznaj cenę od razu</h1>
+    <form id="szukaj" role="search" class="sf">
+      <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Usługa lub stylizacja</label>
+      <div class="fld">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#625860" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input id="q" type="search" placeholder="Usługa lub stylizacja, np. velvet">
+      </div>
+      <label for="city" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Miasto lub dzielnica</label>
+      <div class="fld">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#625860" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+        <input id="city" type="text" placeholder="[miasto, dzielnica]">
+      </div>
+      <div id="kiedy" data-choice role="group" aria-label="Kiedy" style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="chip" aria-pressed="true">Dziś</button>
+        <button type="button" class="chip" aria-pressed="false">Jutro</button>
+        <button type="button" class="chip" aria-pressed="false">Ten tydzień</button>
+        <button type="button" class="chip" aria-pressed="false">Wybierz datę</button>
+      </div>
+      <div id="data-box" hidden class="fld"><label for="data" style="font-size:13px;color:#625860">Data</label><input id="data" type="date" min="2026-10-19"></div>
+      <button type="submit" class="btn">Szukaj wolnych terminów</button>
+    </form>
+  </section>
+
+  <section id="hh" hidden aria-labelledby="hh-h" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2 id="hh-h" style="font-size:20px">Happy hours dziś</h2>
+      <a id="hh-wszystkie" href="wyniki.html" style="font-size:14px;font-weight:500;min-height:44px;display:flex;align-items:center">Wszystkie</a>
+    </div>
+    <span style="color:#625860;font-size:13px">Tańsze wizyty w godzinach, w których studia mają wolne miejsca. Usługi i ceny przykładowe.</span>
+    <div id="hh-lista" class="hh-lista"></div>
+  </section>
+
+  <nav aria-label="Kategorie" class="cats">
+    <a class="cat" href="wyniki.html" data-cat="Paznokcie"><span aria-hidden="true" style="background:#F6EDF1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round"><path d="M8 20V9a4 4 0 0 1 8 0v11"></path><path d="M8 13h8"></path></svg></span>Paznokcie</a>
+    <a class="cat" href="wyniki.html" data-cat="Rzęsy"><span aria-hidden="true" style="background:#EAF0F7"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F5A86" stroke-width="2" stroke-linecap="round"><path d="M3 14c4-4 14-4 18 0"></path><path d="M6 12l-1-3M10 11V8M14 11V8M18 12l1-3"></path></svg></span>Rzęsy</a>
+    <a class="cat" href="wyniki.html" data-cat="Brwi"><span aria-hidden="true" style="background:#EEF3EA"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3F6B2E" stroke-width="2.4" stroke-linecap="round"><path d="M3 13c5-5 13-5 18-1"></path></svg></span>Brwi</a>
+    <a class="cat" href="wyniki.html" data-cat="Fryzjer"><span aria-hidden="true" style="background:#F7EFE6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8A4B12" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M8 16L19 4M16 16L5 4"></path></svg></span>Fryzjer</a>
+    <a class="cat" href="wyniki.html" data-cat="Kosmetyka"><span aria-hidden="true" style="background:#F1ECF7"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5B3A86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"></path></svg></span>Kosmetyka</a>
+  </nav>
+
+  <section aria-labelledby="kr-h" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <h2 id="kr-h" style="font-size:20px">Zaprojektuj i poznaj cenę</h2>
+    <span style="color:#625860;font-size:14px;line-height:1.45">Kreator liczy cenę i czas wizyty, zanim zarezerwujesz. Ceny przykładowego studia.</span>
+    <div class="kr-lista">
+      <a class="kr-card" href="paznokcie.html"><img src="zdjecia/k-paznokcie.jpg" alt="" width="480" height="360" loading="lazy"><b>Paznokcie</b><span style="color:#625860;font-size:13px;line-height:1.4">Kształt, kolor i zdobienia na prawdziwej dłoni</span></a>
+      <a class="kr-card" href="rzesy.html"><img src="zdjecia/k-rzesy.jpg" alt="" width="480" height="360" loading="lazy"><b>Rzęsy</b><span style="color:#625860;font-size:13px;line-height:1.4">Styl, gęstość i skręt, przymierz na selfie</span></a>
+      <a class="kr-card" href="brwi.html"><img src="zdjecia/k-brwi.jpg" alt="" width="480" height="360" loading="lazy"><b>Brwi</b><span style="color:#625860;font-size:13px;line-height:1.4">Kształt i odcień, pakiety z rzęsami</span></a>
+      <a class="kr-card" href="fryzjer.html"><img src="zdjecia/k-fryzjer.jpg" alt="" width="480" height="360" loading="lazy"><b>Fryzjer</b><span style="color:#625860;font-size:13px;line-height:1.4">Długość i kolor, zobacz kolor na swoim zdjęciu</span></a>
+      <a class="kr-card" href="kosmetyka.html"><img src="zdjecia/k-kosmetyka.jpg" alt="" width="480" height="360" loading="lazy"><b>Kosmetologia</b><span style="color:#625860;font-size:13px;line-height:1.4">Zabieg, obszar i seria z rabatem</span></a>
+    </div>
+  </section>
+
+  <section id="nw" hidden aria-labelledby="nw-h" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2 id="nw-h" style="font-size:20px">Co nowego w beauty</h2>
+      <a href="aktualnosci.html" style="font-size:14px;font-weight:500;min-height:44px;display:flex;align-items:center">Wszystkie</a>
+    </div>
+    <div id="nw-lista" style="display:grid;gap:10px"></div>
+  </section>
+  <script type="module">
+    import { wczytajNewsy, karta } from './aktualnosci.js';
+    // the block only shows up when there are headlines; no spinner on the start page
+    wczytajNewsy().then(d => {
+      const k = d.items.slice(0, 3).map(i => karta(i, { lead: false })).filter(Boolean);
+      if (!k.length) return;
+      document.getElementById('nw-lista').replaceChildren(...k);
+      document.getElementById('nw').hidden = false;
+    }).catch(() => {});
+  </script>
+
+  <div class="st-row">
+  <section class="nov" style="margin:24px 20px 0;padding:16px;border-radius:18px;background:#1E1A1D;color:#FFFFFF;display:flex;flex-direction:column;gap:10px">
+    <span style="font-size:12px;color:#E9DEE3;letter-spacing:.04em">NOWOŚĆ</span>
+    <h2 style="font-size:20px">Szukaj po stylizacji</h2>
+    <p style="margin:0;color:#E9DEE3;font-size:14px;line-height:1.45">Ułóż paznokcie w kreatorze, a pokażemy studia z ceną i najbliższym terminem właśnie na tę stylizację.</p>
+    <a href="paznokcie.html" style="align-self:flex-start;min-height:44px;padding:0 16px;border-radius:10px;background:#FFFFFF;color:#1E1A1D;text-decoration:none;font-weight:700;display:flex;align-items:center">Ułóż stylizację</a>
+  </section>
+
+  <section style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <h2>Popularne stylizacje</h2>
+    <div class="pop-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+      <a href="stylizacja.html" style="display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D">
+        <img src="zdjecia/styl-micro-french.jpg" alt="Micro french na krótkich paznokciach soft square" width="600" height="450" loading="lazy" style="width:100%;height:88px;object-fit:cover;object-position:50% 78%;border-radius:12px;display:block">
+        <span style="font-weight:500;font-size:13px">Micro french</span>
+      </a>
+      <a href="stylizacja.html" style="display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D">
+        <img src="zdjecia/styl-velvet-burgund.jpg" alt="Velvet burgund na migdałowych paznokciach" width="600" height="450" loading="lazy" style="width:100%;height:88px;object-fit:cover;border-radius:12px;display:block">
+        <span style="font-weight:500;font-size:13px">Velvet burgund</span>
+      </a>
+      <a href="stylizacja.html" style="display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D">
+        <img src="zdjecia/styl-glazed-pearl.jpg" alt="Glazed pearl, perłowe paznokcie w kształcie migdała" width="600" height="450" loading="lazy" style="width:100%;height:88px;object-fit:cover;object-position:50% 78%;border-radius:12px;display:block">
+        <span style="font-weight:500;font-size:13px">Glazed pearl</span>
+      </a>
+    </div>
+  </section>
+  </div>
+
+  <section style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2>Wolne dziś w pobliżu</h2>
+      <a href="wyniki.html" style="font-size:14px;font-weight:500;min-height:44px;display:flex;align-items:center">Wszystkie</a>
+    </div>
+    <div class="d-grid">
+    <a href="salon.html?s=%5BStudio%201%5D" class="salonk">
+      <img src="zdjecia/dlon-2-mini.jpg" alt="" width="56" height="56" loading="lazy" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none">
+      <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+        <span style="font-weight:700">[Studio 1]</span>
+        <span style="color:#625860;font-size:13px">Paznokcie, rzęsy · [x] km</span>
+        <span style="font-size:13px">Dziś: 14:30, 16:40</span>
+      </span>
+    </a>
+    <a href="salon.html?s=%5BStudio%202%5D" class="salonk">
+      <img src="zdjecia/k-rzesy.jpg" alt="" width="56" height="56" loading="lazy" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none">
+      <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+        <span style="font-weight:700">[Studio 2]</span>
+        <span style="color:#625860;font-size:13px">Rzęsy, brwi · [x] km</span>
+        <span style="font-size:13px">Dziś: 18:00</span>
+      </span>
+    </a>
+    </div>
+  </section>
+
+  <footer style="margin-top:24px;padding:16px 20px;border-top:1px solid #F0E8EC;display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
+    <a href="dla-studiow.html" style="min-height:44px;display:flex;align-items:center;font-weight:500">Dla studiów</a>
+    <a href="karta-podarunkowa.html" style="min-height:44px;display:flex;align-items:center;font-weight:500">Karta podarunkowa</a>
+    <a href="wycena.html" style="min-height:44px;display:flex;align-items:center;font-weight:500">Wycena ze zdjęcia</a>
+  </footer>
+
+  <nav class="nav d-tabbar" aria-label="Menu główne">
+    <a href="start.html" aria-current="page"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Start</a>
+    <a href="wyniki.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Szukaj</a>
+    <a href="wizyty.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Wizyty</a>
+    <a href="konto.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profil</a>
+  </nav>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const s0 = Mock.get('search', {}) || {};
+  const user = Mock.get('user', {}) || {};
+  if (user.zalogowana) { $('#konto-ikona').href = 'konto.html'; $('#konto-ikona').setAttribute('aria-label', 'Twoje konto'); }
+  if (s0.q) $('#q').value = s0.q;
+  if (s0.miasto) $('#city').value = s0.miasto;
+  let kiedy = 'Dziś';
+  const current = () => ({ q: $('#q').value.trim(), miasto: $('#city').value.trim(), kiedy: kiedy === 'Wybierz datę' && $('#data').value ? $('#data').value.split('-').reverse().slice(0, 2).join('.') : kiedy });
+  $('#kiedy').addEventListener('mock:choice', e => {
+    kiedy = e.detail.value;
+    $('#data-box').hidden = kiedy !== 'Wybierz datę';
+    if (kiedy === 'Wybierz datę') $('#data').focus();
+  });
+  const b0 = [...document.querySelectorAll('#kiedy .chip')].find(c => c.textContent.trim() === s0.kiedy);
+  if (b0) b0.click();
+  $('#szukaj').addEventListener('submit', e => {
+    e.preventDefault();
+    Mock.set('search', current());
+    location.href = 'wyniki.html';
+  });
+  document.querySelectorAll('[data-cat]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    Mock.set('search', { ...current(), q: a.dataset.cat });
+    location.href = 'wyniki.html';
+  }));
+
+  // happy hours today (mock "today" = Monday 19.10.2026): [Studio 1] from the studio's offers + one fixed example from another studio
+  const hh = Mock.happyToday(new Date(2026, 9, 19));
+  if (hh.length) {
+    const EX = { Paznokcie: ['Manicure hybrydowy', 140], 'Rzęsy': ['Rzęsy 2D', 180], Brwi: ['Laminacja brwi', 140], Fryzjer: ['Strzyżenie', 120], Kosmetologia: ['Oczyszczanie wodorowe', 250] };
+    const hm = s => s.replace(/^0/, '');
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const toStr = n => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
+    const toMin = s => { const [h, m] = s.split(':'); return h * 60 + +m; };
+    const card = (studio, nazwa, rabat, od, doo, usluga, cena, hours) => `<a class="hh-card" href="salon.html?s=${encodeURIComponent(studio)}">
+      <span style="display:flex;justify-content:space-between;align-items:center"><b>${studio}</b><span class="hh-badge">−${rabat}%</span></span>
+      <span style="font-size:13px">${esc(nazwa)} · ${hm(od)}–${hm(doo)}</span>
+      <span>${usluga} <s style="color:#625860">${cena} zł</s> <b>${Mock.priceAfter(cena, rabat)} zł</b></span>
+      <span style="color:#625860;font-size:12px">Najniższa cena z 30 dni przed obniżką: ${cena} zł</span>
+      ${hours.length ? `<span style="display:flex;gap:6px;margin-top:4px">${hours.map(h => `<span class="hh-t">${h}</span>`).join('')}</span>` : ''}</a>`;
+    const cards = hh.map(h => {
+      const [usluga, cena] = EX[(h.kategorie[0]) || 'Paznokcie'] || EX.Paznokcie;
+      const hours = [75, 120].map(d => toMin(h.od) + d).filter(m => m < toMin(h.do)).map(toStr);
+      return card('[Studio 1]', h.nazwa, h.rabat, h.od, h.do, usluga, cena, hours);
+    });
+    cards.push(card('[Studio 2]', 'Popołudnie brwi', 15, '14:00', '17:00', 'Laminacja brwi', 140, []));
+    $('#hh-lista').innerHTML = cards.join('');
+    $('#hh').hidden = false;
+    $('#hh-wszystkie').addEventListener('click', () => Mock.set('search', { ...(Mock.get('search', {}) || {}), hh: true }));
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Załóż studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="width: 100%; max-width: 560px; margin: 0 auto; min-height: 100vh; box-sizing: border-box; padding: 0 20px 32px; background: #FFFFFF; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 15px; display: flex; flex-direction: column; gap: 18px">
+  <header style="padding-top: 18px; display: flex; align-items: center; gap: 12px">
+    <a href="dla-studiow.html" aria-label="Wróć do strony dla studiów" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4D9DE; display: flex; align-items: center; justify-content: center; color: #1E1A1D; flex: none">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column">
+      <span id="krokNapis" style="color: #625860; font-size: 12px" aria-live="polite">Krok 1 z 5</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">Załóż studio</h1>
+    </div>
+  </header>
+  <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px">
+    <span data-bar style="height: 6px; border-radius: 3px; background: #9E1F50"></span><span data-bar style="height: 6px; border-radius: 3px; background: #F0E8EC"></span><span data-bar style="height: 6px; border-radius: 3px; background: #F0E8EC"></span><span data-bar style="height: 6px; border-radius: 3px; background: #F0E8EC"></span><span data-bar style="height: 6px; border-radius: 3px; background: #F0E8EC"></span>
+  </div>
+
+  <section id="krok1" data-krok="1" style="display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Dane studia</h2>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="nazwa" style="font-size: 13px; color: #625860">Nazwa studia</label><input id="nazwa" type="text" autocomplete="organization" placeholder="[Nazwa studia]" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="adres" style="font-size: 13px; color: #625860">Adres</label><input id="adres" type="text" autocomplete="street-address" placeholder="[ulica, numer lokalu], [miasto]" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="telefon" style="font-size: 13px; color: #625860">Telefon studia</label><input id="telefon" type="tel" autocomplete="tel" placeholder="[telefon]" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; justify-content: flex-end"><button type="button" data-hide="#krok1" data-show="#krok2" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Dalej</button></div>
+  </section>
+
+  <section id="krok2" data-krok="2" hidden style="display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Jakie usługi robicie?</h2>
+    <p style="margin: 0; color: #625860; font-size: 14px">Każda kategoria dostaje swój kreator z ceną i czasem. Wybierz kilka.</p>
+    <div id="kategorie" data-choice="multi" role="group" aria-label="Kategorie usług" style="display: flex; flex-wrap: wrap; gap: 8px">
+      <button type="button" data-value="Paznokcie" aria-pressed="true" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 2px solid #9E1F50; background: #F6EDF1; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Paznokcie</button>
+      <button type="button" data-value="Rzęsy" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Rzęsy</button>
+      <button type="button" data-value="Brwi" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Brwi</button>
+      <button type="button" data-value="Fryzjer" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Fryzjer</button>
+      <button type="button" data-value="Kosmetyka" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Kosmetyka</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; gap: 10px">
+      <button type="button" data-hide="#krok2" data-show="#krok1" style="min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; cursor: pointer">Wstecz</button>
+      <button type="button" data-hide="#krok2" data-show="#krok3" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Dalej</button>
+    </div>
+  </section>
+
+  <section id="krok3" data-krok="3" hidden style="display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Import klientek z Booksy</h2>
+    <p style="margin: 0; color: #625860; font-size: 14px; line-height: 1.45">W Booksy Biz pobierz listę klientek jako plik CSV i wybierz go tutaj. W makiecie plik jest tylko liczony w przeglądarce, nic nie jest wysyłane.</p>
+    <label for="csv" style="min-height: 56px; padding: 0 16px; border-radius: 12px; border: 1px dashed #C9B6BF; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 500">Wybierz plik CSV<input id="csv" type="file" accept=".csv,text/csv" style="position: absolute; width: 1px; height: 1px; opacity: 0"></label>
+    <p id="csvStatus" style="margin: 0; font-size: 14px; color: #625860" aria-live="polite">Nie wybrano pliku.</p>
+    <h3 style="margin: 6px 0 0; font-size: 16px">Kalendarz z wizytami</h3>
+    <p style="margin: 0; color: #625860; font-size: 14px; line-height: 1.45">Masz wizyty w Kalendarzu Google lub Apple? Przenieś je do panelu (opcjonalnie).</p>
+    <div id="cal-mount" style="display: flex; flex-direction: column; gap: 12px"></div>
+    <div style="display: flex; justify-content: space-between; gap: 10px">
+      <button type="button" data-hide="#krok3" data-show="#krok2" style="min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; cursor: pointer">Wstecz</button>
+      <span style="display: flex; gap: 8px">
+        <button type="button" data-hide="#krok3" data-show="#krok4" data-toast="Import pominięty, możesz go zrobić później w panelu" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 0; background: transparent; color: #9E1F50; font: inherit; font-weight: 500; cursor: pointer">Pomiń</button>
+        <button type="button" data-hide="#krok3" data-show="#krok4" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Dalej</button>
+      </span>
+    </div>
+  </section>
+
+  <section id="krok4" data-krok="4" hidden style="display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Godziny pracy</h2>
+    <div id="godziny" style="display: flex; flex-direction: column; gap: 8px"></div>
+    <div style="display: flex; justify-content: space-between; gap: 10px">
+      <button type="button" data-hide="#krok4" data-show="#krok3" style="min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; cursor: pointer">Wstecz</button>
+      <button type="button" data-hide="#krok4" data-show="#krok5" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Dalej</button>
+    </div>
+  </section>
+
+  <section id="krok5" data-krok="5" hidden style="display: flex; flex-direction: column; gap: 14px">
+    <div aria-hidden="true" style="width: 52px; height: 52px; border-radius: 50%; background: #E6F2EC; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F6B47" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px">Gotowe</h2>
+    <dl id="podsumowanie" style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 14px"></dl>
+    <p style="margin: 0; color: #625860; font-size: 14px; line-height: 1.45">Następny krok w panelu: uzupełnij cennik, żeby kreatory pokazywały Twoje ceny i czasy.</p>
+    <div style="display: flex; justify-content: space-between; gap: 10px">
+      <button type="button" data-hide="#krok5" data-show="#krok4" style="min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; cursor: pointer">Wstecz</button>
+      <button type="button" data-toast="Studio założone" data-go="panel.html" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Przejdź do panelu</button>
+    </div>
+  </section>
+</div>
+<script>
+// Working hours rows (defaults: Mon–Fri 9–18, Sat 9–14, Sun closed).
+const DAYS = [['Poniedziałek', '09:00', '18:00', true], ['Wtorek', '09:00', '18:00', true], ['Środa', '09:00', '18:00', true], ['Czwartek', '09:00', '18:00', true],
+  ['Piątek', '09:00', '18:00', true], ['Sobota', '09:00', '14:00', true], ['Niedziela', '10:00', '14:00', false]];
+document.getElementById('godziny').innerHTML = DAYS.map(([d, a, b, open], i) => `
+  <div data-day style="display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 8px 12px; border: 1px solid #E4D9DE; border-radius: 12px">
+    <label style="display: flex; gap: 8px; align-items: center; min-height: 44px"><input type="checkbox" ${open ? 'checked' : ''} style="width: 20px; height: 20px; margin: 0">${d}</label>
+    <input type="time" value="${a}" aria-label="${d}: od" ${open ? '' : 'disabled'} style="min-height: 40px; border-radius: 10px; border: 1px solid #C9B6BF; font: inherit; padding: 0 6px">
+    <input type="time" value="${b}" aria-label="${d}: do" ${open ? '' : 'disabled'} style="min-height: 40px; border-radius: 10px; border: 1px solid #C9B6BF; font: inherit; padding: 0 6px">
+  </div>`).join('');
+document.getElementById('godziny').addEventListener('change', e => {
+  if (e.target.type !== 'checkbox') return;
+  e.target.closest('[data-day]').querySelectorAll('input[type=time]').forEach(t => { t.disabled = !e.target.checked; });
+});
+
+// Booksy CSV: count rows locally (header excluded); the file never leaves the browser.
+let imported = 0;
+const klientki = n => `${n} ${n === 1 ? 'klientkę' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'klientki' : 'klientek'}`;
+console.assert(klientki(1) === '1 klientkę' && klientki(3) === '3 klientki' && klientki(12) === '12 klientek' && klientki(22) === '22 klientki' && klientki(5) === '5 klientek', 'plural');
+document.getElementById('csv').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  imported = Math.max(0, (await f.text()).split(/\r?\n/).filter(l => l.trim()).length - 1);
+  document.getElementById('csvStatus').textContent = `${f.name}: do importu ${klientki(imported)}.`;
+  window.Mock?.toast(`Wczytano ${klientki(imported)}`);
+});
+
+document.addEventListener('DOMContentLoaded', () => PS.calImport(document.getElementById('cal-mount')));
+
+// Progress bar and summary follow whichever step mock.js shows (data-show / data-hide).
+const steps = [...document.querySelectorAll('[data-krok]')];
+function syncStep() {
+  const n = Number(steps.find(s => !s.hidden)?.dataset.krok || 1);
+  document.getElementById('krokNapis').textContent = `Krok ${n} z 5`;
+  document.querySelectorAll('[data-bar]').forEach((b, i) => { b.style.background = i < n ? '#9E1F50' : '#F0E8EC'; });
+  if (n === 5) {
+    const cats = [...document.querySelectorAll('#kategorie [aria-pressed="true"]')].map(b => b.dataset.value);
+    const open = [...document.querySelectorAll('[data-day]')].filter(r => r.querySelector('input[type=checkbox]').checked).length;
+    const rows = [['Studio', document.getElementById('nazwa').value.trim() || '[Nazwa studia]'], ['Adres', document.getElementById('adres').value.trim() || '[adres]'],
+      ['Usługi', cats.join(', ') || 'nie wybrano'], ['Klientki z importu', String(imported)], ['Dni otwarte', `${open} w tygodniu`]];
+    const dl = document.getElementById('podsumowanie'); dl.replaceChildren();
+    for (const [k, v] of rows) dl.append(Object.assign(document.createElement('dt'), { textContent:k, style:'color: #625860' }), Object.assign(document.createElement('dd'), { textContent:v, style:'margin: 0' }));
+  }
+  window.scrollTo({ top: 0 });
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-show]')) setTimeout(syncStep); }); // after mock.js toggled the sections
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – karnety i pakiety</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Karnety i pakiety</h1><span class="p-mut">Karnet czasowy to dostęp na okres, pakiet to z góry opłacona liczba wizyt. Ceny są przykładowe.</span></div>
+      <button type="button" class="p-btn pri" id="new">+ Nowy</button>
+    </div>
+
+    <div id="oferta" class="p-grid"></div>
+
+    <section class="p-card" aria-labelledby="sp-h">
+      <h2 id="sp-h" class="p-h2">Sprzedane klientkom</h2>
+      <div id="sprzedane" style="display: flex; flex-direction: column; gap: 8px"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, KL = ['[Klientka A]', '[Klientka B]', '[Klientka D]', '[Klientka E]'];
+  const SEED = [
+    { id: 1, n: 'Pakiet 5× hybryda', t: 'pakiet', cena: 600, ile: 5, dni: 180, us: 'Manicure hybrydowy' },
+    { id: 2, n: 'Karnet miesięczny: hybryda bez limitu', t: 'czasowy', cena: 450, ile: 0, dni: 30, us: 'Manicure hybrydowy' },
+    { id: 3, n: 'Pakiet 3× uzupełnienie rzęs', t: 'pakiet', cena: 400, ile: 3, dni: 120, us: 'Uzupełnienie rzęs 1:1' }];
+  let O = Mock.get('karnety.oferta', SEED), SP = Mock.get('karnety.sprzedane', []);
+  const sv = () => { Mock.set('karnety.oferta', O); Mock.set('karnety.sprzedane', SP); };
+
+  function render() {
+    document.getElementById('oferta').innerHTML = O.map(o => `<section class="p-card"><div class="p-top"><h2 class="p-h2" style="font-size:17px">${E(o.n)}</h2><span class="p-badge ${o.t === 'pakiet' ? 'blue' : ''}">${o.t === 'pakiet' ? 'pakiet' : 'karnet czasowy'}</span></div>
+      <span style="color:#625860">${E(o.us)} · ${o.t === 'pakiet' ? o.ile + ' wizyt' : 'bez limitu wizyt'} · ważny ${o.dni} dni</span>
+      <b style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px">${o.cena} zł</b>
+      <div class="p-acts"><button type="button" class="p-btn dark" data-sell="${o.id}">Sprzedaj klientce</button><button type="button" class="p-btn sm dng" data-del="${o.id}">Usuń</button></div></section>`).join('') || '<span class="p-mut">Brak karnetów. Dodaj pierwszy przyciskiem „+ Nowy”.</span>';
+    document.getElementById('sprzedane').innerHTML = SP.map((s, i) => `<div class="p-row"><span><b>${E(s.k)}</b> · ${E(s.n)}<br><span class="p-mut">sprzedano ${E(s.data)} · ${E(s.cena)} zł · ${s.t === 'pakiet' ? (s.ile > 0 ? 'zostało ' + s.ile + ' wizyt' : 'wykorzystany') : 'do ' + E(s.do)}</span></span>
+      ${s.t === 'pakiet' && s.ile > 0 ? `<button type="button" class="p-btn sm" data-use="${i}">Odlicz wizytę</button>` : s.t === 'pakiet' ? '<span class="p-badge ok">komplet</span>' : '<span class="p-badge ok">aktywny</span>'}</div>`).join('') || '<span class="p-mut">Jeszcze nic nie sprzedano.</span>';
+  }
+  document.getElementById('oferta').addEventListener('click', e => {
+    const s = e.target.closest('[data-sell]'), d = e.target.closest('[data-del]');
+    if (s) { const o = O.find(x => x.id === +s.dataset.sell); PS.modal({
+      title: 'Sprzedaj: ' + o.n, ok: 'Sprzedaj za ' + o.cena + ' zł',
+      body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map(k => `<option>${E(k)}</option>`).join('')}</select></label><label class="p-lab">Płatność<select class="p-in" name="m"><option>gotówka</option><option>karta</option><option>BLIK</option></select></label>`,
+      onOk: f => { const end = new Date(2026, 9, 20 + o.dni); SP.unshift({ k: f.k.value, n: o.n, t: o.t, cena: o.cena, ile: o.ile, data: '20.10.2026', do: end.toLocaleDateString('pl-PL') }); sv(); render(); },
+      toast: f => `Sprzedano karnet: ${f.k.value}, ${o.cena} zł`
+    }); }
+    if (d) { const o = O.find(x => x.id === +d.dataset.del); PS.modal({ title: 'Usunąć z oferty?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">${E(o.n)} zniknie z oferty. Karnety już sprzedane klientkom nadal działają.</p>`, onOk: () => { O = O.filter(x => x !== o); sv(); render(); }, toast: 'Usunięto z oferty' }); }
+  });
+  document.getElementById('sprzedane').addEventListener('click', e => { const b = e.target.closest('[data-use]'); if (!b) return; const s = SP[+b.dataset.use]; s.ile -= 1; sv(); render(); Mock.toast(s.ile ? `Odliczono wizytę: ${s.k}, zostało ${s.ile}` : `Pakiet wykorzystany: ${s.k}`); });
+  document.getElementById('new').addEventListener('click', () => PS.modal({
+    title: 'Nowy karnet lub pakiet', ok: 'Dodaj',
+    body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. Pakiet 4× brwi"></label>
+      <label class="p-lab">Rodzaj<select class="p-in" name="t"><option value="pakiet">Pakiet (liczba wizyt)</option><option value="czasowy">Karnet czasowy</option></select></label>
+      <label class="p-lab">Usługa<input class="p-in" name="us" required placeholder="np. Henna + regulacja"></label>
+      <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Cena (zł)<input class="p-in" type="number" min="0" name="c" required></label><label class="p-lab" style="flex:1">Liczba wizyt<input class="p-in" type="number" min="0" name="i" value="4"></label><label class="p-lab" style="flex:1">Ważny (dni)<input class="p-in" type="number" min="1" name="d" value="90"></label></div>`,
+    onOk: f => { O.push({ id: Date.now(), n: f.n.value.trim(), t: f.t.value, cena: +f.c.value, ile: f.t.value === 'pakiet' ? +f.i.value : 0, dni: +f.d.value, us: f.us.value.trim() }); sv(); render(); },
+    toast: f => 'Dodano: ' + f.n.value.trim()
+  }));
+  render();
+});
+</script>
+</body>
+</html>

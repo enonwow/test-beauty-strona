@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – profil studia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Profil studia</h1><span class="p-mut">Tak klientki zobaczą Twoją stronę w wyszukiwarce i po linku z Instagrama.</span></div>
+      <div class="p-acts"><a class="p-btn" href="salon.html">Zobacz stronę studia</a><button type="button" class="p-btn pri" id="save">Zapisz profil</button></div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <div style="flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+        <section class="p-card">
+          <h2>Podstawowe dane</h2>
+          <label class="p-lab">Nazwa studia<input class="p-in" id="nm" value="[Nazwa studia]"></label>
+          <label class="p-lab">Opis<textarea class="p-in" id="ds" rows="4">[Krótki opis: czym się zajmujecie, co Was wyróżnia, dla kogo jest studio]</textarea></label>
+          <label class="p-lab">Adres<input class="p-in" id="ad" value="[ulica numer, miasto]"></label>
+        </section>
+
+        <section class="p-card">
+          <h2>Godziny otwarcia</h2>
+          <div class="p-tw"><table class="p-tbl" style="min-width: 380px"><thead><tr><th>Dzień</th><th>Od</th><th>Do</th><th>Zamknięte</th></tr></thead><tbody id="godz"></tbody></table></div>
+        </section>
+
+        <section class="p-card">
+          <div class="p-top"><h2 class="p-h2">Zdjęcia i portfolio</h2><label class="p-btn sm" style="cursor: pointer">+ Dodaj zdjęcie<input id="foto" type="file" accept="image/*" class="p-sr"></label></div>
+          <div id="portfolio" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px"></div>
+          <span class="p-mut">Pierwsze trzy zdjęcia widać w podglądzie. Dodane zdjęcia to podgląd lokalny, znikną po odświeżeniu strony.</span>
+        </section>
+
+        <section class="p-card">
+          <h2>Udogodnienia</h2>
+          <div id="udog" style="display: flex; gap: 6px 20px; flex-wrap: wrap"></div>
+        </section>
+
+        <section class="p-card">
+          <h2>Zasady</h2>
+          <label class="p-lab">Zasady odwołania i spóźnień (widzi klientka przed płatnością)<textarea class="p-in" id="zs" rows="3">Bezpłatne odwołanie do 24 godzin przed wizytą. Spóźnienie powyżej 15 minut może skrócić zabieg.</textarea></label>
+        </section>
+
+        <section class="p-card" id="kanaly" aria-labelledby="kan-h">
+          <h2 id="kan-h">Kanały rezerwacji</h2>
+          <span class="p-mut">Skąd klientki mogą się umówić: z Twojej strony www, z wydruku z kodem QR i z wyszukiwarki Google.</span>
+
+          <h3 class="p-h2" style="font-size: 15px">Widżet na stronę www</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px">
+            <label class="p-lab" style="flex: 1 1 180px">Tekst przycisku<input class="p-in" id="wg-tekst" value="Zarezerwuj wizytę" maxlength="30"></label>
+            <label class="p-lab" style="flex: 1 1 180px">Wygląd<select class="p-in" id="wg-styl"><option value="plywajacy">Pływający w rogu strony</option><option value="w-tekscie">Przycisk w treści</option></select></label>
+          </div>
+          <label class="p-lab">Kod do wklejenia na stronę (przed &lt;/body&gt;)<textarea class="p-in" id="wg-kod" rows="3" readonly style="font-family: monospace; font-size: 12px"></textarea></label>
+          <div class="p-acts"><button type="button" class="p-btn sm" id="wg-kopiuj">Kopiuj kod</button></div>
+          <div id="wg-pod" role="group" aria-label="Podgląd widżetu na stronie www" style="position: relative; min-height: 150px; border: 1px dashed #C9B6BF; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: #FAF6F8">
+            <span class="p-mut">Podgląd: Twoja strona www</span>
+            <span aria-hidden="true" style="height: 8px; width: 70%; border-radius: 4px; background: #E4D9DE"></span><span aria-hidden="true" style="height: 8px; width: 50%; border-radius: 4px; background: #E4D9DE"></span>
+            <button type="button" class="p-btn pri" id="wg-btn"></button>
+          </div>
+
+          <hr class="p-sep">
+          <h3 class="p-h2" style="font-size: 15px">Kod QR do profilu</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center">
+            <div id="qr" style="width: 160px; flex: none"></div>
+            <div style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 8px">
+              <span>Klientka skanuje kod telefonem i od razu widzi Twój profil z przyciskiem „Zarezerwuj”. Dobry na drzwi, ladę i wizytówki.</span>
+              <span class="p-mut">Makieta: to wzór poglądowy, nie działający kod QR. Prawdziwy kod powstanie z linku do profilu.</span>
+              <div class="p-acts"><button type="button" class="p-btn sm" id="qr-pobierz">Pobierz do druku</button></div>
+            </div>
+          </div>
+
+          <hr class="p-sep">
+          <h3 class="p-h2" style="font-size: 15px">Rezerwuj przez Google</h3>
+          <div class="p-row"><span style="display: flex; flex-direction: column"><b>Profil firmy w Google</b><span class="p-mut" id="gg-opis"></span></span><span style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><span class="p-badge" id="gg-st"></span><button type="button" class="p-btn sm" id="gg-btn"></button></span></div>
+        </section>
+      </div>
+
+      <aside aria-label="Podgląd na telefonie" style="flex: 1 1 300px; max-width: 380px; min-width: 0; position: sticky; top: 16px">
+        <div style="border: 8px solid #1E1A1D; border-radius: 32px; background: #FFFFFF; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 480px">
+          <span class="p-mut">Podgląd strony studia</span>
+          <div role="img" aria-label="Zdjęcie główne studia" id="pv-cover" style="height: 110px; border-radius: 14px; background: #E4D9DE"></div>
+          <b id="pv-nm" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px"></b>
+          <span class="p-mut">★ [ocena] · <span id="pv-ad"></span></span>
+          <span id="pv-h" style="font-size: 13px"></span>
+          <p id="pv-ds" style="margin: 0; line-height: 1.45; white-space: pre-wrap"></p>
+          <div id="pv-ud" style="display: flex; gap: 6px; flex-wrap: wrap"></div>
+          <div id="pv-ph" style="display: flex; gap: 6px"></div>
+          <span class="p-btn dark" aria-hidden="true" style="margin-top: auto">Zarezerwuj</span>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, DN = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'], UD = ['Wi-Fi', 'Parking', 'Klimatyzacja', 'Dostęp dla wózków', 'Płatność kartą', 'Kawa i herbata'], COL = ['#5B1630', '#3E2A4A', '#C98C8C', '#2F5A86', '#F3E3DA', '#EEF3EA'];
+  const DEF = {
+    nm: '[Nazwa studia]', ds: '[Krótki opis: czym się zajmujecie, co Was wyróżnia, dla kogo jest studio]', ad: '[ulica numer, miasto]', zs: document.getElementById('zs').value,
+    h: DN.map((d, i) => (i < 5 ? ['9:00', '18:00', false] : i === 5 ? ['9:00', '14:00', false] : ['9:00', '14:00', true])),
+    ud: ['Wi-Fi', 'Płatność kartą', 'Kawa i herbata'], ph: COL.slice(0, 4).map(c => ({ c }))
+  };
+  const S = { ...DEF, ...Mock.get('profil', {}) };
+  const $ = id => document.getElementById(id);
+
+  function renderStatic() {
+    $('godz').innerHTML = DN.map((d, i) => `<tr><td>${d}</td><td><input class="p-in s" type="time" data-h="${i}" data-k="0" value="${S.h[i][0].padStart(5, '0')}" aria-label="${d}: otwarcie"></td><td><input class="p-in s" type="time" data-h="${i}" data-k="1" value="${S.h[i][1].padStart(5, '0')}" aria-label="${d}: zamknięcie"></td><td><input type="checkbox" data-h="${i}" data-k="2" ${S.h[i][2] ? 'checked' : ''} aria-label="${d}: zamknięte" style="width:20px;height:20px;accent-color:#9E1F50"></td></tr>`).join('');
+    $('udog').innerHTML = UD.map(u => `<label class="p-chk"><input type="checkbox" data-u="${E(u)}" ${S.ud.includes(u) ? 'checked' : ''}>${u}</label>`).join('');
+    $('nm').value = S.nm; $('ds').value = S.ds; $('ad').value = S.ad; $('zs').value = S.zs;
+  }
+  function tile(p, i) { return p.src ? `<img src="${p.src}" alt="Zdjęcie portfolio ${i + 1}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">` : ''; }
+  function renderPortfolio() {
+    $('portfolio').innerHTML = S.ph.map((p, i) => `<div data-tile style="position:relative;aspect-ratio:1;border-radius:10px;background:${p.c || '#E4D9DE'}">${tile(p, i)}<button type="button" data-rm="${i}" aria-label="Usuń zdjęcie ${i + 1}" style="position:absolute;top:4px;right:4px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#1E1A1D;font:700 18px 'DM Sans',sans-serif;cursor:pointer">×</button></div>`).join('') || '<span class="p-mut">Brak zdjęć. Dodaj pierwsze.</span>';
+  }
+  function preview() {
+    $('pv-nm').textContent = S.nm || 'Nazwa studia'; $('pv-ds').textContent = S.ds; $('pv-ad').textContent = S.ad;
+    const t = S.h[1]; // makieta: "dziś" to wtorek
+    $('pv-h').textContent = t[2] ? 'Dziś zamknięte' : `Dziś otwarte ${t[0]}–${t[1]}`;
+    $('pv-ud').innerHTML = S.ud.map(u => `<span class="p-chip">${E(u)}</span>`).join('');
+    $('pv-ph').innerHTML = S.ph.slice(0, 3).map(p => `<div style="flex:1;aspect-ratio:1;border-radius:8px;background:${p.c || '#E4D9DE'};overflow:hidden">${p.src ? `<img alt="" src="${p.src}" style="width:100%;height:100%;object-fit:cover">` : ''}</div>`).join('');
+    if (S.ph[0]) $('pv-cover').style.background = S.ph[0].c || '#E4D9DE';
+  }
+  renderStatic(); renderPortfolio(); preview();
+
+  const on = (id, k) => $(id).addEventListener('input', e => { S[k] = e.target.value; preview(); });
+  on('nm', 'nm'); on('ds', 'ds'); on('ad', 'ad'); on('zs', 'zs');
+  $('godz').addEventListener('input', e => { const t = e.target, i = +t.dataset.h, k = +t.dataset.k; S.h[i][k] = k === 2 ? t.checked : t.value; preview(); });
+  $('udog').addEventListener('change', e => { const u = e.target.dataset.u; S.ud = e.target.checked ? S.ud.concat(u) : S.ud.filter(x => x !== u); preview(); });
+  $('portfolio').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; S.ph.splice(+b.dataset.rm, 1); renderPortfolio(); preview(); Mock.toast('Usunięto zdjęcie'); });
+  $('foto').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    S.ph.push({ src: URL.createObjectURL(f) }); renderPortfolio(); preview(); e.target.value = ''; Mock.toast('Dodano zdjęcie do portfolio');
+  });
+
+  // Kanały rezerwacji
+  const LINK = '[adres]/[nazwa-studia]';
+  const kod = () => '<script src="[adres]/widget.js" data-studio="[nazwa-studia]" data-tekst="' + $('wg-tekst').value.replace(/"/g, '&quot;') + '" data-styl="' + $('wg-styl').value + '" async><' + '/script>';
+  function widget() {
+    const txt = $('wg-tekst').value.trim() || 'Zarezerwuj wizytę', b = $('wg-btn'), fl = $('wg-styl').value === 'plywajacy';
+    b.textContent = txt;
+    b.style.cssText = fl ? 'position:absolute;right:12px;bottom:12px;border-radius:999px' : 'align-self:flex-start';
+    $('wg-kod').value = kod();
+  }
+  $('wg-tekst').addEventListener('input', widget); $('wg-styl').addEventListener('change', widget); widget();
+  $('wg-kopiuj').addEventListener('click', () => { navigator.clipboard?.writeText($('wg-kod').value).catch(() => {}); Mock.toast('Skopiowano kod widżetu'); });
+  $('wg-btn').addEventListener('click', () => PS.modal({
+    title: 'Zarezerwuj wizytę', noOk: true,
+    body: `<span class="p-mut">Tak klientka zobaczy okienko na Twojej stronie www.</span><label class="p-lab">Usługa<select class="p-in">${PS.SVC.map(s => `<option>${E(s[0])}</option>`).join('')}</select></label><a class="p-btn pri" href="salon.html">Wybierz termin</a>`
+  }));
+  // shortcut: wzór z haszu linku, nie prawdziwy QR (to wymagałoby biblioteki); podmienić na generator QR przy wdrożeniu.
+  function qrSvg(text) {
+    const N = 25; let h = 2166136261; for (const ch of text) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+    const finder = (x, y) => (x < 8 && y < 8) || (x >= N - 8 && y < 8) || (x < 8 && y >= N - 8);
+    let r = '';
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      let on;
+      if (finder(x, y)) { const ax = x < 8 ? x : x - (N - 7), ay = y < 8 ? y : y - (N - 7); on = ax >= 0 && ax < 7 && ay >= 0 && ay < 7 && (ax === 0 || ax === 6 || ay === 0 || ay === 6 || (ax > 1 && ax < 5 && ay > 1 && ay < 5)); }
+      else { h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0; on = (h & 3) < 2; }
+      if (on) r += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 ${N + 4} ${N + 9}" role="img" aria-label="Wzór kodu QR do profilu studia (makieta)"><rect x="-2" y="-2" width="${N + 4}" height="${N + 9}" fill="#fff"/><g fill="#1E1A1D">${r}</g><text x="${N / 2}" y="${N + 4.5}" text-anchor="middle" font-size="2.2" font-family="DM Sans,Arial,sans-serif" fill="#1E1A1D">Makieta, nie skanuj</text></svg>`;
+  }
+  $('qr').innerHTML = qrSvg(LINK);
+  $('qr-pobierz').addEventListener('click', () => {
+    const a = document.createElement('a'); a.download = 'kod-qr-profil-studia.svg';
+    a.href = URL.createObjectURL(new Blob([qrSvg(LINK)], { type: 'image/svg+xml' })); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    Mock.toast('Pobrano plik do druku (SVG)');
+  });
+  const gg = () => Mock.get('kanaly.google', false);
+  function ggShow() {
+    const on = gg();
+    $('gg-st').textContent = on ? 'połączono' : 'niepołączono'; $('gg-st').className = 'p-badge ' + (on ? 'ok' : 'warn');
+    $('gg-opis').textContent = on ? 'Przycisk „Zarezerwuj” działa w wyszukiwarce Google i w Mapach.' : 'Po połączeniu klientki umówią się prosto z wyniku w Google i w Mapach.';
+    $('gg-btn').textContent = on ? 'Rozłącz' : 'Połącz';
+  }
+  ggShow();
+  $('gg-btn').addEventListener('click', () => {
+    if (gg()) return PS.modal({ title: 'Rozłączyć Google?', ok: 'Rozłącz', cls: 'dark', body: '<p style="margin:0">Przycisk „Zarezerwuj” zniknie z Profilu firmy w Google. Rezerwacje z Google, które już masz, zostają.</p>', onOk: () => { Mock.set('kanaly.google', false); ggShow(); }, toast: 'Rozłączono z Google' });
+    PS.modal({ title: 'Połącz z Profilem firmy w Google', ok: 'Połącz', body: '<label class="p-lab">Profil firmy<select class="p-in" name="p"><option>[Nazwa studia], [miasto]</option><option>Inny profil (przykład)</option></select></label><span class="p-mut">Makieta: nic nie jest wysyłane do Google. Prawdziwe połączenie wymaga zalogowania na konto właściciela profilu.</span>', onOk: () => { Mock.set('kanaly.google', true); ggShow(); }, toast: f => 'Połączono z Google: ' + f.p.value });
+  });
+  if (location.hash === '#kanaly') $('kanaly').scrollIntoView();
+  $('save').addEventListener('click', () => { Mock.set('profil', { ...S, ph: S.ph.filter(p => !p.src) }); Mock.toast('Zapisano profil studia'); });
+});
+</script>
+</body>
+</html>

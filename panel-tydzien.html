@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – tydzień</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+<script src="panel-drag.js" defer></script>
+<style>@media (max-width:1023px){[data-day]>[data-s]{min-height:44px}}</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 940px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav" data-active="panel.html"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+      <div style="display: flex; gap: 10px; align-items: center">
+        <button type="button" id="prev" aria-label="Poprzedni tydzień" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+        <h1 id="week" aria-live="polite" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">19–24 października</h1>
+        <button type="button" id="next" aria-label="Następny tydzień" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg></button>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+        <label for="who" style="font-size: 13px; color: #625860">Stylistka</label>
+        <select id="who" style="min-height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; font: inherit"><option value="0">Wszystkie</option><option value="1">[Stylistka 1]</option><option value="2">[Stylistka 2]</option></select>
+        <div role="group" aria-label="Widok" style="display: flex; border: 1px solid #E4D9DE; border-radius: 10px; overflow: hidden; background: #FFFFFF">
+          <a href="panel.html" style="min-height: 40px; padding: 0 14px; background: #FFFFFF; color: #1E1A1D; text-decoration: none; display: flex; align-items: center">Dzień</a>
+          <a href="panel-tydzien.html" aria-current="page" style="min-height: 40px; padding: 0 14px; background: #1E1A1D; color: #FFFFFF; text-decoration: none; display: flex; align-items: center">Tydzień</a>
+        </div>
+        <button type="button" id="add-visit" class="p-btn pri">+ Wizyta</button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; border-radius: 12px; background: #FFFFFF; border: 1px solid #F0E8EC">
+      <span style="font-weight: 700">Wolne okna na 1 h 50 min:</span>
+      <button type="button" class="p-chip" data-free="pn 15:00" style="border:0;min-height:36px;font:inherit;cursor:pointer">pn 15:00</button>
+      <button type="button" class="p-chip" data-free="śr 9:00" style="border:0;min-height:36px;font:inherit;cursor:pointer">śr 9:00</button>
+      <button type="button" class="p-chip" data-free="sob 13:30" style="border:0;min-height:36px;font:inherit;cursor:pointer">sob 13:30</button>
+      <span style="color: #625860">Tylko te godziny widzi klientka, która wybrała taką stylizację. Kliknij godzinę, żeby dodać wizytę.</span>
+    </div>
+
+    <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; overflow-x: auto">
+      <div style="min-width: 760px; display: grid; grid-template-columns: 56px repeat(6, minmax(0, 1fr))">
+        <div style="border-bottom: 1px solid #F0E8EC"></div>
+        <div data-hd="0" style="padding: 10px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC;"><b>pon 19</b></div>
+        <div data-hd="1" style="padding: 10px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC; background: #F6EDF1"><b>wt 20</b> <span style="color: #625860">· jutro</span></div>
+        <div data-hd="2" style="padding: 10px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC;"><b>śr 21</b></div>
+        <div data-hd="3" style="padding: 10px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC;"><b>czw 22</b></div>
+        <div data-hd="4" style="padding: 10px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC;"><b>pt 23</b></div>
+        <div data-hd="5" style="padding: 10px; border-bottom: 1px solid #F0E8EC; border-left: 1px solid #F0E8EC;"><b>sob 24</b></div>
+
+        <div style="position: relative; height: 432px; color: #625860; font-size: 12px">
+          <span style="position: absolute; top: 2px; right: 8px">9:00</span>
+          <span style="position: absolute; top: 98px; right: 8px">11:00</span>
+          <span style="position: absolute; top: 194px; right: 8px">13:00</span>
+          <span style="position: absolute; top: 290px; right: 8px">15:00</span>
+          <span style="position: absolute; top: 386px; right: 8px">17:00</span>
+        </div>
+
+        <div data-day="19" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC">
+          <a href="panel.html" data-s="1" style="position: absolute; top: 48px; left: 4px; right: 4px; height: 58px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>10:00</b> Hybryda</a>
+          <a href="panel.html" data-s="2" style="position: absolute; top: 192px; left: 4px; right: 4px; height: 94px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #EAF0F7; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>13:00</b> Rzęsy 2D–3D</a>
+        </div>
+        <div data-day="20" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC">
+          <a href="panel.html" data-s="1" style="position: absolute; top: 0; left: 4px; right: 4px; height: 58px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>9:00</b> Hybryda</a>
+          <a href="panel.html" data-s="1" style="position: absolute; top: 108px; left: 4px; right: 4px; height: 86px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #9E1F50; color: #FFFFFF; text-decoration: none; font-size: 12px; overflow: hidden"><b>11:15</b> Velvet × 10 · 200 zł</a>
+          <a href="panel.html" data-s="1" style="position: absolute; top: 240px; left: 4px; right: 4px; height: 122px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>14:00</b> Przedłużanie L</a>
+        </div>
+        <div data-day="21" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC">
+          <div data-s="0" style="position: absolute; top: 0; left: 4px; right: 4px; height: 94px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; border: 1px dashed #9E1F50; color: #9E1F50; font-size: 12px">Wolne 2 h</div>
+          <a href="panel.html" data-s="2" style="position: absolute; top: 144px; left: 4px; right: 4px; height: 34px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #EEF3EA; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>12:00</b> Brwi</a>
+          <a href="panel.html" data-s="1" style="position: absolute; top: 288px; left: 4px; right: 4px; height: 94px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>15:00</b> Żel · french</a>
+        </div>
+        <div data-day="22" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC; background: #FAF6F8">
+          <div data-s="1" style="position: absolute; top: 8px; left: 4px; right: 4px; padding: 6px 8px; border-radius: 8px; background: #FFFFFF; border: 1px solid #E4D9DE; color: #625860; font-size: 12px">Urlop · [Stylistka 1]</div>
+        </div>
+        <div data-day="23" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC">
+          <a href="panel.html" data-s="2" style="position: absolute; top: 48px; left: 4px; right: 4px; height: 118px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #EAF0F7; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>10:00</b> Rzęsy 4D–6D</a>
+          <a href="panel.html" data-s="1" style="position: absolute; top: 240px; left: 4px; right: 4px; height: 58px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>14:00</b> Hybryda</a>
+          <div data-s="2" style="position: absolute; top: 336px; left: 4px; right: 4px; height: 46px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; border: 1px dashed #A99BA2; color: #625860; font-size: 12px">Blokada ręczna</div>
+        </div>
+        <div data-day="24" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC">
+          <a href="panel.html" data-s="1" style="position: absolute; top: 0; left: 4px; right: 4px; height: 118px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>9:00</b> Przedłużanie</a>
+          <a href="panel.html" data-s="1" style="position: absolute; top: 144px; left: 4px; right: 4px; height: 70px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>12:00</b> Żel</a>
+        </div>
+      </div>
+    </div>
+
+    <span id="note" class="p-mut" hidden>W tym tygodniu nie ma jeszcze wizyt. Dodaj pierwszą przyciskiem „+ Wizyta”.</span>
+    <p class="p-mut" style="margin:0">Przeciągnij wizytę na inną godzinę lub dzień (na telefonie przytrzymaj blok). Z klawiatury: zaznacz blok i naciśnij Alt + strzałki.</p>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #625860">
+      <span style="display: flex; gap: 6px; align-items: center"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 4px; background: #F6EDF1; border: 1px solid #E4D9DE"></span>paznokcie</span>
+      <span style="display: flex; gap: 6px; align-items: center"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 4px; background: #EAF0F7"></span>rzęsy</span>
+      <span style="display: flex; gap: 6px; align-items: center"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 4px; background: #EEF3EA"></span>brwi</span>
+      <span style="display: flex; gap: 6px; align-items: center"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 4px; border: 1px dashed #9E1F50; box-sizing: border-box"></span>wolne okno</span>
+    </div>
+  </main>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const MON = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'], DN = ['pon', 'wt', 'śr', 'czw', 'pt', 'sob'];
+  const KC = { Paznokcie: '#F6EDF1', Rzęsy: '#EAF0F7', Brwi: '#EEF3EA' };
+  let w = 0;
+  const day = i => new Date(2026, 9, 19 + 7 * w + i);
+  const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+
+  function render() {
+    const a = day(0), b = day(5);
+    document.getElementById('week').textContent = a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${MON[b.getMonth()]}` : `${a.getDate()} ${MON[a.getMonth()]} – ${b.getDate()} ${MON[b.getMonth()]}`;
+    document.querySelectorAll('[data-hd]').forEach(h => {
+      const i = +h.dataset.hd, d = day(i);
+      h.innerHTML = `<b>${DN[i]} ${d.getDate()}</b>` + (w === 0 && i === 1 ? ' <span style="color:#625860">· jutro</span>' : '');
+      h.style.background = w === 0 && i === 1 ? '#F6EDF1' : '';
+    });
+    document.querySelectorAll('[data-day] .dyn').forEach(n => n.remove());
+    document.querySelectorAll('[data-day]').forEach(col => col.querySelectorAll(':scope > [data-s]:not(.dyn)').forEach(n => { n.dataset.wk = '1'; }));
+    // przykładowe wizyty są tylko w pierwszym tygodniu; wizyty dodane w panelu mają datę, więc trafiają do właściwej kolumny
+    document.querySelectorAll('[data-wk]').forEach(n => { n.style.display = w === 0 ? '' : 'none'; });
+    document.getElementById('note').hidden = w === 0;
+    Mock.get('visits', []).filter(v => v.godzina && v.status === 'nadchodząca').forEach(v => {
+      const m = /(\d+)\.(\d+)$/.exec(v.dzien || ''); if (!m) return;
+      for (let i = 0; i < 6; i++) {
+        const d = day(i); if (d.getDate() !== +m[1] || d.getMonth() + 1 !== +m[2]) continue;
+        const col = document.querySelector(`[data-day="${19 + i}"]`), el = document.createElement('a');
+        el.className = 'dyn kal-item'; el.href = 'panel.html'; el.dataset.s = v.stylistka === '[Stylistka 2]' ? '2' : '1'; el.dataset.k = 'v' + v.id; el.dataset.dur = Math.max(30, v.czas || 60);
+        el.style.cssText = `position:absolute;top:${(toMin(v.godzina) - 540) * 0.8}px;left:4px;right:4px;height:${Math.max(30, (v.czas || 60) * 0.8 - 2)}px;box-sizing:border-box;padding:6px 8px;border-radius:8px;background:${KC[v.kategoria] || '#F6EDF1'};color:#1E1A1D;text-decoration:none;font-size:12px;overflow:hidden;outline:2px solid #9E1F50`;
+        el.innerHTML = `<b>${v.godzina}</b> ${PS.esc(v.klientka || 'Klientka online')}`;
+        col.append(el);
+      }
+    });
+    applyMoves();
+    filter();
+  }
+  function filter() {
+    const who = document.getElementById('who').value;
+    document.querySelectorAll('[data-s]').forEach(n => { n.hidden = who !== '0' && n.dataset.s !== '0' && n.dataset.s !== who; });
+  }
+  document.getElementById('prev').addEventListener('click', () => { w--; render(); });
+  document.getElementById('next').addEventListener('click', () => { w++; render(); });
+  document.getElementById('who').addEventListener('change', () => { filter(); Mock.toast(document.getElementById('who').selectedOptions[0].text === 'Wszystkie' ? 'Pokazuję cały zespół' : 'Filtr: ' + document.getElementById('who').selectedOptions[0].text); });
+  const openAdd = (dzien, godz) => PS.visitModal({ days: DN.map((n, i) => [`${n} ${day(i).getDate()}`, `${n} ${day(i).getDate()}.${day(i).getMonth() + 1}`]), dzien, godz, done: render });
+  document.getElementById('add-visit').addEventListener('click', () => openAdd(`wt ${day(1).getDate()}.${day(1).getMonth() + 1}`, '10:00'));
+  const FREE = { 'pn 15:00': [0, '15:00'], 'śr 9:00': [2, '9:00'], 'sob 13:30': [5, '13:30'] };
+  document.querySelectorAll('[data-free]').forEach(b => b.addEventListener('click', () => { const [i, t] = FREE[b.dataset.free]; openAdd(`${DN[i]} ${day(i).getDate()}.${day(i).getMonth() + 1}`, t); }));
+
+  // --- przeciąganie wizyt między dniami i godzinami ---
+  const fmt = KalDrag.fmt, PPM = 0.8, DAY0 = 540, DAY1 = 1080;
+  const techMin = () => (Mock.get('kalendarz', { techMin: 10 }) || {}).techMin ?? 10;
+  const W = Mock.get('panel.week', {}); // {klucz bloku: {day, t}} przeniesione przykładowe wizyty
+  const colOf = d => document.querySelector(`[data-day="${d}"]`);
+  const byK = k => document.querySelector(`[data-day] > [data-k="${k}"]`);
+  const startOf = n => DAY0 + parseFloat(n.style.top) / PPM;
+  const durOf = n => +n.dataset.dur || (parseFloat(n.style.height) + 2) / PPM;
+  document.querySelectorAll('[data-day]').forEach(col => [...col.children].filter(n => n.matches('a[data-s]:not(.dyn)')).forEach((n, i) => {
+    n.dataset.k = col.dataset.day + '-' + i; n.dataset.dur = Math.round((parseFloat(n.style.height) + 2) / PPM); n.classList.add('kal-item');
+    n.setAttribute('aria-keyshortcuts', 'Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight'); n.title = 'Przeciągnij albo Alt + strzałki, żeby przenieść';
+  }));
+  function applyMoves() {
+    Object.entries(W).forEach(([k, o]) => { const n = byK(k), c = colOf(o.day); if (n && c) { c.append(n); n.style.top = (o.t - DAY0) * PPM + 'px'; if (n.firstElementChild) n.firstElementChild.textContent = fmt(o.t); } });
+  }
+  function check(id, col, start, dur) {
+    const me = byK(id), s = me.dataset.s;
+    if (start < DAY0 || start + dur > DAY1) return 'poza godzinami kalendarza (9:00–18:00).';
+    for (const tech of [0, techMin()]) {
+      const end = start + dur + tech;
+      for (const n of col.children) {
+        if (n === me || !n.dataset.s || n.dataset.s === '0' || n.dataset.s !== s) continue; // okno „Wolne” i inne stylistki nie blokują
+        const lock = /^\s*Urlop/.test(n.textContent), a = lock ? DAY0 : startOf(n), b = lock ? DAY1 : a + durOf(n);
+        if (start < b + (lock ? 0 : tech) && end > a) {
+          const name = n.textContent.trim().replace(/\s+/g, ' ').slice(0, 28);
+          return lock ? 'ten dzień to urlop tej stylistki.' : tech ? `za mało przerwy po wizycie (${name}): potrzeba ${tech} min odstępu.` : `termin zajęty: ${name} (${fmt(a)}–${fmt(b)}).`;
+        }
+      }
+    }
+    return '';
+  }
+  const kal = KalDrag.attach({
+    root: document.querySelector('main'), attr: 'k', cols: () => [...document.querySelectorAll('[data-day]')], ppm: PPM, top0: 0, startMin: DAY0, endMin: DAY1, snap: 15,
+    place: id => { const n = byK(id); return { col: n.parentElement, start: startOf(n), dur: durOf(n) }; },
+    check, label: id => byK(id).textContent.trim().replace(/^\d+:\d+\s*/, '').slice(0, 24) || 'wizyta', colName: c => ` · ${DN[+c.dataset.day - 19]} ${c.dataset.day}`,
+    commit: (id, col, start) => {
+      if (id[0] === 'v') { // wizyta z Mock "visits": zmieniamy jej dzień i godzinę
+        const i = +col.dataset.day - 19, d = day(i);
+        Mock.set('visits', Mock.get('visits', []).map(v => (String(v.id) === id.slice(1) ? { ...v, godzina: fmt(start), dzien: `${DN[i]} ${d.getDate()}.${d.getMonth() + 1}` } : v)));
+      } else { W[id] = { day: +col.dataset.day, t: start }; Mock.set('panel.week', W); }
+      render();
+    }
+  });
+  render();
+});
+</script>
+</body>
+</html>

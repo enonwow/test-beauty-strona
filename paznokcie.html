@@ -1,0 +1,1476 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<link rel="preload" href="zdjecia/dlonie.json" as="fetch" crossorigin>
+<link rel="preload" href="zdjecia/dlon-1.jpg" as="image">
+<title>Kreator paznokci</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"><!-- not render-blocking: the 3D/photo canvas must not wait for fonts -->
+<link rel="stylesheet" href="mock.css">
+<style>
+  :root { --bg:#FFFFFF; --panel:#fff; --ink:#1E1A1D; --muted:#625860; --line:#E4D9DE; --accent:#9E1F50; --tint:#F6EDF1; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; font-family:'DM Sans', system-ui, sans-serif; color:var(--ink); background:var(--bg); }
+  body { display:flex; flex-direction:column; }
+  #app { display:flex; flex:1; min-height:0; }
+  [hidden] { display:none !important; }
+  #view { flex:1; position:relative; min-width:0; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 35%, #fff, #eadcd6); }
+  #view canvas { display:block; width:100%; height:100%; touch-action:none; }
+  #video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transform:scaleX(-1); background:#000; }
+  #photoEmpty { color:var(--muted); padding:24px; text-align:center; }
+  #photoTools, #demoTools { display:grid; gap:10px; margin-top:10px; }
+  .thumbs { display:grid; grid-template-columns:repeat(auto-fill, minmax(72px, 1fr)); gap:8px; }
+  .thumb { position:relative; }
+  .thumb > button:first-child { display:block; width:100%; aspect-ratio:1; padding:0; border:2px solid transparent; border-radius:8px; overflow:hidden; cursor:pointer; background:var(--line); }
+  .thumb > button:first-child[aria-pressed=true] { border-color:var(--accent); }
+  .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .thumb .del { position:absolute; top:2px; right:2px; border:0; border-radius:999px; padding:2px 6px; font-size:11px; background:rgba(255,255,255,.9); color:var(--ink); cursor:pointer; }
+  .file { border:1px solid var(--line); padding:6px 10px; border-radius:999px; cursor:pointer; font-size:13px; }
+  .file:focus-within { outline:2px solid var(--accent); }
+  .file input { position:absolute; opacity:0; width:1px; height:1px; }
+  .chips button:disabled { opacity:.4; cursor:default; }
+  #editor { display:block; width:100%; max-width:300px; margin:0 auto; background:var(--bg); border-radius:8px; cursor:crosshair; touch-action:none; }
+  #panel { width:380px; overflow-y:auto; background:var(--panel); border-left:1px solid var(--line); padding:16px; }
+  @media (max-width:760px) { /* the page scrolls; the picture stays pinned above the options */
+    html, body { height:auto; min-height:100%; }
+    #app { flex-direction:column; flex:none; }
+    #view { flex:none; height:42vh; position:sticky; top:0; z-index:6; }
+    #panel { width:auto; overflow:visible; border-left:0; border-top:1px solid var(--line); padding-bottom:104px; }
+    #book { display:none; } /* the bottom bar has it */
+  }
+  .sub { font-size:12px; color:var(--muted); margin:0 0 8px; }
+  .step { margin:14px 0; }
+  .step h2 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px; font-weight:600; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chips button { border:1px solid var(--line); background:#fff; color:var(--ink); padding:6px 10px; border-radius:999px; cursor:pointer; font:inherit; font-size:13px; }
+  .chips button[aria-pressed=true] { background:var(--tint); border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); } /* 2 px accent frame without moving the layout */
+  .chips button[aria-pressed=true]::before { content:'\2713'; margin-right:5px; color:var(--accent); font-weight:700; }
+  .swatches { display:flex; flex-wrap:wrap; align-items:center; }
+  /* 44 px touch target, 28 px dot (::before); the chosen one also gets a tick, so it is not told apart by colour alone */
+  .swatches button { position:relative; width:44px; height:44px; border:0; padding:0; background:none; cursor:pointer; border-radius:8px; }
+  .swatches button::before { content:''; position:absolute; inset:8px; border-radius:50%; background:var(--c); border:2px solid #fff; box-shadow:0 0 0 1px var(--line); }
+  .swatches button[aria-pressed=true]::before { box-shadow:0 0 0 2px var(--ink); }
+  .swatches button[aria-pressed=true]::after { content:'\2713'; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font:700 15px/1 system-ui, sans-serif; text-shadow:0 0 2px #000, 0 0 3px #000; }
+  .swatches button:focus-visible { outline:2px solid var(--ink); outline-offset:-2px; }
+  .swatches input { width:44px; height:44px; border:0; padding:6px; background:none; cursor:pointer; }
+  .range { display:flex; gap:8px; align-items:center; }
+  input[type=range] { width:100%; height:44px; margin:0; }
+  #quote { width:100%; border-collapse:collapse; font-size:13px; }
+  #quote td { padding:4px 0; border-bottom:1px solid var(--line); }
+  #quote td:last-child { text-align:right; white-space:nowrap; }
+  #total { font-size:15px; font-weight:600; margin:8px 0; }
+  #pbar { display:none; }
+  @media (max-width:760px) {
+    #pbar { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:20; align-items:center; gap:12px; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); border-radius:16px 16px 0 0; background:#1E1A1D; color:#fff; box-shadow:0 -6px 20px rgba(30,26,29,.18); }
+    #pbar .pb-info { flex:1; min-width:0; display:flex; flex-direction:column; }
+    #pbPrice { font-family:'Bricolage Grotesque', sans-serif; font-size:20px; font-weight:700; }
+    #pbTime { color:#E9DEE3; font-size:13px; }
+    #pbar a { display:inline-flex; align-items:center; min-height:48px; padding:0 20px; border-radius:12px; background:#fff; color:#1E1A1D; font-weight:700; text-decoration:none; }
+  }
+  .cta { display:block; margin-top:10px; padding:12px; border-radius:12px; background:var(--ink); color:#fff; text-align:center; text-decoration:none; font-weight:600; }
+  #recipe { padding-left:20px; font-size:13px; line-height:1.5; margin:0; }
+  #recipe li { margin-bottom:4px; }
+  @media (max-width:1023px) { /* 44 px touch targets on phones and tablets; desktop keeps the compact chips */
+    .chips button { min-height:44px; }
+    .file { display:inline-flex; align-items:center; min-height:44px; box-sizing:border-box; }
+  }
+  #err { position:absolute; inset:0; display:none; place-items:center; padding:24px; text-align:center; }
+</style>
+<script src="mock.js" defer></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<header style="padding: 16px 20px 12px; display: flex; align-items: center; gap: 12px">
+  <a href="start.html" data-back aria-label="Wróć" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4D9DE; display: flex; align-items: center; justify-content: center; color: #1E1A1D; flex: none">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+  </a>
+  <div style="display: flex; flex-direction: column; flex: 1">
+    <span style="color: #625860; font-size: 12px">Paznokcie · [Nazwa studia]</span>
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Kreator paznokci</h1>
+  </div>
+</header>
+<div id="app">
+  <div id="view">
+    <div id="err">Ta przeglądarka nie obsługuje WebGL.</div>
+    <video id="video" playsinline muted hidden></video>
+    <p id="photoEmpty" hidden>Włącz kamerę albo wgraj zdjęcie grzbietu dłoni.</p>
+  </div>
+  <aside id="panel">
+    <p class="sub" id="hint">Wybierz przykładową dłoń albo wgraj własne zdjęcie. Kliknij paznokieć, żeby go wybrać.</p>
+    <section class="step">
+      <h2 id="h-mode">Podgląd</h2>
+      <div class="chips" id="modeChips" role="group" aria-labelledby="h-mode">
+        <button type="button" data-v="sample">Przykładowe dłonie</button><button type="button" data-v="photo">Moje zdjęcie</button>
+        <button type="button" data-v="3d" hidden>Dłoń 3D</button><button type="button" data-v="demo" hidden>Demo</button><!-- 3D hand and demo gallery: only with ?hand3d (development) -->
+      </div>
+      <div id="sampleTools">
+        <div id="sampleList" class="thumbs" role="group" aria-label="Przykładowe dłonie"></div>
+        <p class="sub" id="sampleStatus" aria-live="polite">Podgląd orientacyjny. Efekt zależy od Twoich paznokci i oceni go stylistka. Cenę liczy kreator, nie zdjęcie.</p>
+      </div>
+      <div id="photoTools" hidden>
+        <div class="chips">
+          <button type="button" id="camera">Włącz kamerę</button>
+          <button type="button" id="shoot">Zrób zdjęcie (3 s)</button>
+          <label class="file">Wgraj zdjęcie<input type="file" id="upload" accept="image/*"></label>
+          <button type="button" id="savePhoto">Zapisz zdjęcie</button>
+          <button type="button" id="addDemo">Dodaj do demo</button>
+        </div>
+        <div class="range"><label for="nailSize" class="sub">Rozmiar paznokci</label><input type="range" id="nailSize" min="0.6" max="1.6" step="0.02" value="1"></div>
+        <div class="chips"><button type="button" id="resetFix">Cofnij korekty</button></div>
+        <p class="sub" id="photoStatus" aria-live="polite">Zdjęcie jest przetwarzane tylko w tej przeglądarce i nigdzie nie jest wysyłane.</p>
+      </div>
+      <div id="demoTools" hidden>
+        <div id="demoList" class="thumbs" role="group" aria-label="Zdjęcia demo"></div>
+        <div class="chips">
+          <button type="button" id="demoPrev">‹ Poprzednie</button><button type="button" id="demoNext">Następne ›</button>
+          <button type="button" id="demoSave">Zapisz poprawki</button>
+        </div>
+        <div class="chips">
+          <button type="button" id="demoExport">Eksportuj demo</button>
+          <label class="file">Importuj demo<input type="file" id="demoImport" accept="application/json,.json"></label>
+        </div>
+        <p class="sub" id="demoStatus" aria-live="polite"></p>
+      </div>
+    </section>
+    <div id="controls"></div>
+    <section class="step">
+      <h2 id="h-deco">7. Zdobienia</h2>
+      <div class="chips" id="presetChips" role="group" aria-labelledby="h-deco"></div>
+      <div class="range"><label for="arcN" class="sub">Cyrkonie w łuku</label><input type="range" id="arcN" min="1" max="9" step="1" value="5"><output id="arcNOut">5</output></div>
+      <div class="chips"><button type="button" id="advToggle" aria-pressed="false">Układam i maluję samodzielnie (tryb zaawansowany)</button></div>
+      <div id="editorBox" hidden>
+        <p class="sub" id="editorTitle"></p>
+        <p class="sub">Dodatki 3D</p>
+        <div class="chips" id="toolChips" role="group" aria-label="Dodatki 3D"></div>
+        <p class="sub">Malowanie</p>
+        <div class="chips" id="paintChips" role="group" aria-label="Malowanie"></div>
+        <div class="swatches" id="paintSwatches" role="group" aria-label="Kolor malowania"></div>
+        <div class="range"><label for="toolSize" class="sub">Rozmiar / grubość</label><input type="range" id="toolSize" min="0.03" max="0.16" step="0.005" value="0.07"></div>
+        <canvas id="editor" width="300" height="400" aria-label="Edytor zdobień wybranego paznokcia"></canvas>
+        <p class="sub">Dodatki 3D: kliknij, żeby dodać; przeciągnij, żeby przesunąć; kółko myszy zmienia rozmiar. Malowanie: przeciągnij pędzlem albo kliknij stemplem. Prawy przycisk lub dwuklik usuwa element pod kursorem. Ctrl + Z cofa, Ctrl + Y ponawia.</p>
+      </div>
+    </section>
+    <section class="step">
+      <h2>Wycena i karta stylizacji</h2>
+      <table id="quote"></table>
+      <p id="total"></p>
+      <div class="chips"><button type="button" id="copyLink">Kopiuj link</button><button type="button" id="png">Pobierz kartę PNG</button></div>
+      <a href="termin.html" id="book" data-book class="cta">Wybierz termin</a>
+      <p class="sub" id="code" aria-live="polite"></p>
+    </section>
+    <section class="step"><h2>Proces wykonania</h2><ol id="recipe"></ol></section>
+  </aside>
+</div>
+<div id="pbar" role="region" aria-label="Cena i czas">
+  <div class="pb-info"><span id="pbPrice"></span><span id="pbTime"></span></div>
+  <a href="termin.html" data-book>Wybierz termin</a>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js';
+
+// Salon price list: services, length classes, add-ons (edit pricing.json, not code).
+const P = await fetch('pricing.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+  .catch(e => { document.getElementById('total').textContent = `Nie udało się wczytać pricing.json (${e.message}). Otwórz stronę przez serwer HTTP.`; throw e; });
+
+// Trend palette 2026: nudes, milky beige, peach, powder pink, red, chocolate, burgundy, plum, bottle green + basics.
+const PALETTE = ['#e9c9b6','#efe3d6','#f6d5c8','#f2c4c4','#f4a988','#b0102a','#5a3426','#6b1426','#5b2a4a','#1f4a3a','#ffffff','#151515','#c8a24a','#c0c0c8'];
+const SKIN = ['#f3d3c0','#e3b08f','#c98b65','#9a6244','#5e3b2a'];
+const FINGER_IDS = ['thumb','index','middle','ring','pinky'];
+const FINGER_LABELS = { thumb:'Kciuk', index:'Wskazujący', middle:'Środkowy', ring:'Serdeczny', pinky:'Mały' };
+const USES_COLOR2 = ['french','ombre','cateye','velvet','glitter'];
+
+const UI = [
+  { key:'service', title:'1. Usługa', type:'chips', options:{ hybrid:'Hybryda', gel:'Żel na naturalnej płytce', extension:'Przedłużanie', refill:'Uzupełnienie' } },
+  { key:'removal', title:'Zdjęcie poprzedniej stylizacji', type:'chips', options:{ none:'Brak', hybrid:'Hybryda', gel:'Żel / akryl' } },
+  { key:'shape', title:'2. Kształt', type:'chips', options:{ squoval:'Soft square', square:'Kwadrat', round:'Owal', almond:'Migdał', stiletto:'Stiletto', coffin:'Coffin' } },
+  { key:'length', title:'Długość', type:'chips', options:Object.fromEntries(Object.entries(P.length).map(([k, v]) => [k, v.label])) },
+  { key:'sel', title:'3. Paznokcie do edycji', type:'select' },
+  { key:'color', title:'4. Kolor', type:'color', nail:true },
+  { key:'effect', title:'5. Efekt', type:'chips', nail:true, options:{ cream:'Jednolity', french:'French', ombre:'Ombre', chrome:'Chrome', glazed:'Glazed / pearl', cateye:'Kocie oko', velvet:'Velvet', glitter:'Brokat', holo:'Holo / aurora' } },
+  { key:'frenchStyle', title:'Wariant frencza', type:'chips', nail:true, options:{ classic:'Klasyczny', micro:'Micro', metallic:'Metaliczny' }, show:d => d.effect === 'french' },
+  { key:'ombreStyle', title:'Wariant', type:'chips', nail:true, options:{ ombre:'Ombre', babyboomer:'Baby boomer' }, show:d => d.effect === 'ombre' },
+  { key:'color2', title:'Drugi kolor', type:'color', nail:true, show:d => USES_COLOR2.includes(d.effect) },
+  { key:'pattern', title:'6. Wzór', type:'chips', nail:true, options:{ none:'Brak', marble:'Marmurek', tortoise:'Szylkret', leopard:'Panterka', plaid:'Krata', dots:'Kropki', stripes:'Paski' } },
+  { key:'patternColor', title:'Kolor wzoru', type:'color', nail:true, show:d => d.pattern !== 'none' },
+  { key:'patternScale', title:'Gęstość wzoru', type:'range', nail:true, min:0.5, max:2, step:0.05, show:d => d.pattern !== 'none' },
+  { key:'top', title:'7. Top', type:'chips', nail:true, options:{ gloss:'Połysk', matte:'Mat' } },
+  { key:'skin', title:'Odcień skóry (podgląd)', type:'range', min:0, max:SKIN.length - 1, step:0.05 },
+];
+// Per-nail design: these keys + a list of placed decorations. Shape, length and service stay per hand, like in a salon.
+const NAIL_KEYS = UI.filter(u => u.nail).map(u => u.key);
+const BASE_NAIL = { color:'#f2c4c4', effect:'french', frenchStyle:'micro', ombreStyle:'ombre', color2:'#ffffff', pattern:'none', patternColor:'#151515', patternScale:1, top:'gloss', deco:[], art:[] };
+const DEFAULTS = { service:'hybrid', removal:'none', shape:'almond', length:'M', skin:1.5,
+  nails:Object.fromEntries(FINGER_IDS.map(id => [id, structuredClone(BASE_NAIL)])) };
+const nailKey = d => NAIL_KEYS.map(k => d[k]).join('|') + JSON.stringify(d.art); // same look -> same material
+
+// ---------- state <-> URL hash (the hash is untrusted input: whitelist every value) ----------
+// Globals as key=value; each nail as n_<finger>=NAIL_KEYS values joined by "~" (colours without #),
+// d_<finger>=type:x:y:size_... (3D decorations) and a_<finger>=painted art: stamp:colour:x:y:size or
+// b:colour:width:x,y;x,y;... (brush stroke). All positions in nail units.
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const MAX_DECO = 40, MAX_ART = 30, MAX_PTS = 300;
+function parseHash(hash) {
+  const s = structuredClone(DEFAULTS), q = new URLSearchParams(hash.replace(/^#/, ''));
+  const valid = (u, v) => u.type === 'chips' ? Object.hasOwn(u.options, v) : u.type === 'color' ? /^#[0-9a-f]{6}$/.test(v)
+    : u.type === 'range' && v !== '' && Number.isFinite(+v) && +v >= u.min && +v <= u.max;
+  for (const u of UI) {
+    const v = q.get(u.key);
+    if (v === null || u.nail) continue;
+    if (u.type === 'chips' && Object.hasOwn(u.options, v)) s[u.key] = v;
+    else if (u.type === 'range' && v !== '' && Number.isFinite(+v)) s[u.key] = clamp(+v, u.min, u.max);
+  }
+  for (const id of FINGER_IDS) {
+    const n = q.get('n_' + id)?.split('~') ?? [];
+    NAIL_KEYS.forEach((k, i) => {
+      const u = UI.find(x => x.key === k), v = u.type === 'color' ? '#' + (n[i] ?? '').toLowerCase() : n[i];
+      if (valid(u, v)) s.nails[id][k] = u.type === 'range' ? +v : v;
+    });
+    const hex = c => /^[0-9a-f]{6}$/i.test(c) ? '#' + c.toLowerCase() : null, num = (v, a, b) => v !== '' && Number.isFinite(+v) ? clamp(+v, a, b) : null;
+    s.nails[id].art = (q.get('a_' + id) || '').split('_').filter(Boolean).slice(0, MAX_ART).map(it => {
+      const [k, c, ...r] = it.split(':');
+      if (!hex(c)) return null;
+      if (k === 'b' && r.length === 2) {
+        const w = num(r[0], 0.005, 0.1), pts = r[1].split(';').slice(0, MAX_PTS).map(pt => pt.split(',').map(v => num(v, -1, 3)));
+        return w !== null && pts.length && pts.every(pt => pt.length === 2 && pt.every(v => v !== null)) ? { k, c:hex(c), w, pts } : null;
+      }
+      if (Object.hasOwn(STAMPS, k) && r.length === 3) {
+        const [x, y, z] = [num(r[0], -0.6, 0.6), num(r[1], -0.2, 3), num(r[2], 0.01, 0.3)];
+        return x !== null && y !== null && z !== null ? { k, c:hex(c), x, y, s:z } : null;
+      }
+      return null;
+    }).filter(Boolean);
+    const d = q.get('d_' + id);
+    if (d !== null) s.nails[id].deco = d.split('_').slice(0, MAX_DECO).map(it => it.split(':')).filter(([t, ...xs]) => Object.hasOwn(DECO, t) && xs.length === 3 && xs.every(v => v !== '' && Number.isFinite(+v)))
+      .map(([t, x, y, z]) => ({ t, x:clamp(+x, -0.6, 0.6), y:clamp(+y, -0.2, 3), s:clamp(+z, 0.02, 0.2) }));
+  }
+  return s;
+}
+const r3 = v => +v.toFixed(3);
+const toHash = s => new URLSearchParams([
+  ...Object.entries(s).filter(([k]) => k !== 'nails').map(([k, v]) => [k, String(v)]),
+  ...FINGER_IDS.flatMap(id => [['n_' + id, NAIL_KEYS.map(k => String(s.nails[id][k]).replace('#', '')).join('~')],
+    ['a_' + id, s.nails[id].art.map(a => a.k === 'b' ? `b:${a.c.slice(1)}:${r3(a.w)}:${a.pts.map(pt => pt.map(r3).join(',')).join(';')}`
+      : [a.k, a.c.slice(1), r3(a.x), r3(a.y), r3(a.s)].join(':')).join('_')],
+    ['d_' + id, s.nails[id].deco.map(d => [d.t, r3(d.x), r3(d.y), r3(d.s)].join(':')).join('_')]]),
+]).toString();
+const designCode = s => { let h = 2166136261; for (const c of toHash({ ...s, skin:0 })) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return (h >>> 0).toString(36).toUpperCase().padStart(7, '0'); };
+
+// ---------- nail shape: half-width of the plate at height y (nail units: width 1, base at y=0) ----------
+const rc = (y, L, r, w) => y < L - r ? w : w - r + Math.sqrt(Math.max(0, r*r - (y - L + r)**2)); // rounded tip corner
+const SHAPES = {
+  squoval:  { L:1.25, hw:(y, L) => rc(y, L, 0.22, 0.5) },
+  square:   { L:1.2,  hw:(y, L) => rc(y, L, 0.1, 0.5) },
+  round:    { L:1.25, hw:(y, L) => y < L - 0.5 ? 0.5 : Math.sqrt(Math.max(0, 0.25 - (y - L + 0.5)**2)) },
+  almond:   { L:1.55, hw:(y, L) => { const y0 = 0.35*L, s = (y - y0)/(L - y0); return y < y0 ? 0.5 : 0.5*Math.max(0, 1 - s*s)**0.75; } },
+  stiletto: { L:1.9,  hw:(y, L) => { const y0 = 0.25*L, s = (y - y0)/(L - y0); return y < y0 ? 0.5 : 0.5*Math.max(0, 1 - s**1.4); } },
+  coffin:   { L:1.7,  hw:(y, L) => { const y0 = 0.3*L, s = Math.max(0, (y - y0)/(L - y0)); return rc(y, L, 0.06, 0.5 - 0.2*s); } },
+};
+const nailLength = s => SHAPES[s.shape].L * (P.length[s.length]?.factor ?? 1);
+
+function outline(shape, L) {
+  const hw = SHAPES[shape].hw, N = 48, pts = [];
+  for (let i = 0; i <= N; i++) pts.push(new THREE.Vector2(hw(L*i/N, L), L*i/N));
+  for (let i = hw(L, L) < 1e-4 ? N - 1 : N; i >= 0; i--) pts.push(new THREE.Vector2(-hw(L*i/N, L), L*i/N));
+  for (let i = 1; i < 16; i++) { const x = -0.5 + i/16; pts.push(new THREE.Vector2(x, -0.2*Math.sqrt(1 - (2*x)**2))); } // cuticle arc
+  return new THREE.Shape(pts);
+}
+
+// Wrap the flat plate around the finger (C-curve) and curl it slightly along its length.
+const R = 0.6, CURL = 0.05, TOP = 0.075;
+const bend = (x, y, z) => { const t = x/R, r = R + z; return new THREE.Vector3(r*Math.sin(t), y, r*Math.cos(t) - R - CURL*y*y); };
+const bendNormal = (x, y) => new THREE.Vector3(Math.sin(x/R), 2*CURL*y, Math.cos(x/R)).normalize();
+
+function nailGeometry(shape, L) {
+  let g = new THREE.ExtrudeGeometry(outline(shape, L), { depth:0.05, bevelEnabled:true, bevelThickness:0.025, bevelSize:0.025, bevelSegments:3, curveSegments:1 });
+  g = new TessellateModifier(0.06, 8).modify(g); // caps are outline-only triangles; bending them needs interior vertices
+  const p = g.attributes.position, uv = g.attributes.uv, top = new Float32Array(p.count);
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i);
+    uv.setXY(i, x + 0.5, y / L);
+    top[i] = p.getZ(i) > TOP - 1e-4 ? 1 : 0;
+    p.setXYZ(i, ...bend(x, y, p.getZ(i)).toArray());
+  }
+  g.setAttribute('top', new THREE.BufferAttribute(top, 1));
+  g.deleteAttribute('normal');
+  g = mergeVertices(g); // ExtrudeGeometry is non-indexed -> faceted normals otherwise
+  g.computeVertexNormals();
+  // The cap is earcut into long slivers whose averaged normals drew a faint line of ripples across the polish: the visible face gets the exact normal of the bent plate.
+  const n = g.attributes.normal, gu = g.attributes.uv, gt = g.attributes.top;
+  for (let i = 0; i < n.count; i++) if (gt.getX(i)) n.setXYZ(i, ...bendNormal(gu.getX(i) - 0.5, gu.getY(i) * L).toArray());
+  g.deleteAttribute('top');
+  return g;
+}
+
+// ---------- paint (canvas texture: top of canvas = free edge) ----------
+function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+const rgba = (hex, a) => `rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},${a})`;
+const W = 256, H = 512;
+const canvas2d = fill => { const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.fillStyle = fill; g.fillRect(0, 0, W, H); return [c, g]; };
+function flakes(g, m, n, min, max, colors) {
+  const rnd = rng(42); // fixed seed so flakes don't jump while dragging the colour picker
+  m.fillStyle = '#fff';
+  for (let i = 0; i < n; i++) {
+    const x = rnd()*W, y = rnd()*H, s = min + rnd()*(max - min);
+    g.fillStyle = colors[rnd() < 0.7 ? 0 : 1]; g.fillRect(x, y, s, s); m.fillRect(x, y, s, s);
+  }
+}
+
+function paint(s, L, effect) {
+  const { color, color2 } = s, [c, g] = canvas2d(color);
+  let metal = null, m = null;
+  if (['french','glitter','velvet'].includes(effect)) [metal, m] = canvas2d('#000');
+  if (effect === 'french') {
+    const f = s.frenchStyle === 'micro' ? 0.06 : Math.min(0.55, Math.max(0.2, (L - 0.85) / L)); // free edge share of the plate
+    for (const [ctx, fill] of [[g, color2], [m, '#fff']]) {
+      ctx.fillStyle = fill; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, H*(f + 0.08));
+      ctx.quadraticCurveTo(W/2, H*(f - 0.16), W, H*(f + 0.08)); ctx.lineTo(W, 0); ctx.fill();
+    }
+  } else if (effect === 'ombre') {
+    const soft = s.ombreStyle === 'babyboomer', gr = g.createLinearGradient(0, H, 0, 0);
+    gr.addColorStop(soft ? 0.1 : 0.3, color); gr.addColorStop(soft ? 0.95 : 0.75, color2);
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  } else if (effect === 'cateye') {
+    const gr = g.createLinearGradient(0, H*0.62, W, H*0.38);
+    gr.addColorStop(0.2, rgba(color2, 0)); gr.addColorStop(0.47, rgba(color2, 0.9));
+    gr.addColorStop(0.5, 'rgba(255,255,255,0.8)'); gr.addColorStop(0.53, rgba(color2, 0.9)); gr.addColorStop(0.8, rgba(color2, 0));
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  } else if (effect === 'velvet') {
+    const gr = g.createRadialGradient(W/2, H*0.5, 0, W/2, H*0.5, H*0.55);
+    gr.addColorStop(0, rgba(color2, 0.25)); gr.addColorStop(1, rgba(color2, 0));
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    flakes(g, m, 3000, 0.8, 1.8, [rgba(color2, 0.8), 'rgba(255,255,255,0.6)']);
+  } else if (effect === 'glitter') {
+    flakes(g, m, 1400, 1.5, 5, [color2, '#ffffff']);
+  }
+  drawPattern(g, s, L);
+  drawArt(g, s.art, L);
+  return { c, metal }; // canvases: the 3D material and the 2D editor both use them
+}
+
+// Patterns and painted art are drawn in nail units (x -0.5..0.5, y 0..L, y up), so circles stay round on the nail.
+const toNail = (g, L) => g.setTransform(W, 0, 0, -H/L, W/2, H);
+function drawPattern(g, d, L) {
+  if (d.pattern === 'none') return;
+  const k = 1 / d.patternScale, c = d.patternColor, rnd = rng(7);
+  g.save(); toNail(g, L); g.fillStyle = g.strokeStyle = c;
+  if (d.pattern === 'dots') {
+    for (let row = 0, y = 0.08; y < L + 0.1; row++, y += 0.15*k)
+      for (let x = -0.55 + (row % 2)*0.075*k; x < 0.6; x += 0.15*k) { g.beginPath(); g.arc(x, y, 0.028*k, 0, Math.PI*2); g.fill(); }
+  } else if (d.pattern === 'stripes') {
+    g.lineWidth = 0.025*k;
+    for (let t = -1.4; t < L + 0.2; t += 0.13*k) { g.beginPath(); g.moveTo(-0.6, t); g.lineTo(0.6, t + 1.2); g.stroke(); }
+  } else if (d.pattern === 'plaid') {
+    g.globalAlpha = 0.3;
+    for (let x = -0.45; x < 0.6; x += 0.32*k) g.fillRect(x, -0.2, 0.1*k, L + 0.4);
+    for (let y = 0.05; y < L + 0.2; y += 0.32*k) g.fillRect(-0.6, y, 1.2, 0.1*k);
+    g.globalAlpha = 0.85; g.lineWidth = 0.01*k;
+    for (let x = -0.45 + 0.05*k; x < 0.6; x += 0.32*k) { g.beginPath(); g.moveTo(x, -0.2); g.lineTo(x, L + 0.2); g.stroke(); }
+    for (let y = 0.1; y < L + 0.2; y += 0.32*k) { g.beginPath(); g.moveTo(-0.6, y); g.lineTo(0.6, y); g.stroke(); }
+  } else if (d.pattern === 'marble') {
+    for (let i = 0; i < 7; i++) { // soft wide vein + crisp thin core, like ink dragged through wet gel
+      const pts = Array.from({ length:4 }, (_, j) => [rnd()*1.2 - 0.6, (j/3)*(L + 0.3) - 0.15 + (rnd() - 0.5)*0.3]);
+      for (const [w, a] of [[0.06*k, 0.18], [(0.008 + rnd()*0.02)*k, 0.75]]) {
+        g.globalAlpha = a; g.lineWidth = w; g.beginPath(); g.moveTo(...pts[0]); g.bezierCurveTo(...pts[1], ...pts[2], ...pts[3]); g.stroke();
+      }
+    }
+  } else if (d.pattern === 'tortoise') { // translucent amber/brown blotches over the base colour
+    for (const [n, r0, r1, a] of [[14, 0.1, 0.24, 0.55], [12, 0.04, 0.1, 0.8]]) for (let i = 0; i < n/(k*k); i++) { // big soft patches, then dark cores
+      const x = rnd()*1.3 - 0.65, y = rnd()*(L + 0.3) - 0.15, r = (r0 + rnd()*(r1 - r0))*k, gr = g.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, rgba(c, a)); gr.addColorStop(0.55, rgba(c, a*0.6)); gr.addColorStop(1, rgba(c, 0));
+      g.fillStyle = gr; g.fillRect(x - r, y - r, 2*r, 2*r);
+    }
+  } else if (d.pattern === 'leopard') { // broken "C" rings around a slightly darker centre
+    g.lineWidth = 0.03*k; g.lineCap = 'round';
+    for (let y = 0.05; y < L + 0.15; y += 0.22*k) for (let x = -0.55; x < 0.6; x += 0.22*k) {
+      const cx = x + (rnd() - 0.5)*0.1*k, cy = y + (rnd() - 0.5)*0.1*k, r = (0.05 + rnd()*0.03)*k;
+      g.globalAlpha = 0.25; g.beginPath(); g.ellipse(cx, cy, r, r*0.8, 0, 0, Math.PI*2); g.fill();
+      g.globalAlpha = 1;
+      for (let a = rnd()*Math.PI*2, n = 0; n < 3; n++, a += 2.1 + rnd()*0.4) { g.beginPath(); g.ellipse(cx, cy, r*1.25, r, 0, a, a + 1.3); g.stroke(); }
+    }
+  }
+  g.restore();
+}
+function stampPath(g, t, x, y, s) {
+  g.beginPath();
+  if (t === 'dot') g.arc(x, y, s*0.6, 0, Math.PI*2);
+  else if (t === 'flower') for (let i = 0; i < 5; i++) { const a = Math.PI/2 + i*Math.PI*0.4, px = x + Math.cos(a)*s*0.55, py = y + Math.sin(a)*s*0.55; g.moveTo(px + s*0.42, py); g.arc(px, py, s*0.42, 0, Math.PI*2); }
+  else ICONS[t].forEach(p => g.lineTo(x + p.x*s, y + p.y*s));
+  g.closePath();
+}
+function drawArt(g, art, L) {
+  g.save(); toNail(g, L); g.lineCap = g.lineJoin = 'round';
+  for (const a of art) {
+    g.fillStyle = g.strokeStyle = a.c;
+    if (a.k === 'b') {
+      g.lineWidth = a.w; g.beginPath(); g.moveTo(...a.pts[0]);
+      for (const pt of a.pts.length > 1 ? a.pts.slice(1) : [[a.pts[0][0] + 1e-4, a.pts[0][1]]]) g.lineTo(...pt);
+      g.stroke();
+    } else {
+      stampPath(g, a.k, a.x, a.y, a.s); g.fill();
+      if (a.k === 'flower') { g.fillStyle = 'rgba(255,240,200,0.9)'; g.beginPath(); g.arc(a.x, a.y, a.s*0.28, 0, Math.PI*2); g.fill(); }
+    }
+  }
+  g.restore();
+}
+
+// Polish thins out at the cuticle instead of ending in a hard plastic edge (canvas bottom = cuticle).
+const CUTICLE_FADE = (() => {
+  const [c, g] = canvas2d('#fff'), gr = g.createLinearGradient(0, H, 0, H*0.9);
+  gr.addColorStop(0, '#000'); gr.addColorStop(1, '#fff'); g.fillStyle = gr; g.fillRect(0, H*0.9, W, H*0.1);
+  return new THREE.CanvasTexture(c);
+})();
+// Magnetic polish (cat eye, velvet): the glow band lies under the gel, so it slides over the plate when the view tilts
+// (parallax in nail space; on the orthographic photo camera the view direction is fixed instead).
+function glowBand(m, L, { angle, width, depth, glow, color, core }) {
+  const u = { uBand:{ value:new THREE.Vector4(Math.cos(angle), Math.sin(angle), width, depth) }, uGlow:{ value:glow }, uGlowColor:{ value:new THREE.Color(color) }, uLen:{ value:L }, uCore:{ value:core } };
+  m.customProgramCacheKey = () => 'nailGlowBand';
+  m.userData.glow = true;
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, u);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vNailPos;\nvarying vec3 vNailCam;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        vNailPos = position;
+        vNailCam = isOrthographic ? (inverse(modelMatrix) * vec4(0.0, 0.0, 1.0, 0.0)).xyz : (inverse(modelMatrix) * vec4(cameraPosition, 1.0)).xyz - position;`);
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vNailPos;\nvarying vec3 vNailCam;\nuniform vec4 uBand;\nuniform float uGlow, uLen, uCore;\nuniform vec3 uGlowColor;')
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        vec3 nv = normalize(vNailCam);
+        vec2 q = vNailPos.xy - nv.xy / max(nv.z, 0.25) * uBand.w - vec2(0.0, uLen * 0.5);
+        float bc = dot(q, vec2(-uBand.y, uBand.x)) / uBand.z;
+        float band = exp(-bc * bc) + 0.12 * exp(-bc * bc / 9.0);
+        totalEmissiveRadiance += mix(uGlowColor, vec3(1.0), uCore * exp(-bc * bc * 4.0)) * band * uGlow;`);
+  };
+}
+function nailMaterial(s, L, effect) {
+  const tex = t => { if (!t) return null; const ct = new THREE.CanvasTexture(t); ct.anisotropy = 8; ct.wrapT = THREE.MirroredRepeatWrapping; return ct; }; // mirrored: the plate's proximal arc samples just below the canvas
+  const { c, metal:mc } = paint(s, L, effect === 'cateye' ? 'cream' : effect), map = tex(c), metal = tex(mc); // cat eye: the band is a shader, not paint
+  map.colorSpace = THREE.SRGBColorSpace;
+  const matte = s.top === 'matte';
+  const m = new THREE.MeshPhysicalMaterial({ map, alphaMap:CUTICLE_FADE, transparent:true, roughness:0.3, clearcoat:1, clearcoatRoughness:0.03 });
+  if (effect === 'french' && s.frenchStyle === 'metallic') Object.assign(m, { metalness:1, metalnessMap:metal, roughness:0.08 });
+  if (effect === 'chrome') Object.assign(m, { metalness:1, roughness:0.06 });
+  if (effect === 'glazed') Object.assign(m, { metalness:0.15, roughness:0.18, iridescence:1, iridescenceIOR:1.6, iridescenceThicknessRange:[250, 750], sheen:0.4, sheenColor:new THREE.Color(s.color).lerp(new THREE.Color('#ffffff'), 0.5) });
+  if (effect === 'holo') Object.assign(m, { metalness:0.8, roughness:0.12, iridescence:1, iridescenceIOR:2, iridescenceThicknessRange:[150, 900] });
+  if (effect === 'cateye') {
+    Object.assign(m, { metalness:0.5, roughness:0.28 });
+    glowBand(m, L, { angle:0.45, width:0.16, depth:0.55, glow:matte ? 0.45 : 0.7, color:s.color2, core:0.15 });
+  }
+  if (effect === 'velvet') {
+    Object.assign(m, { metalness:1, metalnessMap:metal, roughness:0.4, sheen:0.25, sheenColor:new THREE.Color(s.color2), sheenRoughness:0.5 });
+    glowBand(m, L, { angle:1.0, width:0.4, depth:0.4, glow:matte ? 0.05 : 0.08, color:s.color2, core:0 });
+  }
+  if (effect === 'glitter') Object.assign(m, { metalness:1, metalnessMap:metal, roughness:0.18 });
+  if (matte) Object.assign(m, { clearcoat:0, roughness:Math.max(m.roughness, effect === 'velvet' ? 0.6 : m.metalness >= 0.8 ? 0.45 : 0.7) }); // satin metal stays metallic
+  return m;
+}
+
+// ---------- decorations: items { t:type, x, y, s:size } in nail units (width 1, base y=0) ----------
+const charmGeo = shape => {
+  const g = new THREE.ExtrudeGeometry(shape, { depth:0.3, bevelEnabled:true, bevelThickness:0.15, bevelSize:0.12, bevelSegments:2, curveSegments:8 });
+  g.center(); return g;
+};
+const heartShape = () => { const p = new THREE.Shape(); p.moveTo(0, -0.9); p.bezierCurveTo(-1.6, 0.1, -0.8, 1.3, 0, 0.5); p.bezierCurveTo(0.8, 1.3, 1.6, 0.1, 0, -0.9); return p; };
+const starShape = () => new THREE.Shape(Array.from({ length:10 }, (_, i) => { const a = Math.PI/2 + i*Math.PI/5, r = i % 2 ? 0.45 : 1; return new THREE.Vector2(r*Math.cos(a), r*Math.sin(a)); }));
+const GOLD = new THREE.MeshPhysicalMaterial({ color:'#d4af37', metalness:1, roughness:0.18, flatShading:true });
+const DECO = { // price: key in pricing.json "deco"; ui: colour in the 2D editor
+  stone: { label:'Cyrkonia', price:'stones', flat:0.5, ui:'#ffffff', geo:new THREE.IcosahedronGeometry(1, 1),
+    mat:new THREE.MeshPhysicalMaterial({ color:'#fff', metalness:0.3, roughness:0, flatShading:true, iridescence:0.7, envMapIntensity:3 }) },
+  pearl: { label:'Perełka', price:'pearls', flat:0.75, ui:'#f5ecdc', geo:new THREE.SphereGeometry(1, 24, 16),
+    mat:new THREE.MeshPhysicalMaterial({ color:'#f5ecdc', roughness:0.22, iridescence:0.35, sheen:0.5 }) },
+  stud:  { label:'Ćwiek', price:'studs', flat:1, ui:'#d4af37', geo:new THREE.ConeGeometry(1, 1.4, 4).rotateX(Math.PI/2), mat:GOLD },
+  heart: { label:'Serce', price:'charms', flat:1, ui:'#d4af37', geo:charmGeo(heartShape()), mat:GOLD },
+  star:  { label:'Gwiazdka', price:'charms', flat:1, ui:'#d4af37', geo:charmGeo(starShape()), mat:GOLD },
+};
+const ICONS = { heart:heartShape().getPoints(12), star:starShape().getPoints() }; // outlines (y up) for stamps and the 2D editor
+const STAMPS = { dot:'Kropka', heart:'Serduszko', star:'Gwiazdka', flower:'Kwiatek' }; // painted motifs (flat, part of the polish)
+const PRESETS = { // ready layouts; "Wyczyść" removes all
+  arc:     { label:'Łuk cyrkonii', items:(L, n) => Array.from({ length:n }, (_, i) => {
+    const x = n === 1 ? 0 : -0.32 + 0.64*i/(n - 1), cap = n === 1 ? 0.1 : 0.35/(n - 1); // shrink stones so a row never overlaps
+    return { t:'stone', x, y:0.16 + 0.9*x*x, s:Math.min(0.1 - 0.045*Math.abs(x)/0.32, cap) };
+  }) },
+  line:    { label:'Linia perełek', items:L => { const a = []; for (let y = 0.2; y < L*0.8; y += 0.17) a.push({ t:'pearl', x:0, y, s:0.065 }); return a; } },
+  chevron: { label:'Ćwieki w V', items:() => [[-0.24, 0.52, 0.045], [-0.12, 0.37, 0.05], [0, 0.22, 0.06], [0.12, 0.37, 0.05], [0.24, 0.52, 0.045]].map(([x, y, s]) => ({ t:'stud', x, y, s })) },
+  heart:   { label:'Serduszko', items:() => [{ t:'heart', x:0, y:0.4, s:0.13 }] },
+  clear:   { label:'Wyczyść', items:() => [] },
+};
+DEFAULTS.nails.ring.deco = PRESETS.arc.items(0, 5);
+
+// ---------- quote: one exact gross amount + minutes (price-info law: no "from-to" ranges) ----------
+function quote(s, P) {
+  const items = [], nails = FINGER_IDS.map(id => s.nails[id]);
+  const qty = (e, nails, pieces) => e.per === 'nail' ? nails : e.per === 'piece' ? pieces : nails ? 1 : 0;
+  const add = (e, n = 1, fallback = '') => {
+    if (!e || !n) return;
+    items.push({ label:(e.label ?? fallback) + (n > 1 ? ` ×${n}` : ''), price:(e.price ?? 0)*n, minutes:(e.minutes ?? 0)*n });
+  };
+  add(P.services[s.service], 1, s.service);
+  const len = P.length[s.length];
+  if (len?.price || len?.minutes) add({ ...len, label:`Długość ${len.label}` });
+  if (s.removal !== 'none') add(P.removal?.[s.removal], 1, s.removal);
+  const fx = {};
+  for (const d of nails) if (d.effect !== 'cream') fx[d.effect] = (fx[d.effect] ?? 0) + 1;
+  for (const [k, n] of Object.entries(fx)) { const e = P.effects?.[k]; if (e) add(e, qty(e, n, n), k); }
+  const deco = {}; // pricing key -> nails using it, pieces placed
+  for (const d of nails) {
+    for (const k of new Set(d.deco.map(it => DECO[it.t].price))) (deco[k] ??= { nails:0, pieces:0 }).nails++;
+    for (const it of d.deco) deco[DECO[it.t].price].pieces++;
+  }
+  for (const [k, c] of Object.entries(deco)) { const e = P.deco?.[k]; if (e) add(e, qty(e, c.nails, c.pieces), k); }
+  const artNails = nails.filter(d => d.pattern !== 'none' || d.art.length).length, ea = P.deco?.art;
+  if (ea && artNails) add(ea, qty(ea, artNails, artNails), 'Zdobienie ręczne');
+  const mattes = nails.filter(d => d.top === 'matte').length, mt = P.top?.matte;
+  if (mt && mattes) add(mt, qty(mt, mattes, mattes), 'Top matowy');
+  return { items, total:Math.round(items.reduce((a, i) => a + i.price, 0)*100)/100, minutes:items.reduce((a, i) => a + i.minutes, 0) };
+}
+const zl = v => v.toFixed(2).replace('.', ',') + ' zł';
+const hm = m => (m >= 60 ? `${Math.floor(m/60)} h ` : '') + `${m % 60} min`;
+
+// ---------- scene ----------
+const PHOTO_ENV = 0.15, PHOTO_ENV_METAL = 0.7, PHOTO_ENV_FLAKES = 0.3, STRIP_LIGHT = 30, FILL_LIGHT = 3, WALL_LIGHT = 1.2; // the room is baked once and used by photos (and the dev 3D hand); photo mode scales its intensity by the photo's brightness
+const view = document.getElementById('view');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true }); }
+catch { document.getElementById('err').style.display = 'grid'; throw new Error('no WebGL'); }
+renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 760 ? 1.5 : 2)); // phones: fewer pixels for the clearcoat/sheen shaders
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+view.append(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+const room = new RoomEnvironment();
+room.add(new THREE.AmbientLight(0xffffff, WALL_LIGHT)); // the stock room is lit from one lamp only, so a mirror nail reflected mostly black
+// Two tall softboxes in front of the hand: a glossy curved nail reflects them as long bright streaks, which is what reads as gel gloss and chrome.
+for (const [x, y, z, ry, w, h, i] of [[-6, 9, 11, 0.45, 2.4, 13, STRIP_LIGHT], [6.5, 9, 11, -0.45, 2.4, 13, STRIP_LIGHT], [0, 6, 13, 0, 26, 20, FILL_LIGHT]]) { // last: a dim wall, so a mirror nail is silver and not black
+  const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial());
+  box.material.color.setScalar(i); box.position.set(x, y, z); box.rotation.y = ry; box.scale.set(w, h, 0.1); room.add(box);
+}
+scene.environment = pmrem.fromScene(room, 0.04).texture;
+room.dispose(); pmrem.dispose(); // the baked cube map stays
+scene.environmentIntensity = PHOTO_ENV;
+const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(3, 5, 6); scene.add(sun);
+
+const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+camera.position.set(0, 2.4, 8);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 2.1, 0); controls.enableDamping = true; controls.minDistance = 2.5; controls.maxDistance = 16;
+
+// Stylised right hand, back side facing the camera.
+const skin = new THREE.MeshPhysicalMaterial({ roughness:0.55, sheen:0.4, sheenColor:'#ffd9c7' });
+const hand = new THREE.Group(); scene.add(hand);
+const palm = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), skin); palm.scale.set(1.2, 1.15, 0.38); hand.add(palm);
+const wrist = new THREE.Mesh(new THREE.CapsuleGeometry(0.8, 1.6, 8, 32), skin); wrist.scale.z = 0.45; wrist.position.y = -1.7; hand.add(wrist);
+
+const FINGERS = [
+  { name:'thumb',  x:-1.05, y:-0.2, rot:0.9,   len:1.75, r:0.25 },
+  { name:'index',  x:-0.68, y:0.95, rot:0.12,  len:2.2,  r:0.205 },
+  { name:'middle', x:-0.22, y:1.08, rot:0.02,  len:2.45, r:0.215 },
+  { name:'ring',   x:0.24,  y:1.02, rot:-0.08, len:2.3,  r:0.205 },
+  { name:'pinky',  x:0.66,  y:0.85, rot:-0.2,  len:1.8,  r:0.18 },
+];
+for (const f of FINGERS) {
+  f.group = new THREE.Group(); f.group.position.set(f.x, f.y, 0); f.group.rotation.z = f.rot; hand.add(f.group);
+  const m = new THREE.Mesh(new THREE.CapsuleGeometry(f.r, f.len - 2*f.r, 8, 24), skin); m.position.y = f.len/2; f.group.add(m);
+  f.group.userData.finger = f.name; // clicking the finger also selects its nail
+}
+
+let state = parseHash(location.hash);
+let sel = [...FINGER_IDS]; // nails the panel edits (UI only, not part of the design)
+let nailGeo, geoKey = '', mats = new Map(); // nailKey -> material, shared by nails that look the same
+const disposeMat = m => { m.map?.dispose(); m.metalnessMap?.dispose(); m.userData.shade?.dispose(); m.dispose(); };
+// One finished nail (plate + decorations) in nail units: width 1, base at origin, pointing +y.
+function makeNail(name, s, mat = mats.get(nailKey(s.nails[name]))) {
+  const d = s.nails[name], nail = new THREE.Mesh(nailGeo, mat);
+  for (const it of d.deco) {
+    const k = DECO[it.t], g = new THREE.Mesh(k.geo, k.mat);
+    g.position.copy(bend(it.x, it.y, TOP)); g.quaternion.setFromUnitVectors(Z, bendNormal(it.x, it.y)); g.scale.set(it.s, it.s, it.s*k.flat);
+    nail.add(g);
+  }
+  nail.userData.finger = name;
+  return nail;
+}
+function rebuild() {
+  const s = state, L = nailLength(s), t = s.skin, i = Math.min(Math.floor(t), SKIN.length - 2);
+  skin.color.lerpColors(new THREE.Color(SKIN[i]), new THREE.Color(SKIN[i + 1]), t - i);
+  // Geometry only when shape/length change; materials are kept per look, so painting one nail rebuilds one material.
+  if (geoKey !== `${s.shape}|${L}`) {
+    nailGeo?.dispose(); nailGeo = nailGeometry(s.shape, L); geoKey = `${s.shape}|${L}`;
+    for (const m of mats.values()) disposeMat(m); // textures depend on the length too (french tip)
+    mats.clear();
+  }
+  if (mode === '3d') { // the 3D hand is development-only now: no materials for it while photos are shown
+    const need = new Map(FINGER_IDS.map(id => [nailKey(s.nails[id]), s.nails[id]]));
+    for (const [k, m] of mats) if (!need.has(k)) { disposeMat(m); mats.delete(k); }
+    for (const [k, d] of need) if (!mats.has(k)) mats.set(k, nailMaterial(d, L, d.effect));
+  }
+  layout();
+}
+// Re-places nails and decorations with the current geometry/materials: cheap enough to run while dragging a decoration.
+function layout() {
+  const s = state;
+  if (mode === '3d') for (const f of FINGERS) {
+    f.nail && f.group.remove(f.nail);
+    const size = 2*f.r*0.82; // nail width vs finger width
+    f.nail = makeNail(f.name, s);
+    f.nail.scale.setScalar(size);
+    f.nail.position.set(0, f.len - f.r - 0.5*size, f.r);
+    f.group.add(f.nail);
+  }
+  placePhotoNails();
+  renderQuote(s);
+  renderRecipe(s);
+  drawEditor();
+}
+const Z = new THREE.Vector3(0, 0, 1);
+
+// ---------- spec, quote and process (typical hybrid/gel manicure sequence) ----------
+const opt = (s, k) => UI.find(u => u.key === k).options[s[k]];
+const nailsLabel = ids => ids.length === FINGER_IDS.length ? 'wszystkie' : ids.map(id => FINGER_LABELS[id]).join(', ') || 'żaden';
+const fxName = d => d.effect === 'french' ? `French ${opt(d, 'frenchStyle').toLowerCase()}` : d.effect === 'ombre' ? opt(d, 'ombreStyle') : opt(d, 'effect');
+const lookOf = d => `${fxName(d)} ${d.color.toUpperCase()}${USES_COLOR2.includes(d.effect) ? ' / ' + d.color2.toUpperCase() : ''}`
+  + (d.pattern === 'none' ? '' : `, wzór ${opt(d, 'pattern').toLowerCase()} ${d.patternColor.toUpperCase()}`)
+  + (d.art.length ? `, malowanie (${artColours(d).join(', ')})` : '') + `, top ${opt(d, 'top').toLowerCase()}`;
+const artColours = d => [...new Set(d.art.map(a => a.c.toUpperCase()))];
+const PATTERN_HOW = {
+  marble:'marmurek: kropla koloru w nieutwardzony żel, przeciągnij cienkim pędzelkiem w żyłki, utwardź',
+  tortoise:'szylkret: bursztynowy jelly, kleksy ciemnego brązu, rozmyj krawędzie, utwardź; powtórz warstwę',
+  leopard:'panterka: plamki pędzelkiem, potem obwódki w kształcie litery C ciemnym linerem, utwardź',
+  plaid:'krata: szerokie półprzezroczyste pasy w dwóch kierunkach, cienkie linie linerem, utwardź',
+  dots:'kropki: sonda (dotting tool) w równych rzędach, utwardź',
+  stripes:'paski: liner lub taśma do zdobień, ukośne linie w równych odstępach, utwardź',
+};
+function groups(s) { // nails with an identical look, in finger order
+  const m = new Map();
+  for (const id of FINGER_IDS) { const k = nailKey(s.nails[id]); if (!m.has(k)) m.set(k, { d:s.nails[id], ids:[] }); m.get(k).ids.push(id); }
+  return [...m.values()];
+}
+function decoSummary(s) {
+  const c = {};
+  for (const id of FINGER_IDS) for (const it of s.nails[id].deco) { const e = c[it.t] ??= { n:0, ids:new Set() }; e.n++; e.ids.add(id); }
+  return Object.entries(c).map(([t, e]) => `${DECO[t].label} ×${e.n} (${nailsLabel(FINGER_IDS.filter(id => e.ids.has(id)))})`);
+}
+function spec(s) {
+  const g = groups(s);
+  return [
+    ['Usługa', opt(s, 'service') + (s.removal === 'none' ? '' : ` + zdjęcie (${opt(s, 'removal').toLowerCase()})`)],
+    ['Kształt / długość', `${opt(s, 'shape')}, ${opt(s, 'length')}`],
+    ...g.map(({ d, ids }) => [g.length === 1 ? 'Stylizacja' : nailsLabel(ids), lookOf(d)]),
+    ['Zdobienia', decoSummary(s).join('; ') || 'Brak'],
+  ];
+}
+
+let lastQuote;
+function renderQuote(s) {
+  lastQuote = quote(s, P);
+  document.getElementById('quote').replaceChildren(...lastQuote.items.map(i => {
+    const tr = document.createElement('tr');
+    tr.append(Object.assign(document.createElement('td'), { textContent:i.label }), Object.assign(document.createElement('td'), { textContent:zl(i.price) }));
+    return tr;
+  }));
+  document.getElementById('total').textContent = `Razem ${zl(lastQuote.total)} brutto · ok. ${hm(lastQuote.minutes)}`;
+  document.getElementById('pbPrice').textContent = zl(lastQuote.total); document.getElementById('pbTime').textContent = `ok. ${hm(lastQuote.minutes)}`;
+  document.getElementById('code').textContent = `Kod projektu: ${designCode(s)} · ${P.salon ?? ''}`;
+}
+
+function colourSteps(d) {
+  const c1 = d.color.toUpperCase(), c2 = d.color2.toUpperCase();
+  const french = { classic:`Końcówka ${c2}: linia uśmiechu (smile line) pędzelkiem, utwardź`,
+    micro:`Micro french ${c2}: cienka linia 1–2 mm na samym wolnym brzegu pędzelkiem liner, utwardź`,
+    metallic:`Metaliczna końcówka: top no-wipe, utwardź; wetrzyj pyłek chrome (${c2}) tylko na wolnym brzegu, usuń nadmiar` };
+  const ombre = { ombre:`Przejście do ${c2} od wolnego brzegu gąbeczką lub pędzlem do ombre, utwardź; powtórz 2×`,
+    babyboomer:`Baby boomer: ${c2} gąbeczką od wolnego brzegu do ok. 2/3 płytki, mocno rozmyta granica; utwardź, powtórz 2–3×` };
+  const fx = ({
+    cream:   [`Kolor ${c1}: 2 cienkie warstwy, każdą utwardź`],
+    french:  [`Kolor bazowy ${c1} (zwykle nude / mleczny beż): 1–2 warstwy, utwardź.`, french[d.frenchStyle]],
+    ombre:   [`Kolor ${c1} na całą płytkę, utwardź.`, ombre[d.ombreStyle]],
+    chrome:  [`Kolor ${c1}: 2 warstwy, utwardź.`, 'Top no-wipe, utwardź; wetrzyj pyłek chrome aplikatorem, strzepnij nadmiar'],
+    glazed:  [`Kolor ${c1}: 2 warstwy, utwardź.`, 'Top no-wipe, utwardź; delikatnie wetrzyj perłowy pyłek (glazed / pearl), żeby kolor pod spodem prześwitywał'],
+    cateye:  [`Ciemny podkład ${c1}, utwardź.`, `Lakier magnetyczny „kocie oko”; magnes nad paznokciem 5–10 s formuje pasek (${c2}), od razu utwardź`],
+    velvet:  [`Ciemny podkład ${c1}, utwardź.`, `Lakier magnetyczny velvet (${c2}); magnes przykładany kolejno z boków i od dołu rozprasza drobinki w miękką poświatę, utwardź`],
+    glitter: [`Kolor ${c1}: 2 warstwy, utwardź.`, `Warstwa żelu z drobinkami (${c2}) lub brokat wsypany w lepką warstwę, utwardź`],
+    holo:    [`Kolor ${c1}: 2 warstwy, utwardź.`, 'Top no-wipe, utwardź; wetrzyj pyłek holo / aurora'],
+  })[d.effect];
+  fx[fx.length - 1] += '.';
+  return fx;
+}
+function renderRecipe(s) {
+  const shape = opt(s, 'shape'), len = opt(s, 'length'), g = groups(s), multi = g.length > 1, steps = [];
+  if (s.removal === 'hybrid') steps.push('Zdjęcie hybrydy: spiłuj top frezem lub pilnikiem 100/180, resztę zetrzyj frezem do bazy albo rozpuść acetonem.');
+  if (s.removal === 'gel') steps.push('Zdjęcie żelu / akrylu: zeszlifuj frezem warstwa po warstwie, nie naruszając naturalnej płytki.');
+  steps.push('Przygotowanie: odsuń i usuń skórki, zmatowij płytkę pilnikiem 180/240, odtłuść cleanerem.');
+  steps.push(...({
+    hybrid:    [`Opiłowanie na kształt: ${shape}, długość ${len}.`, 'Baza cienką warstwą, utwardź w lampie UV/LED (~60 s).'],
+    gel:       [`Opiłowanie na kształt: ${shape}, długość ${len}.`, 'Baza, potem żel budujący (struktura i apex), utwardź; przepiłuj kształt, odpyl.'],
+    extension: [`Przedłużenie na tipsach lub szablonie (żel / akryl) do długości ${len}, opiłowanie na kształt: ${shape}.`, 'Baza i żel budujący (apex), utwardź; przepiłuj, odpyl.'],
+    refill:    [`Uzupełnienie: spiłuj odrost i stary kolor, uzupełnij żelem budującym, korekta kształtu: ${shape}, długość ${len}.`, 'Odpyl i odtłuść.'],
+  })[s.service]);
+  for (const { d, ids } of g) {
+    const extra = [];
+    if (d.pattern !== 'none') extra.push(`Wzór ${PATTERN_HOW[d.pattern]} (kolor ${d.patternColor.toUpperCase()}).`);
+    if (d.art.length) extra.push(`Malowanie według projektu: liner i sonda, kolory ${artColours(d).join(', ')}; utwardź.`);
+    steps.push(...[...colourSteps(d), ...extra].map(t => multi ? `${nailsLabel(ids)}: ${t}` : t));
+  }
+  const deco = decoSummary(s);
+  if (deco.length) steps.push(`Zdobienia: ${deco.join('; ')}. Punktowo żel do zdobień, ułóż pęsetą lub woskowym pickerem, utwardź, obrysuj żelem, żeby nie odstawały.`);
+  const matte = FINGER_IDS.filter(id => s.nails[id].top === 'matte'), gloss = FINGER_IDS.filter(id => !matte.includes(id));
+  if (gloss.length) steps.push(`Top połyskowy (no-wipe)${matte.length ? ` (${nailsLabel(gloss)})` : ''}, zabezpiecz wolny brzeg, utwardź.`);
+  if (matte.length) steps.push(`Top matowy${gloss.length ? ` (${nailsLabel(matte)})` : ''}, zabezpiecz wolny brzeg, utwardź.`);
+  steps.push('Oliwka na skórki.');
+  document.getElementById('recipe').replaceChildren(...steps.map(t => Object.assign(document.createElement('li'), { textContent:t })));
+}
+
+// ---------- style card (PNG) ----------
+function cardBlob() {
+  renderFrame(); // draw now: the WebGL buffer is cleared after compositing
+  const src = renderer.domElement, CW = 1080, imgH = Math.min(1080, Math.round(CW*src.height/src.width));
+  const rows = [...spec(state), ...lastQuote.items.map(i => [i.label, zl(i.price)])];
+  const c = document.createElement('canvas'); c.width = CW; c.height = imgH + 170 + rows.length*44 + 110;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f6f1ee'; g.fillRect(0, 0, CW, c.height);
+  const sh = src.width*imgH/CW; g.drawImage(src, 0, (src.height - sh)/2, src.width, sh, 0, 0, CW, imgH);
+  g.fillStyle = '#2b2226'; g.font = '600 46px system-ui, sans-serif'; g.fillText('Karta stylizacji', 60, imgH + 80);
+  g.font = '28px system-ui, sans-serif'; g.fillStyle = '#625860'; g.fillText(`Kod ${designCode(state)} · ${P.salon ?? ''}`, 60, imgH + 125);
+  rows.forEach(([k, v], i) => {
+    const y = imgH + 190 + i*44;
+    g.fillStyle = '#625860'; g.fillText(k, 60, y);
+    g.fillStyle = '#2b2226'; g.fillText(v, 380, y, CW - 440);
+  });
+  g.font = '600 36px system-ui, sans-serif';
+  g.fillText(`Razem ${zl(lastQuote.total)} brutto · ok. ${hm(lastQuote.minutes)}`, 60, c.height - 60);
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+const msg = t => { const el = document.getElementById('code'), prev = el.textContent; el.textContent = t; setTimeout(() => { el.textContent = prev; }, 2000); };
+// Booking mockup gets the same design state as "Kopiuj link", so "Zmień" there comes back to this design.
+const book = e => {
+  e.preventDefault();
+  const q = quote(state, P); // same numbers as the quote on screen
+  window.Mock?.set('booking', { kategoria:'Paznokcie', usluga:P.services[state.service]?.label ?? opt(state, 'service'),
+    opis:spec(state).slice(1).map(([, v]) => v).join(' · '), cena:q.total, czas:q.minutes, czasTekst:hm(q.minutes), studio:'[Studio 1]', cenaMin:q.total, cenaMax:q.total, sciezka:'rezerwacja' });
+  location.href = 'termin.html#' + toHash(state);
+};
+document.querySelectorAll('[data-book]').forEach(a => { a.onclick = book; });
+document.getElementById('copyLink').onclick = () => navigator.clipboard.writeText(location.href).then(() => msg('Skopiowano link do projektu'), () => msg('Skopiuj adres z paska przeglądarki'));
+document.getElementById('png').onclick = async () => {
+  const a = Object.assign(document.createElement('a'), { href:URL.createObjectURL(await cardBlob()), download:`stylizacja-${designCode(state)}.png` });
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+
+// ---------- photo mode: webcam / upload -> MediaPipe hand landmarks -> our nails over the photo ----------
+const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+const HAND_MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+const FINGER_LM = { thumb:[3, 4], index:[7, 8], middle:[11, 12], ring:[15, 16], pinky:[19, 20] }; // [DIP (thumb: IP), TIP]
+const MAX_SIDE = 2048; // keeps detection and texture upload fast
+
+const photo = { scene:new THREE.Scene(), camera:new THREE.OrthographicCamera(0, 1, 0, -1, -1000, 1000), nails:new THREE.Group(),
+  light:new THREE.DirectionalLight(0xffffff, 1.4), plane:null, img:null, id:0, k:1, cal:null, hands:[], fix:{}, size:1 };
+let photoId = 0;
+photo.scene.environment = scene.environment;
+photo.light.position.set(0.3, 0.5, 1);
+photo.scene.add(photo.light, photo.nails);
+let mode = 'sample', stream = null;
+const HAND3D = new URLSearchParams(location.search).has('hand3d'); // the 3D hand and the demo gallery come back with ?hand3d
+const $ = id => document.getElementById(id);
+const video = $('video'), photoStatus = t => { $('photoStatus').textContent = t; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const onPhoto = () => mode !== '3d'; // "photo" and "demo" both show the photo scene
+let dirty = true; // render on demand: the loop only draws after a change or while the orbit is still moving
+function renderFrame() { onPhoto() ? renderer.render(photo.scene, photo.camera) : renderer.render(scene, camera); }
+function resize() {
+  dirty = true;
+  const { clientWidth:w, clientHeight:h } = view, el = renderer.domElement;
+  if (onPhoto() && photo.img) {
+    const k = Math.min(w/photo.img.width, h/photo.img.height), cw = Math.floor(photo.img.width*k), ch = Math.floor(photo.img.height*k);
+    renderer.setSize(cw, ch, false); el.style.width = cw + 'px'; el.style.height = ch + 'px';
+  } else {
+    renderer.setSize(w, h, false); el.style.width = el.style.height = '100%';
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+}
+
+let landmarkerPromise = null;
+const landmarker = () => landmarkerPromise ??= (async () => {
+  const { FilesetResolver, HandLandmarker } = await import(`${MP}/vision_bundle.mjs`);
+  const files = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
+  // CPU: the GPU delegate silently found no hands on some machines; one still photo is fast enough on CPU.
+  return HandLandmarker.createFromOptions(files, { baseOptions:{ modelAssetPath:HAND_MODEL, delegate:'CPU' }, runningMode:'IMAGE', numHands:2 });
+})().catch(e => { landmarkerPromise = null; throw e; }); // allow a retry after a network error
+
+// Nail plate sits on the distal phalanx: from ~30% of DIP->TIP up to the fingertip; width ~60% of that segment
+// (slightly generous so the natural nail in the photo never peeks out).
+// Width comes from the 3D segment length (landmark z is in x-units), and the nail is shortened by how much the
+// finger points toward the camera, so tilted fingers don't get full-length nails.
+function nailPose(hand, name, iw, ih) {
+  const [i, j] = FINGER_LM[name], a = new THREE.Vector2(hand[i].x*iw, hand[i].y*ih);
+  const d = new THREE.Vector2(hand[j].x*iw, hand[j].y*ih).sub(a), len3 = Math.hypot(d.x, d.y, (hand[j].z - hand[i].z)*iw);
+  return { base:a.addScaledVector(d, 0.3), rot:Math.atan2(-d.y, d.x) - Math.PI/2, // image y is down, world y is up
+    width:len3*0.6, foreshorten:Math.max(0.35, d.length()/len3) };
+}
+const fixOf = key => photo.fix[key] ??= { dx:0, dy:0, rot:0, scale:1, len:1 };
+const SHADOW_GEO = new THREE.PlaneGeometry(1, 1), SHADOW_MAT = (() => {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 128;
+  const g = c.getContext('2d'), gr = g.createRadialGradient(32, 64, 0, 32, 64, 32);
+  gr.addColorStop(0, 'rgba(0,0,0,0.45)'); gr.addColorStop(0.7, 'rgba(0,0,0,0.25)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.setTransform(1, 0, 0, 2, 0, -64); g.fillStyle = gr; g.fillRect(0, 0, 64, 128); // stretch the round falloff into an oval
+  return new THREE.MeshBasicMaterial({ map:new THREE.CanvasTexture(c), transparent:true, depthWrite:false, toneMapped:false });
+})();
+
+// Lacquer on a photo keeps the photo's light: every nail gets its own material that multiplies the polish colour by the
+// luminance of the photo under the natural nail (blurred, relative to its mean), so shadows and window light carry over.
+function shadeTexture(P) {
+  const U = 16, V = 32, big = document.createElement('canvas'); big.width = U*4; big.height = V*4; // blur by a 4x downsample
+  const g = big.getContext('2d'), e1x = -P.u.y*P.W*1.15, e1y = P.u.x*P.W*1.15, e2x = P.u.x*P.Lnat, e2y = P.u.y*P.Lnat, det = e1x*e2y - e2x*e1y;
+  const a = big.width*e2y/det, c = -big.width*e2x/det, b = -big.height*e1y/det, d = big.height*e1x/det;
+  g.setTransform(a, b, c, d, big.width*0.5 - (a*P.c[0] + c*P.c[1]), -(b*P.c[0] + d*P.c[1]));
+  g.drawImage(photo.img, 0, 0);
+  const sm = document.createElement('canvas'); sm.width = U; sm.height = V;
+  const sg = sm.getContext('2d', { willReadFrequently:true }); sg.imageSmoothingQuality = 'high'; sg.drawImage(big, 0, 0, U, V);
+  const px = sg.getImageData(0, 0, U, V), Y = new Float32Array(U*V); let mean = 0, n = 0;
+  for (let i = 0; i < U*V; i++) {
+    Y[i] = 0.299*px.data[4*i] + 0.587*px.data[4*i + 1] + 0.114*px.data[4*i + 2];
+    const x = i % U, y = (i / U) | 0; if (x > U*0.2 && x < U*0.8 && y > V*0.1 && y < V*0.9) { mean += Y[i]; n++; }
+  }
+  mean = Math.max(mean/n, 8);
+  for (let i = 0; i < U*V; i++) px.data.set([Math.round(128*Math.min(1.25, Math.max(0.7, Y[i]/mean))), 0, 0, 255], 4*i); // 128 = as bright as the nail's average; the old polish's glare is clipped
+  sg.putImageData(px, 0, 0);
+  return new THREE.CanvasTexture(sm);
+}
+function withShade(m, tex, vScale, vOff, L) {
+  m.userData.shade = tex;
+  m.alphaMap = null; // the cuticle fade follows the plate's proximal arc instead (below)
+  const prev = m.onBeforeCompile;
+  m.customProgramCacheKey = () => 'nailShade' + (m.userData.glow ? 'G' : '');
+  m.onBeforeCompile = (sh, r) => {
+    prev?.call(m, sh, r);
+    sh.uniforms.uShade = { value:tex }; sh.uniforms.uShadeV = { value:new THREE.Vector2(vScale, vOff) };
+    sh.uniforms.uGloss = { value:m.clearcoat > 0 && m.metalness < 0.5 ? 1 : 0 }; sh.uniforms.uPlateL = { value:L };
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uShade;\nuniform vec2 uShadeV;\nuniform float uGloss;\nuniform float uPlateL;')
+      .replace('#include <alphamap_fragment>', `#include <alphamap_fragment>
+        float px = vMapUv.x - 0.5, py = vMapUv.y * uPlateL + 0.2 * sqrt(max(0.0, 1.0 - 4.0 * px * px)); // height above the proximal arc
+        diffuseColor.a *= smoothstep(0.0, 0.16, py);`)
+      .replace('#include <map_fragment>', `#include <map_fragment>
+        diffuseColor.rgb *= mix(1.0, 2.0 * texture2D(uShade, vec2(vMapUv.x, clamp(vMapUv.y * uShadeV.x + uShadeV.y, 0.0, 1.0))).r, 0.6);`)
+      // Gel gloss: the curved plate mirrors a window up-left of the camera as a long bright streak (and a weaker one on the other side).
+      // Normals are in view space = image space on the photo camera, so the streak follows the nail's own axis.
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        vec2 gA = normal.xy - vec2(-0.075, 0.11), gB = normal.xy - vec2(0.07, -0.04);
+        float gT = smoothstep(0.05, 0.3, vMapUv.y) * (1.0 - smoothstep(0.55, 0.9, vMapUv.y)); // a window is not a line: it fades towards both ends
+        diffuseColor.a *= 1.0 - smoothstep(0.8, 0.97, length(normal.xy)); // the edge-on wall of the plate is a dark sliver on a photo: let the silhouette fade instead
+        totalEmissiveRadiance += vec3(uGloss * gT) * (1.0 * exp(-dot(gA, gA) / 0.006) + 0.2 * exp(-dot(gB, gB) / 0.01));`);
+  };
+}
+// A calibrated nail (zdjecia/dlonie.json: cuticle line centre, free-edge centre, plate width, all in photo pixels) -> where our plate goes.
+// The plate starts a hair after the cuticle line (a narrow strip of skin stays), and never ends before the natural nail does.
+function calPose(n, L) {
+  const [cx, cy] = n.cuticle, dx = n.tip[0] - cx, dy = n.tip[1] - cy, len = Math.hypot(dx, dy), ux = dx/len, uy = dy/len, W = n.width, inset = 0.2*W; // the plate's proximal arc is 0.2 deep: its centre then sits on the cuticle line
+  const sx = 1.1*W; // the C-curve makes the plate 0.89 of its flat width; polish stops a hair short of the side folds like a real manicure
+  const sy = Math.min(1.35*1.02*W, Math.max(1.02*W, 0.97*(len - inset)/L));
+  return { base:[cx + ux*inset, cy + uy*inset], rot:Math.atan2(-uy, ux) - Math.PI/2, sx, sy, c:[cx, cy], u:{ x:ux, y:uy }, W, Lnat:len, inset };
+}
+const photoMats = new Map(); // `${photo.id}|${nail}|${look}|${L}` -> material, owned by placePhotoNails
+function placePhotoNails() {
+  dirty = true;
+  photo.nails.clear(); // meshes share the geometry; materials are cached in photoMats
+  if (!photo.img || !nailGeo) return;
+  const s = state, L = nailLength(s), used = new Set();
+  const put = (key, name, P, fix = null) => {
+    const d = s.nails[name], mk = `${photo.id}|${key}|${nailKey(d)}|${L}`;
+    let m = photoMats.get(mk);
+    if (!m) {
+      m = nailMaterial(d, L, d.effect);
+      if (m.metalness >= 0.5) { m.envMap = photo.scene.environment; m.envMapIntensity = (m.metalnessMap ? PHOTO_ENV_FLAKES : PHOTO_ENV_METAL)*photo.k; } // mirrors need the room; matte polish does not
+      withShade(m, shadeTexture(P), L*P.sy/P.Lnat, -P.inset/P.Lnat, L); photoMats.set(mk, m);
+    }
+    used.add(mk);
+    const nail = makeNail(name, s, m);
+    nail.position.set(P.base[0] + (fix?.dx ?? 0), -(P.base[1] + (fix?.dy ?? 0)), 0);
+    nail.rotation.z = P.rot + (fix?.rot ?? 0);
+    nail.scale.set(P.sx, P.sy, P.sx);
+    const shadow = new THREE.Mesh(SHADOW_GEO, SHADOW_MAT); // soft contact shadow so the nail sits on the finger
+    shadow.scale.set(1.25, L*1.05, 1); shadow.position.set(0, L*0.47, -0.4);
+    nail.add(shadow);
+    nail.userData.key = key;
+    photo.nails.add(nail);
+  };
+  if (photo.cal) for (const n of photo.cal.nails) put(`0-${n.id}`, n.id, calPose(n, L));
+  else photo.hands.forEach((hand, h) => FINGER_IDS.forEach(name => {
+    const p = nailPose(hand, name, photo.img.width, photo.img.height), key = `${h}-${name}`, f = fixOf(key), w = p.width * photo.size * f.scale;
+    const [i, j] = FINGER_LM[name], len = 0.7*Math.hypot((hand[j].x - hand[i].x)*photo.img.width, (hand[j].y - hand[i].y)*photo.img.height);
+    put(key, name, { base:[p.base.x, p.base.y], rot:p.rot, sx:w, sy:w*p.foreshorten*(f.len ?? 1), c:[p.base.x, p.base.y], u:{ x:-Math.sin(p.rot), y:-Math.cos(p.rot) }, W:w, Lnat:Math.max(len, w), inset:0 }, f);
+  }));
+  for (const [k, m] of photoMats) if (!used.has(k)) { disposeMat(m); photoMats.delete(k); }
+}
+
+// Old polish and decorations in the sample photo (dlon-4) are painted over with a nude plate in the photo's own light, so a shorter or
+// narrower shape of ours does not leave the old colour showing at its corners.
+function patchCovers(c, cal) {
+  const g = c.getContext('2d', { willReadFrequently:true });
+  for (const n of cal.nails) if (n.contour) {
+    const xs = n.contour.map(p => p[0]), ys = n.contour.map(p => p[1]), pad = 12;
+    const x0 = Math.max(0, Math.floor(Math.min(...xs)) - pad), y0 = Math.max(0, Math.floor(Math.min(...ys)) - pad);
+    const w = Math.min(c.width, Math.ceil(Math.max(...xs)) + pad) - x0, h = Math.min(c.height, Math.ceil(Math.max(...ys)) + pad) - y0;
+    const mc = document.createElement('canvas'); mc.width = w; mc.height = h;
+    const mg = mc.getContext('2d', { willReadFrequently:true }), cx = xs.reduce((a, v) => a + v)/xs.length, cy = ys.reduce((a, v) => a + v)/ys.length;
+    mg.fillStyle = '#fff'; mg.shadowColor = '#fff'; mg.shadowBlur = 3; mg.beginPath();
+    const ax = n.tip[0] - n.cuticle[0], ay = n.tip[1] - n.cuticle[1], al = Math.hypot(ax, ay), ux = ax/al, uy = ay/al; // grow the cover 14% along the nail, 6% across
+    n.contour.forEach(([x, y], i) => {
+      const dx = x - cx, dy = y - cy, a = dx*ux + dy*uy, b = -dx*uy + dy*ux, A = a*1.14 + al*0.04, B = b*1.06;
+      mg[i ? 'lineTo' : 'moveTo'](cx + A*ux - B*uy - x0, cy + A*uy + B*ux - y0);
+    }); mg.fill();
+    const img = g.getImageData(x0, y0, w, h), mask = mg.getImageData(0, 0, w, h);
+    // nude = the skin just below the cuticle, lighter and pinker
+    const sx = Math.round(n.cuticle[0] - ux*n.width*0.35), sy = Math.round(n.cuticle[1] - uy*n.width*0.35);
+    const sk = g.getImageData(sx - 4, sy - 4, 8, 8).data, nude = [0, 0, 0];
+    for (let i = 0; i < sk.length; i += 4) for (let j = 0; j < 3; j++) nude[j] += sk[i + j]/(sk.length/4);
+    const nd = [Math.min(255, nude[0]*1.25 + 18), Math.min(255, nude[1]*1.2 + 22), Math.min(255, nude[2]*1.15 + 24)];
+    let ym = 0, yn = 0; const Y = i => 0.299*img.data[i] + 0.587*img.data[i + 1] + 0.114*img.data[i + 2];
+    for (let i = 0; i < img.data.length; i += 4) if (mask.data[i] > 200) { ym += Y(i); yn++; }
+    ym = Math.max(ym/yn, 8);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const a = mask.data[i]/255; if (!a) continue;
+      const k = 0.55 + 0.45*Math.min(1.8, Y(i)/ym); // the old nail's own light, not its colour
+      for (let j = 0; j < 3; j++) img.data[i + j] = img.data[i + j]*(1 - a) + Math.min(255, nd[j]*k)*a;
+    }
+    g.putImageData(img, x0, y0);
+  }
+}
+
+async function setPhoto(src, preset = null, cal = null) { // preset: a demo entry with stored landmarks and fixes; cal: a calibrated sample photo
+  const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height, k = Math.min(1, MAX_SIDE / Math.max(sw, sh)), c = document.createElement('canvas');
+  c.width = Math.round(sw*k); c.height = Math.round(sh*k);
+  c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+  if (cal) patchCovers(c, cal);
+  if (photo.plane) { photo.scene.remove(photo.plane); photo.plane.material.map.dispose(); photo.plane.material.dispose(); photo.plane.geometry.dispose(); }
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  photo.plane = new THREE.Mesh(new THREE.PlaneGeometry(c.width, c.height), new THREE.MeshBasicMaterial({ map:tex, toneMapped:false }));
+  photo.plane.position.set(c.width/2, -c.height/2, -100);
+  photo.scene.add(photo.plane);
+  Object.assign(photo.camera, { right:c.width, bottom:-c.height }); photo.camera.updateProjectionMatrix();
+  // Match the photo: studio reflections (they give the gloss) dimmed to the photo's brightness, and both the
+  // key light and the reflections tinted by its average colour (white balance), so nails don't glow in a dark room.
+  // A blurred photo as the reflection map was tried: it killed the highlights and left a pale rim on the nail sides.
+  const t = document.createElement('canvas'); t.width = t.height = 16;
+  const tg = t.getContext('2d'); tg.drawImage(c, 0, 0, 16, 16);
+  const px = tg.getImageData(0, 0, 16, 16).data, avg = [0, 0, 0];
+  for (let i = 0; i < px.length; i += 4) for (let j = 0; j < 3; j++) avg[j] += px[i + j] / 255 / 256;
+  const lum = 0.2126*avg[0] + 0.7152*avg[1] + 0.0722*avg[2], light = Math.min(1.15, Math.max(0.75, lum / 0.5)), top = Math.max(...avg);
+  // On a photo the studio reflections must stay faint (a bright veil washes the polish out): measured so a deep red keeps its hue.
+  photo.k = light; photo.scene.environmentIntensity = PHOTO_ENV*light;
+  photo.light.intensity = 1.8*light;
+  photo.light.color.setRGB(...avg.map(v => 0.6 + 0.4*v/top)); // partial tint: full tint turns nails muddy
+  Object.assign(photo, { img:c, id:++photoId, cal, hands:preset?.hands ?? [], fix:structuredClone(preset?.fix ?? {}), size:preset?.size ?? 1 });
+  $('nailSize').value = photo.size;
+  syncPhotoUI(); resize(); placePhotoNails();
+  requestAnimationFrame(() => setTimeout(geometryChecks)); // the self-checks wait for the first picture
+  if (preset || cal) return;
+  photoStatus('Szukam dłoni…');
+  try { photo.hands = (await landmarker()).detect(c).landmarks; }
+  catch (e) { photoStatus(`Nie udało się wczytać wykrywania dłoni (${e.message}). Sprawdź internet i spróbuj ponownie.`); return; }
+  placePhotoNails(); syncPhotoUI(); // enables "Dodaj do demo"
+  photoStatus(photo.hands.length ? `Wykryte dłonie: ${photo.hands.length}. Przeciągnij paznokieć, żeby go przesunąć; kółko myszy zmienia rozmiar, Alt + kółko długość, Shift + kółko obraca.`
+    : 'Nie wykryto dłoni. Pokaż grzbiet dłoni z lekko rozstawionymi palcami, w dobrym świetle, i spróbuj ponownie.');
+}
+
+async function startCamera() {
+  try { stream = await navigator.mediaDevices.getUserMedia({ video:{ width:{ ideal:1920 }, height:{ ideal:1080 } }, audio:false }); }
+  catch (e) {
+    photoStatus(e.name === 'NotAllowedError' ? 'Brak zgody na kamerę. Zezwól na dostęp do kamery dla tej strony i kliknij ponownie.'
+      : e.name === 'NotFoundError' ? 'Nie znaleziono kamery. Podłącz kamerę i kliknij ponownie.' : `Kamera jest niedostępna (${e.name}). Zamknij inne programy, które jej używają.`);
+    return;
+  }
+  video.srcObject = stream; await video.play();
+  photoStatus('Ułóż dłoń grzbietem do kamery i kliknij „Zrób zdjęcie”.');
+  syncPhotoUI();
+}
+function stopCamera() { stream?.getTracks().forEach(t => t.stop()); stream = null; video.srcObject = null; syncPhotoUI(); }
+async function capture() {
+  $('shoot').disabled = true;
+  for (let i = 3; i > 0; i--) { photoStatus(`Zdjęcie za ${i}…`); await sleep(1000); }
+  const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight;
+  const g = c.getContext('2d'); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(video, 0, 0); // same mirror as the preview
+  stopCamera();
+  await setPhoto(c);
+}
+const HINTS = { sample:'Wybierz przykładową dłoń. Kliknij paznokieć na zdjęciu, żeby go wybrać.', photo:'Zrób zdjęcie grzbietu dłoni albo wgraj plik. Kliknij paznokieć, żeby go wybrać.',
+  '3d':'Przeciągnij, by obrócić dłoń; kółko / szczypanie przybliża.', demo:'Zdjęcia demo zapisane w tej przeglądarce.' };
+function clearPhoto() { // leaving a sample photo: nothing of it may stay under "Moje zdjęcie"
+  Object.assign(photo, { img:null, cal:null, hands:[], fix:{} });
+  if (photo.plane) { photo.scene.remove(photo.plane); photo.plane.material.map.dispose(); photo.plane.material.dispose(); photo.plane.geometry.dispose(); photo.plane = null; }
+  placePhotoNails(); // also frees the nail materials
+}
+function setMode(m) {
+  mode = m; controls.enabled = m === '3d';
+  if (m !== 'photo') stopCamera();
+  if (m === 'photo' && photo.cal) clearPhoto();
+  if (m === '3d') rebuild(); // the 3D hand is built only when it is shown
+  $('hint').textContent = HINTS[m];
+  syncPhotoUI(); resize();
+  if (m === 'sample') showSample(samples.at);
+  if (m === 'demo') loadDemoList().then(() => showDemo(Math.max(0, demo.at)));
+}
+// Sample hands: real photos (zdjecia/) with hand-checked nail calibration, so the page works without camera, MediaPipe or network beyond three.js.
+const SAMPLE_NOTE = $('sampleStatus').textContent, samples = { list:[], at:0, req:null };
+const loadSamples = () => samples.req ??= fetch('zdjecia/dlonie.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+  .then(j => { samples.list = j.photos; }).catch(e => { samples.req = null; throw e; });
+function renderSamples() {
+  $('sampleList').replaceChildren(...samples.list.map((p, i) => {
+    const wrap = Object.assign(document.createElement('div'), { className:'thumb' });
+    const pick = Object.assign(document.createElement('button'), { type:'button', onclick:() => showSample(i), ariaLabel:`Przykładowa dłoń ${i + 1}: ${p.label}` });
+    pick.setAttribute('aria-pressed', i === samples.at);
+    pick.append(Object.assign(document.createElement('img'), { src:'zdjecia/' + p.mini, alt:'', width:200, height:Math.round(200*p.h/p.w) }));
+    wrap.append(pick); return wrap;
+  }));
+}
+async function showSample(i) {
+  const status = t => { $('sampleStatus').textContent = t; };
+  try { await loadSamples(); } catch (e) { status(`Nie udało się wczytać zdjęć przykładowych (${e.message}). Otwórz stronę przez serwer HTTP albo użyj „Moje zdjęcie”.`); return; }
+  const p = samples.list[i] ?? samples.list[0]; if (!p) return;
+  samples.at = samples.list.indexOf(p); renderSamples();
+  const img = new Image(); img.src = 'zdjecia/' + p.file;
+  try { await img.decode(); } catch { status('Nie udało się wczytać zdjęcia. Spróbuj ponownie.'); return; }
+  if (mode !== 'sample' || samples.list[samples.at] !== p) return; // the user moved on while it loaded
+  await setPhoto(img, null, p);
+  status(SAMPLE_NOTE);
+}
+function syncPhotoUI() {
+  const live = !!stream && mode === 'photo', noDemo = mode === 'demo' && demo.at < 0;
+  document.querySelectorAll('#modeChips button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === mode));
+  $('photoTools').hidden = mode !== 'photo';
+  $('sampleTools').hidden = mode !== 'sample';
+  $('demoTools').hidden = mode !== 'demo';
+  video.hidden = !live;
+  renderer.domElement.hidden = onPhoto() && (live || !photo.img || noDemo);
+  $('photoEmpty').hidden = !(onPhoto() && !live && (!photo.img || noDemo));
+  $('photoEmpty').textContent = mode === 'demo' ? 'Brak zdjęć demo. W trybie „Moje zdjęcie” zrób zdjęcie, dopasuj paznokcie i kliknij „Dodaj do demo”.'
+    : mode === 'sample' ? 'Ładuję przykładową dłoń…' : 'Włącz kamerę albo wgraj zdjęcie grzbietu dłoni.';
+  $('addDemo').disabled = !photo.img || !photo.hands.length;
+  ['demoPrev', 'demoNext', 'demoSave'].forEach(id => { $(id).disabled = demo.at < 0; });
+  $('demoExport').disabled = !demo.list.length;
+  $('camera').textContent = live ? 'Wyłącz kamerę' : 'Włącz kamerę';
+  $('shoot').disabled = !live;
+  $('savePhoto').disabled = !photo.img;
+}
+
+// Pointer correction: drag moves the nearest nail, wheel scales it, Shift + wheel rotates it.
+function nailAt(e) {
+  if (!onPhoto() || !photo.img) return null;
+  const r = renderer.domElement.getBoundingClientRect();
+  const x = (e.clientX - r.left)/r.width*photo.img.width, y = (e.clientY - r.top)/r.height*photo.img.height;
+  let best = null, bestD = Infinity;
+  for (const n of photo.nails.children) {
+    const c = n.localToWorld(new THREE.Vector3(0, 0.6, 0)), dist = Math.hypot(c.x - x, -c.y - y);
+    if (dist < n.scale.x*1.2 && dist < bestD) { best = n; bestD = dist; }
+  }
+  return best && { key:best.userData.key, x, y, k:photo.img.width/r.width };
+}
+let drag = null;
+renderer.domElement.addEventListener('pointerdown', e => { drag = mode === 'sample' ? null : nailAt(e); if (drag) renderer.domElement.setPointerCapture(e.pointerId); }); // sample photos are calibrated: no dragging
+renderer.domElement.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const f = fixOf(drag.key);
+  f.dx += e.movementX*drag.k; f.dy += e.movementY*drag.k;
+  placePhotoNails();
+});
+renderer.domElement.addEventListener('pointerup', () => { drag = null; });
+renderer.domElement.addEventListener('wheel', e => {
+  const hit = mode === 'sample' ? null : nailAt(e); if (!hit) return;
+  e.preventDefault();
+  const f = fixOf(hit.key), dir = Math.sign(e.deltaY);
+  if (e.shiftKey) f.rot -= dir*0.05; else if (e.altKey) f.len = (f.len ?? 1) * (dir < 0 ? 1.04 : 1/1.04); else f.scale *= dir < 0 ? 1.05 : 1/1.05;
+  placePhotoNails();
+}, { passive:false });
+
+document.querySelectorAll('#modeChips button').forEach(b => { b.onclick = () => setMode(b.dataset.v); });
+$('camera').onclick = () => stream ? stopCamera() : startCamera();
+$('shoot').onclick = capture;
+$('upload').onchange = async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try { stopCamera(); await setPhoto(await createImageBitmap(file)); }
+  catch { photoStatus('Nie udało się otworzyć pliku. Wybierz zdjęcie JPG lub PNG.'); }
+  e.target.value = '';
+};
+$('savePhoto').onclick = () => photo.img.toBlob(b => {
+  const a = Object.assign(document.createElement('a'), { href:URL.createObjectURL(b), download:`dlon-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.jpg` });
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}, 'image/jpeg', 0.92);
+$('nailSize').oninput = e => { photo.size = +e.target.value; placePhotoNails(); };
+$('resetFix').onclick = () => { photo.fix = {}; photo.size = 1; $('nailSize').value = 1; placePhotoNails(); };
+
+// ---------- demo gallery: photos + detected hands + hand-tuned fixes, kept in this browser (IndexedDB) ----------
+// The design is not stored with a photo: every demo photo shows whatever the creator currently has.
+let demoDb = null;
+async function demoStore(write, fn) {
+  demoDb ??= await new Promise((res, rej) => {
+    const r = indexedDB.open('nail-studio-demo', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('photos', { keyPath:'id' });
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+  return new Promise((res, rej) => {
+    const t = demoDb.transaction('photos', write ? 'readwrite' : 'readonly'), q = fn(t.objectStore('photos'));
+    t.oncomplete = () => res(q.result); t.onerror = () => rej(t.error);
+  });
+}
+const demo = { list:[], at:-1, urls:[], confirm:null };
+const demoStatus = t => { $('demoStatus').textContent = t; };
+async function loadDemoList() {
+  try { demo.list = (await demoStore(false, s => s.getAll())).sort((a, b) => a.id - b.id); }
+  catch (e) { demo.list = []; demoStatus(`Nie można otworzyć pamięci demo w tej przeglądarce (${e?.name ?? e}). Wyłącz tryb prywatny i spróbuj ponownie.`); }
+  if (demo.at >= demo.list.length) demo.at = demo.list.length - 1;
+  renderDemoList();
+}
+function renderDemoList() {
+  demo.urls.forEach(u => URL.revokeObjectURL(u));
+  demo.urls = demo.list.map(e => URL.createObjectURL(e.img));
+  $('demoList').replaceChildren(...demo.list.map((e, i) => {
+    const wrap = Object.assign(document.createElement('div'), { className:'thumb' });
+    const pick = Object.assign(document.createElement('button'), { type:'button', onclick:() => showDemo(i), ariaLabel:`Zdjęcie demo ${i + 1}` });
+    pick.setAttribute('aria-pressed', i === demo.at);
+    pick.append(Object.assign(document.createElement('img'), { src:demo.urls[i], alt:'' }));
+    const del = Object.assign(document.createElement('button'), { type:'button', className:'del',
+      textContent:demo.confirm === e.id ? 'Usunąć?' : '×', ariaLabel:demo.confirm === e.id ? 'Potwierdź usunięcie zdjęcia' : `Usuń zdjęcie demo ${i + 1}`,
+      onclick:() => deleteDemo(e.id) });
+    wrap.append(pick, del);
+    return wrap;
+  }));
+  syncPhotoUI();
+}
+async function showDemo(i) {
+  const n = demo.list.length;
+  if (!n) { demo.at = -1; syncPhotoUI(); demoStatus(''); return; }
+  demo.at = (i + n) % n; demo.confirm = null;
+  const e = demo.list[demo.at];
+  await setPhoto(await createImageBitmap(e.img), e);
+  renderDemoList();
+  demoStatus(`Zdjęcie ${demo.at + 1} z ${n}. Poprawki: przeciągnij paznokieć, kółko rozmiar, Alt + kółko długość, Shift + kółko obrót.`);
+}
+const jpeg = c => new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+$('addDemo').onclick = async () => {
+  try {
+    const img = await jpeg(photo.img);
+    await demoStore(true, s => s.put({ id:Date.now(), img, hands:photo.hands, fix:structuredClone(photo.fix), size:photo.size }));
+    await loadDemoList();
+    photoStatus(`Dodano do demo. Zdjęć w demo: ${demo.list.length}.`);
+  } catch (e) { photoStatus(`Nie udało się zapisać zdjęcia w demo (${e?.name ?? e}).`); }
+};
+$('demoSave').onclick = async () => {
+  const e = demo.list[demo.at]; if (!e) return;
+  Object.assign(e, { fix:structuredClone(photo.fix), size:photo.size });
+  await demoStore(true, s => s.put(e));
+  demoStatus(`Zapisano poprawki zdjęcia ${demo.at + 1}.`);
+};
+async function deleteDemo(id) {
+  if (demo.confirm !== id) { demo.confirm = id; renderDemoList(); return; } // first click asks, second deletes
+  demo.confirm = null;
+  await demoStore(true, s => s.delete(id));
+  await loadDemoList();
+  await showDemo(demo.at);
+}
+$('demoPrev').onclick = () => showDemo(demo.at - 1);
+$('demoNext').onclick = () => showDemo(demo.at + 1);
+addEventListener('keydown', e => {
+  if (mode !== 'demo' || e.target.closest?.('input') || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+  showDemo(demo.at + (e.key === 'ArrowLeft' ? -1 : 1));
+});
+
+// Export / import: one JSON file with every demo photo, for moving the demo to the presentation computer.
+const dataUrl = blob => new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(blob); });
+$('demoExport').onclick = async () => {
+  const photos = await Promise.all(demo.list.map(async e => ({ img:await dataUrl(e.img), hands:e.hands.map(h => h.map(({ x, y, z }) => ({ x, y, z }))), fix:e.fix, size:e.size })));
+  const a = Object.assign(document.createElement('a'), { href:URL.createObjectURL(new Blob([JSON.stringify({ app:'nail-studio-demo', version:1, photos })], { type:'application/json' })), download:'demo-paznokcie.json' });
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+// The imported file is untrusted: keep only well-formed photos, landmarks and clamped fixes.
+const finite = v => typeof v === 'number' && Number.isFinite(v);
+function validDemo(p) {
+  if (!p || typeof p.img !== 'string' || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(p.img)) return null;
+  if (!Array.isArray(p.hands) || p.hands.length > 2 || !p.hands.every(h => Array.isArray(h) && h.length === 21 && h.every(l => l && finite(l.x) && finite(l.y) && finite(l.z)))) return null;
+  const fix = {};
+  for (const [k, f] of Object.entries(p.fix && typeof p.fix === 'object' ? p.fix : {})) {
+    if (!/^[01]-(thumb|index|middle|ring|pinky)$/.test(k) || !f || !['dx', 'dy', 'rot', 'scale', 'len'].every(n => f[n] === undefined || finite(f[n]))) continue;
+    fix[k] = { dx:clamp(f.dx ?? 0, -4000, 4000), dy:clamp(f.dy ?? 0, -4000, 4000), rot:clamp(f.rot ?? 0, -7, 7), scale:clamp(f.scale ?? 1, 0.2, 5), len:clamp(f.len ?? 1, 0.2, 5) };
+  }
+  return { img:p.img, hands:p.hands.map(h => h.map(({ x, y, z }) => ({ x, y, z }))), fix, size:finite(p.size) ? clamp(p.size, 0.6, 1.6) : 1 };
+}
+$('demoImport').onchange = async e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  if (file.size > 200e6) { demoStatus('Plik jest za duży (limit 200 MB).'); return; }
+  let photos;
+  try { photos = JSON.parse(await file.text()).photos; } catch { demoStatus('To nie jest plik demo (niepoprawny JSON).'); return; }
+  const ok = (Array.isArray(photos) ? photos : []).slice(0, 200).map(validDemo).filter(Boolean);
+  const base = Date.now();
+  for (const [i, p] of ok.entries()) { const img = await (await fetch(p.img)).blob(); await demoStore(true, s => s.put({ ...p, id:base + i, img })); }
+  await loadDemoList(); await showDemo(demo.at < 0 ? 0 : demo.at);
+  demoStatus(`Zaimportowano zdjęć: ${ok.length}${Array.isArray(photos) && photos.length > ok.length ? `, pominięto niepoprawnych: ${photos.length - ok.length}` : ''}.`);
+};
+
+// ---------- UI ----------
+const controlsEl = document.getElementById('controls');
+const sections = {};
+const chip = (v, label, onclick) => { const b = Object.assign(document.createElement('button'), { type:'button', textContent:label, onclick }); b.dataset.v = v; return b; };
+for (const u of UI) {
+  const sec = document.createElement('section'); sec.className = 'step';
+  const h = document.createElement('h2'); h.textContent = u.title; h.id = 'h-' + u.key; sec.append(h);
+  const box = document.createElement('div'); box.setAttribute('role', 'group'); box.setAttribute('aria-labelledby', h.id);
+  if (u.type === 'chips') {
+    box.className = 'chips';
+    for (const [v, label] of Object.entries(u.options)) box.append(chip(v, label, () => set(u.key, v)));
+  } else if (u.type === 'select') {
+    box.className = 'chips';
+    for (const id of FINGER_IDS) box.append(chip(id, FINGER_LABELS[id], () => selectNail(id, true)));
+    const all = chip('', 'Wszystkie', () => { sel = [...FINGER_IDS]; syncUI(); drawEditor(); }); all.dataset.role = 'action';
+    const copy = chip('', 'Kopiuj wygląd na wszystkie', () => {
+      const src = state.nails[sel[0]];
+      for (const id of FINGER_IDS) state.nails[id] = structuredClone(src);
+      commit();
+    }); copy.dataset.role = 'action';
+    const undo = chip('', 'Cofnij', () => undoRedo(-1)), redo = chip('', 'Ponów', () => undoRedo(1));
+    undo.dataset.role = redo.dataset.role = 'action';
+    box.append(all, copy, undo, redo);
+    sec.append(box, Object.assign(document.createElement('p'), { className:'sub', textContent:'Kliknij paznokieć na dłoni lub zdjęciu, żeby go wybrać; Ctrl + klik zaznacza kilka. Kolor, efekt, top i zdobienia zmieniają się tylko na zaznaczonych.' }));
+    controlsEl.append(sec); sections[u.key] = sec;
+    continue;
+  } else if (u.type === 'color') {
+    box.className = 'swatches';
+    for (const hex of PALETTE) {
+      const b = chip(hex, '', () => set(u.key, hex));
+      b.title = hex; b.style.setProperty('--c', hex); b.setAttribute('aria-label', hex); box.append(b);
+    }
+    box.append(Object.assign(document.createElement('input'), { type:'color', title:'Własny kolor', ariaLabel:{ color:'Kolor główny', color2:'Kolor dodatkowy' }[u.key] ?? u.title, oninput:e => set(u.key, e.target.value) }));
+  } else {
+    box.className = 'range';
+    box.append(Object.assign(document.createElement('input'), { type:'range', min:u.min, max:u.max, step:u.step, oninput:e => set(u.key, +e.target.value), ariaLabel:u.title }));
+  }
+  sec.append(box); controlsEl.append(sec); sections[u.key] = sec;
+}
+function syncUI() {
+  const d = state.nails[sel[0]];
+  for (const u of UI) {
+    const sec = sections[u.key], v = u.type === 'select' ? sel : u.nail ? d[u.key] : state[u.key];
+    sec.querySelectorAll('button:not([data-role])').forEach(b => b.setAttribute('aria-pressed', Array.isArray(v) ? v.includes(b.dataset.v) : b.dataset.v === String(v)));
+    sec.querySelectorAll('input').forEach(i => { i.value = v; });
+    sec.hidden = u.show ? !u.show(d) : false;
+  }
+}
+// Nail-scoped keys change only the selected nails; the rest is per hand.
+function set(k, v) {
+  if (UI.find(u => u.key === k).nail) for (const id of sel) state.nails[id][k] = v; else state[k] = v;
+  commit();
+}
+// Every finished change is one undo step (the URL hash is the snapshot); live drags/strokes record on release.
+const hist = [toHash(state)]; let histAt = 0;
+function commit(record = true) {
+  const h = toHash(state);
+  history.replaceState(null, '', '#' + h); rebuild(); syncUI();
+  if (record && h !== hist[histAt]) { hist.splice(histAt + 1); hist.push(h); if (hist.length > 100) hist.shift(); histAt = hist.length - 1; }
+}
+function undoRedo(step) {
+  const i = histAt + step;
+  if (i < 0 || i >= hist.length) return;
+  histAt = i; state = parseHash(hist[i]);
+  history.replaceState(null, '', '#' + hist[i]); rebuild(); syncUI();
+}
+addEventListener('keydown', e => {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  const k = e.key.toLowerCase();
+  if (k === 'z') { e.preventDefault(); undoRedo(e.shiftKey ? 1 : -1); } else if (k === 'y') { e.preventDefault(); undoRedo(1); }
+});
+function selectNail(id, add) {
+  sel = !add ? [id] : !sel.includes(id) ? FINGER_IDS.filter(n => n === id || sel.includes(n)) : sel.length > 1 ? sel.filter(n => n !== id) : sel;
+  syncUI(); drawEditor();
+}
+addEventListener('hashchange', () => { state = parseHash(location.hash); rebuild(); syncUI(); });
+
+// ---------- decorations + painting: presets and the 2D editor of the first selected nail ----------
+for (const [k, p] of Object.entries(PRESETS)) $('presetChips').append(chip(k, p.label, () => applyDeco(p.items(nailLength(state), +$('arcN').value))));
+$('arcN').oninput = e => { $('arcNOut').textContent = e.target.value; };
+let tool = 'stone', paintColor = '#ffffff'; // tool: a DECO key, 'brush' or 'p:<stamp>'
+for (const [k, d] of Object.entries(DECO)) $('toolChips').append(chip(k, d.label, () => { tool = k; syncTools(); }));
+$('paintChips').append(chip('brush', 'Pędzel', () => { tool = 'brush'; syncTools(); }));
+for (const [k, label] of Object.entries(STAMPS)) $('paintChips').append(chip('p:' + k, label, () => { tool = 'p:' + k; syncTools(); }));
+const clearArt = chip('', 'Wyczyść malowanie', () => applyArt([])); clearArt.dataset.role = 'action'; $('paintChips').append(clearArt);
+for (const hex of PALETTE) {
+  const b = chip(hex, '', () => { paintColor = hex; tool = DECO[tool] ? 'brush' : tool; syncTools(); });
+  b.title = hex; b.style.setProperty('--c', hex); b.setAttribute('aria-label', 'Kolor malowania ' + hex); $('paintSwatches').append(b);
+}
+$('paintSwatches').append(Object.assign(document.createElement('input'), { type:'color', title:'Własny kolor malowania', ariaLabel:'Własny kolor malowania', value:paintColor,
+  oninput:e => { paintColor = e.target.value; tool = DECO[tool] ? 'brush' : tool; syncTools(); } }));
+function syncTools() {
+  document.querySelectorAll('#toolChips button, #paintChips button:not([data-role])').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === tool));
+  $('paintSwatches').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === paintColor));
+}
+syncTools();
+$('advToggle').onclick = () => {
+  const on = $('editorBox').hidden;
+  $('editorBox').hidden = !on; $('advToggle').setAttribute('aria-pressed', on);
+  drawEditor();
+};
+function applyDeco(list, record = true) { // the edited list goes to every selected nail
+  for (const id of sel) state.nails[id].deco = structuredClone(list);
+  commit(record);
+}
+function applyArt(list, record = true) {
+  for (const id of sel) state.nails[id].art = structuredClone(list);
+  commit(record);
+}
+
+const ed = $('editor'), eg = ed.getContext('2d');
+function edView() {
+  const L = nailLength(state), S = ed.width / 1.4;
+  return { L, S, X:x => (x + 0.7)*S, Y:y => (L + 0.25 - y)*S, ix:px => px/S - 0.7, iy:py => L + 0.25 - py/S, H:Math.round((L + 0.45)*S) };
+}
+function drawEditor() {
+  if ($('editorBox').hidden) return;
+  const v = edView(), d = state.nails[sel[0]], hw = SHAPES[state.shape].hw, N = 48;
+  ed.height = v.H; // also clears
+  $('editorTitle').textContent = `Edytujesz: ${FINGER_LABELS[sel[0]]}${sel.length > 1 ? ` (zmiany trafią też na: ${sel.slice(1).map(id => FINGER_LABELS[id]).join(', ')})` : ''}`;
+  eg.beginPath();
+  for (let i = 0; i <= N; i++) eg.lineTo(v.X(hw(v.L*i/N, v.L)), v.Y(v.L*i/N));
+  for (let i = N; i >= 0; i--) eg.lineTo(v.X(-hw(v.L*i/N, v.L)), v.Y(v.L*i/N));
+  for (let i = 1; i < 16; i++) { const x = -0.5 + i/16; eg.lineTo(v.X(x), v.Y(-0.14*Math.sqrt(1 - (2*x)**2))); }
+  eg.closePath();
+  eg.save(); eg.clip(); eg.drawImage(paint(d, v.L, d.effect).c, v.X(-0.5), v.Y(v.L), v.S, v.L*v.S); eg.restore();
+  eg.lineWidth = 1.5; eg.strokeStyle = '#8a7c82'; eg.stroke();
+  for (const it of d.deco) {
+    const x = v.X(it.x), y = v.Y(it.y), r = it.s*v.S;
+    eg.beginPath();
+    if (ICONS[it.t]) ICONS[it.t].forEach(p => eg.lineTo(x + p.x*r, y - p.y*r));
+    else if (it.t === 'stud') { eg.moveTo(x, y - r); eg.lineTo(x + r, y); eg.lineTo(x, y + r); eg.lineTo(x - r, y); }
+    else eg.arc(x, y, r, 0, Math.PI*2);
+    eg.closePath(); eg.fillStyle = DECO[it.t].ui; eg.fill(); eg.strokeStyle = '#2b2226'; eg.lineWidth = 1; eg.stroke();
+  }
+}
+function edPoint(e) { const v = edView(), r = ed.getBoundingClientRect(), k = ed.width / r.width; return { v, x:v.ix((e.clientX - r.left)*k), y:v.iy((e.clientY - r.top)*k) }; }
+function edHit(p) {
+  const list = state.nails[sel[0]].deco; let best = -1, bestD = Infinity;
+  list.forEach((it, i) => { const dd = Math.hypot(it.x - p.x, it.y - p.y); if (dd < Math.max(it.s*1.3, 0.05) && dd < bestD) { best = i; bestD = dd; } });
+  return best;
+}
+function artHit(p) { // topmost painted item under the pointer
+  const art = state.nails[sel[0]].art;
+  for (let i = art.length - 1; i >= 0; i--) {
+    const a = art[i];
+    if (a.k === 'b' ? a.pts.some(([x, y]) => Math.hypot(x - p.x, y - p.y) < a.w + 0.03) : Math.hypot(a.x - p.x, a.y - p.y) < a.s*1.1) return i;
+  }
+  return -1;
+}
+let edDrag = null, edStroke = false;
+ed.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  const p = edPoint(e), d = state.nails[sel[0]], size = +$('toolSize').value;
+  const onPlate = p.y >= -0.1 && p.y <= p.v.L + 0.02 && Math.abs(p.x) <= SHAPES[state.shape].hw(clamp(p.y, 0, p.v.L), p.v.L) + 0.03;
+  if (DECO[tool]) {
+    const i = edHit(p);
+    if (i >= 0) { edDrag = i; ed.setPointerCapture(e.pointerId); return; }
+    if (onPlate && d.deco.length < MAX_DECO) applyDeco([...structuredClone(d.deco), { t:tool, x:p.x, y:p.y, s:size }]);
+  } else if (onPlate && d.art.length < MAX_ART) {
+    edStroke = tool === 'brush';
+    if (edStroke) ed.setPointerCapture(e.pointerId);
+    const item = edStroke ? { k:'b', c:paintColor, w:size*0.45, pts:[[p.x, p.y]] } : { k:tool.slice(2), c:paintColor, x:p.x, y:p.y, s:size };
+    applyArt([...structuredClone(d.art), item], !edStroke);
+  }
+});
+ed.addEventListener('pointermove', e => {
+  const p = edPoint(e), d = state.nails[sel[0]];
+  if (edDrag !== null) {
+    const list = structuredClone(d.deco);
+    Object.assign(list[edDrag], { x:clamp(p.x, -0.6, 0.6), y:clamp(p.y, -0.2, 3) });
+    applyDeco(list, false);
+  } else if (edStroke) {
+    const art = structuredClone(d.art), b = art.at(-1), [lx, ly] = b.pts.at(-1);
+    if (Math.hypot(p.x - lx, p.y - ly) < 0.01 || b.pts.length >= MAX_PTS) return;
+    b.pts.push([clamp(p.x, -1, 3), clamp(p.y, -1, 3)]);
+    applyArt(art, false);
+  }
+});
+ed.addEventListener('pointerup', () => { if (edDrag !== null || edStroke) commit(); edDrag = null; edStroke = false; });
+ed.addEventListener('wheel', e => {
+  const i = edHit(edPoint(e)); if (i < 0) return;
+  e.preventDefault();
+  const list = structuredClone(state.nails[sel[0]].deco);
+  list[i].s = clamp(list[i].s * (e.deltaY < 0 ? 1.1 : 1/1.1), 0.02, 0.2);
+  applyDeco(list);
+}, { passive:false });
+const edRemove = e => {
+  e.preventDefault();
+  const p = edPoint(e), d = state.nails[sel[0]], i = edHit(p), j = i < 0 ? artHit(p) : -1;
+  if (i >= 0) applyDeco(d.deco.filter((_, k) => k !== i));
+  else if (j >= 0) applyArt(d.art.filter((_, k) => k !== j));
+};
+ed.addEventListener('contextmenu', edRemove);
+ed.addEventListener('dblclick', edRemove);
+
+// Click (not drag) on a nail in the 3D view or the photo selects it.
+const raycaster = new THREE.Raycaster();
+function pick3d(e) {
+  const r = renderer.domElement.getBoundingClientRect();
+  raycaster.setFromCamera(new THREE.Vector2((e.clientX - r.left)/r.width*2 - 1, -(e.clientY - r.top)/r.height*2 + 1), camera);
+  for (let o = raycaster.intersectObjects(FINGERS.map(f => f.group), true)[0]?.object; o; o = o.parent) if (o.userData.finger) return o.userData.finger;
+  return null;
+}
+let downAt = null;
+renderer.domElement.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  const click = downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) < 5;
+  downAt = null;
+  if (!click) return;
+  const finger = onPhoto() ? nailAt(e)?.key.split('-')[1] : pick3d(e);
+  if (finger) selectNail(finger, e.ctrlKey || e.metaKey || e.shiftKey);
+});
+
+// ---------- self-checks ----------
+// 30 extrude + tessellate runs: they used to delay the first frame, so they run right after it.
+let checksDone = false;
+function geometryChecks() {
+  if (checksDone) return; checksDone = true;
+  for (const sh of Object.keys(SHAPES)) for (const len of Object.values(P.length)) {
+    const g = nailGeometry(sh, SHAPES[sh].L * len.factor), a = g.attributes.position.array;
+    console.assert(a.length > 0 && a.every(Number.isFinite), `bad nail geometry: ${sh} x${len.factor}`);
+    g.dispose();
+  }
+}
+{
+  // Defaults: french on all 5 nails (flat), 5 stones on the ring nail; one nail switched to chrome (per nail) and matte.
+  const fixture = { services:{ hybrid:{ label:'H', price:100, minutes:60 } }, length:{ M:{ label:'M', price:10, minutes:5 } },
+    effects:{ french:{ price:20, minutes:15, per:'flat' }, chrome:{ price:5, minutes:3, per:'nail' } },
+    deco:{ stones:{ price:2, minutes:1, per:'piece' } }, top:{ matte:{ price:4, minutes:0, per:'flat' } } };
+  const qs = structuredClone(DEFAULTS); Object.assign(qs.nails.index, { effect:'chrome', top:'matte' });
+  const q = quote(qs, fixture);
+  console.assert(q.total === 100 + 10 + 20 + 5 + 10 + 4 && q.minutes === 60 + 5 + 15 + 3 + 5, 'quote mismatch', q);
+  const evil = parseHash('#n_ring=red;x~french&n_index=ffffff~__proto__~micro~ombre~ffffff~marble~000000~9~gloss&shape=__proto__&d_ring=stone:9:0.2:0.05_evil:0:0:0.1_stone:a:b:c'
+    + '&a_ring=b:ff0000:0.03:0,0;0.1,0.2_heart:00ff00:0:0.5:0.1_b:zz:1:0,0_x:ff0000:0:0:0.1_b:ff0000:0.03:0,a');
+  console.assert(JSON.stringify(evil.nails.ring.art) === '[{"k":"b","c":"#ff0000","w":0.03,"pts":[[0,0],[0.1,0.2]]},{"k":"heart","c":"#00ff00","x":0,"y":0.5,"s":0.1}]'
+    && evil.nails.index.pattern === 'marble' && evil.nails.index.patternScale === BASE_NAIL.patternScale, 'art/pattern not sanitised', evil);
+  console.assert(evil.nails.ring.color === BASE_NAIL.color && evil.nails.index.color === '#ffffff' && evil.nails.index.effect === BASE_NAIL.effect && evil.shape === DEFAULTS.shape
+    && JSON.stringify(evil.nails.ring.deco) === '[{"t":"stone","x":0.6,"y":0.2,"s":0.05}]', 'hash not sanitised', evil);
+  console.assert(toHash(parseHash(toHash(DEFAULTS))) === toHash(DEFAULTS), 'hash round trip');
+  const hand = Array.from({ length:21 }, (_, i) => ({ x:i/21, y:0.5, z:0, visibility:1 }));
+  const good = validDemo({ img:'data:image/jpeg;base64,AAAA', hands:[hand], fix:{ '0-ring':{ dx:5, dy:-3, rot:0.1, scale:9, len:1.2 }, 'x-ring':{ dx:1 }, '0-pinky':{ dx:'1' } }, size:7 });
+  console.assert(good && good.size === 1.6 && good.fix['0-ring'].scale === 5 && Object.keys(good.fix).join() === '0-ring' && !('visibility' in good.hands[0][0]), 'demo import', good);
+  console.assert(validDemo({ img:'javascript:alert(1)', hands:[] }) === null && validDemo({ img:'data:image/png;base64,AA', hands:[[{ x:1 }]] }) === null, 'demo import rejects');
+  const up = nailPose({ 3:{ x:0.5, y:0.6, z:0 }, 4:{ x:0.5, y:0.4, z:0 } }, 'thumb', 100, 100), right = nailPose({ 3:{ x:0.4, y:0.5, z:0 }, 4:{ x:0.6, y:0.5, z:0 } }, 'thumb', 100, 100);
+  const tilted = nailPose({ 3:{ x:0.5, y:0.6, z:0 }, 4:{ x:0.5, y:0.5, z:-0.1 } }, 'thumb', 100, 100); // 45° toward the camera
+  console.assert(Math.abs(up.rot) < 1e-9 && Math.abs(right.rot + Math.PI/2) < 1e-9 && Math.abs(up.width - 12) < 1e-9 && up.foreshorten === 1, 'nail pose', up, right);
+  console.assert(Math.abs(tilted.foreshorten - Math.SQRT1_2) < 1e-9 && Math.abs(tilted.width - 0.6*Math.hypot(10, 10)) < 1e-9, 'foreshortening', tilted);
+}
+
+new ResizeObserver(resize).observe(view);
+if (HAND3D) document.querySelectorAll('#modeChips [hidden]').forEach(b => { b.hidden = false; });
+rebuild(); syncUI(); setMode(mode);
+renderer.domElement.addEventListener('webglcontextrestored', () => { dirty = true; });
+renderer.setAnimationLoop(() => { if (controls.update() || dirty) { dirty = false; renderFrame(); } });
+setTimeout(geometryChecks, 8000); // fallback: normally they run after the first photo is on screen (setPhoto)
+</script>
+</body>
+</html>

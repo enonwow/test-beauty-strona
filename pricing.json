@@ -1,0 +1,41 @@
+{
+  "salon": "Salon demo",
+  "note": "Ceny brutto w zł, czasy w minutach. per: nail = za paznokieć, piece = za sztukę, flat = raz za zabieg.",
+  "services": {
+    "hybrid":    { "label": "Manicure hybrydowy",            "price": 140, "minutes": 75 },
+    "gel":       { "label": "Żel na naturalnej płytce",      "price": 170, "minutes": 105 },
+    "extension": { "label": "Przedłużanie (tipsy / szablon)", "price": 200, "minutes": 150 },
+    "refill":    { "label": "Uzupełnienie żelu",             "price": 180, "minutes": 120 }
+  },
+  "length": {
+    "S":   { "label": "S (do 1)", "factor": 0.85, "price": 0,  "minutes": 0 },
+    "M":   { "label": "M (do 2)", "factor": 1.0,  "price": 10, "minutes": 5 },
+    "L":   { "label": "L (do 3)", "factor": 1.15, "price": 20, "minutes": 10 },
+    "XL":  { "label": "XL (do 4)", "factor": 1.3, "price": 30, "minutes": 15 },
+    "XXL": { "label": "XXL (5+)", "factor": 1.5,  "price": 50, "minutes": 20 }
+  },
+  "removal": {
+    "hybrid": { "label": "Zdjęcie hybrydy",       "price": 20, "minutes": 15 },
+    "gel":    { "label": "Zdjęcie żelu / akrylu", "price": 40, "minutes": 30 }
+  },
+  "effects": {
+    "french":  { "label": "French",         "price": 20, "minutes": 15, "per": "flat" },
+    "ombre":   { "label": "Ombre / baby boomer", "price": 25, "minutes": 20, "per": "flat" },
+    "chrome":  { "label": "Chrome",         "price": 5, "minutes": 3, "per": "nail" },
+    "glazed":  { "label": "Glazed / pearl", "price": 5, "minutes": 3, "per": "nail" },
+    "cateye":  { "label": "Kocie oko",      "price": 4, "minutes": 2, "per": "nail" },
+    "velvet":  { "label": "Velvet",         "price": 5, "minutes": 3, "per": "nail" },
+    "glitter": { "label": "Brokat",         "price": 3, "minutes": 2, "per": "nail" },
+    "holo":    { "label": "Holo / aurora",  "price": 5, "minutes": 3, "per": "nail" }
+  },
+  "deco": {
+    "stones": { "label": "Cyrkonie",     "price": 1, "minutes": 1, "per": "piece" },
+    "pearls": { "label": "Perełki",      "price": 1, "minutes": 1, "per": "piece" },
+    "studs":  { "label": "Złote ćwieki", "price": 1, "minutes": 1, "per": "piece" },
+    "charms": { "label": "Charmsy",      "price": 3, "minutes": 2, "per": "piece" },
+    "art":    { "label": "Zdobienie ręczne (wzór / malowanie)", "price": 8, "minutes": 8, "per": "nail" }
+  },
+  "top": {
+    "matte": { "label": "Top matowy", "price": 5, "minutes": 0, "per": "flat" }
+  }
+}

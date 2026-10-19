@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wycena ze zdjęcia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
+.sec{padding:20px 20px 0;display:flex;flex-direction:column;gap:8px}
+.sec h2,.lab{margin:0;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1}
+.inp{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;box-sizing:border-box;width:100%}
+.zdj{min-height:140px;border:2px dashed #C9B6BF;border-radius:16px;background:#FAF6F8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:#1E1A1D;text-align:center;padding:12px;overflow:hidden}
+.zdj:focus-within{outline:2px solid #9E1F50;outline-offset:2px}
+.zdj img{max-width:100%;max-height:220px;border-radius:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.btn{min-height:52px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;padding:0 16px}
+.btn:hover{background:#7A173D;color:#fff}
+.btn-o{min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;padding:0 16px}
+.btn-o:hover{color:#1E1A1D;background:#FAF6F8}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.d-cols{flex:1}
+.d-main{display:flex;flex-direction:column;flex:1}
+.how{margin:14px 20px 0;padding:16px 16px 16px 36px;border-radius:14px;background:#FAF6F8;font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px}
+@media (min-width:1024px){
+  .d-cols{flex:none;padding-bottom:32px;justify-content:center}
+  .d-main{display:block;max-width:640px}
+  .d-aside{order:1;flex-basis:380px !important;top:16px}
+  .d-aside>p{margin-left:0 !important;margin-right:0 !important}
+  .how{margin-left:0;margin-right:0}
+  .d-main>div:last-child{padding-left:20px;padding-right:20px}
+  #ok{max-width:640px;margin:0 auto;width:100%;box-sizing:border-box}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
+    <a href="salon.html" data-back data-studio aria-label="Wróć do studia" class="back">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <h1 style="margin:0;font-size:20px;font-weight:700">Wycena ze zdjęcia</h1>
+  </header>
+
+  <form id="wf" style="display:flex;flex-direction:column;flex:1" novalidate>
+    <div class="d-cols">
+    <div class="d-aside">
+    <p style="margin:16px 20px 0;color:#625860;font-size:14px;line-height:1.45">Wyślij inspirację, np. zdjęcie z Instagrama. <b id="studio" style="color:#1E1A1D">[Studio 1]</b> odtworzy ją w kreatorze i odeśle Ci SMS-em cenę, czas i wolne terminy.</p>
+    <ol class="d-only how">
+      <li>Dodajesz zdjęcie i krótki opis.</li>
+      <li>Stylistka odtwarza stylizację w kreatorze.</li>
+      <li>Dostajesz SMS z ceną, czasem i wolnymi terminami.</li>
+    </ol>
+    </div>
+    <div class="d-main">
+
+    <section class="sec">
+      <h2>Zdjęcie inspiracji</h2>
+      <label class="zdj" for="zdj" id="zdj-box">
+        <input id="zdj" class="sr" type="file" accept="image/*">
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="11" r="2"></circle><path d="M21 16l-5-5-8 8"></path></svg>
+        <span id="zdj-txt" style="font-weight:500">Wybierz zdjęcie z telefonu</span>
+        <span style="color:#625860;font-size:12px">Zdjęcie zostaje na tym urządzeniu (makieta)</span>
+      </label>
+      <button type="button" id="zdj-usun" hidden class="btn-o" style="min-height:44px">Usuń zdjęcie</button>
+    </section>
+
+    <section class="sec">
+      <h2>Kategoria</h2>
+      <div id="kat" data-choice role="group" aria-label="Kategoria" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="chip" aria-pressed="true">Paznokcie</button>
+        <button type="button" class="chip" aria-pressed="false">Rzęsy</button>
+        <button type="button" class="chip" aria-pressed="false">Brwi</button>
+        <button type="button" class="chip" aria-pressed="false">Fryzjer</button>
+        <button type="button" class="chip" aria-pressed="false">Kosmetyka</button>
+      </div>
+    </section>
+
+    <section class="sec">
+      <label class="lab" for="opis">Opis (opcjonalnie, jeśli dodałaś zdjęcie)</label>
+      <textarea id="opis" rows="4" placeholder="Np. ten kolor, ale krótsze paznokcie i bez brokatu" style="padding:12px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;resize:vertical"></textarea>
+    </section>
+
+    <section class="sec">
+      <label class="lab" for="imie">Imię</label>
+      <input id="imie" class="inp" type="text" autocomplete="given-name">
+      <label class="lab" for="tel" style="margin-top:8px">Telefon (na SMS z wyceną)</label>
+      <input id="tel" class="inp" type="tel" autocomplete="tel" inputmode="numeric" placeholder="600 100 200">
+    </section>
+
+    <div style="margin-top:auto;padding:20px 20px 24px;display:flex;flex-direction:column;gap:10px">
+      <span style="color:#625860;font-size:12px;line-height:1.4">Wycena jest bezpłatna i nie zobowiązuje do rezerwacji. Studio odpowiada zwykle w ciągu jednego dnia roboczego.</span>
+      <button type="submit" class="btn">Wyślij do wyceny</button>
+    </div>
+    </div>
+    </div>
+  </form>
+
+  <section id="ok" hidden style="padding:32px 20px 24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start;flex:1">
+    <div aria-hidden="true" style="width:52px;height:52px;border-radius:50%;background:#E6F2EC;display:flex;align-items:center;justify-content:center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F6B47" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+    </div>
+    <h2 style="margin:0;font-size:24px">Wysłano</h2>
+    <p style="margin:0;line-height:1.5">Studio <b id="ok-studio">[Studio 1]</b> odeśle wycenę SMS-em na numer <b id="ok-tel"></b>.</p>
+    <img id="ok-img" alt="Wysłane zdjęcie inspiracji" hidden style="max-width:160px;border-radius:12px;border:1px solid #E4D9DE">
+    <p style="margin:0;color:#625860;font-size:13px;line-height:1.45">W wiadomości dostaniesz link z ceną, czasem i wolnymi terminami. Prośba jest widoczna w panelu studia w sekcji „Wyceny”.</p>
+    <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:8px">
+      <a href="panel.html" class="btn-o">Zobacz po stronie studia (panel)</a>
+      <a href="start.html" class="btn">Wróć na start</a>
+      <button type="button" id="jeszcze" class="btn-o">Wyślij kolejne zdjęcie</button>
+    </div>
+  </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const u = Mock.get('user', {}) || {};
+  const studio = new URLSearchParams(location.search).get('s') || (Mock.get('booking', {}) || {}).studio || '[Studio 1]';
+  document.querySelectorAll('[data-studio]').forEach(a => (a.href = 'salon.html?s=' + encodeURIComponent(studio)));
+  $('#studio').textContent = studio;
+  if (u.imie) $('#imie').value = u.imie;
+  if (u.tel) $('#tel').value = u.tel;
+  let kat = 'Paznokcie', plik = null, url = null;
+  $('#kat').addEventListener('mock:choice', e => (kat = e.detail.value));
+
+  $('#zdj').addEventListener('change', e => {
+    plik = e.target.files[0] || null;
+    const box = $('#zdj-box');
+    box.querySelector('img')?.remove();
+    if (!plik) return;
+    if (url) URL.revokeObjectURL(url);
+    url = URL.createObjectURL(plik);
+    const img = new Image(); img.src = url; img.alt = 'Podgląd wybranego zdjęcia';
+    box.prepend(img);
+    $('#zdj-txt').textContent = 'Zmień zdjęcie'; $('#zdj-usun').hidden = false;
+  });
+  $('#zdj-usun').addEventListener('click', () => {
+    $('#zdj').value = ''; plik = null; $('#zdj-box').querySelector('img')?.remove();
+    $('#zdj-txt').textContent = 'Wybierz zdjęcie z telefonu'; $('#zdj-usun').hidden = true;
+  });
+
+  // small thumbnail so the studio panel can show the photo without a server
+  const miniatura = () => new Promise(res => {
+    if (!url) return res('');
+    const im = new Image();
+    im.onload = () => {
+      try {
+        const k = Math.min(1, 160 / Math.max(im.width, im.height)), c = document.createElement('canvas');
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', 0.6));
+      } catch { res(''); }
+    };
+    im.onerror = () => res('');
+    im.src = url;
+  });
+
+  $('#wf').addEventListener('submit', async e => {
+    e.preventDefault();
+    const tel = $('#tel').value.replace(/\D/g, '');
+    if (!plik && $('#opis').value.trim().length < 5) return Mock.toast('Dodaj zdjęcie albo opisz, czego szukasz');
+    if (!$('#imie').value.trim()) { $('#imie').focus(); return Mock.toast('Wpisz imię'); }
+    if (tel.length < 9) { $('#tel').focus(); return Mock.toast('Wpisz 9-cyfrowy numer telefonu'); }
+    const zdjecie = await miniatura();
+    const q = Mock.get('quotes', []);
+    q.unshift({ id: Date.now(), klientka: $('#imie').value.trim(), tel: $('#tel').value.trim(), kategoria: kat, opis: $('#opis').value.trim(), status: 'nowa', studio, zdjecie });
+    Mock.set('quotes', q);
+    $('#ok-studio').textContent = studio; $('#ok-tel').textContent = '+48 ' + $('#tel').value.trim();
+    $('#ok-img').hidden = !zdjecie; if (zdjecie) $('#ok-img').src = zdjecie;
+    $('#wf').hidden = true; $('#ok').hidden = false;
+    Mock.toast('Wysłano, studio odeśle wycenę SMS-em');
+    scrollTo(0, 0);
+  });
+  $('#jeszcze').addEventListener('click', () => { $('#zdj-usun').click(); $('#opis').value = ''; $('#wf').hidden = false; $('#ok').hidden = true; });
+});
+</script>
+</body>
+</html>

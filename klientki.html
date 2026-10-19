@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – klientki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 1000px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+
+    <section aria-label="Lista klientek" style="flex: 1 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap">
+        <h1 class="p-h1" style="font-size: 24px">Klientki</h1>
+        <div class="p-acts">
+          <button type="button" class="p-btn sm" id="imp">Importuj CSV</button>
+          <button type="button" class="p-btn sm pri" id="add">+ Dodaj</button>
+        </div>
+      </div>
+      <label for="szukaj" class="p-sr">Szukaj klientki</label>
+      <input id="szukaj" type="search" class="p-in" placeholder="Imię, telefon lub notatka">
+      <div id="filtr" data-choice role="group" aria-label="Filtr" style="display: flex; gap: 6px; flex-wrap: wrap">
+        <button type="button" data-value="all" aria-pressed="true" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 0; background: #1E1A1D; color: #FFFFFF; font: inherit; font-size: 13px">Wszystkie</button>
+        <button type="button" data-value="uzup" aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 13px">Czas na uzupełnienie</button>
+        <button type="button" data-value="nowa" aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 13px">Nowe</button>
+        <button type="button" data-value="nieob" aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 13px">Z nieobecnością</button>
+      </div>
+      <div id="filtr-tag" data-choice role="group" aria-label="Filtr po tagu" style="display: flex; gap: 6px; flex-wrap: wrap">
+        <button type="button" data-value="" aria-pressed="true" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 0; background: #1E1A1D; color: #FFFFFF; font: inherit; font-size: 13px">Każdy tag</button>
+        <button type="button" data-value="VIP" aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 13px">VIP</button>
+        <button type="button" data-value="alergia" aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 13px">alergia</button>
+        <button type="button" data-value="nowa" aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 13px">nowa</button>
+        <button type="button" data-value="ryzyko nieobecności" aria-pressed="false" style="min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 13px">ryzyko nieobecności</button>
+      </div>
+      <ul id="lista" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column"></ul>
+      <span id="pusto" class="p-mut" hidden>Nikogo nie znaleziono. Zmień filtr albo wyszukiwanie.</span>
+    </section>
+
+    <section id="karta" aria-label="Karta klientki" aria-live="polite" style="flex: 2 1 480px; min-width: 0; background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 18px"></section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc;
+  const C0 = [
+    { id: 'b', n: '[Klientka B]', c: '#5B1630', sub: 'jutro 11:15 · velvet', tag: 'all', tel: '[telefon]', od: '[data]', w: 4, nb: 0, skad: 'Instagram', zg: [true, false], tg: ['VIP'], zdj: true, fo: [['29.09', 'Hybryda M · velvet × 10', '#E4D9DE', '#5B1630'], ['[data]', 'Hybryda S · micro french', '#F3E3DA', '#C98C8C']],
+      h: [['20.10 (jutro)', 'Hybryda M · velvet × 10 · [Stylistka 1]', '200 zł', '#5B1630'], ['29.09', 'Hybryda M · velvet × 10 · lakier [marka, kod]', '200 zł', '#5B1630'], ['[data]', 'Hybryda S · micro french · zmiana na wizycie: + zdjęcie hybrydy, powód: [powód]', '[kwota]', '#F3E3DA']], note: '[np. wrażliwe skórki, lubi krótki kształt migdała]' },
+    { id: 'd', n: '[Klientka D]', c: '#2F5A86', sub: 'rzęsy 2D–3D · czas na uzupełnienie', tag: 'uzup', badge: ['uzupełnienie', '#FFF1E0', '#8A3B12'], tel: '[telefon]', od: '[data]', w: 3, nb: 0, skad: 'Instagram', zg: [true, true], tg: ['alergia'], zdj: true, fo: [['[data]', 'Rzęsy 2D–3D · pełny komplet', '#E4D9DE', '#2F5A86']],
+      h: [['dziś 9:30', 'Rzęsy 1:1 · uzupełnienie · [Stylistka 2]', '150 zł (przykład)', '#2F5A86'], ['[data]', 'Rzęsy 2D–3D · pełny komplet', '[kwota]', '#2F5A86']], note: '[np. uczulenie na klej, ma pierwszeństwo na wolne terminy]' },
+    { id: 'f', n: '[Klientka F]', c: '#E4D9DE', sub: 'czeka na wycenę z Instagrama', tag: 'nowa', badge: ['nowa', '#EAF0F7', '#2F5A86'], tel: '[telefon]', od: 'dziś', w: 0, nb: 0, skad: 'Instagram', zg: [true, false], tg: ['nowa'], zdj: false, fo: [],
+      h: [], note: 'Wysłała zdjęcie inspiracji: „Takie jak na zdjęciu, ale krótsze”.' },
+    { id: 'a', n: '[Klientka A]', c: '#C98C8C', sub: 'ostatnio [data] · hybryda', tag: 'nieob', badge: ['nieobecność', '#FFF1E0', '#8A3B12'], tel: '[telefon]', od: '[data]', w: 2, nb: 1, skad: 'Wyszukiwarka', zg: [true, true], tg: ['ryzyko nieobecności'], zdj: false, fo: [],
+      h: [['dziś 9:00', 'Hybryda jednolita · [Stylistka 1]', '140 zł', '#C98C8C'], ['[data]', 'Hybryda S · nie przyszła, bez odwołania', '0 zł', '#E4D9DE']], note: '[np. przy następnej rezerwacji poproś o zadatek]' }
+  ];
+  let S = Mock.get('klientki.state', { del: [], block: [], dep: [], notes: {}, extra: [], tags: {}, zdj: [], foto: {} });
+  const save = () => Mock.set('klientki.state', S);
+  const all = () => C0.concat(S.extra).filter(c => !S.del.includes(c.id));
+  let sel = 'b', filt = 'all', q = '', tagF = '';
+  S = { tags: {}, zdj: [], foto: {}, ...S };
+  const TAGS = ['VIP', 'alergia', 'nowa', 'ryzyko nieobecności'];
+  const tagsOf = c => S.tags[c.id] ?? c.tg ?? [];
+  const consent = c => c.zdj || S.zdj.includes(c.id);
+  const photos = c => (c.fo || []).concat(S.foto[c.id] || []);
+  // Zdjęcie przykładowe: kafel SVG z podpisem, bez zdjęć prawdziwych osób.
+  const tile = (bg, fg, lab) => `<svg role="img" aria-label="Zdjęcie przykładowe: ${lab}" viewBox="0 0 120 120" style="width:100%;aspect-ratio:1;border-radius:10px;display:block"><rect width="120" height="120" fill="${bg}"/><rect x="38" y="26" width="44" height="60" rx="22" fill="${fg}" opacity=".85"/><rect y="94" width="120" height="26" fill="#fff" opacity=".88"/><text x="60" y="111" text-anchor="middle" font-size="11" font-family="DM Sans,sans-serif" fill="#1E1A1D">${lab} (przykład)</text></svg>`;
+
+  function renderList() {
+    const l = all().filter(c => (filt === 'all' || c.tag === filt) && (!tagF || tagsOf(c).includes(tagF)) && (c.n + ' ' + c.tel + ' ' + (S.notes[c.id] ?? c.note)).toLowerCase().includes(q));
+    document.getElementById('lista').innerHTML = l.map(c => `<li><a href="#" data-id="${c.id}"${c.id === sel ? ' aria-current="true"' : ''} style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;${c.id === sel ? 'background:#F6EDF1;' : ''}text-decoration:none;color:#1E1A1D;min-height:44px;box-sizing:border-box"><span aria-hidden="true" style="width:36px;height:36px;border-radius:50%;background:${c.c};flex:none"></span><span style="display:flex;flex-direction:column;flex:1;min-width:0"><b>${E(c.n)}</b><span style="color:#625860;font-size:13px">${E(c.sub)}</span></span>${tagsOf(c).includes('VIP') ? '<span class="p-badge">VIP</span>' : ''}${c.badge ? `<span style="padding:4px 8px;border-radius:999px;background:${c.badge[1]};color:${c.badge[2]};font-size:12px">${c.badge[0]}</span>` : ''}</a></li>`).join('');
+    document.getElementById('pusto').hidden = l.length > 0;
+  }
+  // Dokumenty: zgoda RODO podpisana (Mock "podpisy" + jeden przykład) albo czeka na podpis (Mock "podprosby").
+  const p2 = n => String(n).padStart(2, '0');
+  const kiedy = iso => { const d = new Date(iso); return `${p2(d.getDate())}.${p2(d.getMonth() + 1)}, ${p2(d.getHours())}:${p2(d.getMinutes())}`; };
+  const rodoSigned = c => [{ doc: 'rodo', klientka: '[Klientka A]', data: '2026-10-18T14:20:00' }].concat(Mock.get('podpisy', [])).find(p => p.doc === 'rodo' && p.klientka === c.n);
+  function docsHtml(c) {
+    if (!PS.addon('podpisy')) return `<div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Dokumenty</h3>${PS.signUpsell()}</div>`;
+    const s = rodoSigned(c), req = Mock.get('podprosby', []).find(p => p.doc === 'rodo' && p.klientka === c.n);
+    return `<div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Dokumenty</h3>
+      <div class="p-row"><span><b>Zgoda RODO</b><br><span class="p-mut">${s ? 'podpisana ' + kiedy(s.data) : req ? 'wysłano do podpisu ' + kiedy(req.data) + ' (' + E(req.kanal) + ')' : 'brak podpisu'}</span></span>
+      ${s ? '<span class="p-badge ok">podpisana</span>' : `<span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="p-badge warn">${req ? 'czeka na podpis' : 'niepodpisana'}</span><button type="button" class="p-btn sm" data-a="sign">${req ? 'Wyślij ponownie' : 'Wyślij do podpisu'}</button></span>`}</div></div>`;
+  }
+  function photosHtml(c) {
+    const ph = photos(c), ok = consent(c);
+    return `<div style="display:flex;flex-direction:column;gap:8px"><div class="p-top"><h3 style="margin:0;font-size:15px;font-weight:700">Zdjęcia przed i po</h3>${ok ? '<button type="button" class="p-btn sm" data-a="foto">+ Dodaj zdjęcia</button>' : '<button type="button" class="p-btn sm" data-a="zgfoto">Poproś o zgodę na zdjęcia</button>'}</div>
+      <div class="p-row"><span><b>Zgoda na zdjęcia</b><br><span class="p-mut">${ok ? 'klientka zgodziła się na zdjęcia w karcie; do portfolio studia potrzebna jest osobna zgoda' : 'brak zgody: nie dodawaj ani nie pokazuj zdjęć tej klientki'}</span></span><span class="p-badge ${ok ? 'ok' : 'warn'}">${ok ? 'jest zgoda' : 'brak zgody'}</span></div>
+      ${ph.length ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">${ph.map(f => `<figure style="margin:0;display:flex;flex-direction:column;gap:6px;min-width:0"><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">${tile(f[2], f[3], 'przed')}${tile(f[3], f[2], 'po')}</div><figcaption class="p-mut"><b style="color:#1E1A1D">${E(f[0])}</b> · ${E(f[1])}</figcaption></figure>`).join('')}</div>` : `<span class="p-mut">${ok ? 'Jeszcze bez zdjęć. Dodaj pierwsze po wizycie.' : 'Bez zdjęć.'}</span>`}</div>`;
+  }
+  function renderCard() {
+    const c = all().find(x => x.id === sel) || all()[0];
+    const k = document.getElementById('karta');
+    if (!c) { k.innerHTML = '<span class="p-mut">Brak klientek. Dodaj pierwszą przyciskiem „+ Dodaj”.</span>'; return; }
+    sel = c.id;
+    const dep = S.dep.includes(c.id), blk = S.block.includes(c.id);
+    k.innerHTML = `
+      <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:14px;align-items:center"><span aria-hidden="true" style="width:56px;height:56px;border-radius:50%;background:${c.c}"></span>
+          <div style="display:flex;flex-direction:column;gap:2px"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700">${E(c.n)}</h2><span style="color:#625860">${E(c.tel)} · klientka od ${E(c.od)}</span>
+          ${dep ? '<span class="p-badge warn" style="align-self:flex-start">zadatek wymagany</span>' : ''}${blk ? '<span class="p-badge warn" style="align-self:flex-start">rezerwacje online zablokowane</span>' : ''}</div></div>
+        <div class="p-acts"><button type="button" class="p-btn pri" data-a="visit">Umów wizytę</button><button type="button" class="p-btn" data-a="sms">Wyślij SMS</button></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Tagi</h3>
+        <div class="p-pills" role="group" aria-label="Tagi klientki">${TAGS.map(t => `<button type="button" class="p-pill" data-tag="${E(t)}" aria-pressed="${tagsOf(c).includes(t)}">${E(t)}</button>`).join('')}</div>
+        <span class="p-mut">Tagi widzi tylko zespół. Kliknij, żeby dodać albo zdjąć.</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px">
+        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Wizyty</span><b style="font-size:20px">${c.w}</b></div>
+        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Nieobecności</span><b style="font-size:20px">${c.nb}</b></div>
+        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Wydała łącznie</span><b style="font-size:20px">[kwota]</b></div>
+        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Skąd przyszła</span><b style="font-size:16px">${E(c.skad)}</b></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Historia stylizacji</h3>
+        ${c.h.length ? c.h.map(h => `<div style="display:flex;gap:12px;align-items:center;padding:10px;border:1px solid #F0E8EC;border-radius:12px"><span aria-hidden="true" style="width:40px;height:40px;border-radius:10px;background:${h[3]};flex:none"></span><span style="flex:1"><b>${E(h[0])}</b> · ${E(h[1])}</span><span>${E(h[2])}</span></div>`).join('') : '<span class="p-mut">Jeszcze bez wizyt. Wycena czeka w zakładce Wyceny.</span>'}</div>
+      ${photosHtml(c)}
+      <div style="display:flex;flex-wrap:wrap;gap:16px">
+        <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:8px"><label for="notatka" style="font-size:15px;font-weight:700">Notatki (widzi tylko zespół)</label>
+          <textarea id="notatka" rows="4" class="p-in" data-toast-change="Zapisano notatkę">${E(S.notes[c.id] ?? c.note)}</textarea></div>
+        <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Zgody</h3>
+          <span style="display:flex;justify-content:space-between"><span>Przypomnienia SMS</span><b style="color:${c.zg[0] ? '#1F6B47' : '#625860'}">${c.zg[0] ? 'tak' : 'nie'}</b></span>
+          <span style="display:flex;justify-content:space-between"><span>Marketing SMS</span><b style="color:${c.zg[1] ? '#1F6B47' : '#625860'}">${c.zg[1] ? 'tak' : 'nie'}</b></span>
+          <span class="p-mut">Zgodę marketingową zmienia tylko klientka. Kampanie trafiają wyłącznie do osób ze zgodą.</span></div>
+      </div>
+      ${docsHtml(c)}
+      <div class="p-acts" style="padding-top:12px;border-top:1px solid #F0E8EC">
+        <button type="button" class="p-btn sm" data-a="dep">${dep ? 'Nie wymagaj zadatku' : 'Wymagaj zadatku od tej klientki'}</button>
+        <button type="button" class="p-btn sm" data-a="block">${blk ? 'Odblokuj rezerwacje online' : 'Zablokuj rezerwacje online'}</button>
+        <button type="button" class="p-btn sm" data-a="rodo">Eksport danych (RODO)</button>
+        <button type="button" class="p-btn sm dng" data-a="del">Usuń dane klientki</button>
+      </div>`;
+  }
+  const render = () => { renderList(); renderCard(); };
+
+  document.getElementById('lista').addEventListener('click', e => { const a = e.target.closest('[data-id]'); if (!a) return; e.preventDefault(); sel = a.dataset.id; render(); });
+  document.getElementById('filtr').addEventListener('mock:choice', e => { filt = e.detail.button.dataset.value; renderList(); });
+  document.getElementById('filtr-tag').addEventListener('mock:choice', e => { tagF = e.detail.button.dataset.value; renderList(); });
+  document.getElementById('szukaj').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); renderList(); });
+  document.getElementById('karta').addEventListener('change', e => { if (e.target.id === 'notatka') { S.notes[sel] = e.target.value; save(); } });
+  document.getElementById('karta').addEventListener('click', e => {
+    const tg = e.target.closest('[data-tag]');
+    if (tg) { const c = all().find(x => x.id === sel), t = tg.dataset.tag, cur = tagsOf(c); S.tags[c.id] = cur.includes(t) ? cur.filter(x => x !== t) : cur.concat(t); save(); render(); Mock.toast(S.tags[c.id].includes(t) ? 'Dodano tag: ' + t : 'Zdjęto tag: ' + t); return; }
+    const b = e.target.closest('[data-a]'); if (!b) return;
+    const c = all().find(x => x.id === sel), a = b.dataset.a;
+    if (a === 'visit') PS.visitModal({ done: () => {} });
+    if (a === 'sms') PS.modal({ title: 'SMS do ' + c.n, ok: 'Wyślij', body: '<label class="p-lab">Treść<textarea class="p-in" rows="4" name="t" required maxlength="160">[NazwaStudia]: dziękujemy za wizytę! Zapraszamy ponownie.</textarea></label>', toast: 'SMS wysłany do ' + c.n });
+    if (a === 'dep') { S.dep = S.dep.includes(c.id) ? S.dep.filter(x => x !== c.id) : S.dep.concat(c.id); save(); renderCard(); Mock.toast(S.dep.includes(c.id) ? 'Zadatek będzie wymagany przy kolejnej rezerwacji' : 'Zadatek nie jest już wymagany'); }
+    if (a === 'block') {
+      if (S.block.includes(c.id)) { S.block = S.block.filter(x => x !== c.id); save(); renderCard(); Mock.toast('Rezerwacje online odblokowane'); }
+      else PS.modal({ title: 'Zablokować rezerwacje online?', ok: 'Zablokuj', cls: 'dark', body: `<p style="margin:0">${E(c.n)} nie umówi się już sama przez stronę studia. Wizytę nadal możesz dodać ręcznie.</p>`, onOk: () => { S.block.push(c.id); save(); renderCard(); }, toast: 'Zablokowano rezerwacje online' });
+    }
+    if (a === 'sign') PS.modal({
+      title: 'Wyślij do podpisu: Zgoda RODO', ok: 'Wyślij',
+      body: `<p style="margin:0">Dla: <b>${E(c.n)}</b></p><fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Kanał</legend>${['SMS', 'e-mail'].map((k, i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="c" value="${k}"${i ? '' : ' checked'}>${k}</label>`).join('')}</fieldset><span class="p-mut">Klientka dostanie link do podpisu w telefonie.</span>`,
+      onOk: fm => { const l = Mock.get('podprosby', []); l.unshift({ doc: 'rodo', klientka: c.n, kanal: fm.c.value, data: new Date().toISOString() }); Mock.set('podprosby', l); renderCard(); },
+      toast: fm => `Wysłano do podpisu: ${c.n} (${fm.c.value})`
+    });
+    if (a === 'zgfoto') PS.modal({ title: 'Prośba o zgodę na zdjęcia', ok: 'Wyślij prośbę', body: `<p style="margin:0;line-height:1.45">${E(c.n)} dostanie SMS z linkiem. Zdjęcia będzie można dodawać dopiero po jej zgodzie.</p><label class="p-chk"><input type="checkbox" name="sim" checked>Makieta: oznacz zgodę jako udzieloną od razu</label>`, onOk: f => { if (f.sim.checked) { S.zdj.push(c.id); save(); render(); } }, toast: f => f.sim.checked ? 'Zgoda na zdjęcia zapisana' : 'Wysłano prośbę o zgodę: ' + c.n });
+    if (a === 'foto') PS.modal({ title: 'Dodaj zdjęcia z wizyty', ok: 'Dodaj', body: `<label class="p-lab">Podpis<input class="p-in" name="p" required placeholder="np. Hybryda M · velvet"></label><label class="p-lab">Data<input class="p-in" type="date" name="d" value="2026-10-19" required></label><span class="p-mut">Makieta: zamiast prawdziwych zdjęć pokażemy kafle przykładowe.</span>`, onOk: f => { const p = f.p.value.trim(), d = f.d.value.split('-').reverse().slice(0, 2).join('.'); (S.foto[c.id] = S.foto[c.id] || []).push([d, p, '#E4D9DE', c.c === '#E4D9DE' ? '#9E1F50' : c.c]); save(); render(); }, toast: 'Dodano zdjęcia przed i po' });
+    if (a === 'rodo') Mock.toast('Przygotowano plik z danymi klientki (ZIP)');
+    if (a === 'del') PS.modal({ title: 'Usunąć dane klientki?', ok: 'Usuń dane', cls: 'dark', body: `<p style="margin:0">Dane ${E(c.n)} zostaną usunięte bezpowrotnie: historia, notatki i zgody. Tej operacji nie można cofnąć.</p>`, onOk: () => { S.del.push(c.id); save(); sel = ''; render(); }, toast: 'Dane klientki usunięte' });
+  });
+  document.getElementById('add').addEventListener('click', () => PS.modal({
+    title: 'Nowa klientka',
+    body: '<label class="p-lab">Imię i nazwisko<input class="p-in" name="n" required></label><label class="p-lab">Telefon<input class="p-in" name="t" type="tel" required placeholder="+48 …"></label>',
+    onOk: f => { const id = 'x' + Date.now(); S.extra.push({ id, n: f.n.value.trim(), c: '#9E1F50', sub: 'dodana ręcznie', tag: 'nowa', badge: ['nowa', '#EAF0F7', '#2F5A86'], tel: f.t.value.trim(), od: 'dziś', w: 0, nb: 0, skad: 'Dodana ręcznie', zg: [false, false], tg: ['nowa'], zdj: false, fo: [], h: [], note: '' }); sel = id; save(); render(); },
+    toast: f => 'Dodano klientkę: ' + f.n.value.trim()
+  }));
+  document.getElementById('imp').addEventListener('click', () => PS.modal({
+    title: 'Import klientek z CSV', ok: 'Importuj',
+    body: '<label class="p-lab">Plik CSV (np. eksport z Booksy)<input class="p-in" type="file" name="f" accept=".csv,text/csv" required></label><span class="p-mut">Kolumny: imię, telefon, e-mail. Zgody marketingowe nie są przenoszone.</span>',
+    toast: 'Wczytano [x] klientek'
+  }));
+  render();
+});
+</script>
+</body>
+</html>

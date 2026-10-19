@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – raporty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 1000px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Raporty</h1><span id="okres-lbl" class="p-mut" aria-live="polite">Październik 2026</span></div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <label for="okres" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Okres</label>
+        <select id="okres" style="min-height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; font: inherit"><option value="tydzien">Ten tydzień</option><option value="miesiac" selected>Październik 2026</option><option value="zakres">Od – do…</option></select>
+        <button type="button" id="exp" class="p-btn sm">Pobierz dla księgowej (CSV)</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Utarg</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[kwota]</b><span style="color: #625860; font-size: 12px"><span id="vs">vs wrzesień</span>: [zmiana]</span></div>
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Wizyty</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[liczba]</b><span style="color: #625860; font-size: 12px">średnio [kwota] za wizytę</span></div>
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nieobecności</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[x]%</b><span style="color: #625860; font-size: 12px">z zadatkiem: [x]%</span></div>
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nowe klientki</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[liczba]</b><span style="color: #625860; font-size: 12px">prowizja dla nas: 0 zł</span></div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+      <section style="flex: 999 1 460px; min-width: 0; background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><h2 id="chart-h" style="margin: 0; font-size: 16px; font-weight: 700">Utarg tygodniowo</h2><span style="color: #625860; font-size: 12px">wykres poglądowy</span></div>
+        <div id="chart" role="img" aria-label="Wykres poglądowy utargu w 4 tygodniach października" style="height: 200px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 24px; align-items: end; padding: 0 12px; border-bottom: 1px solid #E4D9DE">
+          <div style="height: 55%; border-radius: 8px 8px 0 0; background: #E7B7C0"></div>
+          <div style="height: 70%; border-radius: 8px 8px 0 0; background: #E7B7C0"></div>
+          <div style="height: 62%; border-radius: 8px 8px 0 0; background: #E7B7C0"></div>
+          <div style="height: 85%; border-radius: 8px 8px 0 0; background: #9E1F50"></div>
+        </div>
+        <div id="chart-x" aria-hidden="true" style="display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 24px; padding: 0 12px; color: #625860; font-size: 12px; text-align: center"><span>1–5</span><span>6–12</span><span>13–19</span><span>20–26</span></div>
+      </section>
+
+      <section style="flex: 1 1 300px; min-width: 0; background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Skąd przyszły klientki</h2>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Link na Instagramie</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 60%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Wyszukiwarka</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 25%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Polecenie</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 10%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Dodane ręcznie</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 5%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <span style="color: #625860; font-size: 12px">Słupki poglądowe. Za żadne źródło nie płacisz prowizji.</span>
+      </section>
+    </div>
+
+    <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 700">Zespół</h2>
+      <div style="overflow-x: auto">
+        <table style="width: 100%; min-width: 560px; border-collapse: collapse; text-align: left">
+          <thead><tr style="color: #625860; font-size: 12px"><th style="padding: 8px; font-weight: 500">Osoba</th><th style="padding: 8px; font-weight: 500">Wizyty</th><th style="padding: 8px; font-weight: 500">Utarg</th><th style="padding: 8px; font-weight: 500">Prowizja</th><th style="padding: 8px; font-weight: 500">Czas planowany / faktyczny</th></tr></thead>
+          <tbody>
+            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">[Stylistka 1]</td><td style="padding: 10px 8px">[liczba]</td><td style="padding: 10px 8px">[kwota]</td><td style="padding: 10px 8px">—</td><td style="padding: 10px 8px">[x] h / [y] h</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">[Stylistka 2]</td><td style="padding: 10px 8px">[liczba]</td><td style="padding: 10px 8px">[kwota]</td><td style="padding: 10px 8px">[kwota]</td><td style="padding: 10px 8px">[x] h / [y] h</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <span style="color: #625860; font-size: 12px">Porównanie czasu pomaga poprawić minuty w cenniku, żeby terminy były trafne.</span>
+    </section>
+  </main>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sel = document.getElementById('okres'), lbl = document.getElementById('okres-lbl'), chart = document.getElementById('chart'), x = document.getElementById('chart-x');
+  const DATA = {
+    tydzien: { t: 'Ten tydzień, 19–24 października', vs: 'vs poprzedni tydzień', h: 'Utarg dziennie', bars: [40, 65, 80, 55, 70, 30], lab: ['pn', 'wt', 'śr', 'cz', 'pt', 'sb'] },
+    miesiac: { t: 'Październik 2026', vs: 'vs wrzesień', h: 'Utarg tygodniowo', bars: [55, 70, 62, 85], lab: ['1–5', '6–12', '13–19', '20–26'] }
+  };
+  let last = 'miesiac';
+  function draw(d, text) {
+    lbl.textContent = text;
+    document.getElementById('vs').textContent = d.vs;
+    document.getElementById('chart-h').textContent = d.h;
+    chart.setAttribute('aria-label', 'Wykres poglądowy: ' + d.h.toLowerCase() + ', ' + text);
+    chart.innerHTML = d.bars.map((b, i) => `<div style="height:${b}%;border-radius:8px 8px 0 0;background:${i === d.bars.length - 1 ? '#9E1F50' : '#E7B7C0'}"></div>`).join('');
+    x.innerHTML = d.lab.map(l => `<span>${l}</span>`).join('');
+  }
+  sel.addEventListener('change', () => {
+    if (sel.value !== 'zakres') { last = sel.value; draw(DATA[sel.value], DATA[sel.value].t); Mock.toast('Okres: ' + DATA[sel.value].t); return; }
+    PS.modal({
+      title: 'Własny okres', ok: 'Pokaż',
+      body: '<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" value="2026-10-01" required></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" value="2026-10-15" required></label></div>',
+      onOk: f => { if (f.do.value < f.od.value) { Mock.toast('Data końca jest przed początkiem'); return false; } last = 'zakres'; draw({ vs: 'vs poprzedni okres', h: 'Utarg w okresie', bars: [50, 60, 45, 75, 65], lab: ['1', '2', '3', '4', '5'] }, f.od.value.split('-').reverse().join('.') + ' – ' + f.do.value.split('-').reverse().join('.')); },
+      toast: 'Zmieniono okres raportu'
+    }).addEventListener('close', () => { if (last !== 'zakres') sel.value = last; });
+  });
+  document.getElementById('exp').addEventListener('click', () => Mock.toast('Pobrano CSV dla księgowej: ' + lbl.textContent));
+  draw(DATA.miesiac, DATA.miesiac.t);
+});
+</script>
+</body>
+</html>

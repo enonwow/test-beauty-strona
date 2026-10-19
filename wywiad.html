@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pytania przed zabiegiem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+@media (min-width: 1024px) {
+  #wywiad-side { max-height: calc(100vh - 128px); overflow-y: auto; } /* 128 = side's top before the page scrolls (~103) + gap */
+  #wywiad-side [data-dalej] { position: sticky; bottom: 0; box-shadow: 0 0 0 12px #FFFFFF; }
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="d-page" style="min-height: 100vh; background: #FFFFFF; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 15px; display: flex; flex-direction: column">
+  <header style="padding: 16px 20px 12px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #F0E8EC">
+    <a id="wstecz" href="salon.html" data-back aria-label="Wróć" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4D9DE; display: flex; align-items: center; justify-content: center; color: #1E1A1D; flex: none">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column">
+      <span id="podsumowanie" style="color: #625860; font-size: 12px"></span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Kilka pytań przed zabiegiem</h1>
+    </div>
+  </header>
+  <!-- desktop: questions in the main column, result and "Zanim zapłacisz" sticky on the right -->
+  <div id="wywiad" class="d-cols" style="padding: 0 20px 24px">
+    <div id="wywiad-main" class="d-main"></div>
+    <div id="wywiad-side" class="d-aside"></div>
+  </div>
+</div>
+<script src="kreator.js"></script>
+<script>
+// RODO: health answers live only in the `odp` variable below. They are never written to localStorage, the URL
+// or the booking; the booking gets only the effect (sciezka, testMin, uwagi).
+const KAT = { rzesy: { plik: 'rzesy.html', nazwa: 'Rzęsy' }, brwi: { plik: 'brwi.html', nazwa: 'Brwi' }, fryzjer: { plik: 'fryzjer.html', nazwa: 'Fryzjer' }, kosmetologia: { plik: 'kosmetyka.html', nazwa: 'Kosmetologia' } };
+const kat = new URLSearchParams(location.search).get('kat');
+const root = document.getElementById('wywiad'), { esc, zl, dur, zlRange } = Kreator;
+const odp = {}; let zgoda = false, c, booking, pyt = [];
+const BOX = {
+  test48h: ['#EAF0F7', '#1E1A1D', 'Najpierw krótki test uczuleniowy'],
+  rezerwacja: ['#E6F2EC', '#1F6B47', 'Możesz rezerwować'],
+  konsultacja: ['#FFF1E0', '#8A3B12', 'Porozmawiajmy przed zabiegiem'],
+  blokada: ['#FFFFFF', '#A3262A', 'Teraz nie wykonamy zabiegu'],
+};
+
+async function start() {
+  if (!KAT[kat]) { root.innerHTML = '<p style="padding-top: 20px">Nie wiemy, którego zabiegu dotyczą pytania. <a href="salon.html">Wybierz usługę w studiu</a>.</p>'; return; }
+  document.getElementById('wstecz').href = KAT[kat].plik;
+  booking = window.Mock?.get('booking', null);
+  if (!booking || booking.kat !== kat) { root.innerHTML = `<p style="padding-top: 20px; line-height: 1.5">Najpierw skonfiguruj zabieg, żeby pytania dotyczyły tego, co wybierzesz. <a href="${KAT[kat].plik}">Przejdź do kreatora</a>.</p>`; return; }
+  try { c = await (await fetch(`cenniki/${kat}.json`)).json(); }
+  catch (e) { root.innerHTML = `<p style="padding-top: 20px; color: #A3262A">Nie udało się wczytać pytań (${esc(e.message)}).</p>`; return; }
+  pyt = Kreator.pytania(c, booking.zakres || []);
+  zgoda = !pyt.length; // nothing to ask: no health data, no consent needed
+  document.getElementById('podsumowanie').textContent = `${KAT[kat].nazwa} · ${booking.sciezka === 'konsultacja' ? 'konsultacja' : zlRange(booking.cenaMin ?? booking.cena, booking.cenaMax ?? booking.cena)} · ok. ${booking.czasTekst}`;
+  render();
+}
+
+function wynik() {
+  const ocena = Kreator.ocenWywiad(c, booking.zakres || [], odp, zgoda), sciezka = Kreator.worst(booking.sciezka || 'rezerwacja', ocena.sciezka);
+  const komplet = !zgoda || pyt.every(q => odp[q.id] !== undefined);
+  return { ...ocena, sciezka, komplet };
+}
+
+function render() {
+  const r = wynik();
+  const toggle = (q, val, label) => { const on = odp[q.id] === (val === 'tak'); // odp holds booleans
+    return `<button type="button" data-q="${q.id}" data-val="${val}" aria-pressed="${on}" ${zgoda ? '' : 'disabled'} style="min-height: 44px; padding: 0 14px; border: 0; background: ${on ? '#1E1A1D' : '#FFFFFF'}; color: ${on ? '#FFFFFF' : '#1E1A1D'}; font: inherit; font-size: 13px; cursor: ${zgoda ? 'pointer' : 'not-allowed'}; opacity: ${zgoda ? 1 : 0.5}">${label}</button>`; };
+  let html = '';
+  if (booking.sciezka === 'konsultacja') html += `<p style="margin: 16px 0 0; padding: 10px 12px; border-radius: 10px; background: #FFF1E0; color: #8A3B12; font-size: 13px; line-height: 1.45">Kreator skierował Cię na konsultację (${esc(booking.usluga)}). Pytania pomogą przygotować rozmowę.</p>`;
+  if (pyt.length) {
+    html += `<section style="margin-top: 16px; padding: 14px; border-radius: 14px; background: #FAF6F8; display: flex; flex-direction: column; gap: 10px">
+      <label style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45"><input id="zgoda" type="checkbox" ${zgoda ? 'checked' : ''} style="width: 22px; height: 22px; margin: 0; flex: none">Zgadzam się, żeby studio użyło moich odpowiedzi o zdrowiu tylko do bezpiecznego wykonania zabiegu.</label>
+      <span style="color: #625860; font-size: 12px; line-height: 1.45">Odpowiedzi nie trafiają do linku ani na kartę wizyty. Studio zobaczy tylko wynik, np. „wymagany test”. Bez zgody możesz zarezerwować konsultację.</span></section>
+      <section aria-label="Pytania" style="padding-top: 12px; display: flex; flex-direction: column">`
+      + pyt.map((q, i) => `<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; ${i < pyt.length - 1 ? 'border-bottom: 1px solid #F0E8EC' : ''}"><span id="q-${q.id}" style="font-size: 14px">${esc(q.pytanie)}</span>`
+        + `<div role="group" aria-labelledby="q-${q.id}" style="display: flex; border: 1px solid #E4D9DE; border-radius: 10px; overflow: hidden; flex: none">${toggle(q, 'tak', 'Tak')}${toggle(q, 'nie', 'Nie')}</div></div>`).join('')
+      + '</section>';
+  } else html += `<p style="margin: 16px 0 0; color: #625860; font-size: 14px">Do tego zabiegu nie mamy pytań o zdrowie.</p>`;
+
+  document.getElementById('wywiad-main').innerHTML = html;
+  html = `<h2 style="margin: 20px 0 10px; font-size: 15px; font-weight: 700">Wynik</h2>`;
+  if (!r.komplet) html += `<p role="status" style="margin: 0; padding: 12px 14px; border-radius: 14px; background: #FAF6F8; font-size: 14px">Odpowiedz na wszystkie pytania (${pyt.filter(q => odp[q.id] !== undefined).length} z ${pyt.length}), żeby zobaczyć wynik.</p>`;
+  else {
+    const [bg, fg, title] = BOX[r.sciezka];
+    const texts = r.wyniki.filter(x => x.typ === r.sciezka || (r.sciezka === 'rezerwacja' && x.typ === 'uwaga') || (r.sciezka === 'test48h' && x.typ === 'uwaga')).map(x => x.tekst);
+    if (r.sciezka === 'rezerwacja' && !texts.length) texts.push('Na podstawie odpowiedzi nic nie stoi na przeszkodzie.');
+    if (r.sciezka === 'konsultacja' && !texts.length) texts.push(booking.sciezka === 'konsultacja' ? 'Zarezerwujesz bezpłatną konsultację, a zabieg umówicie na miejscu.' : 'Zarezerwuj bezpłatną konsultację, a zabieg umówicie na miejscu.');
+    if (r.sciezka === 'konsultacja') texts.push(`Konsultacja: ${zl(c.konsultacja.cena)} · ${dur(c.konsultacja.min)}.`);
+    html += `<section role="status" style="padding: 14px; border-radius: 14px; background: ${bg}; ${r.sciezka === 'blokada' ? 'border: 2px solid #A3262A;' : ''} display: flex; flex-direction: column; gap: 6px"><b style="color: ${fg}">${title}</b>`
+      + texts.map(t => `<span style="font-size: 14px; line-height: 1.45">${esc(t)}</span>`).join('')
+      + (r.sciezka === 'blokada' ? `<button type="button" data-przypomnij style="align-self: flex-start; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #1E1A1D; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Przypomnij mi</button>` : '')
+      + '</section>';
+  }
+  html += `<section style="margin-top: 20px; padding: 14px; border-radius: 14px; background: #FAF6F8; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.45">
+      <b style="font-size: 14px">Zanim zapłacisz</b>
+      <span>Wpłata to <b>zaliczka [x] zł</b>. Zwracamy ją, gdy odwołasz do 24 h przed wizytą.</span>
+      <span>Rezerwujesz online, więc masz 14 dni na odstąpienie od umowy.</span>
+      <span>Cena brutto z kreatora jest ostateczna${booking.cenaMax > booking.cenaMin ? ', poza widełkami opisanymi w kreatorze' : ''}.</span></section>`;
+  const blocked = !r.komplet || r.sciezka === 'blokada';
+  const label = !r.komplet ? 'Odpowiedz na pytania' : { test48h: 'Wybierz termin testu i zabiegu', konsultacja: 'Umów konsultację', rezerwacja: 'Wybierz termin', blokada: 'Rezerwacja niedostępna' }[r.sciezka];
+  html += `<button type="button" data-dalej ${blocked ? 'disabled' : ''} style="margin-top: 16px; min-height: 52px; border-radius: 12px; border: 0; background: ${blocked ? '#C9B6BF' : '#9E1F50'}; color: #FFFFFF; font: inherit; font-weight: 700; cursor: ${blocked ? 'not-allowed' : 'pointer'}">${label}</button>`;
+  document.getElementById('wywiad-side').innerHTML = html;
+}
+
+root.addEventListener('change', e => { if (e.target.id === 'zgoda') { zgoda = e.target.checked; render(); document.getElementById('zgoda').focus(); } });
+root.addEventListener('click', e => {
+  const t = e.target.closest('button[data-q]');
+  if (t) { odp[t.dataset.q] = t.dataset.val === 'tak'; render(); root.querySelector(`button[data-q="${t.dataset.q}"][data-val="${t.dataset.val}"]`)?.focus(); return; }
+  if (e.target.closest('[data-przypomnij]')) { window.Mock?.toast('Przypomnimy Ci za 2 tygodnie'); return; }
+  if (!e.target.closest('[data-dalej]')) return;
+  const r = wynik();
+  if (!r.komplet || r.sciezka === 'blokada') return;
+  const next = { ...booking, sciezka: r.sciezka, testMin: r.sciezka === 'test48h' ? c.test.min : 0, uwagi: [...new Set([...(booking.uwagi || []), ...r.uwagi])] };
+  if (r.sciezka === 'konsultacja') Object.assign(next, { czas: c.konsultacja.min, czasTekst: dur(c.konsultacja.min) });
+  // self-check: nothing from the answers themselves leaves this page
+  console.assert(!Object.keys(odp).some(id => JSON.stringify(next).includes(`"${id}"`)), 'wywiad: odpowiedzi nie trafiają do booking');
+  window.Mock?.set('booking', next);
+  location.href = 'termin.html';
+});
+document.readyState === 'loading' ? addEventListener('DOMContentLoaded', start, { once: true }) : start(); // after deferred mock.js
+</script>
+</body>
+</html>

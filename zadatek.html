@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zaliczka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
+.pay{min-height:52px;padding:0 14px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;width:100%}
+.pay::before{content:"";width:20px;height:20px;border-radius:50%;border:2px solid #C9B6BF;box-sizing:border-box;flex:none}
+.pay[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1}
+.pay[aria-pressed=true]::before{border:6px solid #9E1F50;background:#fff}
+.inp{min-height:56px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:22px;letter-spacing:.2em;text-align:center;box-sizing:border-box;width:100%}
+.btn{min-height:52px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
+.btn:hover{background:#7A173D;color:#fff}
+.row{display:flex;justify-content:space-between;font-size:14px}
+.err{color:#A3262A;font-size:13px;line-height:1.35}
+.inp[aria-invalid=true]{border:2px solid #A3262A}
+.btn:disabled{background:#8A7F86;cursor:default}
+.b2{min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer;padding:0 14px}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.d-cols{flex:1}
+.d-main{display:flex;flex-direction:column;flex:1}
+@media (min-width:1024px){
+  .d-cols{flex:none;padding-bottom:32px;justify-content:center}
+  .d-main{max-width:640px;display:block}
+  .d-aside{order:1;flex-basis:400px !important;top:16px}
+  .d-aside>section{margin-left:0 !important;margin-right:0 !important}
+  #plac>div:last-child{padding:16px 20px 0 !important;border-top:0 !important}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <header style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
+    <a href="termin.html" aria-label="Wróć do terminu" class="back">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <h1 style="margin:0;font-size:20px;font-weight:700">Zaliczka</h1>
+  </header>
+
+  <div class="d-cols">
+  <div class="d-aside">
+  <section style="margin:16px 20px 0;padding:14px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:4px">
+    <b id="kiedy">Wt 20.10 · 11:15–13:05 · [Studio 1]</b>
+    <span style="color:#625860;font-size:14px" data-bind="booking.opis">Manicure hybrydowy · M · velvet × 10</span>
+    <div class="row" style="padding-top:8px"><span>Cena wizyty</span><b><span data-bind="booking.cena">200</span> zł</b></div>
+    <div class="row"><span>Zaliczka teraz (przykładowo 30%)</span><b><span id="zad">60</span> zł</b></div>
+    <div class="row"><span>Do zapłaty w studiu</span><b><span id="reszta">140</span> zł</b></div>
+  </section>
+
+  <section aria-label="Zasady zaliczki" style="margin:16px 20px 0;padding:14px;border-radius:14px;border:2px solid #1E1A1D;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45">
+    <b style="font-size:15px">Przeczytaj, zanim zapłacisz</b>
+    <span>Odwołasz do <b id="termin-odw">poniedziałku 19.10, 11:15</b> (24 h przed): zaliczka wraca automatycznie w ciągu 5 dni roboczych.</span>
+    <span>Odwołasz później albo nie przyjdziesz: zaliczki nie zwracamy.</span>
+    <span>Studio odwoła wizytę: zawsze zwrot całości.</span>
+    <span>Rezerwujesz online, więc masz 14 dni na odstąpienie od umowy.</span>
+    <span id="seria-zal" hidden style="padding-top:6px;border-top:1px solid #E4D9DE">Cała seria (<span id="seria-ile"></span> zabiegów, <b id="seria-suma"></b> zł) jest płatna z góry w studiu przy pierwszej wizycie. Teraz wpłacasz tylko zaliczkę.</span>
+  </section>
+  </div>
+
+  <div class="d-main">
+  <form id="plac" style="display:flex;flex-direction:column;flex:1" novalidate>
+  <fieldset id="metody" data-choice style="margin:16px 20px 0;padding:0;border:0;display:flex;flex-direction:column;gap:8px">
+    <legend style="font-size:14px;font-weight:700;margin-bottom:8px;padding:0">Metoda płatności</legend>
+    <button type="button" class="pay" aria-pressed="true" data-value="BLIK">BLIK</button>
+    <button type="button" class="pay" aria-pressed="false" data-value="Karta płatnicza">Karta płatnicza</button>
+    <button type="button" class="pay" aria-pressed="false" data-value="Apple Pay / Google Pay">Apple Pay / Google Pay</button>
+  </fieldset>
+
+  <div id="blik-box" style="margin:14px 20px 0;display:flex;flex-direction:column;gap:6px">
+    <label for="blik" style="font-size:13px;color:#625860">Kod BLIK z aplikacji banku (6 cyfr)</label>
+    <input id="blik" class="inp" inputmode="numeric" maxlength="7" placeholder="000 000" autocomplete="off" aria-describedby="blik-err">
+    <span id="blik-err" class="err" role="alert" hidden></span>
+  </div>
+  <p id="inna-met" hidden style="margin:14px 20px 0;padding:12px 14px;border-radius:12px;background:#FAF6F8;color:#625860;font-size:14px;line-height:1.45">Po kliknięciu „Zapłać” otworzy się bramka płatności [operator płatności]. W makiecie płatność zatwierdza się od razu.</p>
+
+  <div style="margin-top:auto;padding:16px 20px 24px;border-top:1px solid #F0E8EC;display:flex;flex-direction:column;gap:10px">
+    <span style="color:#625860;font-size:12px;line-height:1.4">Płatność obsługuje [operator płatności]. Studio nie widzi danych Twojej karty.</span>
+    <button type="submit" id="plac-btn" class="btn">Zapłać <span id="zad2" style="margin:0 4px">60</span> zł i zarezerwuj</button>
+  </div>
+  </form>
+  </div>
+  </div>
+</div>
+
+<dialog id="dlg-blik" aria-labelledby="bl-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div id="bl-stan" style="display:flex;flex-direction:column;gap:12px">
+      <h2 id="bl-t" style="margin:0;font-size:18px">Potwierdź płatność w aplikacji banku</h2>
+      <p style="margin:0;font-size:14px;line-height:1.5">Otwórz aplikację swojego banku i zatwierdź płatność BLIK <b><span id="bl-kwota"></span> zł</b>. Nie zamykaj tej strony.</p>
+      <p style="margin:0;font-size:14px">Czekamy jeszcze <b id="bl-sek">20</b> s…</p>
+      <p style="margin:0;color:#625860;font-size:12px;line-height:1.4">Makieta: prawdziwego banku nie ma, więc potwierdzenie możesz zasymulować przyciskiem poniżej.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" id="bl-anuluj" class="b2" style="flex:1">Anuluj</button>
+        <button type="button" id="bl-ok" class="btn" style="flex:2;min-height:48px">Potwierdziłam w aplikacji</button>
+      </div>
+    </div>
+    <div id="bl-blad" role="alert" hidden style="display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-size:18px">Nie dotarło potwierdzenie</h2>
+      <p style="margin:0;font-size:14px;line-height:1.5">Bank nie potwierdził płatności w ciągu 20 sekund. Nic nie pobraliśmy. Kod BLIK wygasa, więc wpisz nowy z aplikacji banku.</p>
+      <div style="display:flex;gap:8px">
+        <button type="button" id="bl-zamknij" class="b2" style="flex:1">Zamknij</button>
+        <button type="button" id="bl-ponow" class="btn" style="flex:2;min-height:48px">Spróbuj ponownie</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const B = Mock.get('booking', {}) || {};
+  const cena = Number(B.cena) || 200;
+  const zad = Math.ceil(((B.seria && B.seria.zaZabieg) || cena) * 0.3); // for a series the deposit covers one treatment
+  $('#zad').textContent = zad; $('#zad2').textContent = zad; $('#reszta').textContent = cena - zad;
+  if (B.cenaMin != null && B.cenaMax > B.cenaMin) { // price range from the v2 creators: the deposit is 30% of the upper end
+    document.querySelector('[data-bind="booking.cena"]').parentElement.innerHTML = `${B.cenaMin}–${B.cenaMax} zł`;
+    $('#reszta').textContent = `${B.cenaMin - zad}–${B.cenaMax - zad}`;
+  }
+  if (B.seria) { $('#seria-zal').hidden = false; $('#seria-ile').textContent = B.seria.ile; $('#seria-suma').textContent = B.seria.suma; }
+  if (B.dzien && B.godzina) {
+    $('#kiedy').textContent = `${B.dzien[0].toUpperCase() + B.dzien.slice(1)} · ${B.godzina}${B.koniec ? '–' + B.koniec : ''} · ${B.studio || '[Studio 1]'}`;
+    const m = B.dzien.match(/(\d{1,2})\.(\d{2})/);
+    if (m) {
+      const [h, mi] = B.godzina.split(':');
+      const d = new Date(2026, m[2] - 1, +m[1], +h, +mi - 24 * 60);
+      const dnia = ['niedzieli', 'poniedziałku', 'wtorku', 'środy', 'czwartku', 'piątku', 'soboty'][d.getDay()];
+      $('#termin-odw').textContent = `${dnia} ${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}, ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+  }
+  let metoda = 'BLIK';
+  $('#metody').addEventListener('mock:choice', e => {
+    metoda = e.detail.value;
+    $('#blik-box').hidden = metoda !== 'BLIK';
+    $('#inna-met').hidden = metoda === 'BLIK';
+  });
+  $('#blik').addEventListener('input', e => {
+    const d = e.target.value.replace(/\D/g, '').slice(0, 6);
+    e.target.value = d.length > 3 ? d.slice(0, 3) + ' ' + d.slice(3) : d;
+  });
+  // payment: errors under the field, a busy button, a waiting screen for BLIK (the bank confirms in its own app), no double payment
+  const btn = $('#plac-btn'), btnHtml = btn.innerHTML;
+  let placi = false, timer = null;
+  const blikErr = msg => { $('#blik-err').textContent = msg; $('#blik-err').hidden = !msg; $('#blik').setAttribute('aria-invalid', String(!!msg)); };
+  $('#blik').addEventListener('input', () => blikErr(''));
+  const busy = on => { placi = on; btn.disabled = on; if (on) btn.setAttribute('aria-busy', 'true'); else btn.removeAttribute('aria-busy'); btn.innerHTML = on ? 'Płacę…' : btnHtml; };
+  function zatwierdz() {
+    Mock.set('booking', { ...B, zadatek: zad, metodaZadatku: metoda });
+    const visits = Mock.get('visits', []), v = visits.find(x => x.id === B.visitId);
+    if (v) { v.zadatek = zad; Mock.set('visits', visits); }
+    Mock.toast('Płatność zatwierdzona');
+    setTimeout(() => (location.href = 'potwierdzenie.html'), 700);
+  }
+  const dlg = $('#dlg-blik');
+  function czekaj() {
+    let sek = 20;
+    $('#bl-kwota').textContent = zad; $('#bl-sek').textContent = sek; $('#bl-stan').hidden = false; $('#bl-blad').hidden = true;
+    dlg.returnValue = ''; dlg.showModal();
+    timer = setInterval(() => {
+      $('#bl-sek').textContent = --sek;
+      if (sek <= 0) { clearInterval(timer); $('#bl-stan').hidden = true; $('#bl-blad').hidden = false; $('#bl-ponow').focus(); }
+    }, 1000);
+  }
+  // anything except a confirmed payment gives the form back (also on Esc); called from the buttons and from "close", so it must be idempotent
+  function wroc(v) {
+    clearInterval(timer);
+    if (!placi) return;
+    busy(false);
+    if (v === 'ponow') { $('#blik').value = ''; blikErr('Wpisz nowy kod BLIK z aplikacji banku.'); }
+    $('#blik').focus();
+  }
+  $('#bl-ok').addEventListener('click', () => { clearInterval(timer); dlg.close('ok'); zatwierdz(); });
+  ['anuluj', 'zamknij', 'ponow'].forEach(v => $('#bl-' + v).addEventListener('click', () => { dlg.close(v); wroc(v); }));
+  dlg.addEventListener('close', () => { if (dlg.returnValue !== 'ok') wroc(dlg.returnValue); });
+  $('#plac').addEventListener('submit', e => {
+    e.preventDefault();
+    if (placi) return;
+    if (metoda === 'BLIK' && $('#blik').value.replace(/\D/g, '').length !== 6) { blikErr('Wpisz 6-cyfrowy kod BLIK z aplikacji banku.'); return $('#blik').focus(); }
+    blikErr(''); busy(true);
+    if (metoda === 'BLIK') czekaj(); else setTimeout(zatwierdz, 1200); // card and wallets: the gateway answers at once in the mock
+  });
+});
+</script>
+</body>
+</html>

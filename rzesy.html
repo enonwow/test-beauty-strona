@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kreator rzęs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="d-page" style="min-height: 100vh; background: #FFFFFF; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 15px; display: flex; flex-direction: column">
+  <header style="padding: 16px 20px 12px; display: flex; align-items: center; gap: 12px">
+    <a href="start.html" data-back aria-label="Wróć" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4D9DE; display: flex; align-items: center; justify-content: center; color: #1E1A1D; flex: none">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column; flex: 1">
+      <span style="color: #625860; font-size: 12px">Rzęsy · [Nazwa studia]</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Kreator rzęs</h1>
+    </div>
+    <button type="button" id="odNowa" style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #625860; font: inherit; font-size: 13px; cursor: pointer">Od nowa</button>
+  </header>
+  <nav id="kroki" aria-label="Kroki" style="padding: 0 20px 12px; display: grid; gap: 4px; border-bottom: 1px solid #F0E8EC"></nav>
+  <div class="d-cols" style="flex: 1">
+    <div class="d-main" style="padding: 0 20px; display: flex; flex-direction: column">
+      <div id="przymierz" style="display: contents"></div><!-- outside #kreator: Kreator.ui replaces its content on every click -->
+      <div id="kreator" style="display: flex; flex-direction: column"></div>
+    </div>
+    <div id="kreator-bar" class="d-aside"></div>
+  </div>
+</div>
+<script src="kreator.js"></script>
+<script>
+// Lash map like the design: five zones from inner to outer corner, about 2 px per mm.
+function mapSvg(mm, on, w = 150) {
+  const X = [20, 47, 75, 103, 130], Y = [44, 40, 39, 40, 44], TILT = [-4, -2, 0, 2, 4], k = w / 150;
+  const lines = mm.map((m, i) => `<line x1="${X[i]}" y1="${Y[i]}" x2="${X[i] + TILT[i] * (m / 10)}" y2="${Y[i] - m * 2}"></line>`).join('');
+  const labels = mm.map((m, i) => `<text x="${X[i] + TILT[i] * (m / 10)}" y="${Math.max(12, Y[i] - m * 2 - 6)}">${m}</text>`).join('');
+  return `<svg role="img" aria-label="Mapa: ${mm.join(', ')} mm" width="${w}" height="${56 * k}" viewBox="0 0 150 56"><path d="M8 48 Q75 30 142 48" fill="none" stroke="#1E1A1D" stroke-width="2"></path>`
+    + `<g stroke="${on ? '#9E1F50' : '#1E1A1D'}" stroke-width="2" stroke-linecap="round">${lines}</g><g font-size="12" fill="#625860" text-anchor="middle">${labels}</g></svg>`;
+}
+const SHIFT = { krotsze: -1, mapa: 0, dluzsze: 1 };
+const plural = n => `${n} ${n === 1 ? 'pytanie' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'pytania' : 'pytań'}`;
+const extension = w => w.wizyta === 'nowa' || w.wizyta === 'uzupelnienie';
+
+Kreator.ui({
+  kat: 'rzesy', nazwa: 'Rzęsy',
+  preview: (w, c) => (extension(w)
+    ? `${mapSvg(by(c.style, w.styl).mapaMm.map(m => m + SHIFT[w.dlugosc]), true, 280)}<div style="margin-top: 8px; color: #625860; font-size: 13px">${Kreator.esc(by(c.style, w.styl).nazwa)} · skręt ${w.skret === 'LM' ? 'L/M' : w.skret}</div>`
+    : `<div style="color: #625860; font-size: 14px">${w.wizyta === 'lifting' ? 'Lifting z laminacją, bez przedłużania' : 'Zdjęcie rzęs bez nowej aplikacji'}</div>`),
+  defaults: () => ({ wizyta: 'uzupelnienie', tyg: '3', gdzie: 'u_nas', zostalo: 'ponad', styl: 'kocie_oko', gestosc: '3D', dlugosc: 'mapa', skret: 'CC', dodatki: ['kim'] }),
+  dalej: (r, c) => `Dalej: ${plural(Kreator.pytania(c, r.zakres).length)} o zdrowie oczu`,
+  steps: c => [
+    { key: 'wizyta', krok: 'wizyta-start', title: 'Jaka wizyta?', nav: 'Wizyta', layout: 'tiles2', options: () => [
+      { id: 'nowa', label: 'Nowa aplikacja' }, { id: 'uzupelnienie', label: 'Uzupełnienie' },
+      { id: 'lifting', label: 'Lifting z laminacją', hint: 'bez przedłużania, trzyma 6–8 tyg.' }, { id: 'zdjecie', label: 'Tylko zdjęcie rzęs' }] },
+    { key: 'tyg', sub: true, title: 'Ile tygodni od ostatniej wizyty?', layout: 'chips', show: w => w.wizyta === 'uzupelnienie',
+      options: () => [{ id: 'do2', label: 'do 2' }, { id: '3', label: '3' }, { id: '4', label: '4' }, { id: 'wiecej', label: 'więcej' }] },
+    { key: 'gdzie', sub: true, title: 'Gdzie była robiona?', layout: 'chips', show: w => w.wizyta === 'uzupelnienie',
+      options: () => [{ id: 'u_nas', label: 'U nas' }, { id: 'inne', label: 'W innym studiu' }] },
+    { key: 'zostalo', krok: 'wizyta', sub: true, title: 'Ile rzęs zostało?', layout: 'chips', show: w => w.wizyta === 'uzupelnienie',
+      options: () => [{ id: 'ponad', label: 'ponad połowa' }, { id: 'mniej', label: 'mniej' }, { id: 'nie_wiem', label: 'nie wiem' }],
+      note: () => `Po ${c.ustawieniaSalonu.granicaTyg} tygodniach, przy mniej niż połowie rzęs albo po innym studiu liczymy nową aplikację. Cena przeliczy się od razu, nie na wizycie.` },
+    { key: 'styl', title: 'Styl', aside: 'w cenie, mapę ustala stylistka', layout: 'cards', show: extension,
+      options: () => c.style.map(s => ({ id: s.id, label: s.nazwa, hint: s.opis, meta: null, svg: on => mapSvg(s.mapaMm, on) })),
+      note: w => (by(c.style, w.styl)?.odradzaj ? 'Opadająca powieka? Kocie oko może ją optycznie obniżyć. Rozważ lalkę ze skrętem L/M.' : '') },
+    { key: 'gestosc', title: 'Gęstość', layout: 'list', show: extension, aside: 'cena i czas Twojej wizyty',
+      options: () => c.warianty.map(v => ({ id: v.id, label: v.nazwa, meta: w => { const p = Kreator.wycen.rzesy(c, { ...w, gestosc: v.id }).pozycje[0]; return `${p.cenaMax && p.cenaMax !== p.cena ? p.cena + '–' + p.cenaMax + ' zł' : Kreator.zl(p.cena)} · ${Kreator.dur(p.min)}`; } })) },
+    { key: 'dlugosc', sub: true, title: 'Twoje życzenia (potwierdzi stylistka): długość', layout: 'chips', show: extension,
+      html: w => `<div style="display: flex; justify-content: center">${mapSvg(by(c.style, w.styl).mapaMm.map(m => m + SHIFT[w.dlugosc]), true, 220)}</div>`,
+      options: () => [{ id: 'krotsze', label: 'krótsze', meta: null }, { id: 'mapa', label: 'jak na mapie', meta: null }, { id: 'dluzsze', label: 'dłuższe', meta: null }] },
+    { key: 'skret', sub: true, title: 'Skręt', layout: 'chips', show: extension, note: 'Grubość (0,03–0,15 mm) dobiera stylistka do Twoich rzęs.',
+      options: () => [{ id: 'C', label: 'C' }, { id: 'CC', label: 'CC' }, { id: 'D', label: 'D' }, { id: 'LM', label: 'L / M' }] },
+    { key: 'dodatki', title: 'Dodatki', layout: 'list', multi: true, show: extension,
+      options: () => c.dodatki.filter(d => !d.typ && !d.automatyczny).map(d => ({ id: d.id, label: d.nazwa })) },
+  ],
+});
+function by(list, id) { return list.find(x => x.id === id); }
+</script>
+<script type="module">
+// Lash try-on: strands rendered along the upper lid from the chosen style map (mm), density (fan size) and curl.
+// Without a selfie it runs on a stock eye photo (zdjecia/oczy-1.jpg), which also feeds the style thumbnails.
+import { przymierzalnia, naZmiane, wzdluz } from './twarz.js';
+const FAN = { '1:1': 1, '2D': 2, '3D': 3, '4D': 4, '5D': 5, '6-8D': 7, '8-10D': 9 }; // strands from one base
+const THICK = { '1:1': 0.15, '2D': 0.1, '3D': 0.07, '4D': 0.07, '5D': 0.06, '6-8D': 0.05, '8-10D': 0.03 }; // mm per method (report)
+const MIN_MM = 0.045; // thinner strands vanish below a pixel and mega volume turns to haze; on photos it reads as a dark mass
+// Curl seen from the front: cubic Bézier controls [sideways, up] in strand lengths. The last "up" is the share of the
+// length the camera sees (the lash also points at it), so a tighter curl stands taller.
+const CURL = { C: [[0.02, 0.3], [0.1, 0.52], [0.24, 0.6]], CC: [[0.02, 0.32], [0.08, 0.58], [0.2, 0.66]], D: [[0, 0.36], [0.05, 0.66], [0.16, 0.72]], LM: [[0, 0.18], [0.02, 0.6], [0.12, 0.76]] };
+const EYE_MM = 30; // average eye width corner to corner, turns the map's millimetres into photo pixels
+const BASES = 110; // natural upper lashes per eye (90-130); each gets one extension or one fan
+const SS = 2; // strands are drawn at 2x and scaled down: anti-aliased hairs instead of jagged lines
+// Stock eye: the person's left eye. Upper lid margin traced by hand, inner corner first, in pixels of the 1600 x 1100 file.
+const DEMO = { src: 'zdjecia/oczy-1.jpg', crop: { x: 40, y: 200, w: 1480, h: 700 }, thumb: { x: 100, y: 230, w: 1300, h: 620 },
+  lid: [[190, 812], [232, 742], [300, 664], [400, 588], [520, 541], [640, 523], [760, 521], [880, 529], [990, 551], [1090, 588], [1180, 632], [1250, 670], [1300, 700]] };
+const choice = () => window.Mock?.get('kreator_rzesy', null);
+const rnd = (...k) => { const x = Math.sin(k.reduce((s, v, i) => s + (v + 1) * [12.9898, 78.233, 37.719, 4.581][i], 0)) * 43758.5453; return x - Math.floor(x); }; // fixed per strand: no flicker
+let c, stock = null;
+try { c = await (await fetch('cenniki/rzesy.json')).json(); } catch { /* Kreator.ui already shows the price-list error */ }
+
+const buffers = new Map();
+function buffer(w, h) {
+  let b = buffers.get(w + 'x' + h);
+  if (!b) buffers.set(w + 'x' + h, b = Object.assign(document.createElement('canvas'), { width: w, height: h }));
+  return b;
+}
+// A band along the lid: `off` and `wid` in photo pixels along the lid normal, thinning out in both corners.
+function ribbon(g, lid, n, off, wid) {
+  const a = [], b = [];
+  for (let m = 0; m <= 36; m++) {
+    const t = m / 36, { p } = wzdluz(lid, t), h = wid / 2 * Math.min(1, t / 0.15, (1 - t) / 0.1);
+    a.push([p[0] + n[0] * (off + h), p[1] + n[1] * (off + h)]); b.unshift([p[0] + n[0] * (off - h), p[1] + n[1] * (off - h)]);
+  }
+  g.beginPath(); [...a, ...b].forEach((p, i) => g[i ? 'lineTo' : 'moveTo'](...p)); g.fill();
+}
+const bez = (P, s, i) => (1 - s) ** 3 * P[0][i] + 3 * (1 - s) ** 2 * s * P[1][i] + 3 * (1 - s) * s * s * P[2][i] + s ** 3 * P[3][i];
+const bezD = (P, s, i) => 3 * (1 - s) ** 2 * (P[1][i] - P[0][i]) + 6 * (1 - s) * s * (P[2][i] - P[1][i]) + 3 * s * s * (P[3][i] - P[2][i]);
+// One tapered strand: filled outline, thick at the root, fine tip, with a faint gloss line on one side.
+function strand(o, P, w0, colour, gloss) {
+  const left = [], right = [], mid = [];
+  for (let m = 0; m <= 10; m++) {
+    const s = m / 10, x = bez(P, s, 0), y = bez(P, s, 1), dx = bezD(P, s, 0), dy = bezD(P, s, 1), dl = Math.hypot(dx, dy) || 1;
+    const h = w0 / 2 * (1 - 0.9 * s ** 1.4), nx = -dy / dl * h, ny = dx / dl * h;
+    left.push([x + nx, y + ny]); right.unshift([x - nx, y - ny]); mid.push([x + nx * 0.4, y + ny * 0.4]);
+  }
+  o.fillStyle = colour; o.beginPath(); [...left, ...right].forEach((p, i) => o[i ? 'lineTo' : 'moveTo'](...p)); o.fill();
+  if (gloss) { o.beginPath(); mid.slice(2, 7).forEach((p, i) => o[i ? 'lineTo' : 'moveTo'](...p)); o.stroke(); }
+}
+
+// Paints lashes for choice `w` into ctx (photo-pixel transform already set by the caller).
+function drawLashes(ctx, eyes, w) {
+  const mm = by(c.style, w.styl).mapaMm.map(m => m + SHIFT[w.dlugosc]), fan = FAN[w.gestosc] ?? 3, curl = CURL[w.skret] ?? CURL.CC;
+  const T = ctx.getTransform(), scale = Math.hypot(T.a, T.b), W = ctx.canvas.width, H = ctx.canvas.height;
+  const buf = buffer(W * SS, H * SS), o = buf.getContext('2d');
+  o.setTransform(1, 0, 0, 1, 0, 0); o.clearRect(0, 0, buf.width, buf.height);
+  o.setTransform(T.a * SS, T.b * SS, T.c * SS, T.d * SS, T.e * SS, T.f * SS);
+  o.lineCap = 'round'; o.strokeStyle = 'rgba(255, 244, 238, 0.22)';
+  const alpha = fan === 1 ? 0.95 : Math.min(0.88, 2.2 / Math.sqrt(fan)); // fans overlap: a bit less ink per strand, yet volume still reads darkest
+  eyes.forEach((eye, e) => {
+    const px = eye.width / EYE_MM, u = [(eye.outer[0] - eye.inner[0]) / eye.width, (eye.outer[1] - eye.inner[1]) / eye.width];
+    const mid = eye.lid[eye.lid.length >> 1], s = (mid[0] - eye.inner[0]) * u[1] - (mid[1] - eye.inner[1]) * u[0] > 0 ? 1 : -1; // lid arches away from the lower lid
+    const n = [u[1] * s, -u[0] * s], dir = a => [n[0] * Math.cos(a) + u[0] * Math.sin(a), n[1] * Math.cos(a) + u[1] * Math.sin(a)];
+    // lashes fan out from a point below the lid, so inner ones lean to the nose and outer ones outwards
+    const O = [(eye.inner[0] + eye.outer[0]) / 2 - n[0] * eye.width * 0.45, (eye.inner[1] + eye.outer[1]) / 2 - n[1] * eye.width * 0.45];
+    // contact shadow straight on the photo (multiply needs the skin underneath): on the eyeball under the lash line,
+    // on the lid above it, and in the inner corner
+    ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.filter = `blur(${Math.max(1, px * 0.45 * scale)}px)`;
+    ctx.fillStyle = `rgba(80, 52, 52, ${0.16 + 0.025 * fan})`; ribbon(ctx, eye.lid, n, -0.5 * px, 1.1 * px);
+    ctx.fillStyle = 'rgba(105, 75, 68, 0.12)'; ribbon(ctx, eye.lid, n, 1.2 * px, 1.6 * px);
+    const ic = eye.lid[0], g = ctx.createRadialGradient(ic[0], ic[1], 0, ic[0], ic[1], px * 2.5);
+    g.addColorStop(0, 'rgba(85, 50, 50, 0.22)'); g.addColorStop(1, 'rgba(85, 50, 50, 0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ic[0], ic[1], px * 2.5, 0, 7); ctx.fill();
+    ctx.restore();
+    // dense, slightly blurred lash line where the extensions are glued; every root sits inside it
+    o.save(); o.filter = `blur(${Math.max(0.6, px * 0.1 * scale * SS)}px)`; o.fillStyle = 'rgba(14, 10, 10, 0.9)';
+    ribbon(o, eye.lid, n, 0.15 * px, (fan === 1 ? 0.6 : 0.75 + 0.05 * fan) * px); o.restore();
+    // strands never get thinner than about a screen pixel; when the real width is less (small face in a selfie),
+    // they get proportionally less ink instead, so a small eye does not drown in black
+    const wTrue = Math.max(MIN_MM, THICK[w.gestosc] ?? 0.07) * px * 1.15, w0 = Math.max(1.2 / scale, wTrue);
+    const ink = alpha * Math.min(1, Math.max(0.45, wTrue * scale / 1.2));
+    for (let i = 0; i < BASES; i++) {
+      const t = 0.015 + 0.97 * (i + 0.5 + (rnd(e, i, 1) - 0.5) * 0.9) / BASES, edge = Math.min(1, t / 0.12, (1 - t) / 0.08);
+      if (rnd(e, i, 2) > 0.35 + 0.65 * edge) continue; // corners thin out
+      const z = Math.min(3.999, t * 4), zi = Math.floor(z);
+      const len = (mm[zi] + (mm[zi + 1] - mm[zi]) * (z - zi)) * (0.55 + 0.45 * Math.min(1, edge * 1.4)) * px;
+      const { p } = wzdluz(eye.lid, t), lift = (0.1 + 0.12 * rnd(e, i, 3)) * px, base = [p[0] + n[0] * lift, p[1] + n[1] * lift];
+      const rl = Math.hypot(base[0] - O[0], base[1] - O[1]), r = [(base[0] - O[0]) / rl, (base[1] - O[1]) / rl];
+      const radial = Math.atan2(r[0] * u[0] + r[1] * u[1], r[0] * n[0] + r[1] * n[1]);
+      const lean = radial * (radial < 0 ? 0.6 : 1.3) + 0.1 + (rnd(e, i, 4) - 0.5) * 0.1; // inner lashes stay near upright, outer ones sweep out
+      const k = Math.max(1, Math.round(fan * (0.6 + 0.4 * edge))), spread = k === 1 ? 0 : (10 + 15 * (k - 2) / 8) * Math.PI / 180; // fans of 10-25 degrees
+      if (k > 1) { // a fan is glued as one stem: its short dark base is what makes volume look dense
+        const up = dir(lean), side = dir(lean + Math.PI / 2), L = len * 0.22;
+        strand(o, [base, ...curl.map(([x, y]) => [base[0] + (side[0] * x + up[0] * y) * L, base[1] + (side[1] * x + up[1] * y) * L])], w0 * Math.min(3, 0.6 * k), `rgba(14, 10, 10, ${Math.max(0.5, ink)})`, false);
+      }
+      for (let j = 0; j < k; j++) {
+        // strands cross a little: angle and length jitter, and the fan's roots spread along the lid by up to 0.4 mm
+        const a = lean + (k === 1 ? 0 : (j / (k - 1) - 0.5) * spread) + (rnd(e, i, j, 5) - 0.5) * 0.3, L = len * (0.82 + 0.3 * rnd(e, i, j, 6));
+        const up = dir(a), side = dir(a + Math.PI / 2), shift = (rnd(e, i, j, 8) - 0.5) * 0.4 * px, root = [base[0] + u[0] * shift, base[1] + u[1] * shift];
+        const P = [root, ...curl.map(([x, y]) => [root[0] + (side[0] * x + up[0] * y) * L, root[1] + (side[1] * x + up[1] * y) * L])];
+        const v = rnd(e, i, j, 7); // dark brown to black, a little different per strand
+        o.lineWidth = w0 * 0.3;
+        strand(o, P, w0, `rgba(${16 + v * 16 | 0}, ${11 + v * 10 | 0}, ${11 + v * 8 | 0}, ${ink})`, fan < 5 || j % 3 === 0);
+      }
+    }
+  });
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(buf, 0, 0, W, H); ctx.restore();
+}
+const lashes = (ctx, data) => { const w = choice(); if (w && extension(w)) drawLashes(ctx, data.eyes, w); };
+
+async function demo() {
+  const photo = new Image();
+  await new Promise((ok, bad) => { photo.onload = ok; photo.onerror = bad; photo.src = DEMO.src; }); // not decode(): it can stall in a background tab
+  const lid = DEMO.lid, inner = lid[0], outer = lid.at(-1);
+  return { photo, crop: { ...DEMO.crop }, eyes: [{ lid, inner, outer, width: Math.hypot(outer[0] - inner[0], outer[1] - inner[1]) }] };
+}
+// Small realistic thumbnail of every style on the stock eye, above the mm map in the style cards (re-added after each render)
+function thumbs() {
+  const w = choice(), T = DEMO.thumb;
+  if (!stock || !w || !extension(w)) return;
+  for (const b of document.querySelectorAll('#kreator button[data-k="styl"]')) {
+    const cv = Object.assign(document.createElement('canvas'), { width: 280, height: Math.round(280 * T.h / T.w) }), g = cv.getContext('2d'), k = cv.width / T.w;
+    cv.setAttribute('aria-hidden', 'true'); cv.style.cssText = 'display: block; width: 100%; height: auto; border-radius: 8px';
+    g.drawImage(stock.photo, T.x, T.y, T.w, T.h, 0, 0, cv.width, cv.height);
+    g.setTransform(k, 0, 0, k, -T.x * k, -T.y * k); drawLashes(g, stock.eyes, { ...w, styl: b.dataset.v });
+    b.prepend(cv);
+  }
+}
+if (c) {
+  const stockReady = demo().then(d => { stock = d; thumbs(); return d; });
+  const { redraw } = przymierzalnia(document.getElementById('przymierz'), {
+    co: 'rzęs', draw: lashes, demo: () => stockReady,
+    label: () => { const w = choice(); return w && extension(w) ? `${by(c.style, w.styl).nazwa}, ${w.gestosc}, skręt ${w.skret === 'LM' ? 'L/M' : w.skret}` : 'bez przedłużania, zdjęcie bez zmian'; },
+  });
+  naZmiane(() => { redraw(); thumbs(); });
+}
+</script>
+</body>
+</html>

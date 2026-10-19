@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dla studiów</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<style>
+nav[aria-label="Sekcje"] a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (min-width: 1024px) { nav[aria-label="Sekcje"] a { min-height: 24px; } }
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a></div>
+<div style="background: #FFFFFF; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 15px; min-height: 100vh">
+  <div style="max-width: 1040px; margin: 0 auto; box-sizing: border-box; padding: 0 max(16px, env(safe-area-inset-left, 0px)) 40px max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 48px">
+
+    <header style="padding-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+      <div style="display: flex; gap: 10px; align-items: center">
+        <div style="width: 40px; height: 40px; border-radius: 12px; background: #9E1F50; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">NA</div>
+        <span style="font-weight: 700">[Nazwa aplikacji] <span style="color: #625860; font-weight: 400">dla studiów</span></span>
+      </div>
+      <nav aria-label="Sekcje" style="display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px">
+        <a href="#funkcje">Funkcje</a><a href="#porownanie">Porównanie</a><a href="#plany">Plany</a><a href="#faq">Pytania</a>
+      </nav>
+      <a href="onboarding.html" style="min-height: 44px; padding: 0 16px; border-radius: 10px; background: #9E1F50; color: #FFFFFF; text-decoration: none; font-weight: 700; display: flex; align-items: center">Załóż studio</a>
+    </header>
+
+    <section style="display: flex; flex-direction: column; gap: 18px; max-width: 720px">
+      <span style="color: #9E1F50; font-weight: 700; font-size: 13px; letter-spacing: .04em; text-transform: uppercase">System rezerwacji dla salonów beauty</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(30px, 6vw, 48px); line-height: 1.08; font-weight: 700; text-wrap: balance">Klientka widzi cenę i czas, zanim zarezerwuje. Ty nie oddajesz prowizji.</h1>
+      <ul style="margin: 0; padding: 0; list-style: none; display: grid; gap: 10px">
+        <li style="display: flex; gap: 10px; align-items: baseline"><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; color: #9E1F50; min-width: 56px">0%</b><span>prowizji od rezerwacji, także od nowych klientek z wyszukiwarki</span></li>
+        <li style="display: flex; gap: 10px; align-items: baseline"><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; color: #9E1F50; min-width: 56px">1:1</b><span>kreator stylizacji liczy cenę brutto i czas wizyty z Twojego cennika, więc kalendarz rezerwuje tyle, ile naprawdę trwa zabieg</span></li>
+        <li style="display: flex; gap: 10px; align-items: baseline"><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; color: #9E1F50; min-width: 56px">1 klik</b><span>rezygnacja w ustawieniach, bez okresu wypowiedzenia, z eksportem danych klientek</span></li>
+      </ul>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px">
+        <a href="onboarding.html" style="min-height: 48px; padding: 0 20px; border-radius: 12px; background: #9E1F50; color: #FFFFFF; text-decoration: none; font-weight: 700; display: flex; align-items: center">Załóż studio za darmo</a>
+        <a href="paznokcie.html" style="min-height: 48px; padding: 0 20px; border-radius: 12px; border: 1px solid #1E1A1D; color: #1E1A1D; text-decoration: none; font-weight: 500; display: flex; align-items: center">Zobacz kreator paznokci</a>
+      </div>
+    </section>
+
+    <section id="porownanie" style="display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">My a typowy system z prowizją</h2>
+      <div style="overflow-x: auto; border: 1px solid #E4D9DE; border-radius: 16px">
+        <table style="width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px">
+          <thead><tr style="background: #FAF6F8; text-align: left">
+            <th scope="col" style="padding: 12px 14px; font-weight: 700"></th>
+            <th scope="col" style="padding: 12px 14px; font-weight: 700; color: #9E1F50">[Nazwa aplikacji]</th>
+            <th scope="col" style="padding: 12px 14px; font-weight: 700; color: #625860">Typowy system z prowizją</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Prowizja od nowych klientek</th><td style="padding: 12px 14px">0%</td><td style="padding: 12px 14px; color: #625860">[x]% od każdej pierwszej wizyty</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Cena dla klientki</th><td style="padding: 12px 14px">dokładna kwota brutto z kreatora</td><td style="padding: 12px 14px; color: #625860">„od … zł”, dopłaty ustalane na wizycie</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Długość wizyty w kalendarzu</th><td style="padding: 12px 14px">liczona z wybranych opcji</td><td style="padding: 12px 14px; color: #625860">stała dla usługi</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Inspiracja ze zdjęcia</th><td style="padding: 12px 14px">prośba o wycenę wpada do panelu</td><td style="padding: 12px 14px; color: #625860">wiadomości w komunikatorach</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Rezygnacja</th><td style="padding: 12px 14px">jednym kliknięciem, eksport CSV</td><td style="padding: 12px 14px; color: #625860">okres wypowiedzenia</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="funkcje" style="display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">Wszystko, czego potrzebuje studio</h2>
+      <p style="margin: 0; color: #625860">Kliknij kafelek, żeby zobaczyć ekran w makiecie panelu.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px">
+        <a href="panel.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Kalendarz</b><span style="color: #625860; font-size: 13px">dzień i tydzień, wizyty z kreatora z kartą stylizacji</span></a>
+        <a href="wyceny.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Wyceny ze zdjęcia</b><span style="color: #625860; font-size: 13px">inspiracja od klientki, odpowiedź z ceną i terminem</span></a>
+        <a href="cennik.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Cennik i kreator</b><span style="color: #625860; font-size: 13px">ceny i minuty, które klientka widzi w kreatorze</span></a>
+        <a href="klientki.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Klientki</b><span style="color: #625860; font-size: 13px">historia stylizacji, notatki, zgody</span></a>
+        <a href="kasa.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Kasa</b><span style="color: #625860; font-size: 13px">rozliczenie wizyty, utarg dnia, karty podarunkowe</span></a>
+        <a href="karnety.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Karnety i pakiety</b><span style="color: #625860; font-size: 13px">serie zabiegów i karnety czasowe</span></a>
+        <a href="promocje.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Promocje</b><span style="color: #625860; font-size: 13px">happy hours, last minute, flash sale</span></a>
+        <a href="marketing.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Marketing</b><span style="color: #625860; font-size: 13px">przypomnienia o uzupełnieniu, kampanie SMS</span></a>
+        <a href="zespol.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Zespół i grafik</b><span style="color: #625860; font-size: 13px">godziny pracy, urlopy, stanowiska</span></a>
+        <a href="magazyn.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Magazyn</b><span style="color: #625860; font-size: 13px">lakiery, żele, kleje, alerty niskiego stanu</span></a>
+        <a href="profil-studia.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Profil studia</b><span style="color: #625860; font-size: 13px">strona dla klientek, portfolio, zasady</span></a>
+        <a href="formularze.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Formularze i zgody</b><span style="color: #625860; font-size: 13px">RODO, wywiad przed zabiegiem, zgoda na zdjęcia</span></a>
+        <a href="formularze.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><span style="display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline"><b>Podpisy elektroniczne</b><span style="padding: 2px 8px; border-radius: 999px; background: #F6EDF1; color: #9E1F50; font-size: 12px; font-weight: 700">dodatek</span></span><span style="color: #625860; font-size: 13px">klientka podpisuje zgody na telefonie przed wizytą</span></a>
+        <a href="opinie-studio.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Opinie</b><span style="color: #625860; font-size: 13px">tylko po odbytej wizycie, z odpowiedzią studia</span></a>
+        <a href="raporty.html" style="padding: 16px; border: 1px solid #E4D9DE; border-radius: 14px; text-decoration: none; color: #1E1A1D; display: flex; flex-direction: column; gap: 4px"><b>Raporty</b><span style="color: #625860; font-size: 13px">utarg, obłożenie, powracające klientki</span></a>
+      </div>
+    </section>
+
+    <section id="plany" style="display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">Plany</h2>
+        <div id="okres" data-choice role="group" aria-label="Okres rozliczenia" style="display: flex; border: 1px solid #E4D9DE; border-radius: 12px; overflow: hidden">
+          <button type="button" data-value="m" aria-pressed="true" style="min-height: 44px; padding: 0 16px; border: 0; background: #1E1A1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Miesięcznie</button>
+          <button type="button" data-value="y" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border: 0; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Rocznie</button>
+        </div>
+      </div>
+      <p id="okresNote" style="margin: 0; color: #625860; font-size: 14px">Płacisz co miesiąc, rezygnujesz w dowolnej chwili.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px">
+        <article style="padding: 18px; border: 1px solid #E4D9DE; border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+          <h3 style="margin: 0; font-size: 18px">Solo</h3>
+          <span style="color: #625860; font-size: 13px">1 stylistka, 1 stanowisko</span>
+          <b data-price style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[cena] zł / mies.</b>
+          <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 14px"><li>kreator i strona studia</li><li>kalendarz i przypomnienia SMS</li><li>wyceny ze zdjęcia</li></ul>
+          <a href="onboarding.html" style="margin-top: auto; min-height: 44px; border-radius: 10px; border: 1px solid #1E1A1D; color: #1E1A1D; text-decoration: none; font-weight: 500; display: flex; align-items: center; justify-content: center">Wybierz Solo</a>
+        </article>
+        <article style="padding: 18px; border: 2px solid #9E1F50; border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+          <h3 style="margin: 0; font-size: 18px">Studio <span style="font-size: 12px; color: #9E1F50; font-weight: 700">najczęściej wybierany</span></h3>
+          <span style="color: #625860; font-size: 13px">do 5 osób w zespole</span>
+          <b data-price style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[cena] zł / mies.</b>
+          <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 14px"><li>wszystko z Solo</li><li>grafik zespołu, kasa, magazyn</li><li>karnety, promocje, raporty</li></ul>
+          <a href="onboarding.html" style="margin-top: auto; min-height: 44px; border-radius: 10px; background: #9E1F50; color: #FFFFFF; text-decoration: none; font-weight: 700; display: flex; align-items: center; justify-content: center">Wybierz Studio</a>
+        </article>
+        <article style="padding: 18px; border: 1px solid #E4D9DE; border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
+          <h3 style="margin: 0; font-size: 18px">Sieć</h3>
+          <span style="color: #625860; font-size: 13px">kilka lokali, wspólne klientki</span>
+          <b data-price style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[cena] zł / mies.</b>
+          <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 14px"><li>wszystko ze Studio</li><li>wiele lokali i magazynów</li><li>raporty dla całej sieci</li></ul>
+          <a href="onboarding.html" style="margin-top: auto; min-height: 44px; border-radius: 10px; border: 1px solid #1E1A1D; color: #1E1A1D; text-decoration: none; font-weight: 500; display: flex; align-items: center; justify-content: center">Wybierz Sieć</a>
+        </article>
+      </div>
+      <div style="padding: 14px 18px; border-radius: 14px; background: #FAF6F8; display: flex; flex-direction: column; gap: 4px">
+        <span><b>Dodatki:</b> Podpisy elektroniczne · <b>[cena] zł / mies.</b></span>
+        <span style="color: #625860; font-size: 13px">Zwykły podpis elektroniczny (forma dokumentowa) pod zgodami RODO, wywiadami przed zabiegiem i zgodami na zdjęcia.</span>
+      </div>
+    </section>
+
+    <section id="faq" style="display: flex; flex-direction: column; gap: 10px; max-width: 760px">
+      <h2 style="margin: 0 0 4px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">Pytania</h2>
+      <details style="border: 1px solid #E4D9DE; border-radius: 12px; padding: 0 16px"><summary style="min-height: 48px; display: flex; align-items: center; cursor: pointer; font-weight: 500">Skąd macie pieniądze, skoro nie bierzecie prowizji?</summary><p style="margin: 0 0 14px; color: #625860; line-height: 1.5">Ze stałego abonamentu studia. Nie zarabiamy na tym, że klientka przyszła z wyszukiwarki, więc nie mamy powodu jej Ci zabierać.</p></details>
+      <details style="border: 1px solid #E4D9DE; border-radius: 12px; padding: 0 16px"><summary style="min-height: 48px; display: flex; align-items: center; cursor: pointer; font-weight: 500">Czy przeniosę klientki z Booksy?</summary><p style="margin: 0 0 14px; color: #625860; line-height: 1.5">Tak. Przy zakładaniu studia wgrywasz eksport klientek w pliku CSV. Wizyty z Booksy możesz blokować w kalendarzu przez synchronizację z Google Calendar.</p></details>
+      <details style="border: 1px solid #E4D9DE; border-radius: 12px; padding: 0 16px"><summary style="min-height: 48px; display: flex; align-items: center; cursor: pointer; font-weight: 500">Skąd kreator wie, ile kosztuje stylizacja?</summary><p style="margin: 0 0 14px; color: #625860; line-height: 1.5">Z Twojego cennika: usługa bazowa, długość, efekty i dodatki mają cenę i liczbę minut. Klientka widzi jedną kwotę brutto, a kalendarz rezerwuje policzony czas.</p></details>
+      <details style="border: 1px solid #E4D9DE; border-radius: 12px; padding: 0 16px"><summary style="min-height: 48px; display: flex; align-items: center; cursor: pointer; font-weight: 500">Jak zrezygnować?</summary><p style="margin: 0 0 14px; color: #625860; line-height: 1.5">W ustawieniach jednym przyciskiem. Abonament działa do końca opłaconego okresu, a dane klientek pobierasz w CSV.</p></details>
+      <details style="border: 1px solid #E4D9DE; border-radius: 12px; padding: 0 16px"><summary style="min-height: 48px; display: flex; align-items: center; cursor: pointer; font-weight: 500">Czy klientka musi zakładać konto?</summary><p style="margin: 0 0 14px; color: #625860; line-height: 1.5">Nie. Rezerwuje z numerem telefonu, a potwierdzenie i przypomnienie dostaje SMS-em.</p></details>
+    </section>
+
+    <section style="padding: 24px; border-radius: 20px; background: #1E1A1D; color: #FFFFFF; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Załóż studio w 5 krokach</h2><span style="color: #E9DEE3">Dane studia, usługi, import klientek, godziny pracy, gotowe.</span></div>
+      <a href="onboarding.html" style="min-height: 48px; padding: 0 20px; border-radius: 12px; background: #FFFFFF; color: #1E1A1D; text-decoration: none; font-weight: 700; display: flex; align-items: center">Załóż studio</a>
+    </section>
+  </div>
+</div>
+<script>
+// Billing toggle: mock.js switches the buttons, this swaps the price labels and the note.
+document.getElementById('okres').addEventListener('mock:choice', e => {
+  const yearly = e.detail.value === 'y';
+  document.querySelectorAll('[data-price]').forEach(el => { el.textContent = yearly ? '[cena] zł / rok' : '[cena] zł / mies.'; });
+  document.getElementById('okresNote').textContent = yearly ? 'Płacisz raz w roku, [x] miesiące taniej niż miesięcznie.' : 'Płacisz co miesiąc, rezygnujesz w dowolnej chwili.';
+});
+</script>
+</body>
+</html>

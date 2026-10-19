@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kreator fryzjera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+#przymierz [data-hex], #przymierz [data-zdj] { min-height: 52px; padding: 4px; border-radius: 12px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer }
+#przymierz [aria-pressed="true"][data-hex], #przymierz [aria-pressed="true"][data-zdj] { border: 2px solid #9E1F50; padding: 3px; background: #F6EDF1; font-weight: 700 }
+#przymierz [data-hex] canvas, #przymierz [data-zdj] img { display: block; width: 100%; height: auto; border-radius: 8px; object-fit: cover }
+#przymierz [data-zdj] img { aspect-ratio: 1 }
+#przymierz [data-zdj] span { font-size: 11px; line-height: 1.2 }
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="d-page" style="min-height: 100vh; background: #FFFFFF; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 15px; display: flex; flex-direction: column">
+  <header style="padding: 16px 20px 12px; display: flex; align-items: center; gap: 12px">
+    <a href="start.html" data-back aria-label="Wróć" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4D9DE; display: flex; align-items: center; justify-content: center; color: #1E1A1D; flex: none">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column; flex: 1">
+      <span style="color: #625860; font-size: 12px">Fryzjer · [Nazwa studia]</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Kreator fryzjera</h1>
+    </div>
+    <button type="button" id="odNowa" style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #625860; font: inherit; font-size: 13px; cursor: pointer">Od nowa</button>
+  </header>
+  <nav id="kroki" aria-label="Kroki" style="padding: 0 20px 12px; display: grid; gap: 4px; border-bottom: 1px solid #F0E8EC"></nav>
+  <div class="d-cols" style="flex: 1">
+    <div class="d-main" style="padding: 0 20px; display: flex; flex-direction: column">
+      <div id="przymierz" style="display: none"></div><!-- outside #kreator: Kreator.ui replaces its content on every click; shown for colouring only -->
+      <div id="kreator" style="display: flex; flex-direction: column"></div>
+    </div>
+    <div id="kreator-bar" class="d-aside"></div>
+  </div>
+</div>
+<script src="kreator.js"></script>
+<script>
+// Length picture: a canvas the module below fills with the back-view hair photo and the chosen length level (wlosy.js poziomy).
+// Placeholders only: Kreator.ui rewrites #kreator and the side bar on every click, the module redraws after each rewrite.
+const dl = (id, size, big, label) => `<canvas data-dl="${id}" ${big ? 'data-big' : 'aria-hidden="true"'} width="${size}" height="${size}"${label ? ` role="img" aria-label="${label}"` : ''} style="display: block; width: 100%; height: auto; border-radius: ${big ? 14 : 8}px; background: #E4D9DE${big ? '' : '; margin-bottom: auto'}"></canvas>`; // thumbnails stay on top, labels at the bottom, so pictures line up whatever the text below
+const by = (list, id) => list.find(x => x.id === id);
+const damskie = w => w.dla === 'damskie';
+const svc = (c, w) => by(c.warianty, w.usluga);
+
+Kreator.ui({
+  kat: 'fryzjer', nazwa: 'Fryzjer',
+  preview: (w, c) => (damskie(w) && !svc(c, w).bezDlugosci && !svc(c, w).sciezka && !svc(c, w).wymagaKonsultacji
+    ? `<div style="max-width: 270px; margin: 0 auto">${dl(w.dlugosc, 560, true, 'Zdjęcie włosów z zaznaczoną długością: ' + by(c.dlugosc.pasma, w.dlugosc).nazwa)}</div>`
+    : `<div style="color: #625860; font-size: 14px">${Kreator.esc(damskie(w) ? svc(c, w).nazwa : by(c.meskie, w.meskie).nazwa)}</div>`),
+  defaults: () => ({ dla: 'damskie', meskie: 'meskie', usluga: 'kolor', dlugosc: 'ramiona', gestosc: 'geste', historia: [], dodatki: ['plex'], stylista: 'fryzjer' }),
+  dalej: r => (r.sciezka === 'konsultacja' ? 'Dalej: umów bezpłatną konsultację' : r.zakres.includes('koloryzacja') ? 'Dalej: test uczuleniowy i termin' : 'Dalej: kilka pytań i termin'),
+  steps: c => [
+    { key: 'dla', title: 'Dla kogo', nav: 'Usługa', layout: 'tiles2', options: () => [{ id: 'damskie', label: 'Damskie', meta: null }, { id: 'meskie', label: 'Męskie i broda', meta: null }] },
+    { key: 'meskie', sub: true, title: 'Usługa', layout: 'list', show: w => !damskie(w),
+      options: () => c.meskie.map(s => ({ id: s.id, label: s.nazwa, hint: s.zawiera.join(', '), meta: `${Kreator.zl(s.cena)} · ${Kreator.dur(s.min)}` })) },
+    { key: 'usluga', sub: true, title: 'Usługa', layout: 'list', show: damskie,
+      options: () => c.warianty.map(s => ({ id: s.id, label: s.nazwa, hint: s.opis,
+        meta: w => { const r = Kreator.wycen.fryzjer(c, { ...w, usluga: s.id }); return r.sciezka === 'konsultacja' ? 'najpierw konsultacja' : `${Kreator.zlRange(r.cenaMin, r.cenaMax)} · ${Kreator.dur(r.minuty)}`; } })),
+      onChange: w => { if (!svc(c, w).koloryzacja) w.historia = []; } },
+    { key: 'dlugosc', title: 'Długość włosów', nav: 'Długość', layout: 'tiles3', show: w => damskie(w) && !svc(c, w).bezDlugosci && !svc(c, w).sciezka && !svc(c, w).wymagaKonsultacji,
+      // on a desktop the picture sits in the side column (preview above), so the one in the step is phone-only
+      html: w => `<div class="m-only" style="max-width: 340px; width: 100%; align-self: center">${dl(w.dlugosc, 680, true, 'Zdjęcie włosów z zaznaczoną długością: ' + by(c.dlugosc.pasma, w.dlugosc).nazwa)}</div>`,
+      options: () => c.dlugosc.pasma.map(p => ({ id: p.id, label: p.nazwa, svg: () => dl(p.id, 200, false) })),
+      note: 'Salon przypisuje pasma do swoich kolumn cennika: ucho to krótkie, ramiona średnie, łopatki długie.' },
+    { key: 'gestosc', sub: true, title: 'Gęstość', layout: 'tiles3', show: w => damskie(w) && !svc(c, w).bezDlugosci && !svc(c, w).sciezka && !svc(c, w).wymagaKonsultacji,
+      options: () => [{ id: 'cienkie', label: 'cienkie' }, { id: 'normalne', label: 'normalne' }, { id: 'geste', label: 'gęste' }] },
+    { key: 'historia', title: 'Historia włosów', nav: 'Historia', layout: 'list', multi: true, show: w => damskie(w) && svc(c, w).koloryzacja && !svc(c, w).sciezka && !svc(c, w).wymagaKonsultacji,
+      aside: 'ostatnie 2 lata', options: () => c.historia.map(h => ({ id: h.id, label: h.nazwa, meta: null })),
+      note: 'Od tego zależy, czy kolor wyjdzie i ile potrwa. Zaznacz, co dotyczy Twoich włosów.',
+      after: (w, c2, r) => (r.sciezka === 'konsultacja' ? `<a href="${c.wycenaPoZdjeciu.link}" style="min-height: 44px; border-radius: 12px; border: 1px solid #1E1A1D; color: #1E1A1D; text-decoration: none; font-weight: 500; display: flex; align-items: center; justify-content: center">Wolę wycenę po zdjęciu (${c.wycenaPoZdjeciu.godzin} h)</a>` : '') },
+    { key: 'dodatki', title: 'Co zawiera cena i dodatki', nav: 'Dodatki', layout: 'list', multi: true,
+      show: w => damskie(w) && Kreator.wycen.fryzjer(c, w).sciezka !== 'konsultacja',
+      html: w => { const s = svc(c, w); return `<div style="display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px">${s.zawiera.map(z => `<span>✓ ${z}</span>`).join('')}${s.bezStrzyzenia ? `<span style="color: #625860">strzyżenie osobno</span>` : ''}</div>`; },
+      options: (c2, w) => c.dodatki.filter(d => !d.dotyczy || (svc(c, w).koloryzacja && d.dotyczy.includes('koloryzacja'))).map(d => ({ id: d.id, label: d.nazwa })) },
+    { key: 'stylista', sub: true, title: 'Poziom stylistki', layout: 'tiles2', show: w => damskie(w) && Kreator.wycen.fryzjer(c, w).sciezka !== 'konsultacja',
+      options: () => Object.entries(c.stylista).map(([id, s]) => ({ id, label: s.nazwa, hint: s.mnoznik === 1 ? 'cena z cennika' : `×${String(s.mnoznik).replace('.', ',')} ceny usługi` })) },
+  ],
+});
+</script>
+<script type="module">
+// Hair colour try-on, in the same shell as lashes and brows (twarz.js). Without a selfie it paints a stock hair photo
+// (zdjecia/wlosy-N.jpg, mask computed once and saved as PNG, so MediaPipe loads only for a selfie). The technique comes from the
+// chosen service. Photos stay in page memory (no storage, no upload). It reads the creator's saved choices and never changes the price.
+import { przymierzalnia, naZmiane, blad, kadr } from './twarz.js';
+import { loadPhoto, loadUrl, prepare, zMaski, paint, probka, lighterBy, poziomy, TECHNIKI } from './wlosy.js';
+const ODCIENIE = [ // swatches are not in cenniki/fryzjer.json, so they live here (illustrative shades)
+  { id: 'blond', nazwa: 'Blond', hex: '#E3C58E' }, { id: 'karmel', nazwa: 'Karmel', hex: '#B9773A' },
+  { id: 'miedz', nazwa: 'Miedź', hex: '#B4572B' }, { id: 'braz', nazwa: 'Brąz', hex: '#5A3A28' },
+  { id: 'czern', nazwa: 'Czerń', hex: '#1B1716' }, { id: 'roz', nazwa: 'Róż pastelowy', hex: '#E9A7C0' },
+];
+const ZDJECIA = ['Ciemny brąz, długie', 'Średni brąz, długie', 'Jasny blond, do łopatek', 'Złoty brąz, do ramion']; // zdjecia/wlosy-1..4.jpg
+const TECHNIKA = { kolor: 'solid', tonowanie: 'solid', dekoloryzacja: 'solid', odrost: 'root', balayage: 'balayage', airtouch: 'highlights' }; // service id -> wlosy.js technique
+const BIG_LIGHTER = 0.25; // swatch this much brighter than the photo's hair: bleaching, not a plain colour
+const SIDE = 1000;
+const DEMO_TEKST = 'Przykładowe włosy ze zdjęcia stockowego (od tyłu). Podgląd orientacyjny, nie zmienia ceny. Długości ani cięcia tu nie widać. Zrób selfie, żeby zobaczyć kolor na swoich włosach.';
+const mount = document.getElementById('przymierz'), $ = s => mount.querySelector(s);
+let odcien = ODCIENIE[1], hairTiles = null, nr = 1;
+const choice = () => window.Mock?.get('kreator_fryzjer', null);
+const technika = () => TECHNIKA[choice()?.usluga] || 'solid';
+
+// the stock photo is one fixed-size frame whose content is swapped, so the shell keeps the same data object
+const frame = Object.assign(document.createElement('canvas'), { width: SIDE, height: SIDE });
+const fctx = frame.getContext('2d', { willReadFrequently: true }); // read back for the hair mask
+const stock = { photo: frame, out: Object.assign(document.createElement('canvas'), { width: SIDE, height: SIDE }), crop: { x: 0, y: 0, w: SIDE, h: SIDE }, hair: null, key: '' };
+async function wybierz(i) {
+  fctx.drawImage(await loadUrl(`zdjecia/wlosy-${i}.jpg`, SIDE, SIDE), 0, 0);
+  stock.hair = await zMaski(frame, `zdjecia/wlosy-${i}-maska.png`); stock.key = ''; nr = i;
+}
+async function wczytaj(file) {
+  let photo, hair;
+  try { photo = await loadPhoto(file); } catch { throw blad('Nie udało się otworzyć tego pliku. Wybierz zdjęcie w formacie JPG lub PNG.'); }
+  try { hair = await prepare(photo); } catch { throw blad('Nie udało się wczytać przymierzalni. Sprawdź internet i spróbuj ponownie. Kreator działa dalej bez niej.'); }
+  if (!hair) throw blad('Nie widzę na zdjęciu włosów. Spróbuj zdjęcia twarzą do światła, z widocznymi włosami. Kreator działa dalej bez zdjęcia.');
+  return { photo, hair, out: Object.assign(document.createElement('canvas'), { width: photo.width, height: photo.height }), key: '', crop: kadr(photo, ...hair.box, 0.15, 0.1) }; // head = hair box + margin
+}
+function draw(ctx, d) {
+  mount.querySelectorAll('[data-zdj]').forEach(b => b.setAttribute('aria-pressed', d === stock && b.dataset.zdj == nr)); // no stock photo is "selected" while a selfie shows
+  if (d.hair !== hairTiles) { // swatches are photos of this photo's own strands
+    hairTiles = d.hair;
+    mount.querySelectorAll('[data-hex] canvas').forEach(cv => cv.getContext('2d').drawImage(probka(d.hair, cv.parentNode.dataset.hex, cv.width, cv.height), 0, 0));
+  }
+  const sila = $('#wlosy-sl').value / 100, tech = technika(), key = odcien.hex + sila + tech;
+  if (d.key !== key) { paint(d.out, d.hair, odcien.hex, sila, tech); d.key = key; } // dragging before/after does not repaint the hair
+  ctx.drawImage(d.out, 0, 0);
+  $('#wlosy-tech').textContent = `Technika z Twojej usługi: ${TECHNIKI[tech].nazwa}.`;
+  const big = lighterBy(d.hair, odcien.hex) > BIG_LIGHTER, note = $('#wlosy-jasniej');
+  note.hidden = !big;
+  if (big) note.textContent = 'Taki kolor na Twoich włosach to zwykle rozjaśnianie w kilku krokach, a nie samo farbowanie. Zaplanujemy je na bezpłatnej konsultacji, więc efekt i czas mogą się różnić od podglądu.';
+}
+const ready = wybierz(1).then(() => stock);
+const { redraw, pad } = przymierzalnia(mount, {
+  co: 'włosów', draw, wczytaj, ladowanie: 'Wczytuję podgląd. Za pierwszym razem trwa to chwilę.', demo: () => ready, demoTekst: DEMO_TEKST,
+  label: () => `kolor ${odcien.nazwa}, ${TECHNIKI[technika()].nazwa}, intensywność ${$('#wlosy-sl').value}%`,
+  extra: `<div role="group" aria-label="Zdjęcie najbliższe Twoim włosom" style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 14px; font-weight: 500; color: #1E1A1D">Zdjęcie najbliższe Twoim włosom</span>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">${ZDJECIA.map((n, i) => `<button type="button" data-zdj="${i + 1}" aria-pressed="${i === 0}" aria-label="${n}"><img src="zdjecia/wlosy-${i + 1}-mini.jpg" alt="" width="200" height="200"><span>${n}</span></button>`).join('')}</div>
+    </div>
+    <div role="group" aria-label="Odcień" id="wlosy-odcienie" style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 14px; font-weight: 500; color: #1E1A1D">Odcień</span>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">${ODCIENIE.map(o => `<button type="button" data-hex="${o.hex}" aria-pressed="${o === odcien}"><canvas width="160" height="100" aria-hidden="true" style="background: ${o.hex}"></canvas><span>${o.nazwa}</span></button>`).join('')}</div>
+    </div>
+    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; color: #1E1A1D">
+      <label for="wlosy-sl">Intensywność: <output id="wlosy-int">80%</output></label>
+      <input id="wlosy-sl" type="range" min="0" max="100" value="80" style="width: 100%; min-height: 44px; accent-color: #9E1F50">
+    </label>
+    <span id="wlosy-tech" style="font-size: 13px; color: #1E1A1D"></span>
+    <p id="wlosy-jasniej" role="status" hidden style="margin: 0; padding: 10px 12px; border-radius: 10px; background: #FFF1E0; color: #8A3B12; font-size: 13px; line-height: 1.45"></p>`,
+});
+$('#wlosy-odcienie').addEventListener('click', e => {
+  const b = e.target.closest('[data-hex]'); if (!b) return;
+  odcien = ODCIENIE.find(o => o.hex === b.dataset.hex);
+  mount.querySelectorAll('[data-hex]').forEach(x => x.setAttribute('aria-pressed', x === b)); redraw();
+});
+mount.querySelectorAll('[data-zdj]').forEach(b => b.addEventListener('click', async () => {
+  if (!$('[data-usun]').hidden) $('[data-usun]').click(); // a selfie is showing: back to the stock photo first
+  try { await wybierz(+b.dataset.zdj); redraw(); } catch (e) { console.warn('Zdjęcie przykładowe niedostępne', e); }
+}));
+let frameId = 0;
+$('#wlosy-sl').addEventListener('input', e => {
+  $('#wlosy-int').textContent = e.target.value + '%';
+  frameId ||= requestAnimationFrame(() => { frameId = 0; redraw(); });
+});
+
+const cennik = fetch('cenniki/fryzjer.json').then(r => r.json());
+
+// Length levels on the back-view photo zdjecia/wlosy-dlugosc.jpg (1000 px frame), calibrated once by eye:
+// ear, shoulder line, bottom of the shoulder blades, waist, and just below the hair tips (the whole hair).
+const POZIOM_Y = { ucho: 215, ramiona: 330, za_ramiona_lopatki: 520, za_lopatki_pas: 740, ponizej_pasa: 880 };
+const dlugoscFoto = loadUrl('zdjecia/wlosy-dlugosc.jpg', 1000, 1000).then(async photo => ({ photo, hair: await zMaski(photo, 'zdjecia/wlosy-dlugosc-maska.png') }));
+async function rysujDlugosc() {
+  const cv = [...document.querySelectorAll('canvas[data-dl]')]; if (!cv.length) return;
+  try {
+    const [{ photo, hair }, c] = await Promise.all([dlugoscFoto, cennik]), levels = c.dlugosc.pasma.map(p => ({ id: p.id, nazwa: p.nazwa, y: POZIOM_Y[p.id] }));
+    cv.forEach(el => poziomy(el, photo, hair, levels, el.dataset.dl, 'big' in el.dataset));
+  } catch (e) { console.warn('Zdjęcie długości niedostępne', e); cv.forEach(el => { el.style.display = 'none'; }); }
+}
+// both the steps and the side bar are rewritten by the engine
+for (const id of ['kreator', 'kreator-bar']) new MutationObserver(rysujDlugosc).observe(document.getElementById(id), { childList: true });
+rysujDlugosc();
+
+// Show the try-on only for colouring services. The engine rewrites #kreator after every choice and saves them
+// (kreator_fryzjer, no health data); the observer fires after that save.
+cennik.then(c => {
+  const sync = () => {
+    const w = choice(), s = w && c.warianty.find(x => x.id === w.usluga);
+    mount.style.display = w && w.dla === 'damskie' && s?.koloryzacja ? 'contents' : 'none';
+    redraw(); pad();
+  };
+  naZmiane(sync);
+  sync();
+}).catch(() => { /* no price list: the creator itself shows the error, the try-on stays hidden */ });
+</script>
+</body>
+</html>

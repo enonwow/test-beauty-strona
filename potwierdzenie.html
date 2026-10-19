@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Potwierdzenie rezerwacji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.b1{flex:1;min-height:44px;border-radius:10px;border:1px solid #1E1A1D;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+.b2{flex:1;min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
+.b2:hover{color:#1E1A1D;background:#FAF6F8}
+.btn{min-height:48px;border-radius:12px;border:0;background:#1E1A1D;color:#fff;font:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;padding:0 16px}
+.btn:hover{background:#3a3338;color:#fff}
+.btn-r{background:#9E1F50}.btn-r:hover{background:#7A173D}
+.row{display:flex;justify-content:space-between;gap:12px}
+.cell{min-height:52px;text-align:center;border-radius:10px;border:1px solid #C9B6BF;font:inherit;font-size:20px;min-width:0;width:100%;box-sizing:border-box;padding:0}
+.cell.f{border:2px solid #9E1F50;font-weight:700}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.d-cols>.d-main,.d-cols>.d-aside{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}
+@media (min-width:1024px){
+  .d-cols>.d-main,.d-cols>.d-aside{display:block}
+  .d-cols{padding-bottom:16px;justify-content:center}
+  .d-main{max-width:640px}
+  .d-aside{flex-basis:380px !important;top:16px}
+  .d-cols .o1,.d-cols .o2,.d-cols .o3,.d-cols .o4,.d-cols .o5,.d-cols .o6,.d-cols .o7{order:0}
+  .d-aside>*{margin-left:0 !important;margin-right:0 !important}
+  .d-aside>section,.d-aside>div{margin-top:16px !important}
+  #akcje{padding-left:0 !important;padding-right:0 !important;padding-top:32px !important}
+  #po-odw{padding-left:0 !important;padding-right:0 !important;padding-top:32px !important}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app d-page">
+
+  <div class="d-cols">
+  <!-- phone: wrappers vanish and "order" keeps the old sequence; desktop: card left, actions and notes right -->
+  <div class="d-main">
+  <section class="o1" style="padding:32px 20px 0;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+    <div id="ikona" aria-hidden="true" style="width:52px;height:52px;border-radius:50%;background:#E6F2EC;display:flex;align-items:center;justify-content:center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F6B47" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+    </div>
+    <h1 id="tytul" style="margin:4px 0 0;font-size:26px;font-weight:700">Zarezerwowane</h1>
+    <p id="kiedy" style="margin:0;font-size:16px">Wtorek, 20 października · 11:15–13:05</p>
+    <p id="gdzie" style="margin:0;color:#625860;font-size:14px">[Studio 1] · Dowolna stylistka · [adres]</p>
+  </section>
+
+  <section aria-label="Karta stylizacji" class="o4" style="margin:22px 20px 0;border:1px solid #E4D9DE;border-radius:16px;overflow:hidden">
+    <div style="padding:14px 16px;background:#F6EDF1;display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0;font-size:18px;font-weight:700">Karta stylizacji</h2>
+      <span style="font-size:12px;color:#625860">Kod: [KOD-PROJEKTU]</span>
+    </div>
+    <div style="padding:16px;display:flex;gap:14px">
+      <div aria-hidden="true" style="display:flex;gap:5px;align-items:flex-end;flex:none">
+        <div data-sw style="width:14px;height:30px;border-radius:7px 7px 3px 3px;background:#5B1630"></div>
+        <div data-sw style="width:15px;height:38px;border-radius:8px 8px 3px 3px;background:#5B1630"></div>
+        <div data-sw style="width:15px;height:42px;border-radius:8px 8px 3px 3px;background:#5B1630"></div>
+        <div data-sw style="width:15px;height:38px;border-radius:8px 8px 3px 3px;background:#5B1630"></div>
+        <div data-sw style="width:13px;height:28px;border-radius:7px 7px 3px 3px;background:#5B1630"></div>
+      </div>
+      <dl style="margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px">
+        <dt style="color:#625860">Kategoria</dt><dd id="kat" style="margin:0">Paznokcie</dd>
+        <dt style="color:#625860">Usługa</dt><dd id="usl" style="margin:0">Manicure hybrydowy</dd>
+        <dt style="color:#625860">Czas</dt><dd id="czas" style="margin:0">1 h 50 min</dd>
+        <dt style="color:#625860">Dla</dt><dd id="dla" style="margin:0">–</dd>
+      </dl>
+    </div>
+    <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:6px;font-size:14px">
+      <div id="pozycje" style="display:flex;flex-direction:column;gap:6px"><div class="row"><span id="opis" data-bind="booking.opis">Manicure hybrydowy · M · velvet × 10</span><span><span data-bind="booking.cena">200</span> zł</span></div></div>
+      <div id="promo-row" hidden class="row" style="color:#1F6B47"><span id="promo-txt"></span><span id="promo-kw" style="white-space:nowrap"></span></div>
+      <div id="seria-row" hidden class="row" style="color:#1F6B47"><span id="seria-txt">Seria</span><b id="seria-kw"></b></div>
+      <div id="zad-row" hidden class="row" style="color:#1F6B47"><span>Zaliczka wpłacona</span><span>−<span id="zad">60</span> zł</span></div>
+      <div style="height:1px;background:#F0E8EC;margin:4px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:700">Uzgodniona cena brutto</span><span id="total" style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700"><span data-bind="booking.cena">200</span> zł</span></div>
+      <span id="powod-p" hidden style="color:#625860;font-size:13px;line-height:1.4"></span>
+      <span id="omnibus-p" hidden style="color:#625860;font-size:12px;line-height:1.4"></span>
+      <div id="reszta-row" hidden class="row"><span>Do zapłaty w studiu</span><b><span id="reszta">140</span> zł</b></div>
+      <span style="color:#625860;font-size:12px;line-height:1.4">Jeśli na wizycie coś się zmieni, stylistka dopisze pozycję z powodem, a Ty zobaczysz ją tutaj.</span>
+    </div>
+    <div style="padding:0 16px 16px;display:flex;gap:8px">
+      <button type="button" class="b1" data-toast="Zapisano kartę jako obraz (makieta)">Zapisz jako obraz</button>
+      <button type="button" class="b1" data-toast="Skopiowano link do karty">Udostępnij link</button>
+    </div>
+  </section>
+
+  </div>
+
+  <div class="d-aside">
+  <div id="test-box" class="o2" hidden style="margin:18px 20px 0;padding:12px 14px;border-radius:12px;background:#F6EDF1;font-size:14px;line-height:1.45">
+    <b>Test uczuleniowy</b><br><span id="test-txt"></span>
+    <div style="color:#625860;font-size:12px;margin-top:4px">Zabieg jest zaplanowany najwcześniej 48 h po teście. Jeśli test nie przejdzie, studio zadzwoni i odwoła zabieg bez kosztów.</div>
+  </div>
+  <div id="uwagi-box" class="o3" hidden style="margin:12px 20px 0;padding:12px 14px;border-radius:12px;border:1px solid #E4D9DE;font-size:14px;line-height:1.45">
+    <b>Pamiętaj</b>
+    <ul id="uwagi" style="margin:6px 0 0;padding-left:18px"></ul>
+  </div>
+
+  <section id="akcje" class="o5" style="padding:22px 20px 0;display:flex;flex-direction:column;gap:8px">
+    <button type="button" class="btn" data-toast="Dodano do kalendarza">Dodaj do kalendarza</button>
+    <div style="display:flex;gap:8px">
+      <a href="termin.html?przeloz=1" class="b2">Przełóż</a>
+      <button type="button" class="b2" style="color:#A3262A" data-open="#odw">Odwołaj</button>
+    </div>
+  </section>
+
+  <section id="po-odw" class="o6" hidden style="padding:22px 20px 0;display:flex;flex-direction:column;gap:8px">
+    <a href="paznokcie.html" class="btn btn-r">Zarezerwuj ponownie</a>
+    <a href="wizyty.html" class="b2">Moje wizyty</a>
+  </section>
+
+  <section id="zgody" class="o6" aria-labelledby="zgody-h" style="margin:22px 20px 0;padding:14px 16px;border-radius:14px;border:1px solid #E4D9DE;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
+    <h2 id="zgody-h" style="margin:0;font-size:16px">Przed wizytą: zgody</h2>
+    <div id="zgody-lista" style="display:flex;flex-direction:column;gap:10px"></div>
+  </section>
+
+  <section id="konto-karta" class="o6" hidden aria-labelledby="konto-h" style="margin:22px 20px 0;padding:14px 16px;border-radius:14px;border:1px solid #E4D9DE;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
+    <h2 id="konto-h" style="margin:0;font-size:16px">Utwórz konto jednym kliknięciem</h2>
+    <span>Imię i telefon bierzemy z rezerwacji: <b id="konto-dane"></b>. Nic nie wpisujesz drugi raz.</span>
+    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px">
+      <li>historia stylizacji</li><li>„Powtórz” jednym kliknięciem</li><li>przełożenie wizyty bez SMS-a</li><li>ulubione studia</li>
+    </ul>
+    <button type="button" id="konto-btn" class="btn">Utwórz konto</button>
+  </section>
+
+  <section class="o7" style="margin:22px 20px 0;padding:14px 16px;border-radius:14px;background:#FAF6F8;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
+    <div style="display:flex;gap:10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"></path><path d="M10.5 20a1.5 1.5 0 0 0 3 0"></path></svg><span>SMS z przypomnieniem dzień przed wizytą. Link w SMS-ie pozwala przełożyć lub odwołać wizytę bez logowania.</span></div>
+    <div style="display:flex;gap:10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 4v5h-5"></path></svg><span id="przyp-txt">Za około 3 tygodnie przypomnimy o uzupełnieniu, a „Powtórz” zarezerwuje tę samą stylizację.</span></div>
+  </section>
+  </div>
+  </div>
+
+  <footer style="margin-top:auto;padding:20px;color:#625860;font-size:12px;line-height:1.5;border-top:1px solid #F0E8EC;margin-top:22px">
+    Po wizycie możesz wystawić opinię. Zmiana statusu wizyty przez studio jest widoczna w historii. <a href="wizyty.html" style="display:inline-block;padding:14px 0">Moje wizyty</a>
+  </footer>
+</div>
+
+<dialog id="dlg-konto" aria-labelledby="dk-t">
+  <form id="konto-form" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="dk-t" style="margin:0;font-size:18px">Potwierdź numer</h2>
+    <p style="margin:0;font-size:14px;line-height:1.5">Wysłaliśmy kod SMS na <b id="dk-tel"></b>. W makiecie działa każdy 6-cyfrowy kod.</p>
+    <div id="dk-kod" role="group" aria-label="Kod z SMS-a" style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px">
+      <input class="cell" aria-label="Cyfra 1" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+      <input class="cell" aria-label="Cyfra 2" inputmode="numeric" maxlength="1">
+      <input class="cell" aria-label="Cyfra 3" inputmode="numeric" maxlength="1">
+      <input class="cell" aria-label="Cyfra 4" inputmode="numeric" maxlength="1">
+      <input class="cell" aria-label="Cyfra 5" inputmode="numeric" maxlength="1">
+      <input class="cell" aria-label="Cyfra 6" inputmode="numeric" maxlength="1">
+    </div>
+    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Tworząc konto, akceptujesz [regulamin] i [politykę prywatności]. Nie wysyłamy reklam bez osobnej zgody.</p>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="b2" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Potwierdź</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="odw" aria-labelledby="odw-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="odw-t" style="margin:0;font-size:18px">Odwołać wizytę?</h2>
+    <p id="odw-txt" style="margin:0;font-size:14px;line-height:1.5">Odwołanie jest bezpłatne.</p>
+    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Zasady: odwołanie do 24 h przed wizytą zwraca zaliczkę; później zaliczki nie zwracamy. Gdy odwoła studio, zwrot jest zawsze pełny.</p>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="b2" data-close style="flex:1">Zostaw wizytę</button>
+      <button type="button" id="odw-ok" class="btn" style="flex:1;background:#A3262A">Odwołaj wizytę</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const B = Mock.get('booking', {}) || {};
+  const DN = { pon: 'Poniedziałek', wt: 'Wtorek', 'śr': 'Środa', czw: 'Czwartek', pt: 'Piątek', sob: 'Sobota', nd: 'Niedziela' };
+  const MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+  const KOL = { Paznokcie: '#5B1630', 'Rzęsy': '#2F5A86', Brwi: '#3F6B2E', Fryzjer: '#8A4B12', Kosmetyka: '#5B3A86' };
+  const NOW = new Date(2026, 9, 19, 9, 0); // makieta: "dziś" to poniedziałek 19.10, 9:00
+  const cena = B.cena != null ? Number(B.cena) : 200;
+  const dm = (B.dzien || 'wt 20.10').match(/^(\S+)\s+(\d{1,2})\.(\d{2})/);
+
+  if (dm) {
+    $('#kiedy').textContent = `${DN[dm[1]] || dm[1]}, ${+dm[2]} ${MIES[dm[3] - 1]}` + (B.godzina ? ` · ${B.godzina}${B.koniec ? '–' + B.koniec : ''}` : '');
+  }
+  $('#gdzie').textContent = `${B.studio || '[Studio 1]'} · ${B.stylistka && B.stylistka !== 'Dowolna' ? B.stylistka : 'dowolna stylistka'} · [adres]`;
+  if (B.kategoria) $('#kat').textContent = B.kategoria;
+  if (B.usluga) $('#usl').textContent = B.usluga;
+  if (B.czasTekst) $('#czas').textContent = B.czasTekst;
+  if (B.klientka) $('#dla').textContent = B.klientka;
+  if (B.dlaKogo) $('#dla').textContent = B.dlaKogo.imie + (B.kontakt && B.kontakt.imie ? ` (rezerwuje ${B.kontakt.imie})` : '');
+  const osoby = B.osoby > 1 ? B.osoby : 1, D = B.dojazd ? Number(B.dojazd.oplata) || 0 : 0;
+  const dopisz = (k, v) => { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.style.color = '#625860'; dd.style.margin = '0'; dt.textContent = k; dd.textContent = v; $('#dla').parentElement.append(dt, dd); };
+  if (B.dojazd) dopisz('Adres', B.dojazd.adres);
+  if (osoby > 1) dopisz('Osoby', String(osoby));
+  document.querySelectorAll('[data-sw]').forEach(x => (x.style.background = KOL[B.kategoria] || '#5B1630'));
+  // v2 creator fields (all optional): price range with reason, line items, test, series, notes
+  const cenaMax = B.cenaMax != null ? Number(B.cenaMax) : cena, cenaMin = B.cenaMin != null ? Number(B.cenaMin) : cenaMax;
+  const zakres = (a, b) => (a === b ? `${a} zł` : `${a}–${b} zł`);
+  $('#total').textContent = zakres(cenaMin, cenaMax);
+  if (cenaMax > cenaMin && B.powodPrzedzialu) { $('#powod-p').hidden = false; $('#powod-p').textContent = `Widełki, bo: ${String(B.powodPrzedzialu).replace(/[.\s]+$/, '')}.`; }
+  const maUslugi = Array.isArray(B.uslugi) && B.uslugi.length && !(Array.isArray(B.pozycje) && B.pozycje.length);
+  if (maUslugi) {
+    $('#pozycje').innerHTML = '';
+    B.uslugi.forEach(u => {
+      const r = document.createElement('div'); r.className = 'row';
+      const a = document.createElement('span'); a.textContent = `${u.usluga} · ${Mock.dur(u.czas)}${osoby > 1 ? ` × ${osoby} os.` : ''}`;
+      const c = document.createElement('span'); c.textContent = zakres((u.cenaMin ?? u.cena) * osoby, (u.cenaMax ?? u.cena) * osoby); c.style.whiteSpace = 'nowrap';
+      r.append(a, c); $('#pozycje').appendChild(r);
+    });
+  }
+  if (Array.isArray(B.pozycje) && B.pozycje.length) {
+    $('#pozycje').innerHTML = '';
+    B.pozycje.forEach(p => {
+      const r = document.createElement('div'); r.className = 'row';
+      const a = document.createElement('span'); a.textContent = p.nazwa + (p.min ? ' · ' + `${p.min >= 60 ? Math.floor(p.min / 60) + ' h ' : ''}${p.min % 60 ? p.min % 60 + ' min' : ''}`.trim() : '');
+      const c = document.createElement('span'); c.textContent = p.warunkowa ? `${p.cenaMin ?? 0}–${p.cena} zł, jeśli stylistka zaleci` : `${p.cena} zł`.replace('-', '−'); // a discount line has a negative price
+      if (p.warunkowa) c.style.cssText = 'text-align:right;color:#625860';
+      r.append(a, c); $('#pozycje').appendChild(r);
+    });
+  }
+  if (B.dojazd) { // home visit: a separate line, never discounted
+    const r = document.createElement('div'); r.className = 'row';
+    const a = document.createElement('span'); a.textContent = `Dojazd do klientki (${B.dojazd.strefa})`;
+    const c = document.createElement('span'); c.textContent = `${D} zł`; r.append(a, c);
+    $('#promo-row').after(r);
+  }
+  // with line items the series is already itemised (incl. the discount); the summary row would double count it
+  if (B.promo) { // the booking prices are already after the happy-hours discount; line items stay at regular prices
+    const p = B.promo, przed = p.cenaMinPrzed === p.cenaMaxPrzed ? `${p.cenaMaxPrzed} zł` : `${p.cenaMinPrzed}–${p.cenaMaxPrzed} zł`;
+    const lo = p.cenaMinPrzed - (cenaMin - D), hi = p.cenaMaxPrzed - (cenaMax - D);
+    $('#promo-row').hidden = false;
+    $('#promo-txt').textContent = `Happy hours „${p.nazwa}” −${p.rabat}%`;
+    $('#promo-kw').textContent = lo === hi ? `−${hi} zł` : `−${lo}–${hi} zł`;
+    $('#omnibus-p').hidden = false; $('#omnibus-p').textContent = `Najniższa cena z 30 dni przed obniżką: ${przed}`;
+    if (!maUslugi && !(Array.isArray(B.pozycje) && B.pozycje.length)) $('#pozycje .row span:last-child').textContent = przed;
+  }
+  if (B.seria && !(Array.isArray(B.pozycje) && B.pozycje.length)) { $('#seria-row').hidden = false; $('#seria-txt').textContent = `Seria ${B.seria.ile} zabiegów, rabat wliczony`; $('#seria-kw').textContent = `${B.seria.suma} zł`; }
+  if (B.testDzien) { $('#test-box').hidden = false; $('#test-txt').textContent = `${B.testDzien}, ${B.testGodzina}–${B.testKoniec} (${B.testMin || 10} min), ${B.studio || '[Studio 1]'}.`; }
+  if (Array.isArray(B.uwagi) && B.uwagi.length) {
+    $('#uwagi-box').hidden = false;
+    B.uwagi.forEach(u => { const li = document.createElement('li'); li.textContent = u; $('#uwagi').appendChild(li); });
+  }
+  const PRZYP = {
+    brwi: 'Za około 4–7 tygodni przypomnimy o odświeżeniu, a „Powtórz” zarezerwuje tę samą stylizację.',
+    fryzjer: 'Za około 6 tygodni przypomnimy o odroście, a „Powtórz” zarezerwuje tę samą usługę.',
+    kosmetologia: 'Kolejny zabieg serii umówisz według zaleceń kosmetolożki. Przypomnimy Ci o nim SMS-em.' }[B.kat];
+  if (PRZYP) $('#przyp-txt').textContent = PRZYP;
+  if (B.sciezka === 'konsultacja') { document.querySelector('[aria-label="Karta stylizacji"] h2').textContent = 'Karta konsultacji'; document.querySelector('[aria-label="Karta stylizacji"] [data-toast^="Zapisano"]').hidden = true; }
+  if (B.zadatek) {
+    $('#zad-row').hidden = false; $('#reszta-row').hidden = false;
+    $('#zad').textContent = B.zadatek; $('#reszta').textContent = cenaMax > cenaMin ? `${Math.max(0, cenaMin - B.zadatek)}–${Math.max(0, cenaMax - B.zadatek)}` : Math.max(0, cena - B.zadatek);
+  }
+
+  // consents signed on podpis.html are kept in Mock "podpisy" ([{ doc, nazwa, klientka, data, sposob }])
+  const podpisy = Mock.get('podpisy', []) || [];
+  const dm2 = d => { const s = String(d || ''); const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if (iso) return `${iso[3]}.${iso[2]}`; const m = s.match(/(\d{1,2})\.(\d{1,2})/); return m ? `${m[1].padStart(2, '0')}.${m[2].padStart(2, '0')}` : s; };
+  const DOKS = [['rodo', 'Zgoda RODO', '1 min'], ...(B.kat === 'rzesy' ? [['wywiad-rzesy', 'Wywiad przed przedłużaniem rzęs', '2 min']] : [])];
+  DOKS.forEach(([doc, nazwa, czas]) => {
+    const p = podpisy.find(x => x.doc === doc), r = document.createElement('div');
+    r.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:10px';
+    const t = document.createElement('span'); t.textContent = nazwa;
+    r.appendChild(t);
+    if (p) { const ok = document.createElement('b'); ok.textContent = `Podpisano ${dm2(p.data)}`; ok.style.color = '#1F6B47'; r.appendChild(ok); }
+    else { const a = document.createElement('a'); a.href = 'podpis.html?doc=' + doc; a.textContent = `Podpisz (${czas})`; a.className = 'b2'; a.style.cssText = 'flex:none;min-height:44px;padding:0 14px;font-weight:500'; r.appendChild(a); }
+    $('#zgody-lista').appendChild(r);
+  });
+
+  // account from the booking: name and phone are reused, so the client only confirms the SMS code
+  const user = Mock.get('user', {}) || {};
+  const kontakt = B.kontakt && B.kontakt.imie && B.kontakt.tel ? B.kontakt : null;
+  if (!user.zalogowana && kontakt) {
+    $('#konto-karta').hidden = false;
+    $('#konto-dane').textContent = `${kontakt.imie}, +48 ${kontakt.tel}`;
+    const cells = [...document.querySelectorAll('#dk-kod .cell')];
+    $('#konto-btn').addEventListener('click', () => {
+      cells.forEach(c => { c.value = ''; c.classList.remove('f'); });
+      $('#dk-tel').textContent = '+48 ' + kontakt.tel;
+      $('#dlg-konto').showModal(); cells[0].focus();
+      Mock.toast('Kod wysłany SMS-em na +48 ' + kontakt.tel);
+    });
+    cells.forEach((c, i) => {
+      c.addEventListener('input', () => { c.value = c.value.replace(/\D/g, '').slice(-1); c.classList.toggle('f', !!c.value); if (c.value && cells[i + 1]) cells[i + 1].focus(); });
+      c.addEventListener('keydown', e => { if (e.key === 'Backspace' && !c.value && cells[i - 1]) cells[i - 1].focus(); });
+      c.addEventListener('paste', e => {
+        const d = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6); if (!d) return;
+        e.preventDefault(); cells.forEach((x, j) => { x.value = d[j] || ''; x.classList.toggle('f', !!x.value); }); cells[Math.min(d.length, 5)].focus();
+      });
+    });
+    $('#konto-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const empty = cells.find(c => !c.value);
+      if (empty) { empty.focus(); return Mock.toast('Wpisz 6-cyfrowy kod z SMS-a'); }
+      Mock.set('user', { ...user, imie: kontakt.imie, tel: kontakt.tel, zalogowana: true, zgody: { regulamin: true, marketing: false } });
+      $('#dlg-konto').close(); $('#konto-karta').hidden = true;
+      Mock.toast('Konto utworzone, wizyta zapisana w Twoich wizytach');
+    });
+  }
+
+  const visits = Mock.get('visits', []);
+  const visit = visits.find(v => v.id === B.visitId);
+  const testVisit = visits.find(v => v.id === B.testVisitId);
+  function odwolana() {
+    $('#tytul').textContent = 'Wizyta odwołana';
+    $('#ikona').style.background = '#FFF1E0';
+    $('#ikona').innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8A3B12" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>';
+    $('#akcje').hidden = true; $('#po-odw').hidden = false; $('#zgody').hidden = true;
+    $('#po-odw .btn-r').href = 'salon.html?s=' + encodeURIComponent(B.studio || '[Studio 1]');
+  }
+  if (visit && visit.status === 'odwołana') odwolana();
+
+  // dialog text depends on the 24 h rule against the mocked "now"
+  document.querySelector('[data-open="#odw"]').addEventListener('click', () => {
+    let txt = 'Odwołanie jest bezpłatne.';
+    if (dm && B.godzina) {
+      const [h, m] = B.godzina.split(':');
+      const start = new Date(2026, dm[3] - 1, +dm[2], +h, +m);
+      const wczesnie = start - NOW >= 24 * 3600 * 1000;
+      if (B.zadatek) txt = wczesnie ? `Odwołujesz więcej niż 24 h przed wizytą: zaliczka ${B.zadatek} zł wróci na Twoje konto w ciągu 5 dni roboczych.` : `Do wizyty zostało mniej niż 24 h: zaliczki ${B.zadatek} zł nie zwracamy.`;
+      else txt = wczesnie ? 'Odwołujesz więcej niż 24 h przed wizytą. Nie wpłacałaś zaliczki, więc nic nie tracisz.' : 'Do wizyty zostało mniej niż 24 h, ale nie wpłacałaś zaliczki, więc nic nie tracisz.';
+    }
+    $('#odw-txt').textContent = txt;
+  });
+  $('#odw-ok').addEventListener('click', () => {
+    if (visit) visit.status = 'odwołana';
+    if (testVisit) testVisit.status = 'odwołana'; // the test only makes sense with its treatment
+    if (visit || testVisit) Mock.set('visits', visits);
+    $('#odw').close();
+    odwolana();
+    Mock.toast('Wizyta odwołana');
+  });
+});
+</script>
+</body>
+</html>

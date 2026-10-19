@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wystaw opinię</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
+<script src="mock.js" defer></script>
+<style>
+.app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
+.star{width:52px;height:52px;border-radius:12px;border:1px solid #8A7F86;background:#fff;color:#625860;font-size:24px;cursor:pointer;padding:0}
+.star.on{border:2px solid #9E1F50;background:#F6EDF1;color:#9E1F50}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1}
+.btn{min-height:52px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.btn:hover{background:#7A173D}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.d-cols{flex:1}
+.d-main{display:flex;flex-direction:column;flex:1}
+@media (min-width:1024px){
+  .d-cols{flex:none;padding-bottom:32px;justify-content:center}
+  .d-main{display:block;max-width:640px}
+  .d-aside{order:1;flex-basis:380px !important;top:16px}
+  .d-aside>section{margin-left:0 !important;margin-right:0 !important}
+  .d-main>div:last-child{padding:16px 20px 0 !important;border-top:0 !important}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<form id="op" class="app d-page" novalidate>
+
+  <header style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
+    <a href="wizyty.html" aria-label="Zamknij" class="back">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </a>
+    <h1 style="margin:0;font-size:20px;font-weight:700">Jak było?</h1>
+  </header>
+
+  <div class="d-cols">
+  <div class="d-aside">
+  <section style="margin:16px 20px 0;padding:14px;border-radius:14px;background:#F6EDF1;display:flex;gap:12px;align-items:center">
+    <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#5B1630;flex:none"></span>
+    <span style="display:flex;flex-direction:column;gap:2px"><b id="studio">[Studio 1] · 29.09</b><span id="opis" style="color:#625860;font-size:13px">Hybryda M · velvet × 10 · [Stylistka 1]</span></span>
+  </section>
+  </div>
+
+  <div class="d-main">
+  <fieldset style="margin:20px 20px 0;padding:0;border:0;display:flex;flex-direction:column;gap:10px">
+    <legend style="font-weight:700;margin-bottom:10px;padding:0">Ocena</legend>
+    <div id="gwiazdki" style="display:flex;gap:8px">
+      <button type="button" class="star" data-n="1" aria-label="1 gwiazdka" aria-pressed="false">★</button>
+      <button type="button" class="star" data-n="2" aria-label="2 gwiazdki" aria-pressed="false">★</button>
+      <button type="button" class="star" data-n="3" aria-label="3 gwiazdki" aria-pressed="false">★</button>
+      <button type="button" class="star" data-n="4" aria-label="4 gwiazdki" aria-pressed="false">★</button>
+      <button type="button" class="star" data-n="5" aria-label="5 gwiazdek" aria-pressed="false">★</button>
+    </div>
+    <span id="gw-txt" style="color:#625860;font-size:13px">Wybierz od 1 do 5 gwiazdek.</span>
+  </fieldset>
+
+  <fieldset style="margin:20px 20px 0;padding:0;border:0;display:flex;flex-direction:column;gap:10px">
+    <legend style="font-weight:700;margin-bottom:10px;padding:0">Co się udało?</legend>
+    <div id="tagi" data-choice="multi" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="chip" aria-pressed="true">Efekt jak w projekcie</button>
+      <button type="button" class="chip" aria-pressed="true">Cena jak w karcie</button>
+      <button type="button" class="chip" aria-pressed="false">Punktualnie</button>
+      <button type="button" class="chip" aria-pressed="false">Czysto</button>
+      <button type="button" class="chip" aria-pressed="false">Miła atmosfera</button>
+    </div>
+  </fieldset>
+
+  <div style="margin:20px 20px 0;display:flex;flex-direction:column;gap:6px">
+    <label for="tresc" style="font-weight:700">Opinia</label>
+    <textarea id="tresc" rows="5" placeholder="Napisz, co warto wiedzieć innym klientkom" style="padding:12px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;resize:vertical"></textarea>
+  </div>
+
+  <div style="margin:12px 20px 0;display:flex;flex-direction:column;gap:8px">
+    <button type="button" id="foto-btn" style="min-height:48px;border-radius:12px;border:1px dashed #A99BA2;background:#FFFFFF;color:#1E1A1D;font:inherit;cursor:pointer">+ Dodaj zdjęcie paznokci</button>
+    <input id="foto" type="file" accept="image/*" hidden aria-label="Zdjęcie do opinii">
+    <div id="foto-pod" hidden style="display:flex;gap:10px;align-items:center"><img id="foto-img" alt="Podgląd dodanego zdjęcia" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid #E4D9DE"><button type="button" id="foto-usun" style="min-height:44px;border:0;background:none;color:#A3262A;font:inherit;cursor:pointer;text-decoration:underline">Usuń zdjęcie</button></div>
+  </div>
+
+  <p style="margin:14px 20px 0;color:#625860;font-size:12px;line-height:1.45">Opinię możesz poprawić przez 60 dni, np. po korekcie. Jeśli studio oznaczyło Cię jako nieobecną, a byłaś na wizycie, <a href="#zglos" data-open="#zglos">zgłoś to</a>.</p>
+
+  <div style="margin-top:auto;padding:16px 20px 24px;border-top:1px solid #F0E8EC">
+    <button type="submit" class="btn" style="width:100%">Opublikuj opinię</button>
+  </div>
+  </div>
+  </div>
+</form>
+
+<dialog id="zglos" aria-labelledby="zg-t">
+  <form data-mock data-toast="Zgłoszenie wysłane. Wyjaśnimy sprawę ze studiem." style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="zg-t" style="margin:0;font-size:18px">Byłam na wizycie</h2>
+    <p style="margin:0;color:#625860;font-size:14px;line-height:1.45">Studio oznaczyło wizytę jako nieobecność. Opisz krótko, co się stało.</p>
+    <textarea aria-label="Opis zgłoszenia" rows="3" required style="padding:12px;border-radius:12px;border:1px solid #C9B6BF;font:inherit"></textarea>
+    <div style="display:flex;gap:8px">
+      <button type="button" data-close style="flex:1;min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;font:inherit;cursor:pointer">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Wyślij</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const p = new URLSearchParams(location.search);
+  const studio = p.get('s') || '[Studio 1]', opis = p.get('o') || 'Hybryda M · velvet × 10';
+  $('#studio').textContent = p.get('s') ? studio : '[Studio 1] · 29.09';
+  $('#opis').textContent = opis;
+  const NAZWY = ['', 'Słabo', 'Takie sobie', 'W porządku', 'Dobrze', 'Świetnie'];
+  let ocena = 0;
+  const stars = [...document.querySelectorAll('.star')];
+  stars.forEach(s => s.addEventListener('click', () => {
+    ocena = +s.dataset.n;
+    stars.forEach(x => { const on = +x.dataset.n <= ocena; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(+x.dataset.n === ocena)); });
+    $('#gw-txt').textContent = `${ocena} z 5 · ${NAZWY[ocena]}`;
+  }));
+
+  $('#foto-btn').addEventListener('click', () => $('#foto').click());
+  $('#foto').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    $('#foto-img').src = URL.createObjectURL(f); $('#foto-pod').hidden = false; $('#foto-btn').textContent = 'Zmień zdjęcie';
+  });
+  $('#foto-usun').addEventListener('click', () => { $('#foto').value = ''; $('#foto-pod').hidden = true; $('#foto-btn').textContent = '+ Dodaj zdjęcie paznokci'; });
+
+  $('#op').addEventListener('submit', e => {
+    e.preventDefault();
+    if (!ocena) return Mock.toast('Wybierz ocenę od 1 do 5 gwiazdek');
+    const tagi = [...document.querySelectorAll('#tagi [aria-pressed=true]')].map(b => b.textContent.trim());
+    const r = Mock.get('reviews', []);
+    r.unshift({ studio, ocena, tekst: $('#tresc').value.trim(), opis, tagi, data: new Date(2026, 9, 19).toLocaleDateString('pl-PL') });
+    Mock.set('reviews', r);
+    Mock.toast('Opinia opublikowana. Dziękujemy!');
+    setTimeout(() => (location.href = 'opinie.html'), 700);
+  });
+});
+</script>
+</body>
+</html>

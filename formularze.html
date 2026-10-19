@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – formularze i zgody</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Formularze i zgody</h1><span class="p-mut">Klientka wypełnia formularz w telefonie przed pierwszą wizytą. Treści poniżej to wzory, sprawdź je z prawnikiem.</span></div>
+      <button type="button" class="p-btn pri" id="newform">+ Nowy formularz</button>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <section class="p-card" aria-label="Lista formularzy" style="flex: 1 1 240px; max-width: 320px">
+        <h2>Formularze</h2>
+        <div id="lista" style="display: flex; flex-direction: column; gap: 6px"></div>
+      </section>
+
+      <section class="p-card" aria-label="Edytor formularza" style="flex: 3 1 360px">
+        <label class="p-lab">Nazwa formularza<input class="p-in" id="nm"></label>
+        <div class="p-top"><h2 class="p-h2">Pytania</h2><button type="button" class="p-btn sm" id="addq">+ Dodaj pytanie</button></div>
+        <ol id="pyt" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px"></ol>
+        <fieldset style="border: 0; padding: 0; margin: 0"><legend class="p-lab" style="padding: 0 0 6px">Przypisz do usług (klientka wypełnia przed pierwszą wizytą na te usługi)</legend><div id="us" style="display: flex; gap: 6px 18px; flex-wrap: wrap"></div></fieldset>
+        <div id="sign" style="padding:12px;border-radius:12px;background:#FAF6F8;display:flex;flex-direction:column;gap:10px"></div>
+        <div class="p-acts"><button type="button" class="p-btn pri" id="save">Zapisz formularz</button><button type="button" class="p-btn" id="del">Usuń formularz</button></div>
+      </section>
+
+      <aside class="p-card" aria-label="Podgląd formularza" style="flex: 2 1 300px; background: #FFFFFF">
+        <h2>Podgląd u klientki</h2>
+        <div id="pv" style="border: 1px solid #E4D9DE; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px"></div>
+      </aside>
+    </div>
+    <section class="p-card" aria-labelledby="ost-h">
+      <h2 id="ost-h" class="p-h2">Ostatnio podpisane</h2>
+      <div id="ost" style="display: flex; flex-direction: column; gap: 8px"></div>
+      <span class="p-mut">Przechowujemy tylko informację o podpisie (kto, co, kiedy, jak), bez obrazka podpisu. To zwykły podpis elektroniczny (forma dokumentowa).</span>
+    </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, SV = ['Hybryda', 'Żel i przedłużanie', 'Rzęsy', 'Brwi', 'Kosmetyka'], TYP = { tak: 'Tak / nie', tekst: 'Krótki tekst', dlugi: 'Długi tekst', wybor: 'Wybór z listy', data: 'Data', podpis: 'Podpis' };
+  const SEED = [
+    { id: 'f1', n: 'Zgoda RODO', us: SV.slice(), q: [{ t: 'Wyrażam zgodę na przetwarzanie moich danych osobowych w celu realizacji wizyt.', y: 'tak', r: true }, { t: 'Zgoda na przypomnienia SMS o wizytach', y: 'tak', r: false }, { t: 'Podpis', y: 'podpis', r: true }] },
+    { id: 'f2', n: 'Wywiad przed przedłużaniem rzęs', us: ['Rzęsy'], q: [{ t: 'Czy masz alergię na kleje lub kosmetyki?', y: 'tak', r: true }, { t: 'Czy nosisz soczewki kontaktowe?', y: 'tak', r: true }, { t: 'Czy jesteś w ciąży lub karmisz piersią?', y: 'tak', r: false }, { t: 'Jakie choroby oczu przechodziłaś?', y: 'dlugi', r: false }, { t: 'Podpis', y: 'podpis', r: true }] },
+    { id: 'f3', n: 'Zgoda na zdjęcia', us: [], q: [{ t: 'Zgadzam się na publikację zdjęć moich paznokci w portfolio studia.', y: 'tak', r: false }, { t: 'Dopuszczam oznaczanie mnie w mediach społecznościowych', y: 'tak', r: false }] }];
+  let F = Mock.get('formularze', SEED), cur = 'f1';
+  const save = () => Mock.set('formularze', F);
+  const f = () => F.find(x => x.id === cur) || F[0];
+  const $ = id => document.getElementById(id);
+
+  function renderList() { $('lista').innerHTML = F.map(x => `<button type="button" class="p-btn" data-id="${x.id}" aria-pressed="${x.id === cur}" style="justify-content:space-between;text-align:left;${x.id === cur ? 'background:#F6EDF1;font-weight:700' : ''}"><span>${E(x.n)}</span><span class="p-mut">${x.q.length} pyt.${PS.addon('podpisy') ? ' · ' + nPodp(x.id) + ' podp.' : ''}</span></button>`).join(''); }
+  function renderEditor() {
+    const x = f(); if (!x) { $('nm').value = ''; $('pyt').innerHTML = ''; $('pv').innerHTML = '<span class="p-mut">Brak formularzy.</span>'; $('us').innerHTML = ''; return; }
+    cur = x.id; $('nm').value = x.n;
+    $('pyt').innerHTML = x.q.map((q, i) => `<li class="p-row" style="align-items:flex-start"><span style="flex:1;min-width:180px"><b>${i + 1}.</b> ${E(q.t)}<br><span class="p-mut">${TYP[q.y]}${q.r ? ' · wymagane' : ''}</span></span><span class="p-acts"><button type="button" class="p-btn sm" data-up="${i}" aria-label="Przesuń pytanie ${i + 1} w górę"${i ? '' : ' disabled'}>↑</button><button type="button" class="p-btn sm dng" data-rm="${i}" aria-label="Usuń pytanie ${i + 1}">Usuń</button></span></li>`).join('') || '<span class="p-mut">Brak pytań. Dodaj pierwsze.</span>';
+    $('us').innerHTML = SV.map(s => `<label class="p-chk"><input type="checkbox" data-s="${E(s)}" ${x.us.includes(s) ? 'checked' : ''}>${E(s)}</label>`).join('');
+    renderPv(); renderSign();
+  }
+  function renderPv() {
+    const x = f(); if (!x) return;
+    $('pv').innerHTML = `<b style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px">${E(x.n)}</b>` + x.q.map((q, i) => {
+      const L = `${E(q.t)}${q.r ? ' *' : ''}`;
+      if (q.y === 'tak') return `<fieldset style="border:0;padding:0;margin:0"><legend style="padding:0 0 4px">${L}</legend><label class="p-chk" style="display:inline-flex;margin-right:14px"><input type="radio" name="p${i}"> Tak</label><label class="p-chk" style="display:inline-flex"><input type="radio" name="p${i}"> Nie</label></fieldset>`;
+      if (q.y === 'podpis') return `<label class="p-lab">${L}<span style="height:56px;border:1px dashed #A99BA2;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#625860">podpis palcem</span></label>`;
+      if (q.y === 'dlugi') return `<label class="p-lab">${L}<textarea class="p-in" rows="2"></textarea></label>`;
+      if (q.y === 'data') return `<label class="p-lab">${L}<input class="p-in" type="date"></label>`;
+      if (q.y === 'wybor') return `<label class="p-lab">${L}<select class="p-in"><option>Wybierz</option><option>Opcja 1</option><option>Opcja 2</option></select></label>`;
+      return `<label class="p-lab">${L}<input class="p-in"></label>`;
+    }).join('');
+  }
+  $('lista').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b) { cur = b.dataset.id; renderList(); renderEditor(); } });
+  $('nm').addEventListener('input', e => { f().n = e.target.value; renderList(); renderPv(); });
+  $('pyt').addEventListener('click', e => {
+    const u = e.target.closest('[data-up]'), r = e.target.closest('[data-rm]'), q = f().q;
+    if (u) { const i = +u.dataset.up; [q[i - 1], q[i]] = [q[i], q[i - 1]]; renderEditor(); renderList(); }
+    if (r) { q.splice(+r.dataset.rm, 1); renderEditor(); renderList(); Mock.toast('Usunięto pytanie'); }
+  });
+  $('us').addEventListener('change', e => { const s = e.target.dataset.s, x = f(); x.us = e.target.checked ? x.us.concat(s) : x.us.filter(y => y !== s); });
+  $('addq').addEventListener('click', () => PS.modal({
+    title: 'Nowe pytanie', ok: 'Dodaj',
+    body: `<label class="p-lab">Treść pytania<input class="p-in" name="t" required></label><label class="p-lab">Typ odpowiedzi<select class="p-in" name="y">${Object.entries(TYP).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></label><label class="p-chk"><input type="checkbox" name="r" checked> Odpowiedź wymagana</label>`,
+    onOk: fm => { f().q.push({ t: fm.t.value.trim(), y: fm.y.value, r: fm.r.checked }); renderEditor(); renderList(); },
+    toast: 'Dodano pytanie'
+  }));
+  $('newform').addEventListener('click', () => PS.modal({
+    title: 'Nowy formularz', ok: 'Utwórz',
+    body: '<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. Zgoda na zabieg mikroigłowy"></label>',
+    onOk: fm => { const id = 'f' + Date.now(); F.push({ id, n: fm.n.value.trim(), us: [], q: [] }); cur = id; save(); renderList(); renderEditor(); },
+    toast: fm => 'Utworzono formularz: ' + fm.n.value.trim()
+  }));
+  $('save').addEventListener('click', () => { save(); Mock.toast('Zapisano formularz: ' + f().n); });
+  $('del').addEventListener('click', () => { const x = f(); PS.modal({ title: 'Usunąć formularz?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">„${E(x.n)}” zniknie z listy. Wypełnione już formularze klientek zostają w ich kartach.</p>`, onOk: () => { F = F.filter(y => y !== x); save(); cur = ''; renderList(); renderEditor(); }, toast: 'Formularz usunięty' }); });
+
+  // --- podpisy elektroniczne ---
+  const DOCMAP = { f1: 'rodo', f2: 'wywiad-rzesy', f3: 'zdjecia' }; // tylko wzorcowe formularze mają dokument do podpisu w makiecie
+  const SAMPLE_PODP = [
+    { doc: 'rodo', klientka: '[Klientka A]', data: '2026-10-18T14:20:00', sposob: 'odręczny', przyklad: true },
+    { doc: 'wywiad-rzesy', klientka: '[Klientka D]', data: '2026-10-17T10:05:00', sposob: 'wpisany', przyklad: true }];
+  const DOCNAME = { rodo: 'Zgoda RODO', 'wywiad-rzesy': 'Wywiad przed przedłużaniem rzęs', zdjecia: 'Zgoda na zdjęcia' };
+  const podp = () => SAMPLE_PODP.concat(Mock.get('podpisy', [])).sort((a, b) => (a.data < b.data ? 1 : -1));
+  const nPodp = id => (DOCMAP[id] ? podp().filter(p => p.doc === DOCMAP[id]).length : 0);
+  const pad2 = n => String(n).padStart(2, '0');
+  const kiedy = iso => { const d = new Date(iso); return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}, ${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+  const KL = ['[Klientka A]', '[Klientka B]', '[Klientka D]', '[Klientka E]', '[Klientka F]'];
+
+  function renderSign() {
+    const x = f(), doc = x && DOCMAP[x.id];
+    if (!x) { $('sign').innerHTML = ''; return; }
+    if (!PS.addon('podpisy')) { $('sign').innerHTML = PS.signUpsell(); return; }
+    $('sign').innerHTML = `<b>Podpis elektroniczny</b>` + (doc
+      ? `<span class="p-mut">Podpisano: ${nPodp(x.id)}. Klientka podpisuje w telefonie palcem albo wpisuje imię i nazwisko.</span><div class="p-acts"><button type="button" class="p-btn sm dark" id="send">Wyślij do podpisu</button><a class="p-btn sm" id="tablet" href="podpis.html?doc=${doc}" target="_blank" rel="noopener">Podpis na tablecie w studiu</a></div>`
+      : '<span class="p-mut">Podpis elektroniczny jest w makiecie dostępny dla formularzy wzorcowych (RODO, wywiad rzęs, zdjęcia).</span>');
+  }
+  function renderOst() {
+    if (!PS.addon('podpisy')) { $('ost').innerHTML = PS.signUpsell(); return; }
+    $('ost').innerHTML = podp().slice(0, 6).map((p, i) => `<div class="p-row"><span><b>${E(p.klientka)}</b> · ${E(DOCNAME[p.doc])}${p.przyklad ? ' <span class="p-badge blue">przykład</span>' : ''}<br><span class="p-mut">${kiedy(p.data)} · podpis ${p.sposob}</span></span><button type="button" class="p-btn sm" data-prev="${i}" aria-label="Podgląd: ${E(DOCNAME[p.doc])}, ${E(p.klientka)}">Podgląd</button></div>`).join('');
+  }
+  $('sign').addEventListener('click', e => {
+    if (!e.target.closest('#send')) return;
+    const doc = DOCMAP[f().id];
+    PS.modal({
+      title: 'Wyślij do podpisu: ' + DOCNAME[doc], ok: 'Wyślij',
+      body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map(k => `<option>${E(k)}</option>`).join('')}</select></label>
+        <fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Kanał</legend>${['SMS', 'e-mail'].map((c, i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="c" value="${c}"${i ? '' : ' checked'}>${c}</label>`).join('')}</fieldset>
+        <span class="p-mut">Klientka dostanie link do podpisu w telefonie. Link działa 7 dni.</span>`,
+      onOk: fm => { const l = Mock.get('podprosby', []); l.unshift({ doc, klientka: fm.k.value, kanal: fm.c.value, data: new Date().toISOString() }); Mock.set('podprosby', l); },
+      toast: fm => `Wysłano do podpisu: ${fm.k.value} (${fm.c.value})`
+    });
+  });
+  $('ost').addEventListener('click', e => {
+    const b = e.target.closest('[data-prev]'); if (!b) return;
+    const p = podp()[+b.dataset.prev], form = F.find(x => DOCMAP[x.id] === p.doc);
+    PS.modal({
+      title: DOCNAME[p.doc], noOk: true,
+      body: `<div style="max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:8px;line-height:1.45">${form ? form.q.filter(q => q.y !== 'podpis').map(q => `<p style="margin:0">${E(q.t)}</p>`).join('') : ''}</div>
+        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><b>${E(p.klientka)}</b><span>Podpisano elektronicznie ${kiedy(p.data)}</span><span class="p-mut">Podpis ${p.sposob}, bez zapisanego obrazka</span></div>`
+    });
+  });
+  window.addEventListener('storage', () => { renderList(); renderSign(); renderOst(); }); // podpis złożony w drugiej karcie
+  renderList(); renderEditor(); renderOst();
+});
+</script>
+</body>
+</html>

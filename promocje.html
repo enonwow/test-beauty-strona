@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – promocje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+<style>
+.hh-b{min-height:44px;min-width:48px;padding:0 12px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer}
+.hh-b[aria-pressed="true"]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.hh-b:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+.hh-err{margin:0;color:#A3262A;font-size:13px}
+.p-in[aria-invalid="true"]{border-color:#A3262A}
+.hh-card{background:#fff;border:1px solid #E4D9DE;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.hh-card.sel{border:2px solid #9E1F50}
+/* telefon: 7 dni w jednym rzędzie musi dać cel dotyku 44 px, więc mniejsze marginesy */
+@media (max-width:480px){main{padding:12px !important}#hh-form,#fl-form{padding:12px !important}.hh-days{gap:2px !important}}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Promocje</h1><span class="p-mut">Wypełniaj puste godziny. Happy hours pokazujemy klientkom na stronie głównej, w wynikach i przy wolnych godzinach.</span></div>
+      <button type="button" class="p-btn pri" id="hh-add">+ Dodaj happy hours</button>
+    </div>
+
+    <div id="tabs" role="tablist" aria-label="Rodzaj promocji" class="p-pills">
+      <button type="button" role="tab" class="p-pill" data-tab="hh" aria-selected="true" id="tab-hh">Happy hours</button>
+      <button type="button" role="tab" class="p-pill" data-tab="flash" aria-selected="false">Flash sale</button>
+      <button type="button" role="tab" class="p-pill" data-tab="last" aria-selected="false">Last minute</button>
+    </div>
+
+    <!-- Happy hours: lista ofert + edycja -->
+    <div id="t-hh" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <section aria-label="Lista happy hours" id="hh-list" style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 10px"></section>
+      <form id="hh-form" novalidate aria-label="Edycja happy hours" class="p-card" style="flex: 1 1 400px; padding: 18px; gap: 14px"></form>
+    </div>
+
+    <!-- Flash sale i last minute -->
+    <div id="t-fl" hidden style="display: flex; flex-direction: column; gap: 16px">
+      <div id="fl-card"></div>
+      <form id="fl-form" class="p-card" aria-labelledby="f-h">
+        <h2 id="f-h" class="p-h2"></h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px">
+          <label class="p-lab">Rabat (%)<input class="p-in" type="number" name="rabat" min="1" max="90" required style="width: 110px"></label>
+          <label class="p-lab">Od godziny<input class="p-in" type="time" name="od" required></label>
+          <label class="p-lab">Do godziny<input class="p-in" type="time" name="do" required></label>
+        </div>
+        <fieldset style="border: 0; padding: 0; margin: 0"><legend class="p-lab" style="padding: 0 0 6px">Dni tygodnia</legend><div id="fl-dni" class="hh-days" role="group" aria-label="Dni tygodnia" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px"></div></fieldset>
+        <fieldset style="border: 0; padding: 0; margin: 0"><legend class="p-lab" style="padding: 0 0 6px">Usługi objęte promocją</legend><div id="fl-us" style="display: flex; gap: 6px 18px; flex-wrap: wrap"></div></fieldset>
+        <div class="p-box"><span>Klientka zobaczy</span><b id="fl-pv" style="text-align: right"></b></div>
+        <div class="p-acts"><button class="p-btn pri">Zapisz promocję</button></div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, DN = ['pn', 'wt', 'śr', 'cz', 'pt', 'sb', 'nd'], KAT = ['Paznokcie', 'Rzęsy', 'Brwi', 'Fryzjer', 'Kosmetologia'], PRESET = [10, 15, 20, 25];
+  const $ = id => document.getElementById(id);
+  // Przykładowa usługa do podglądu: Paznokcie wg pricing.json, reszta cen przykładowa.
+  const SAMPLE = { Paznokcie: ['Manicure hybrydowy', 140], Rzęsy: ['Rzęsy 1:1', 250], Brwi: ['Henna + regulacja brwi', 70], Fryzjer: ['Strzyżenie damskie', 120], Kosmetologia: ['Oczyszczanie twarzy', 180] };
+  const hhn = s => String(s).replace(/^0/, '');
+  const dniTxt = d => {
+    const s = [...d].sort((a, b) => a - b), out = [];
+    for (let i = 0; i < s.length;) { let j = i; while (s[j + 1] === s[j] + 1) j++; out.push(j - i >= 2 ? `${DN[s[i]]}–${DN[s[j]]}` : s.slice(i, j + 1).map(x => DN[x]).join(', ')); i = j + 1; }
+    return s.length === 7 ? 'codziennie' : out.join(', ') || 'brak dni';
+  };
+  const katTxt = k => (k.length ? k.join(', ') : 'wszystkie usługi');
+
+  let H = Mock.happyHours(), sel = H[0] && H[0].id, draft = null, errs = {};
+  const saveH = () => { Mock.setHappyHours(H); };
+  const used = h => Mock.get('visits', []).filter(v => v.promo && v.promo.id === h.id && v.status !== 'odwołana').length;
+
+  function pick(id) { sel = id; const h = H.find(x => x.id === id); draft = h ? JSON.parse(JSON.stringify(h)) : null; errs = {}; renderList(); renderForm(); }
+
+  function renderList() {
+    $('tab-hh').textContent = `Happy hours (${H.length})`;
+    $('hh-list').innerHTML = H.map(h => `<article class="hh-card${h.id === sel ? ' sel' : ''}">
+      <div class="p-top" style="flex-wrap:nowrap"><h2 class="p-h2" style="overflow-wrap:anywhere">${E(h.nazwa)}</h2><span class="p-badge" style="${h.on ? 'background:#9E1F50;color:#fff' : ''}">−${h.rabat}%</span></div>
+      <span>${dniTxt(h.dni)} · ${hhn(h.od)}–${hhn(h.do)} · ${E(katTxt(h.kategorie))}</span>
+      <div class="p-top" style="gap:8px"><span class="p-mut" style="font-size:13px">${h.naGlownej ? 'Na stronie głównej' : 'Tylko na profilu studia'} · ${h.limit ? `${used(h)} z ${h.limit} miejsc zajęte w tym tygodniu` : 'bez limitu'}</span><span class="p-badge ${h.on ? 'ok' : ''}" style="${h.on ? '' : 'background:#FAF6F8;color:#625860'}">${h.on ? 'włączona' : 'wyłączona'}</span></div>
+      <div class="p-acts"><button type="button" class="p-btn sm" data-edit="${E(h.id)}" aria-pressed="${h.id === sel}" aria-label="Edytuj: ${E(h.nazwa)}">${h.id === sel ? 'Edytujesz obok' : 'Edytuj'}</button></div></article>`).join('') || '<div class="p-card"><span class="p-mut">Brak ofert happy hours. Dodaj pierwszą przyciskiem „+ Dodaj happy hours”.</span></div>';
+  }
+
+  function pv() {
+    const d = draft, s = SAMPLE[d.kategorie[0]] || SAMPLE.Paznokcie, rab = Math.min(50, Math.max(0, d.rabat || 0)), po = Mock.priceAfter(s[1], rab);
+    const todayIn = d.dni.includes(Mock.weekday(new Date()));
+    return `<div style="padding:14px;border-radius:14px;background:#FAF6F8;display:flex;flex-direction:column;gap:8px">
+        <span style="color:#625860;font-size:12px;font-weight:700;letter-spacing:.04em">TAK ZOBACZY TO KLIENTKA</span>
+        <div style="background:#fff;border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><b>[Nazwa studia]</b><span style="padding:2px 8px;border-radius:999px;background:#9E1F50;color:#fff;font-weight:700;font-size:13px">−${rab}%</span></div>
+          <span style="font-size:13px">${E(d.nazwa || 'Happy hours')} · ${todayIn ? 'dziś' : dniTxt(d.dni)} ${hhn(d.od)}–${hhn(d.do)}</span>
+          <span>${E(s[0])} <s style="color:#625860">${s[1]} zł</s> <b>${po} zł</b></span>
+          <span style="color:#625860;font-size:12px">Najniższa cena z 30 dni przed obniżką: ${s[1]} zł</span></div></div>`;
+  }
+  const fieldErr = k => errs[k] ? `<p class="hh-err" id="e-${k}" role="alert">${errs[k]}</p>` : '';
+  const inv = k => (errs[k] ? ` aria-invalid="true" aria-describedby="e-${k}"` : '');
+  function renderForm() {
+    const f = $('hh-form'), d = draft;
+    if (!d) { f.innerHTML = '<span class="p-mut">Wybierz ofertę z listy albo dodaj nową.</span>'; return; }
+    const custom = !PRESET.includes(d.rabat);
+    f.innerHTML = `
+      <h2 class="p-h2" style="font-family:'Bricolage Grotesque',sans-serif;font-size:20px">${E(H.find(x => x.id === sel).nazwa)}</h2>
+      <label class="p-lab" style="font-weight:500;font-size:14px;color:#1E1A1D">Nazwa (widzi ją klientka)<input class="p-in" name="nazwa" value="${E(d.nazwa)}" maxlength="40"${inv('nazwa')}></label>${fieldErr('nazwa')}
+      <div style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:500">Rabat</span>
+        <div role="group" aria-label="Rabat" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${PRESET.map(p => `<button type="button" class="hh-b" data-r="${p}" aria-pressed="${!custom && d.rabat === p}">${p}%</button>`).join('')}<button type="button" class="hh-b" data-r="x" aria-pressed="${custom}" style="${custom ? '' : 'border-style:dashed'}">inny</button>
+        ${custom ? `<label class="p-lab" style="flex-direction:row;align-items:center;gap:6px">Rabat (%)<input class="p-in" name="rabat" type="number" inputmode="numeric" min="5" max="50" value="${E(d.rabat)}" style="width:84px"${inv('rabat')}></label>` : ''}</div>${fieldErr('rabat')}</div>
+      <div style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:500">Dni</span>
+        <div class="hh-days" role="group" aria-label="Dni" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px">${DN.map((n, i) => `<button type="button" class="hh-b" style="min-width:0;padding:0" data-d="${i}" aria-pressed="${d.dni.includes(i)}">${n}</button>`).join('')}</div>${fieldErr('dni')}</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <label class="p-lab" style="font-weight:500;font-size:14px;color:#1E1A1D">Od<input class="p-in" type="time" name="od" value="${E(d.od)}"${inv('godz')}></label>
+        <label class="p-lab" style="font-weight:500;font-size:14px;color:#1E1A1D">Do<input class="p-in" type="time" name="do" value="${E(d.do)}"${inv('godz')}></label>
+        <label class="p-lab" style="font-weight:500;font-size:14px;color:#1E1A1D">Limit miejsc / tydzień<input class="p-in" name="limit" inputmode="numeric" value="${E(d.limit)}" style="width:90px"${inv('limit')}></label></div>${fieldErr('godz')}${fieldErr('limit')}
+      <div style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:500">Usługi <span class="p-mut" style="font-weight:400">(nic nie zaznaczone = wszystkie)</span></span>
+        <div role="group" aria-label="Kategorie usług" style="display:flex;gap:6px;flex-wrap:wrap">${KAT.map(k => `<button type="button" class="hh-b" style="border-radius:999px;padding:0 14px" data-k="${k}" aria-pressed="${d.kategorie.includes(k)}">${k}</button>`).join('')}</div></div>
+      <label class="p-chk" style="min-height:44px"><input type="checkbox" name="glowna" ${d.naGlownej ? 'checked' : ''}>Pokazuj na stronie głównej i w wyszukiwarce</label>
+      <div id="hh-pv" aria-live="polite"></div>
+      <p style="margin:0;padding:10px 12px;border-radius:10px;background:#FFF1E0;color:#8A3B12;font-size:13px;line-height:1.45">Gdy dwie promocje trafią w ten sam termin, klientka dostaje wyższy rabat. Rabatów nie sumujemy.</p>
+      <div class="p-acts"><button class="p-btn pri">Zapisz</button><button type="button" class="p-btn" data-a="toggle">${d.on ? 'Wyłącz' : 'Włącz'}</button><button type="button" class="p-btn dng" data-a="del">Usuń</button></div>`;
+    $('hh-pv').innerHTML = pv();
+  }
+
+  // Zmiany pól odświeżają tylko podgląd i znaczniki, nie same pola (żeby nie gubić fokusu).
+  function readFields() {
+    const f = $('hh-form');
+    if (f.nazwa) draft.nazwa = f.nazwa.value;
+    if (f.rabat) draft.rabat = f.rabat.value === '' ? NaN : +f.rabat.value;
+    if (f.od) { draft.od = f.od.value; draft.do = f.do.value; draft.limit = f.limit.value; }
+    if (f.glowna) draft.naGlownej = f.glowna.checked;
+  }
+  function validate() {
+    errs = {};
+    const d = draft, lim = String(d.limit).trim();
+    if (!d.nazwa.trim()) errs.nazwa = 'Wpisz nazwę, którą zobaczy klientka.';
+    if (!Number.isInteger(d.rabat) || d.rabat < 5 || d.rabat > 50) errs.rabat = 'Rabat musi mieścić się między 5% a 50%.';
+    if (!d.dni.length) errs.dni = 'Wybierz co najmniej jeden dzień.';
+    if (!d.od || !d.do) errs.godz = 'Podaj godzinę początku i końca.';
+    else if (d.od >= d.do) errs.godz = 'Godzina końca musi być po godzinie początku.';
+    if (lim !== '' && !/^\d+$/.test(lim)) errs.limit = 'Limit to liczba całkowita, 0 oznacza bez limitu.';
+    return !Object.keys(errs).length;
+  }
+  // Przy pisaniu odświeżamy tylko podgląd i zdejmujemy błąd z edytowanego pola (formularza nie przebudowujemy, żeby nie gubić fokusu).
+  $('hh-form').addEventListener('input', e => {
+    if (!draft) return;
+    readFields();
+    const key = { nazwa: 'nazwa', rabat: 'rabat', limit: 'limit' }[e.target.name] || 'godz';
+    const m = $('e-' + key); if (m) m.remove(); delete errs[key];
+    e.target.removeAttribute('aria-invalid');
+    $('hh-pv').innerHTML = pv();
+  });
+  $('hh-form').addEventListener('click', e => {
+    if (!draft) return;
+    const r = e.target.closest('[data-r]'), dd = e.target.closest('[data-d]'), k = e.target.closest('[data-k]'), a = e.target.closest('[data-a]');
+    if (r) { readFields(); draft.rabat = r.dataset.r === 'x' ? (PRESET.includes(draft.rabat) ? 30 : draft.rabat) : +r.dataset.r; delete errs.rabat; renderForm(); if (r.dataset.r === 'x') $('hh-form').rabat.focus(); }
+    if (dd) { readFields(); const i = +dd.dataset.d; draft.dni = draft.dni.includes(i) ? draft.dni.filter(x => x !== i) : draft.dni.concat(i); delete errs.dni; renderForm(); }
+    if (k) { readFields(); const n = k.dataset.k; draft.kategorie = draft.kategorie.includes(n) ? draft.kategorie.filter(x => x !== n) : draft.kategorie.concat(n); renderForm(); }
+    if (a && a.dataset.a === 'toggle') {
+      const h = H.find(x => x.id === sel); h.on = !h.on; draft.on = h.on; saveH(); renderList(); renderForm();
+      Mock.toast(h.on ? `Włączono: ${h.nazwa}` : `Wyłączono: ${h.nazwa}. Klientki już jej nie zobaczą`);
+    }
+    if (a && a.dataset.a === 'del') {
+      const h = H.find(x => x.id === sel);
+      PS.modal({ title: 'Usunąć happy hours?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">„${E(h.nazwa)}” zniknie ze strony głównej i z terminów. Wizyty już zarezerwowane z tym rabatem zostają bez zmian.</p>`,
+        onOk: () => { H = H.filter(x => x.id !== h.id); saveH(); pick(H[0] && H[0].id); }, toast: `Usunięto: ${h.nazwa}` });
+    }
+  });
+  $('hh-form').addEventListener('submit', e => {
+    e.preventDefault(); readFields();
+    if (!validate()) { renderForm(); const bad = $('hh-form').querySelector('[aria-invalid="true"]') || $('hh-form').querySelector('.hh-err'); if (bad) bad.focus && bad.focus(); Mock.toast('Popraw zaznaczone pola'); return; }
+    const out = { ...draft, nazwa: draft.nazwa.trim(), limit: String(draft.limit).trim() === '' ? 0 : +draft.limit, dni: [...draft.dni].sort((a, b) => a - b) };
+    H = H.map(x => (x.id === sel ? out : x)); saveH(); draft = JSON.parse(JSON.stringify(out)); renderList(); renderForm();
+    Mock.toast(`Zapisano happy hours: ${out.nazwa}`);
+  });
+  $('hh-list').addEventListener('click', e => { const b = e.target.closest('[data-edit]'); if (b) pick(b.dataset.edit); });
+  $('hh-add').addEventListener('click', () => {
+    $('tab-hh').click();
+    const h = { id: 'hh-' + Date.now(), nazwa: 'Nowe happy hours', on: true, rabat: 15, dni: [0, 1, 2, 3, 4], od: '10:00', do: '12:00', kategorie: [], limit: 0, naGlownej: true };
+    H.push(h); saveH(); pick(h.id); Mock.toast('Dodano nową ofertę. Ustaw nazwę, dni i godziny, potem Zapisz'); $('hh-form').nazwa.select();
+  });
+
+  // --- Flash sale i last minute (bez zmian w działaniu) ---
+  const SV = ['Hybryda', 'Żel', 'Przedłużanie', 'Rzęsy', 'Brwi', 'Kosmetyka'];
+  const SEED = {
+    flash: { n: 'Flash sale', d: 'Jednorazowa obniżka na wybrane godziny. Dobra na ogłoszenie na Instagramie.', on: false, rabat: 30, od: '12:00', do: '15:00', dni: [2], us: ['Hybryda'] },
+    last: { n: 'Last minute', d: 'Rabat na terminy wolne w ciągu najbliższych 24 godzin.', on: false, rabat: 20, od: '09:00', do: '18:00', dni: [0, 1, 2, 3, 4, 5], us: ['Hybryda', 'Żel', 'Rzęsy', 'Brwi'] }
+  };
+  let P = { ...SEED, ...Object.fromEntries(Object.entries(Mock.get('promocje', {})).filter(([k]) => k in SEED)) }, cur = 'flash';
+  const saveP = () => Mock.set('promocje', P); // klucz "happy" z dawnej wersji znika przy pierwszym zapisie
+  const line = p => `−${p.rabat}% · ${dniTxt(p.dni)} · ${p.od}–${p.do} · ${p.us.join(', ') || 'brak usług'}`;
+  function flCard() {
+    const p = P[cur];
+    $('fl-card').innerHTML = `<section class="p-card"><div class="p-top"><h2 class="p-h2" style="font-size:18px">${E(p.n)}</h2><label class="p-chk"><input type="checkbox" id="fl-on" ${p.on ? 'checked' : ''}>${p.on ? 'włączona' : 'wyłączona'}</label></div><span style="color:#625860;line-height:1.4">${E(p.d)}</span><span><b>${line(p)}</b></span></section>`;
+  }
+  function flFill() {
+    const p = P[cur], f = $('fl-form');
+    $('f-h').textContent = 'Ustawienia: ' + p.n;
+    f.rabat.value = p.rabat; f.od.value = p.od; f.do.value = p.do;
+    $('fl-dni').innerHTML = DN.map((d, i) => `<button type="button" class="hh-b" style="min-width:0;padding:0" data-d="${i}" aria-pressed="${p.dni.includes(i)}">${d}</button>`).join('');
+    $('fl-us').innerHTML = SV.map(s => `<label class="p-chk"><input type="checkbox" data-s="${s}" ${p.us.includes(s) ? 'checked' : ''}>${s}</label>`).join('');
+    flPv();
+  }
+  function flDraft() {
+    const f = $('fl-form');
+    return { ...P[cur], rabat: +f.rabat.value || 0, od: f.od.value, do: f.do.value, dni: [...document.querySelectorAll('#fl-dni [data-d]')].filter(b => b.getAttribute('aria-pressed') === 'true').map(b => +b.dataset.d), us: [...document.querySelectorAll('#fl-us [data-s]')].filter(c => c.checked).map(c => c.dataset.s) };
+  }
+  const flPv = () => { $('fl-pv').textContent = line(flDraft()); };
+  $('fl-card').addEventListener('change', e => { if (e.target.id !== 'fl-on') return; P[cur].on = e.target.checked; saveP(); flCard(); Mock.toast(`${P[cur].n}: ${P[cur].on ? 'włączona' : 'wyłączona'}`); });
+  $('fl-dni').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) { b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); flPv(); } });
+  $('fl-form').addEventListener('input', flPv);
+  $('fl-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const d = flDraft();
+    if (!d.dni.length) { Mock.toast('Wybierz przynajmniej jeden dzień'); return; }
+    if (!d.us.length) { Mock.toast('Wybierz przynajmniej jedną usługę'); return; }
+    if (d.do <= d.od) { Mock.toast('Godzina końca musi być po początku'); return; }
+    P[cur] = d; saveP(); flCard(); Mock.toast('Zapisano promocję: ' + d.n);
+  });
+
+  // Zakładki: Happy hours / Flash sale / Last minute
+  $('tabs').addEventListener('click', e => {
+    const t = e.target.closest('[data-tab]'); if (!t) return;
+    document.querySelectorAll('#tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', String(b === t)));
+    const hh = t.dataset.tab === 'hh';
+    $('t-hh').hidden = !hh; $('t-fl').hidden = hh; $('hh-add').hidden = !hh;
+    if (!hh) { cur = t.dataset.tab; flCard(); flFill(); }
+  });
+
+  window.addEventListener('storage', () => { H = Mock.happyHours(); if (!H.some(x => x.id === sel)) sel = H[0] && H[0].id; pick(sel); });
+  pick(sel);
+});
+</script>
+</body>
+</html>
