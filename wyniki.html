@@ -95,6 +95,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <div class="d-aside d-aside-left">
   <div id="filtry" class="o1" data-choice="multi" role="group" aria-label="Filtry" style="padding:12px 20px 0;display:flex;gap:6px">
     <button type="button" class="chip" aria-pressed="true" data-f="kiedy" id="chip-kiedy">Dziś ✕</button>
+    <button type="button" class="chip" aria-pressed="false" data-f="teraz" id="chip-teraz">Wolne w ciągu 2 h</button>
     <button type="button" class="chip" aria-pressed="false" data-f="po16">Po 16:00</button>
     <button type="button" class="chip" aria-pressed="false" data-f="do200">Do 200 zł</button>
     <button type="button" class="chip" aria-pressed="false" data-f="blik">BLIK / karta</button>
@@ -294,22 +295,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const kat = CATS.find(c => c === q.toLowerCase());
   // studios with a happy-hours offer today (mock today = Monday 19.10.2026): [Studio 1] from the studio's offers, [Studio 2] is a fixed example
   const HH_STUDIA = Mock.happyToday().length ? ['[Studio 1]', '[Studio 2]'] : [];
-  const F = { po16: false, do200: false, blik: false, km2: false, hh: false, od: null, do: null, pay: [], udog: [] };
+  const F = { teraz: false, po16: false, do200: false, blik: false, km2: false, hh: false, od: null, do: null, pay: [], udog: [] };
   let favs = Mock.get('favorites', []);
 
   $('#h1').textContent = `${q || 'Wszystkie usługi'} · ${kiedy}`;
   $('#h2').textContent = search.miasto || '[miasto, dzielnica]';
   $('#chip-kiedy').textContent = `${kiedy} ✕`;
-  $('#kiedy-t').textContent = kiedy === 'Dziś' ? 'dziś' : kiedy === 'Jutro' ? 'jutro' : kiedy === 'Ten tydzień' ? 'w tym tygodniu' : `(${kiedy})`;
+  $('#kiedy-t').textContent = kiedy === 'Teraz' ? 'w ciągu 2 godzin' : kiedy === 'Dziś' ? 'dziś' : kiedy === 'Jutro' ? 'jutro' : kiedy === 'Ten tydzień' ? 'w tym tygodniu' : `(${kiedy})`;
   const kt0 = $('#kiedy-t').textContent;
   if (q && !kat) { $('#szukano').hidden = false; $('#szukano').textContent = `Szukano: „${q}”. Pokazujemy wszystkie studia.`; }
 
+  const T0 = Mock.teraz(), terazMin = T0.getHours() * 60 + T0.getMinutes();
+  if (kiedy === 'Teraz') { F.teraz = true; $('#chip-teraz').setAttribute('aria-pressed', 'true'); }
+  if (kiedy !== 'Dziś' && kiedy !== 'Teraz') $('#chip-teraz').hidden = true; // "now" only makes sense for today
   const plural = n => (n === 1 ? 'studio' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'studia' : 'studiów');
   const fmt = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
 
   function ok(c) {
     const d = c.dataset;
     if (kat && !d.kat.split(' ').includes(kat)) return false;
+    if (F.teraz && !(+d.slot >= terazMin && +d.slot <= terazMin + 120)) return false; // first free hour within 2 h from now
     if (F.po16 && d.po16 !== '1') return false;
     if (F.do200 && +d.cena > 200) return false;
     if (F.blik && !/blik|karta/.test(d.pay)) return false;
@@ -359,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearDialog = () => { document.querySelectorAll('#f-form input').forEach(i => (i.type === 'checkbox' ? (i.checked = false) : (i.value = ''))); F.od = F.do = null; F.pay = []; F.udog = []; };
   $('#f-reset').addEventListener('click', () => { clearDialog(); apply(); Mock.toast('Wyczyszczono dodatkowe filtry'); });
   $('#wyczysc').addEventListener('click', () => {
-    clearDialog(); ['po16', 'do200', 'blik', 'km2', 'hh'].forEach(k => (F[k] = false));
+    clearDialog(); ['teraz', 'po16', 'do200', 'blik', 'km2', 'hh'].forEach(k => (F[k] = false));
     document.querySelectorAll('#filtry [data-f]').forEach(b => { if (b.dataset.f !== 'kiedy') b.setAttribute('aria-pressed', 'false'); });
     apply();
   });
@@ -376,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // slot links carry studio, day and hour: termin.html?s=[Studio 1]&t=14:30&d=19 (mock "today" = Monday 19.10, "Jutro" = 20.10)
-  const dzienSzukania = search.kiedy === 'Jutro' ? 1 : 0, DNI = { 0: Mock.krotko(Mock.dzien(0)), 1: Mock.krotko(Mock.dzien(1)) }; // d = days from today
+  const dzienSzukania = search.kiedy === 'Jutro' ? 1 : 0, /* "Teraz" and "Dziś" are today */ DNI = { 0: Mock.krotko(Mock.dzien(0)), 1: Mock.krotko(Mock.dzien(1)) }; // d = days from today
   document.querySelectorAll('.slots a').forEach(a => {
     const studio = a.closest('.card').dataset.n, godzina = a.classList.contains('o') ? '' : a.textContent.trim();
     a.href = `termin.html?s=${encodeURIComponent(studio)}` + (godzina ? `&t=${godzina}&d=${dzienSzukania}` : '');

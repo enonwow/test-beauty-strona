@@ -36,6 +36,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .pot.ok{background:#E6F2EC;color:#1F6B47;font-weight:700}
 .dok{display:flex;flex-direction:column;gap:6px;font-size:14px}
 .dok .r{display:flex;justify-content:space-between;gap:12px}
+.rk{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:12px;background:#FAF6F8;font-size:14px;line-height:1.4}
+.rk-l{align-self:flex-start;min-height:44px;padding:0;border:0;background:none;color:#9E1F50;font:inherit;font-size:14px;font-weight:500;text-decoration:underline;cursor:pointer}
 .badge{align-self:flex-start;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
 .row-v{min-height:44px;border:1px solid #E4D9DE;border-radius:12px;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;text-align:left;padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
 .btn{min-height:44px;padding:0 16px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none}
@@ -131,6 +133,25 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   </nav>
 </div>
 
+<dialog id="rk" aria-labelledby="rk-t">
+  <form id="rk-f" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="rk-t" style="margin:0;font-size:18px">Reklamacja usługi</h2>
+    <p id="rk-opis-w" style="margin:0;color:#625860;font-size:14px"></p>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#625860">Co jest nie tak?<textarea id="rk-tresc" rows="4" required minlength="10" aria-describedby="rk-err" style="padding:12px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:16px;color:#1E1A1D"></textarea></label>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#625860">Zdjęcie (opcjonalnie)<input id="rk-foto" type="file" accept="image/*" style="font:inherit;font-size:14px;color:#1E1A1D"></label>
+    <fieldset style="border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:6px"><legend style="font-size:13px;color:#625860;padding:0 0 6px">Czego oczekujesz?</legend>
+      <label style="display:flex;gap:10px;align-items:center;min-height:44px"><input type="radio" name="ocz" value="poprawka" checked style="width:20px;height:20px;accent-color:#9E1F50">Bezpłatnej poprawki</label>
+      <label style="display:flex;gap:10px;align-items:center;min-height:44px"><input type="radio" name="ocz" value="zwrot" style="width:20px;height:20px;accent-color:#9E1F50">Zwrotu części ceny</label>
+    </fieldset>
+    <span id="rk-err" role="alert" hidden style="color:#A3262A;font-size:13px">Opisz problem w kilku słowach (co najmniej 10 znaków).</span>
+    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Studio ma 14 dni na odpowiedź. Odpowiedź zobaczysz tutaj i dostaniesz SMS-em.</p>
+    <div style="display:flex;gap:8px">
+      <button type="button" data-close style="flex:1;min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer">Anuluj</button>
+      <button type="submit" style="flex:1;min-height:48px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer">Wyślij reklamację</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="dok" aria-labelledby="dok-t">
   <div style="display:flex;flex-direction:column;gap:12px">
     <h2 id="dok-t" style="margin:0;font-size:18px">Paragon fiskalny</h2>
@@ -182,10 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const up = () => all().filter(v => v.status === 'nadchodząca').sort((a, b) => stamp(a) - stamp(b));
   // a test and its treatment are one booking: cancelling one cancels the other
   const partner = (l, v) => l.find(x => x.id === v.testId || x.id === v.zabiegId);
-  const setStatus = (id, status) => {
-    if (id === SAMPLE.id) return Mock.set('wizytyPrzyklad', { ...(Mock.get('wizytyPrzyklad', {}) || {}), status });
+  const setStatus = (id, status, extra = {}) => {
+    if (id === SAMPLE.id) return Mock.set('wizytyPrzyklad', { ...(Mock.get('wizytyPrzyklad', {}) || {}), status, ...extra });
     const l = Mock.get('visits', []), v = l.find(x => x.id === id);
-    if (v) { v.status = status; const p = partner(l, v); if (p) p.status = status; Mock.set('visits', l); }
+    if (v) { Object.assign(v, { status }, extra); const p = partner(l, v); if (p) p.status = status; Mock.set('visits', l); }
   };
   const toBooking = v => {
     const t = v.testId && all().find(x => x.id === v.testId);
@@ -205,10 +226,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const typ = { test: 'Test uczuleniowy', konsultacja: 'Konsultacja' }[v.typ];
     const tag = typ ? `<span class="badge" style="background:#F6EDF1;color:#9E1F50">${typ}</span>` : v.testId ? '<span class="badge" style="background:#F6EDF1;color:#9E1F50">Zabieg po teście</span>' : '';
     if (v.status === 'odwołana') {
-      badge = '<span class="badge" style="background:#FFF1E0;color:#8A3B12">Odwołana</span>';
+      badge = '<span class="badge" style="background:#FFF1E0;color:#8A3B12">Odwołana</span>' + (v.zwrot ? `<small style="color:#1F6B47">Zwrot zaliczki ${esc(v.zadatek)} zł: w drodze, do 5 dni roboczych</small>` : '');
       btns = `<a href="${esc(doStudia(v))}" class="dk">Zarezerwuj ponownie</a><button type="button" data-a="karta">Karta</button>`;
     } else if (v.status === 'odbyta') {
       badge = '<span class="badge" style="background:#E6F2EC;color:#1F6B47">Odbyta</span>';
+      const rk = Mock.reklamacje().find(r => String(r.visitId) === String(v.id));
+      const RK = { nowa: 'Zgłoszona, studio odpowie w ciągu 14 dni', poprawka: 'Przyjęta: bezpłatna poprawka', zwrot: `Przyjęta: zwrot ${rk && rk.kwota} zł`, odrzucona: 'Odrzucona' };
+      badge += rk ? `<div class="rk"><b>Reklamacja: ${esc(RK[rk.status])}</b>${rk.odp ? `<span>${esc(rk.odp)}</span>` : ''}${rk.status === 'poprawka' ? `<a href="${esc(doStudia(v))}" style="font-weight:500">Wybierz termin poprawki</a>` : ''}</div>`
+        : '<button type="button" class="rk-l" data-a="rekl">Coś jest nie tak? Zgłoś reklamację</button>';
+      const zal = Mock.zalecenia()[v.kategoria];
+      if (zal) badge += `<details class="rk"><summary style="cursor:pointer;min-height:24px;font-weight:500">Zalecenia po zabiegu</summary><span>${esc(zal)}</span></details>`;
       btns = `<button type="button" data-a="dok">${v.faktura ? 'Faktura' : 'Paragon'}</button><a href="ocena.html?s=${encodeURIComponent(v.studio || '')}&o=${encodeURIComponent(v.opis || '')}">Oceń</a><a href="${esc(KREATORY[(v.kategoria || '').toLowerCase()] || doStudia(v))}" class="dk">Powtórz</a>`;
     } else {
       if (v.typ !== 'test') { // consents signed on podpis.html (Mock "podpisy")
@@ -276,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (x) { x.potwierdzona = true; Mock.set('visits', l); } else Mock.set('wizytyPrzyklad', { ...(Mock.get('wizytyPrzyklad', {}) || {}), potwierdzona: true });
       renderAll(); Mock.toast('Dziękujemy, studio wie, że będziesz'); return;
     }
+    if (a.dataset.a === 'rekl') { pending = v; $('#rk-opis-w').textContent = `${v.dzien} · ${v.opis} · ${v.studio}`; $('#rk-f').reset(); $('#rk-err').hidden = true; $('#rk').showModal(); return; }
     if (a.dataset.a === 'dok') {
       const fv = !!v.faktura;
       $('#dok-t').textContent = fv ? `Faktura ${v.dokNr || ''}`.trim() : 'Paragon fiskalny';
@@ -300,8 +328,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   $('#m-prev').addEventListener('click', () => { cur.m = (cur.m + 11) % 12; if (cur.m === 11) cur.y--; renderCal(); });
   $('#m-next').addEventListener('click', () => { cur.m = (cur.m + 1) % 12; if (cur.m === 0) cur.y++; renderCal(); });
+  $('#rk-f').addEventListener('submit', e => {
+    e.preventDefault();
+    const t = $('#rk-tresc').value.trim(); if (t.length < 10) { $('#rk-err').hidden = false; $('#rk-tresc').focus(); return; }
+    const v = pending, u = Mock.get('user', {}) || {}, f = $('#rk-foto').files[0];
+    Mock.setReklamacje([{ id: 'rk' + Date.now(), visitId: v.id, klientka: u.imie || v.klientka || 'Klientka online', usluga: v.opis || v.usluga, cena: +v.cena || 0, opis: t,
+      oczekuje: $('#rk-f').ocz.value, foto: f ? f.name : '', data: Mock.iso(Mock.teraz()), status: 'nowa' }, ...Mock.reklamacje()]);
+    $('#rk').close(); pending = null; renderAll(); Mock.toast('Reklamacja wysłana do studia');
+  });
   $('#odw-ok').addEventListener('click', () => {
-    if (pending) setStatus(pending.id, 'odwołana');
+    if (pending) setStatus(pending.id, 'odwołana', pending.zadatek && stamp(pending) - NOW >= 24 * 3600 * 1000 ? { zwrot: true } : {}); // on time: the deposit goes back
     $('#odw').close(); pending = null; renderAll(); Mock.toast('Wizyta odwołana');
   });
 });

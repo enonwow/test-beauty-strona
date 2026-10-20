@@ -188,6 +188,12 @@ h2{margin:0;font-size:18px;font-weight:700}
       <a href="wywiad.html?kat=kosmetologia" class="btn-o" style="align-self:flex-start">Masz pytania? Konsultacja</a>
     </section>
 
+    <section style="margin:12px 20px 0;padding:16px;border-radius:14px;border:1px solid #E4D9DE;display:flex;flex-direction:column;gap:10px" aria-labelledby="karn-h">
+      <h2 id="karn-h">Karnety i pakiety</h2>
+      <p style="margin:0;color:#625860;font-size:14px;line-height:1.45">Płacisz raz, a potem rezerwujesz wizyty bez płacenia. Karnet przypisujemy do Twojego numeru telefonu.</p>
+      <div id="karn-lista" style="display:flex;flex-direction:column;gap:10px"></div>
+    </section>
+
     <section style="margin:12px 20px 0;padding:16px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:10px">
       <h2>Karta podarunkowa</h2>
       <p style="margin:0;color:#625860;font-size:14px;line-height:1.45">Podaruj bliskiej osobie wizytę w tym studiu. Kupisz online, a karta przyjdzie SMS-em.</p>
@@ -314,6 +320,18 @@ h2{margin:0;font-size:18px;font-weight:700}
   </nav>
 </div>
 
+<dialog id="karn-dlg" aria-labelledby="karn-t">
+  <form id="karn-f" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="karn-t" style="margin:0;font-size:18px"></h2>
+    <span id="karn-opis" style="color:#625860;font-size:14px;line-height:1.45"></span>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#625860">Imię<input id="karn-imie" required autocomplete="given-name" style="min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:16px;color:#1E1A1D"></label>
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#625860">Telefon (karnet będzie przypisany do tego numeru)<input id="karn-tel" type="tel" inputmode="tel" required autocomplete="tel" style="min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:16px;color:#1E1A1D"></label>
+    <span id="karn-err" role="alert" hidden style="color:#A3262A;font-size:13px"></span>
+    <span style="color:#625860;font-size:12px;line-height:1.4">Makieta: płatność BLIK lub kartą jest symulowana. Karnet możesz zwrócić w ciągu 14 dni, jeśli nie był użyty.</span>
+    <div style="display:flex;gap:8px"><button type="button" class="btn-o" data-close style="flex:1;justify-content:center">Anuluj</button><button type="submit" id="karn-pay" class="btn" style="flex:1"></button></div>
+  </form>
+</dialog>
+
 <dialog id="powieksz" aria-labelledby="pw-t">
   <div style="display:flex;flex-direction:column;gap:12px">
     <div id="pw-obraz" style="aspect-ratio:1;border-radius:14px;border:1px solid #E4D9DE;overflow:hidden;background:#FAF6F8"></div>
@@ -426,6 +444,28 @@ document.addEventListener('DOMContentLoaded', () => {
     && otwarte(new Date(2026, 9, 20, 7)).txt === 'otwarcie dziś 9:00' && otwarte(new Date(2026, 9, 19, 20)).txt === 'otwarcie jutro 9:00', 'salon otwarte');
   const o = otwarte(Mock.teraz());
   $('#status').innerHTML = `<b class="${o.on ? 'on' : 'off'}">${o.on ? 'Otwarte' : 'Zamknięte'}</b> ${o.txt}`;
+
+  // passes and packages: the studio's offer, bought online and kept with the phone number
+  const KARN = Mock.karnety(), uz = Mock.get('user', {}) || {};
+  let karnWybrany = null;
+  $('#karn-lista').innerHTML = KARN.map(o => `<div class="us2"><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="nm"></span><span class="sub"></span></span><span class="prawa"><span class="cena">${o.cena} zł</span><button type="button" class="add" data-karn="${o.id}">Kup</button></span></div>`).join('');
+  [...$('#karn-lista').children].forEach((el, i) => { const o = KARN[i]; el.querySelector('.nm').textContent = o.n; el.querySelector('.sub').textContent = `${o.us} · ${o.t === 'pakiet' ? Mock.plural(o.ile, ['wizyta', 'wizyty', 'wizyt']) : 'bez limitu wizyt'} · ważny ${o.dni} dni`; });
+  $('#karn-lista').addEventListener('click', e => {
+    const b = e.target.closest('[data-karn]'); if (!b) return;
+    karnWybrany = KARN.find(o => o.id === +b.dataset.karn);
+    $('#karn-t').textContent = karnWybrany.n; $('#karn-opis').textContent = `${karnWybrany.us}, ważny ${karnWybrany.dni} dni od zakupu. Przy rezerwacji tej usługi zobaczysz „Rozlicz z karnetu”.`;
+    $('#karn-pay').textContent = `Zapłać ${karnWybrany.cena} zł`; $('#karn-imie').value = uz.imie || ''; $('#karn-tel').value = uz.tel || ''; $('#karn-err').hidden = true;
+    $('#karn-dlg').showModal();
+  });
+  $('#karn-f').addEventListener('submit', e => {
+    e.preventDefault();
+    const imie = $('#karn-imie').value.trim(), tel = $('#karn-tel').value.trim(), n = tel.replace(/\D/g, '').length;
+    const blad = !imie ? 'Wpisz imię.' : n < 9 || n > 12 ? 'Wpisz numer telefonu, np. 600 100 200.' : '';
+    $('#karn-err').textContent = blad; $('#karn-err').hidden = !blad; if (blad) return;
+    const o = karnWybrany, end = Mock.dzien(o.dni);
+    Mock.set('karnety.sprzedane', [{ k: imie, tel, n: o.n, t: o.t, us: o.us, cena: o.cena, ile: o.ile, data: Mock.dzien(0).toLocaleDateString('pl-PL'), do: end.toLocaleDateString('pl-PL'), doIso: Mock.iso(end), online: true }, ...Mock.sprzedane()]);
+    $('#karn-dlg').close(); Mock.toast(`Kupiono: ${o.n}. Znajdziesz go w profilu, a przy rezerwacji rozliczysz wizytę.`);
+  });
 
   // happy hours of this studio (offers are kept for [Studio 1] in the mock)
   const aktywne = nazwa === '[Studio 1]' ? Mock.happyHours().filter(h => h.on) : [];

@@ -33,11 +33,11 @@
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
-        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Odwołania i zadatki</h2>
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Odwołania i zaliczki</h2>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Bezpłatne odwołanie do<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>12 h przed</option><option selected>24 h przed</option><option>48 h przed</option></select></label>
-        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Zadatek od nowych klientek</label>
-        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Kwota zadatku<input data-toast-change="Zapisano" value="[x] zł" style="min-height: 38px; width: 100px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
-        <span style="color: #625860; font-size: 12px; line-height: 1.45">Klientka widzi zasady przed płatnością, a nie dopiero przy odwołaniu. Zwrot zadatku jest automatyczny, jeśli odwoła w terminie.</span>
+        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Zaliczka od nowych klientek</label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Kwota zaliczki<input data-toast-change="Zapisano" value="[x] zł" style="min-height: 38px; width: 100px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
+        <span style="color: #625860; font-size: 12px; line-height: 1.45">Klientka widzi zasady przed płatnością, a nie dopiero przy odwołaniu. Zwrot zaliczki jest automatyczny, jeśli odwoła w terminie.</span>
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
@@ -53,11 +53,20 @@
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Reklamacje</h2>
+        <label class="p-chk"><input type="checkbox" checked data-toast-change="Zapisano">Klientki mogą zgłosić reklamację w „Moich wizytach”</label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Bezpłatna poprawka paznokci do<select data-toast-change="Zapisano" class="p-in s" aria-label="Dni na bezpłatną poprawkę"><option>3 dni</option><option selected>7 dni</option><option>14 dni</option></select></label>
+        <span class="p-mut">Na odpowiedź masz 14 dni od zgłoszenia (prawo konsumenckie). Treść zasad reklamacji sprawdź z prawnikiem.</span>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Paragony i faktury</h2>
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="display: flex; flex-direction: column"><b>Kasa fiskalna</b><span style="color: #625860; font-size: 12px">Paragon drukuje się po „Rozlicz” w kalendarzu</span></span><span class="p-badge ok">połączono (przykład)</span></div>
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="display: flex; flex-direction: column"><b>Faktury</b><span style="color: #625860; font-size: 12px">Wystawiamy w panelu albo przez Fakturownię lub inFakt</span></span><select data-toast-change="Zapisano" aria-label="Program do faktur" class="p-in s"><option selected>w panelu</option><option>Fakturownia</option><option>inFakt</option></select></div>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Numeracja faktur<input data-toast-change="Zapisano" value="FV/nr/MM/RRRR" class="p-in s" style="width: 150px"></label>
         <label class="p-chk"><input data-toast-change="Zapisano" type="checkbox" checked>Klientka może poprosić o fakturę przy rezerwacji (pole NIP)</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="display: flex; flex-direction: column"><b>KSeF (Krajowy System e-Faktur)</b><span style="color: #625860; font-size: 12px">Faktura idzie do KSeF przy wystawieniu, numer KSeF widać w kasie</span></span><span class="p-badge ok">połączono (makieta)</span></div>
+        <label class="p-chk"><input data-toast-change="Zapisano" type="checkbox" checked>Wysyłaj faktury do KSeF automatycznie</label>
         <span class="p-mut">Stawkę VAT i dane do faktur ustawisz w profilu studia. Makieta nie łączy się z prawdziwą kasą ani z KSeF.</span>
       </section>
 

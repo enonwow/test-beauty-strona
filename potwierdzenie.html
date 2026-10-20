@@ -253,6 +253,14 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#omnibus-p').hidden = false; $('#omnibus-p').textContent = `Najniższa cena z 30 dni przed obniżką: ${przed}`;
     if (!maUslugi && !(Array.isArray(B.pozycje) && B.pozycje.length)) $('#pozycje .row span:last-child').textContent = przed;
   }
+  if (B.karnet) { const r = document.createElement('div'); r.className = 'row'; r.style.color = '#1F6B47';
+    const a = document.createElement('span'); a.textContent = `Z karnetu: ${B.karnet.n}${B.karnet.zostalo != null ? ` (zostało ${Mock.plural(B.karnet.zostalo, ['wizyta', 'wizyty', 'wizyt'])})` : ''}`;
+    const c = document.createElement('span'); c.textContent = `−${B.karnet.wartosc} zł`; c.style.whiteSpace = 'nowrap'; r.append(a, c); $('#promo-row').after(r);
+    if (!(Array.isArray(B.pozycje) && B.pozycje.length) && !maUslugi) $('#pozycje .row span:last-child').textContent = `${B.karnet.wartosc} zł`; }
+  if (B.kod) { const r = document.createElement('div'); r.className = 'row'; r.style.color = '#1F6B47';
+    const a = document.createElement('span'); a.textContent = `Kod ${B.kod.kod} (${B.kod.opis})`; const c = document.createElement('span'); c.textContent = `−${B.kod.rabat} zł`; c.style.whiteSpace = 'nowrap';
+    r.append(a, c); $('#promo-row').after(r);
+    if (!(Array.isArray(B.pozycje) && B.pozycje.length) && !maUslugi) $('#pozycje .row span:last-child').textContent = `${B.bazaCena ? B.bazaCena.max : cenaMax + B.kod.rabat} zł`; }
   if (B.seria && !(Array.isArray(B.pozycje) && B.pozycje.length)) { $('#seria-row').hidden = false; $('#seria-txt').textContent = `Seria ${B.seria.ile} zabiegów, rabat wliczony`; $('#seria-kw').textContent = `${B.seria.suma} zł`; }
   if (B.testDzien) { $('#test-box').hidden = false; $('#test-txt').textContent = `${B.testDzien}, ${B.testGodzina}–${B.testKoniec} (${B.testMin || 10} min), ${B.studio || '[Studio 1]'}.`; }
   if (Array.isArray(B.uwagi) && B.uwagi.length) {
@@ -371,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#odw-txt').textContent = txt;
   });
   $('#odw-ok').addEventListener('click', () => {
-    if (visit) visit.status = 'odwołana';
+    if (visit) { visit.status = 'odwołana'; if (B.zadatek && dm && B.godzina) { const [h, m] = B.godzina.split(':'), d0 = Mock.zKrotko(B.dzien); visit.zwrot = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate(), +h, +m) - NOW >= 24 * 3600 * 1000; } }
     if (testVisit) testVisit.status = 'odwołana'; // the test only makes sense with its treatment
     if (visit || testVisit) Mock.set('visits', visits);
     $('#odw').close();

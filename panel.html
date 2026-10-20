@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (v.dojazd) items.push([`Dojazd (${v.dojazd.strefa || 'strefa'})`, Number(v.dojazd.oplata) || 0]);
     // discounts the client already saw at booking, so "Razem" matches her confirmation
     if (v.promo && v.promo.kwota) items.push([`Happy hours „${v.promo.nazwa}” −${v.promo.rabat}%`, -v.promo.kwota]);
+    if (v.karnet) items.push([`Opłacone karnetem: ${v.karnet.n}`, -(v.karnet.wartosc || 0)]);
+    if (v.kod && v.kod.rabat) items.push([`Kod ${v.kod.kod} (${v.kod.opis})`, -v.kod.rabat]);
     if (v.polecenie) items.push([`Zniżka z polecenia${v.polecenie.od ? ' (' + v.polecenie.od + ')' : ''}`, -20]);
     return { col: v.stylistka === '[Stylistka 2]' ? 2 : 1, t: v.godzina, dur, name: v.klientka || 'Klientka online', phone: v.tel || '[telefon]', info: [v.zrodlo === 'panel' ? 'dodana ręcznie w panelu' : 'rezerwacja online', v.dlaKogo && v.dlaKogo.imie ? 'dla: ' + v.dlaKogo.imie : '', v.polecenie ? `z polecenia${v.polecenie.od ? ': ' + v.polecenie.od : ''}` : ''].filter(Boolean).join(' · '),
       kind: k, svc: us && us.length > 1 ? us.length + ' usługi' : items[0][0], items, gaps, osoby: v.osoby > 1 ? v.osoby : 0, dojazd: v.dojazd || null, przyklad: k !== 'p' || v.zrodlo === 'panel', potw: !!v.potwierdzona, faktura: v.faktura || null,
@@ -211,6 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
       <span>${fmt(toMin(t) + gap.od)}–${fmt(toMin(t) + gap.od + gap.dl)} · ${gap.dl} min wolnych (np. działanie farby)</span>
       <button type="button" class="p-btn" data-act="gap">Wstaw krótką usługę w lukę</button></div>` : ''}
     <div style="display:flex;flex-direction:column;gap:8px">
+      <h3 style="margin:0;font-size:14px;font-weight:700">Użyte preparaty</h3>
+      ${(s.prep || []).map(p => `<div style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span>${E(p.n)}${p.partia ? `<br><small style="color:#625860">partia ${E(p.partia)}</small>` : ''}</span><span style="white-space:nowrap">${E(p.ilosc)} ${E(p.u)}</span></div>`).join('')}
+      <button type="button" class="p-btn dash" style="justify-content:flex-start" data-act="prep">+ Dodaj preparat z magazynu</button>
+      <span style="color:#625860;font-size:12px;line-height:1.4">Zmniejsza stan magazynu i trafia do karty klientki, z numerem partii (ważne przy reakcji alergicznej).</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
       <h3 style="margin:0;font-size:14px;font-weight:700">Zmiany na wizycie</h3>
       <button type="button" class="p-btn dash" style="justify-content:flex-start" data-act="extra">+ Dodaj lub usuń pozycję z powodem</button>
       <span style="color:#625860;font-size:12px;line-height:1.4">Np. „onycholiza, tylko zdjęcie materiału”. Klientka zobaczy zmianę w swojej karcie.</span>
@@ -265,6 +273,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const a = e.target.closest('[data-act]'); if (!a) return;
     const V = all(), v = V[sel], s = st(sel), tot = total(sel, v);
     if (a.dataset.act === 'sms') { Mock.toast('SMS wysłany ponownie'); }
+    if (a.dataset.act === 'prep') { const M = Mock.magazyn(); PS.modal({
+      title: 'Użyty preparat', ok: 'Dodaj',
+      body: `<label class="p-lab">Produkt<select class="p-in" name="p">${M.map((x, i) => `<option value="${i}">${E(x.n)} (stan ${x.s} ${E(x.u)})</option>`).join('')}</select></label>
+        <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Ilość<input class="p-in" type="number" name="i" min="0.1" step="0.1" value="1" required></label><label class="p-lab" style="flex:2">Numer partii (z opakowania)<input class="p-in" name="partia" placeholder="np. LOT 24A19"></label></div>`,
+      onOk: f => {
+        const x = M[+f.p.value], il = +f.i.value; if (!(il > 0)) { Mock.toast('Wpisz ilość'); return false; }
+        (s.prep = s.prep || []).push({ n: x.n, ilosc: il, u: x.u, partia: f.partia.value.trim() }); save();
+        M[+f.p.value] = { ...x, s: Math.max(0, Math.round((x.s - il) * 10) / 10) }; Mock.set('magazyn', M);
+        Mock.set('preparaty', [{ klientka: v.name, data: Mock.iso(Mock.teraz()), usluga: v.svc, n: x.n, ilosc: il, u: x.u, partia: f.partia.value.trim() }, ...(Mock.get('preparaty', []) || [])]);
+        renderDetail();
+      },
+      toast: f => `Dodano preparat, stan w magazynie: ${Math.max(0, M[+f.p.value].s)}`
+    }); }
     if (a.dataset.act === 'ponag') { Mock.toast(`Wysłano drugi SMS z prośbą o potwierdzenie: ${v.name}`); }
     if (a.dataset.act === 'pay') PS.modal({
       title: 'Rozlicz wizytę', ok: 'Rozlicz',
@@ -285,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dok = fv ? { typ: 'faktura', nr, nip: f.nip.value.replace(/[\s-]/g, ''), firma: f.firma.value.trim() } : { typ: 'paragon', nr };
         s.paid = { metoda: f.metoda.value, kwota, dok }; save();
         tx.push({ id: Date.now(), t: s.t || v.t, klientka: v.name, opis: v.svc, metoda: f.metoda.value, kwota, dok }); Mock.set('panel.tx', tx);
-        renderAll(); Mock.toast(`Wizyta rozliczona: ${kwota} zł, ${f.metoda.value}, ${fv ? 'faktura ' + nr : 'paragon wydrukowany'}`); return true;
+        renderAll(); Mock.toast(`Wizyta rozliczona: ${kwota} zł, ${f.metoda.value}, ${fv ? 'faktura ' + nr + ' wysłana do KSeF' : 'paragon wydrukowany'}`); return true;
       }
     });
     if (a.dataset.act === 'move') PS.modal({

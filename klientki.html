@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'f', n: '[Klientka F]', c: '#E4D9DE', sub: 'czeka na wycenę z Instagrama', tag: 'nowa', badge: ['nowa', '#EAF0F7', '#2F5A86'], tel: '[telefon]', od: 'dziś', w: 0, nb: 0, skad: 'Instagram', zg: [true, false], tg: ['nowa'], zdj: false, fo: [],
       h: [], note: 'Wysłała zdjęcie inspiracji: „Takie jak na zdjęciu, ale krótsze”.' },
     { id: 'a', n: '[Klientka A]', c: '#C98C8C', sub: 'ostatnio [data] · hybryda', tag: 'nieob', badge: ['nieobecność', '#FFF1E0', '#8A3B12'], tel: '[telefon]', od: '[data]', w: 2, nb: 1, skad: 'Wyszukiwarka', zg: [true, true], tg: ['ryzyko nieobecności'], zdj: false, fo: [],
-      h: [['dziś 9:00', 'Hybryda jednolita · [Stylistka 1]', '140 zł', '#C98C8C'], ['[data]', 'Hybryda S · nie przyszła, bez odwołania', '0 zł', '#E4D9DE']], note: '[np. przy następnej rezerwacji poproś o zadatek]' }
+      h: [['dziś 9:00', 'Hybryda jednolita · [Stylistka 1]', '140 zł', '#C98C8C'], ['[data]', 'Hybryda S · nie przyszła, bez odwołania', '0 zł', '#E4D9DE']], note: '[np. przy następnej rezerwacji poproś o zaliczkę]' }
   ];
   let S = Mock.get('klientki.state', { del: [], block: [], dep: [], notes: {}, extra: [], tags: {}, zdj: [], foto: {} });
   const save = () => Mock.set('klientki.state', S);
@@ -104,6 +104,21 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="p-row"><span><b>Zgoda na zdjęcia</b><br><span class="p-mut">${ok ? 'klientka zgodziła się na zdjęcia w karcie; do portfolio studia potrzebna jest osobna zgoda' : 'brak zgody: nie dodawaj ani nie pokazuj zdjęć tej klientki'}</span></span><span class="p-badge ${ok ? 'ok' : 'warn'}">${ok ? 'jest zgoda' : 'brak zgody'}</span></div>
       ${ph.length ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">${ph.map(f => `<figure style="margin:0;display:flex;flex-direction:column;gap:6px;min-width:0"><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">${tile(para(f[1])[0], 'przed')}${tile(para(f[1])[1], 'po')}</div><figcaption class="p-mut"><b style="color:#1E1A1D">${E(f[0])}</b> · ${E(f[1])}</figcaption></figure>`).join('')}</div>` : `<span class="p-mut">${ok ? 'Jeszcze bez zdjęć. Dodaj pierwsze po wizycie.' : 'Bez zdjęć.'}</span>`}</div>`;
   }
+  // payments: sample history plus what was settled in the panel (kasa) and refunds
+  const PLAT0 = { b: [[Mock.dm(Mock.dzien(-21)), 'Hybryda M · velvet × 10', 200, 'karta', 'paragon']], d: [[Mock.dm(Mock.dzien(-30)), 'Rzęsy 2D–3D · pełny komplet', 250, 'BLIK', 'paragon']], a: [[Mock.dm(Mock.dzien(-35)), 'Hybryda S', 0, '—', 'nieobecność bez odwołania']] };
+  const platnosci = c => (PLAT0[c.id] || []).concat((Mock.get('panel.tx', []) || []).filter(t => t.klientka === c.n).map(t => [t.t, t.opis, t.kwota, t.metoda, t.dok ? t.dok.nr : '']),
+    (Mock.get('kasa.zwroty', []) || []).filter(z => z.k === c.n).map(z => [z.t, 'Zwrot: ' + z.o, -z.kwota, z.m, z.powod]));
+  const sekcja = (t, body, btn) => `<div style="display:flex;flex-direction:column;gap:8px"><div class="p-top"><h3 style="margin:0;font-size:15px;font-weight:700">${t}</h3>${btn || ''}</div>${body}</div>`;
+  const wiersz = (a, b) => `<div class="p-row"><span>${a}</span><span style="text-align:right">${b}</span></div>`;
+  const platHtml = c => { const L = platnosci(c); return sekcja('Płatności', L.length ? L.map(p => wiersz(`<b>${E(p[1])}</b><br><span class="p-mut">${E(p[0])} · ${E(p[3])}${p[4] ? ' · ' + E(p[4]) : ''}</span>`, `<b style="color:${p[2] < 0 ? '#A3262A' : '#1E1A1D'}">${p[2]} zł</b>`)).join('') : '<span class="p-mut">Brak płatności.</span>'); };
+  const prepHtml = c => { const L = (Mock.get('preparaty', []) || []).filter(p => p.klientka === c.n);
+    return sekcja('Użyte preparaty', L.length ? L.map(p => wiersz(`<b>${E(p.n)}</b><br><span class="p-mut">${E(p.data.split('-').reverse().join('.'))} · ${E(p.usluga)}${p.partia ? ' · partia ' + E(p.partia) : ''}</span>`, `${E(p.ilosc)} ${E(p.u)}`)).join('') : '<span class="p-mut">Preparaty dopisujesz w szczegółach wizyty w kalendarzu. Numer partii pomaga, gdy klientka zgłosi uczulenie.</span>'); };
+  const ZDARZ0 = { a: [{ data: Mock.iso(Mock.dzien(-35)), typ: 'Nieobecność bez odwołania', opis: 'Nie przyszła na 14:00, nie odbierała telefonu.', kto: '[Stylistka 1]' }] };
+  const zdarzenia = c => (S.zdarz && S.zdarz[c.id] || []).concat(ZDARZ0[c.id] || []);
+  const zdarzHtml = c => sekcja('Rejestr zdarzeń (tylko zespół)', zdarzenia(c).map(z => wiersz(`<b>${E(z.typ)}</b><br><span class="p-mut">${E(z.data.split('-').reverse().join('.'))} · wpisała ${E(z.kto)}</span><br>${E(z.opis)}`, '')).join('') || '<span class="p-mut">Spóźnienia, nieobecności, konflikty i inne sytuacje, które zespół powinien znać przed kolejną wizytą.</span>', '<button type="button" class="p-btn sm" data-a="zdarz">+ Dodaj zdarzenie</button>');
+  const plikHtml = c => { const P = (Mock.get('podpisy', []) || []).filter(p => p.klientka === c.n), F = S.pliki && S.pliki[c.id] || [];
+    return sekcja('Załączniki', P.map(p => wiersz(`<b>${E(p.nazwa)}</b><br><span class="p-mut">podpisano ${E(p.data.slice(0, 10).split('-').reverse().join('.'))}${p.kod ? ' · kod ' + E(p.kod) : ''}</span>`, '<span class="p-badge ok">podpis</span>')).concat(F.map(f => wiersz(`<b>${E(f.n)}</b><br><span class="p-mut">dodano ${E(f.data.split('-').reverse().join('.'))} · ${E(f.kb)} kB</span>`, '<span class="p-badge blue">plik</span>'))).join('') || '<span class="p-mut">Brak załączników.</span>',
+      '<label class="p-btn sm" style="cursor:pointer">+ Dodaj plik<input type="file" data-a="plik" accept="application/pdf,image/*" style="position:absolute;width:1px;height:1px;opacity:0"></label>'); };
   function renderCard() {
     const c = all().find(x => x.id === sel) || all()[0];
     const k = document.getElementById('karta');
@@ -114,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
         <div style="display:flex;gap:14px;align-items:center"><span aria-hidden="true" style="width:56px;height:56px;font-size:20px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#F6EDF1;color:#9E1F50;font-weight:700;">${ini(c.n)}</span>
           <div style="display:flex;flex-direction:column;gap:2px"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700">${E(c.n)}</h2><span style="color:#625860">${E(c.tel)} · klientka od ${E(c.od)}</span>
-          ${dep ? '<span class="p-badge warn" style="align-self:flex-start">zadatek wymagany</span>' : ''}${blk ? '<span class="p-badge warn" style="align-self:flex-start">rezerwacje online zablokowane</span>' : ''}</div></div>
+          ${dep ? '<span class="p-badge warn" style="align-self:flex-start">zaliczka wymagana</span>' : ''}${blk ? '<span class="p-badge warn" style="align-self:flex-start">rezerwacje online zablokowane</span>' : ''}</div></div>
         <div class="p-acts"><button type="button" class="p-btn pri" data-a="visit">Umów wizytę</button><a class="p-btn" href="wiadomosci.html?k=${encodeURIComponent(c.n)}">Wiadomości</a></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Tagi</h3>
@@ -123,12 +138,15 @@ document.addEventListener('DOMContentLoaded', () => {
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px">
         <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Wizyty</span><b style="font-size:20px">${c.w}</b></div>
         <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Nieobecności</span><b style="font-size:20px">${c.nb}</b></div>
-        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Wydała łącznie</span><b style="font-size:20px">[kwota]</b></div>
+        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Wydała łącznie</span><b style="font-size:20px">${platnosci(c).reduce((a, p) => a + p[2], 0)} zł</b></div>
         <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Skąd przyszła</span><b style="font-size:16px">${E(c.skad)}</b></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Historia stylizacji</h3>
         ${c.h.length ? c.h.map(h => `<div style="display:flex;gap:12px;align-items:center;padding:10px;border:1px solid #F0E8EC;border-radius:12px"><img src="zdjecia/${para(h[1])[1]}" alt="" width="40" height="40" loading="lazy" style="width:40px;height:40px;border-radius:10px;object-fit:cover;flex:none;background:#F6EDF1"><span style="flex:1"><b>${E(h[0])}</b> · ${E(h[1])}</span><span>${E(h[2])}</span></div>`).join('') : '<span class="p-mut">Jeszcze bez wizyt. Wycena czeka w zakładce Wyceny.</span>'}</div>
       ${photosHtml(c)}
+      ${platHtml(c)}
+      ${prepHtml(c)}
+      ${zdarzHtml(c)}
       <div style="display:flex;flex-wrap:wrap;gap:16px">
         <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:8px"><label for="notatka" style="font-size:15px;font-weight:700">Notatki (widzi tylko zespół)</label>
           <textarea id="notatka" rows="4" class="p-in" data-toast-change="Zapisano notatkę">${E(S.notes[c.id] ?? c.note)}</textarea></div>
@@ -138,8 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="p-mut">Zgodę marketingową zmienia tylko klientka. Kampanie trafiają wyłącznie do osób ze zgodą.</span></div>
       </div>
       ${docsHtml(c)}
+      ${plikHtml(c)}
       <div class="p-acts" style="padding-top:12px;border-top:1px solid #F0E8EC">
-        <button type="button" class="p-btn sm" data-a="dep">${dep ? 'Nie wymagaj zadatku' : 'Wymagaj zadatku od tej klientki'}</button>
+        <button type="button" class="p-btn sm" data-a="dep">${dep ? 'Nie wymagaj zaliczki' : 'Wymagaj zaliczki od tej klientki'}</button>
         <button type="button" class="p-btn sm" data-a="block">${blk ? 'Odblokuj rezerwacje online' : 'Zablokuj rezerwacje online'}</button>
         <button type="button" class="p-btn sm" data-a="rodo">Eksport danych (RODO)</button>
         <button type="button" class="p-btn sm dng" data-a="del">Usuń dane klientki</button>
@@ -151,14 +170,23 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('filtr').addEventListener('mock:choice', e => { filt = e.detail.button.dataset.value; renderList(); });
   document.getElementById('filtr-tag').addEventListener('mock:choice', e => { tagF = e.detail.button.dataset.value; renderList(); });
   document.getElementById('szukaj').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); renderList(); });
-  document.getElementById('karta').addEventListener('change', e => { if (e.target.id === 'notatka') { S.notes[sel] = e.target.value; save(); } });
+  document.getElementById('karta').addEventListener('change', e => {
+    if (e.target.id === 'notatka') { S.notes[sel] = e.target.value; save(); }
+    if (e.target.dataset.a === 'plik' && e.target.files[0]) { // shortcut: only the name and size are kept, the file itself stays in this browser tab
+      const f = e.target.files[0]; S.pliki = S.pliki || {}; (S.pliki[sel] = S.pliki[sel] || []).unshift({ n: f.name, kb: Math.max(1, Math.round(f.size / 1024)), data: Mock.iso(Mock.teraz()) }); save(); render(); Mock.toast('Dodano plik: ' + f.name);
+    }
+  });
   document.getElementById('karta').addEventListener('click', e => {
     const tg = e.target.closest('[data-tag]');
     if (tg) { const c = all().find(x => x.id === sel), t = tg.dataset.tag, cur = tagsOf(c); S.tags[c.id] = cur.includes(t) ? cur.filter(x => x !== t) : cur.concat(t); save(); render(); Mock.toast(S.tags[c.id].includes(t) ? 'Dodano tag: ' + t : 'Zdjęto tag: ' + t); return; }
     const b = e.target.closest('[data-a]'); if (!b) return;
     const c = all().find(x => x.id === sel), a = b.dataset.a;
     if (a === 'visit') PS.visitModal({ done: () => {} });
-    if (a === 'dep') { S.dep = S.dep.includes(c.id) ? S.dep.filter(x => x !== c.id) : S.dep.concat(c.id); save(); renderCard(); Mock.toast(S.dep.includes(c.id) ? 'Zadatek będzie wymagany przy kolejnej rezerwacji' : 'Zadatek nie jest już wymagany'); }
+    if (a === 'zdarz') PS.modal({ title: 'Nowe zdarzenie', ok: 'Zapisz',
+      body: `<label class="p-lab">Rodzaj<select class="p-in" name="t"><option>Spóźnienie</option><option>Nieobecność bez odwołania</option><option>Konflikt lub nieprzyjemna sytuacja</option><option>Reakcja na preparat</option><option>Inne</option></select></label><label class="p-lab">Co się stało<textarea class="p-in" name="o" rows="3" required></textarea></label><span class="p-mut">Wpis widzi tylko zespół. Pisz fakty, bez ocen: klientka może poprosić o swoje dane (RODO).</span>`,
+      onOk: f => { if (!f.o.value.trim()) return false; S.zdarz = S.zdarz || {}; (S.zdarz[c.id] = S.zdarz[c.id] || []).unshift({ data: Mock.iso(Mock.teraz()), typ: f.t.value, opis: f.o.value.trim(), kto: (Mock.get('studioUser', null) || {}).imie || '[Właścicielka]' }); save(); render(); },
+      toast: 'Zdarzenie zapisane w karcie' });
+    if (a === 'dep') { S.dep = S.dep.includes(c.id) ? S.dep.filter(x => x !== c.id) : S.dep.concat(c.id); save(); renderCard(); Mock.toast(S.dep.includes(c.id) ? 'Zaliczka będzie wymagana przy kolejnej rezerwacji' : 'Zaliczka nie jest już wymagana'); }
     if (a === 'block') {
       if (S.block.includes(c.id)) { S.block = S.block.filter(x => x !== c.id); save(); renderCard(); Mock.toast('Rezerwacje online odblokowane'); }
       else PS.modal({ title: 'Zablokować rezerwacje online?', ok: 'Zablokuj', cls: 'dark', body: `<p style="margin:0">${E(c.n)} nie umówi się już sama przez stronę studia. Wizytę nadal możesz dodać ręcznie.</p>`, onOk: () => { S.block.push(c.id); save(); renderCard(); }, toast: 'Zablokowano rezerwacje online' });

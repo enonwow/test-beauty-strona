@@ -44,12 +44,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc;
-  const SEED = [
-    { n: 'Lakier hybrydowy, burgund', k: 'Paznokcie', s: 6, p: 2, u: 'szt.' }, { n: 'Żel budujący, przezroczysty', k: 'Paznokcie', s: 2, p: 3, u: 'szt.' },
-    { n: 'Baza hybrydowa', k: 'Paznokcie', s: 4, p: 2, u: 'szt.' }, { n: 'Top bez przemywania', k: 'Paznokcie', s: 3, p: 2, u: 'szt.' }, { n: 'Velvet, puder', k: 'Paznokcie', s: 5, p: 2, u: 'szt.' },
-    { n: 'Klej do rzęs', k: 'Rzęsy', s: 3, p: 2, u: 'szt.' }, { n: 'Rzęsy 0,07 C 12 mm', k: 'Rzęsy', s: 8, p: 3, u: 'taśm' }, { n: 'Płatki hydrożelowe', k: 'Rzęsy', s: 10, p: 4, u: 'par' },
-    { n: 'Henna do brwi, brąz', k: 'Brwi', s: 4, p: 2, u: 'szt.' }];
-  let P = Mock.get('magazyn', SEED), filt = 'all', q = '';
+  let P = Mock.magazyn(), filt = 'all', q = ''; // shared with the visit details in panel.html
   const save = () => Mock.set('magazyn', P);
   const low = x => x.s <= x.p;
 

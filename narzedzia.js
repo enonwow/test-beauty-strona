@@ -38,6 +38,26 @@ const SCEN = [
   ['Nowa klientka z polecenia', 'Bez konta, z linku od koleżanki: baner 20 zł zniżki w salonie.', () => {
     Mock.set('user', null); Mock.set('polecenie', null); return 'salon.html?s=%5BStudio%201%5D&polec=1&od=Ola';
   }],
+  ['Kod rabatowy z kampanii', 'Rezerwacja z linku z kodem JESIEN20: termin od razu liczy −20%.', () => {
+    Mock.set('koszyk', null); Mock.set('booking', { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy', cena: 140, cenaMin: 140, cenaMax: 140, czas: 75, czasTekst: '1 h 15 min', studio: '[Studio 1]' }); return 'termin.html?kod=JESIEN20';
+  }],
+  ['Klientka z karnetem', 'Kasia ma „Pakiet 5× hybryda” (zostały 3 wizyty): przy rezerwacji widzi „Rozlicz z karnetu”.', () => {
+    const o = Mock.karnety()[0], end = Mock.dzien(150);
+    Mock.set('user', { imie: 'Kasia', tel: '600100200', zalogowana: true });
+    Mock.set('karnety.sprzedane', [{ k: 'Kasia', tel: '600100200', n: o.n, t: o.t, us: o.us, cena: o.cena, ile: 3, data: Mock.dzien(-30).toLocaleDateString('pl-PL'), do: end.toLocaleDateString('pl-PL'), doIso: Mock.iso(end), online: true }]);
+    Mock.set('koszyk', null); Mock.set('booking', { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy', cena: 140, cenaMin: 140, cenaMax: 140, czas: 75, czasTekst: '1 h 15 min', studio: '[Studio 1]' }); return 'termin.html';
+  }],
+  ['Reklamacja po wizycie', 'Odbyta wizyta Kasi w historii: „Zgłoś reklamację”, a w panelu (Opinie) studio na nią odpowiada.', () => {
+    Mock.set('user', { imie: 'Kasia', tel: '600100200', zalogowana: true });
+    Mock.set('visits', [wizyta(Mock.dzien(-4), 11 * 60 + 15, 75, { status: 'odbyta' })]); Mock.setReklamacje(null); return 'wizyty.html';
+  }],
+  ['Odwołanie na czas: zwrot zaliczki', 'Wizyta za 3 dni z zaliczką 42 zł. Odwołaj ją w „Moich wizytach”: w historii pojawi się „Zwrot zaliczki: w drodze”.', () => {
+    Mock.set('user', { imie: 'Kasia', tel: '600100200', zalogowana: true });
+    Mock.set('visits', [wizyta(naDzien(3), 10 * 60, 75, { zadatek: 42 })]); return 'wizyty.html';
+  }],
+  ['Studio z dwiema lokalizacjami', 'Panel ustawiony na drugą lokalizację (przełącznik w nagłówku), lista lokalizacji w profilu studia.', () => {
+    Mock.set('lokalizacje', null); Mock.set('lokalizacja', 1); Mock.set('studioUser', null); return 'profil-studia.html';
+  }],
   ['Studio: dziś dwie rezerwacje online', 'W kalendarzu: Ola z fakturą (potwierdziła) i Ewa z polecenia (czeka na potwierdzenie).', () => {
     Mock.set('visits', [
       wizyta(Mock.dzien(0), 17 * 60, 60, { klientka: 'Ola', kontakt: { imie: 'Ola', tel: '600200300' }, stylistka: '[Stylistka 2]', potwierdzona: true, faktura: { nip: '1234563218', firma: 'Ola Beauty' } }),

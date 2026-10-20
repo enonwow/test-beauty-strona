@@ -37,7 +37,7 @@
 
     <section class="p-card" aria-labelledby="tx-h">
       <h2 id="tx-h" class="p-h2">Transakcje dnia</h2>
-      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Godzina</th><th>Klientka</th><th>Za co</th><th>Metoda</th><th>Dokument</th><th style="text-align: right">Kwota</th></tr></thead><tbody id="tx"></tbody></table></div>
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Godzina</th><th>Klientka</th><th>Za co</th><th>Metoda</th><th>Dokument</th><th style="text-align: right">Kwota</th><th><span class="p-sr">Akcje</span></th></tr></thead><tbody id="tx"></tbody></table></div>
     </section>
 
     <section class="p-card" aria-labelledby="gc-h">
@@ -63,11 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const CARDS = [{ code: 'KARTA-DEMO-1', v: 100, od: '[kupująca], na urodziny' }, { code: 'KARTA-DEMO-2', v: 200, od: '[kupująca], prezent' }];
   const zl = n => n.toLocaleString('pl-PL') + ' zł';
   const tx = () => SEED.concat(Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota, dok: x.dok })), Mock.get('kasa.gc', []).map(x => ({ t: x.t, k: '[klientka]', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })));
-  const dokTxt = d => (!d ? '<span class="p-mut">–</span>' : d.typ === 'faktura' ? `<span class="p-badge blue" title="${E(d.firma)}, NIP ${E(d.nip)}">${E(d.nr)}</span>` : `<span class="p-mut">${E(d.nr)}</span>`);
+  const dokTxt = d => (!d ? '<span class="p-mut">–</span>' : d.typ === 'faktura' ? `<span class="p-badge blue" title="${E(d.firma)}, NIP ${E(d.nip)}">${E(d.nr)}</span><br><span class="p-mut" title="Numer nadany przez Krajowy System e-Faktur">KSeF: ${E(ksef(d))}</span>` : `<span class="p-mut">${E(d.nr)}</span>`);
   const ruch = () => Mock.get('kasa.ruch', []);
+  // mock KSeF number: seller NIP-date-6 characters, as the real one looks
+  const ksef = d => `1234563218-${Mock.iso(Mock.dzien(0)).split('-').join('')}-${(d.nr.replace(/\W/g, '') + 'A1B2C3').slice(-6).toUpperCase()}`;
+  const zwroty = () => Mock.get('kasa.zwroty', []) || [];
+  const zwrocono = x => zwroty().filter(z => z.ref === x.t + '|' + x.k + '|' + x.o).reduce((a, z) => a + z.kwota, 0);
 
   function render() {
-    const T = tx(), R = ruch();
+    const T = tx().concat(zwroty().map(z => ({ t: z.t, k: z.k, o: 'Zwrot: ' + z.o, m: z.m, v: -z.kwota, zw: true }))), R = ruch();
     const sum = f => T.filter(f).reduce((s, x) => s + x.v, 0);
     const total = sum(() => true), got = sum(x => x.m === 'gotówka'), inn = R.filter(r => r.typ === 'wpłata').reduce((s, r) => s + r.v, 0), out = R.filter(r => r.typ === 'wypłata').reduce((s, r) => s + r.v, 0);
     document.getElementById('s-utarg').textContent = zl(total);
@@ -75,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('s-got').textContent = zl(got);
     document.getElementById('s-bez').textContent = zl(total - got);
     document.getElementById('s-kasa').textContent = zl(FUND + got + inn - out);
-    document.getElementById('tx').innerHTML = T.map(x => `<tr><td>${E(x.t)}</td><td>${E(x.k)}</td><td>${E(x.o)}</td><td><span class="p-chip">${E(x.m)}</span></td><td>${dokTxt(x.dok)}</td><td style="text-align:right;font-weight:700">${zl(x.v)}</td></tr>`).join('') +
-      R.map(r => `<tr><td>${E(r.t)}</td><td colspan="2">${r.typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy'}: ${E(r.o)}</td><td><span class="p-chip">gotówka</span></td><td><span class="p-mut">KW/KP</span></td><td style="text-align:right;font-weight:700;color:${r.typ === 'wpłata' ? '#1F6B47' : '#A3262A'}">${r.typ === 'wpłata' ? '+' : '−'}${zl(r.v)}</td></tr>`).join('');
+    document.getElementById('tx').innerHTML = T.map(x => `<tr><td>${E(x.t)}</td><td>${E(x.k)}</td><td>${E(x.o)}</td><td><span class="p-chip">${E(x.m)}</span></td><td>${x.zw ? '<span class="p-mut">korekta</span>' : dokTxt(x.dok)}</td><td style="text-align:right;font-weight:700;color:${x.v < 0 ? '#A3262A' : '#1E1A1D'}">${zl(x.v)}</td><td>${!x.zw && x.v > 0 && x.m !== 'karta podarunkowa' ? (zwrocono(x) >= x.v ? '<span class="p-badge">zwrócono</span>' : `<button type="button" class="p-btn sm" data-zwrot="${E(x.t + '|' + x.k + '|' + x.o)}">Zwrot</button>`) : ''}</td></tr>`).join('') +
+      R.map(r => `<tr><td>${E(r.t)}</td><td colspan="2">${r.typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy'}: ${E(r.o)}</td><td><span class="p-chip">gotówka</span></td><td><span class="p-mut">KW/KP</span></td><td style="text-align:right;font-weight:700;color:${r.typ === 'wpłata' ? '#1F6B47' : '#A3262A'}">${r.typ === 'wpłata' ? '+' : '−'}${zl(r.v)}</td><td></td></tr>`).join('');
     const used = Mock.get('kasa.gc', []).map(x => x.code);
     document.getElementById('gc').innerHTML = CARDS.map(c => `<div class="p-row"><span><b>${E(c.code)}</b> · ${zl(c.v)}<br><span class="p-mut">${E(c.od)}</span></span>${used.includes(c.code) ? '<span class="p-badge ok">zrealizowana</span>' : `<button type="button" class="p-btn sm" data-code="${c.code}">Zrealizuj</button>`}</div>`).join('');
     const closed = Mock.get('kasa.zamkniety', null), bn = document.getElementById('closed');
@@ -91,6 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
       toast: f => `${typ === 'wpłata' ? 'Wpłacono' : 'Wypłacono'} ${f.v.value} zł`
     });
   }
+  document.getElementById('tx').addEventListener('click', e => {
+    const b = e.target.closest('[data-zwrot]'); if (!b) return;
+    const x = tx().find(y => y.t + '|' + y.k + '|' + y.o === b.dataset.zwrot), max = x.v - zwrocono(x);
+    PS.modal({ title: 'Zwrot: ' + x.k, ok: 'Zwróć',
+      body: `<div class="p-box"><span>${E(x.o)} · ${E(x.m)}</span><b>${zl(x.v)}</b></div><label class="p-lab">Kwota zwrotu (do ${max} zł)<input class="p-in" type="number" name="k" min="1" max="${max}" required value="${max}"></label><label class="p-lab">Powód<input class="p-in" name="p" required placeholder="np. reklamacja, odwołanie przez studio"></label><span class="p-mut">Zwrot idzie tą samą metodą (${E(x.m)}). Przy paragonie drukujemy korektę, przy fakturze fakturę korygującą.</span>`,
+      onOk: f => { const k = +f.k.value; if (!(k > 0 && k <= max)) { Mock.toast(`Kwota od 1 do ${max} zł`); return false; } if (!f.p.value.trim()) return false;
+        Mock.set('kasa.zwroty', [...zwroty(), { ref: b.dataset.zwrot, t: now(), k: x.k, o: x.o, m: x.m, kwota: k, powod: f.p.value.trim() }]); render(); },
+      toast: f => `Zwrócono ${f.k.value} zł: ${x.k}` });
+  });
   document.getElementById('in').addEventListener('click', () => cash('wpłata'));
   document.getElementById('out').addEventListener('click', () => cash('wypłata'));
   document.getElementById('close').addEventListener('click', () => {

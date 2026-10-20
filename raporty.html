@@ -29,7 +29,7 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
       <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Utarg</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[kwota]</b><span style="color: #625860; font-size: 12px"><span id="vs">vs wrzesień</span>: [zmiana]</span></div>
       <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Wizyty</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[liczba]</b><span style="color: #625860; font-size: 12px">średnio [kwota] za wizytę</span></div>
-      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nieobecności</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[x]%</b><span style="color: #625860; font-size: 12px">z zadatkiem: [x]%</span></div>
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nieobecności</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[x]%</b><span style="color: #625860; font-size: 12px">z zaliczką: [x]%</span></div>
       <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nowe klientki</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[liczba]</b><span style="color: #625860; font-size: 12px">prowizja dla nas: 0 zł</span></div>
     </div>
 
@@ -68,6 +68,30 @@
       </div>
       <span style="color: #625860; font-size: 12px">Porównanie czasu pomaga poprawić minuty w cenniku, żeby terminy były trafne.</span>
     </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; align-items: start">
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="obl-h"><h2 id="obl-h" class="p-h2">Obłożenie zespołu</h2><div id="obl" style="display: flex; flex-direction: column; gap: 10px"></div><span class="p-mut">Godziny z wizytami do godzin w grafiku, ten tydzień.</span></section>
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="pop-h"><h2 id="pop-h" class="p-h2">Najpopularniejsze usługi</h2><div id="pop" style="display: flex; flex-direction: column; gap: 10px"></div></section>
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="pow-h"><h2 id="pow-h" class="p-h2">Powracalność i odwołania</h2><div id="pow" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"></div><span class="p-mut">Powracalność: klientki, które w ciągu 90 dni przyszły drugi raz.</span></section>
+    </div>
+
+    <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="rent-h">
+      <div class="p-top"><h2 id="rent-h" class="p-h2">Rentowność usług</h2><label class="p-lab" style="flex-direction: row; align-items: center; gap: 8px">Koszt godziny pracy<input id="stawka" class="p-in s" type="number" min="0" step="5" value="60" style="width: 90px"> zł</label></div>
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Usługa</th><th style="text-align: right">Cena</th><th style="text-align: right">Materiały</th><th style="text-align: right">Czas</th><th style="text-align: right">Zostaje</th><th style="text-align: right">Marża</th></tr></thead><tbody id="rent"></tbody></table></div>
+      <span class="p-mut">Zostaje = cena − materiały − czas × koszt godziny. Materiały liczone z magazynu (przykładowo).</span>
+    </section>
+    <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="kos-h">
+      <div class="p-top"><h2 id="kos-h" class="p-h2">Koszty i zysk w tym miesiącu</h2><button type="button" class="p-btn sm" id="kos-add">+ Dodaj koszt</button></div>
+      <div id="kos" style="display: flex; flex-direction: column; gap: 6px"></div>
+      <div id="zysk" class="p-row"></div>
+      <span class="p-mut">Utarg przykładowy z kasy. Koszty wpisujesz sama albo przychodzą z faktur zakupowych (po połączeniu z programem do faktur).</span>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="wyr-r-h">
+      <h2 id="wyr-r-h" class="p-h2">Płatne promocje</h2>
+      <div id="wyr-r" class="p-row"></div>
+    </section>
+    <span class="p-mut" id="zrodlo-danych">Liczby przykładowe razem z rezerwacjami złożonymi w tej makiecie.</span>
   </main>
 </div>
 <script>
@@ -80,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tydzien: { t: `Ten tydzień, ${TYG}`, vs: 'vs poprzedni tydzień', h: 'Utarg dziennie', bars: [40, 65, 80, 55, 70, 30], lab: ['pn', 'wt', 'śr', 'cz', 'pt', 'sb'] },
     miesiac: { t: `${M(T.getMonth())} ${T.getFullYear()}`, vs: `vs ${Mock.MIES[(T.getMonth() + 11) % 12]}`, h: 'Utarg tygodniowo', bars: [55, 70, 62, 85], lab: ['1–5', '6–12', '13–19', '20–26'] }
   };
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   let last = 'miesiac';
   lbl.textContent = DATA.miesiac.t; sel.querySelector('[value=miesiac]').textContent = DATA.miesiac.t;
   function draw(d, text) {
@@ -94,11 +119,46 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sel.value !== 'zakres') { last = sel.value; draw(DATA[sel.value], DATA[sel.value].t); Mock.toast('Okres: ' + DATA[sel.value].t); return; }
     PS.modal({
       title: 'Własny okres', ok: 'Pokaż',
-      body: '<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" value="2026-10-01" required></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" value="2026-10-15" required></label></div>',
+      body: `<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" value="${iso(Mock.dzien(1 - T.getDate()))}" required></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" value="${iso(T)}" required></label></div>`,
       onOk: f => { if (f.do.value < f.od.value) { Mock.toast('Data końca jest przed początkiem'); return false; } last = 'zakres'; draw({ vs: 'vs poprzedni okres', h: 'Utarg w okresie', bars: [50, 60, 45, 75, 65], lab: ['1', '2', '3', '4', '5'] }, f.od.value.split('-').reverse().join('.') + ' – ' + f.do.value.split('-').reverse().join('.')); },
       toast: 'Zmieniono okres raportu'
     }).addEventListener('close', () => { if (last !== 'zakres') sel.value = last; });
   });
+  // --- business results: sample numbers plus the visits booked in this mock ---
+  const E = PS.esc, V = Mock.get('visits', []) || [];
+  const pasek = (nazwa, wart, proc, opis) => `<div style="display:flex;flex-direction:column;gap:4px"><span style="display:flex;justify-content:space-between;gap:8px"><span>${E(nazwa)}</span><b>${E(wart)}</b></span><span style="height:8px;border-radius:4px;background:#F0E8EC" role="img" aria-label="${E(nazwa)}: ${E(opis || wart)}"><span style="display:block;width:${Math.min(100, proc)}%;height:8px;border-radius:4px;background:#9E1F50"></span></span></div>`;
+  const kafel = (t, v, o) => `<div style="padding:12px;border-radius:12px;background:#FAF6F8;display:flex;flex-direction:column;gap:2px"><span class="p-mut">${E(t)}</span><b style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px">${E(v)}</b><span class="p-mut">${E(o)}</span></div>`;
+  [['[Stylistka 1]', 31, 38], ['[Stylistka 2]', 24, 38]].forEach(([n, h, g]) => { document.getElementById('obl').insertAdjacentHTML('beforeend', pasek(n, `${Math.round(h / g * 100)}%`, h / g * 100, `${h} z ${g} godzin`)); });
+  const POP = { 'Manicure hybrydowy': 46, 'Uzupełnienie rzęs 1:1': 21, 'Żel na naturalnej płytce': 18, 'Henna + regulacja brwi': 15, 'Przedłużanie (tipsy / szablon)': 12 };
+  V.filter(v => v.status !== 'odwołana').forEach(v => { const n = v.usluga || v.opis; if (n) POP[n] = (POP[n] || 0) + 1; });
+  const top = Object.entries(POP).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  document.getElementById('pop').innerHTML = top.map(([n, k]) => pasek(n, Mock.plural(k, ['wizyta', 'wizyty', 'wizyt']), k / top[0][1] * 100)).join('');
+  const wszystkie = 112 + V.length, odwolane = 9 + V.filter(v => v.status === 'odwołana').length;
+  document.getElementById('pow').innerHTML = kafel('Powracalność', '68%', 'z 74 klientek') + kafel('Odwołane wizyty', `${Math.round(odwolane / wszystkie * 100)}%`, `${odwolane} z ${wszystkie}`);
+  // what stays from a service: price − materials − time × hourly cost of work
+  const zostaje = (u, stawka) => Math.round(u[1] - u[2] - u[3] / 60 * stawka);
+  console.assert(zostaje(['x', 140, 12, 75], 60) === 53 && zostaje(['x', 100, 0, 60], 100) === 0, 'raporty zostaje');
+  const USL = [['Manicure hybrydowy', 140, 12, 75], ['Żel na naturalnej płytce', 170, 22, 105], ['Przedłużanie (tipsy / szablon)', 200, 30, 150], ['Uzupełnienie rzęs 1:1', 150, 18, 90], ['Henna + regulacja brwi', 70, 6, 40]];
+  const rent = () => { const st = Math.max(0, +document.getElementById('stawka').value || 0);
+    document.getElementById('rent').innerHTML = USL.map(u => { const z = zostaje(u, st), m = Math.round(z / u[1] * 100);
+      return `<tr><td>${E(u[0])}</td><td style="text-align:right">${u[1]} zł</td><td style="text-align:right">${u[2]} zł</td><td style="text-align:right">${Mock.dur(u[3])}</td><td style="text-align:right;font-weight:700;color:${z < 0 ? '#A3262A' : '#1E1A1D'}">${z} zł</td><td style="text-align:right">${m}%</td></tr>`; }).join(''); };
+  document.getElementById('stawka').addEventListener('input', rent); rent();
+  // costs this month (sample + added) against a sample turnover; the paid highlight counts as a cost too
+  const UTARG = 18400, KOS0 = [['Czynsz', 'lokal', 3200], ['Wynagrodzenia', 'zespół', 6800], ['Materiały z magazynu', 'materiały', 1450], ['Media i internet', 'lokal', 450], ['Abonament systemu', 'abonament', 99]];
+  const kosztyLista = () => KOS0.concat(Mock.get('koszty', []) || [], W.on ? [['Wyróżnienie w wyszukiwarce', 'reklama', W.st * 30]] : []);
+  const zysk = (utarg, l) => utarg - l.reduce((a, k) => a + k[2], 0);
+  console.assert(zysk(1000, [['a', '', 300], ['b', '', 200]]) === 500, 'raporty zysk');
+  const rKoszty = () => { const L = kosztyLista(), z = zysk(UTARG, L);
+    document.getElementById('kos').innerHTML = L.map(k => `<div style="display:flex;justify-content:space-between;gap:10px"><span>${E(k[0])} <span class="p-mut">· ${E(k[1])}</span></span><b>${k[2].toLocaleString('pl-PL')} zł</b></div>`).join('');
+    document.getElementById('zysk').innerHTML = `<span>Utarg ${UTARG.toLocaleString('pl-PL')} zł − koszty ${(UTARG - z).toLocaleString('pl-PL')} zł</span><b style="font-size:18px;color:${z < 0 ? '#A3262A' : '#1F6B47'}">Zysk ${z.toLocaleString('pl-PL')} zł (${Math.round(z / UTARG * 100)}%)</b>`; };
+  const W = Mock.get('wyroznienie', { on: false, st: 20 });
+  document.getElementById('kos-add').addEventListener('click', () => PS.modal({ title: 'Nowy koszt', ok: 'Dodaj',
+    body: '<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. Szkolenie z rzęs"></label><div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Kwota (zł)<input class="p-in" type="number" name="k" min="1" required></label><label class="p-lab" style="flex:1">Rodzaj<select class="p-in" name="r"><option>materiały</option><option>lokal</option><option>zespół</option><option>reklama</option><option>szkolenia</option><option>inne</option></select></label></div>',
+    onOk: f => { if (!f.n.value.trim() || !(+f.k.value > 0)) return false; Mock.set('koszty', [...(Mock.get('koszty', []) || []), [f.n.value.trim(), f.r.value, +f.k.value]]); rKoszty(); },
+    toast: f => `Dodano koszt: ${f.n.value.trim()}` }));
+  rKoszty();
+  document.getElementById('wyr-r').innerHTML = W.on ? `<span><b>Wyróżnienie w wyszukiwarce</b><br><span class="p-mut">${W.st} zł / dzień · 9 rezerwacji w 7 dni · ${Math.round(W.st * 7 / 9)} zł za rezerwację</span></span><b>${W.st * 7} zł</b>` : '<span class="p-mut">Wyróżnienie jest wyłączone. Włączysz je w Marketingu.</span>';
+
   document.getElementById('exp').addEventListener('click', () => Mock.toast('Pobrano CSV dla księgowej: ' + lbl.textContent));
   draw(DATA.miesiac, DATA.miesiac.t);
 });

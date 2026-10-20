@@ -19,6 +19,11 @@
   <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
     <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Opinie</h1><span class="p-mut">Średnia ocena studia: ★ [ocena] · [liczba] opinii. Odpowiedz klientce albo zgłoś opinię, która nie dotyczy wizyty.</span></div>
 
+    <section id="reklamacje" class="p-card" aria-labelledby="rk-h" style="scroll-margin-top: 16px">
+      <div class="p-top"><h2 id="rk-h" class="p-h2">Reklamacje</h2><span class="p-mut">Na odpowiedź masz 14 dni. Klientka widzi ją w „Moich wizytach”.</span></div>
+      <div id="rk-lista" style="display: flex; flex-direction: column; gap: 10px"></div>
+    </section>
+
     <div id="filtr" data-choice role="group" aria-label="Filtr opinii" class="p-pills">
       <button type="button" class="p-pill" data-value="all" aria-pressed="true">Wszystkie</button>
       <button type="button" class="p-pill" data-value="open" aria-pressed="false">Bez odpowiedzi</button>
@@ -73,6 +78,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   render();
+
+  // --- complaints ---
+  const ST_RK = { nowa: ['nowa', 'warn'], poprawka: ['bezpłatna poprawka', 'ok'], zwrot: ['zwrot', 'ok'], odrzucona: ['odrzucona', ''] };
+  const dni = iso => Math.max(0, 14 - Math.round((Mock.dzien(0) - new Date(iso)) / 864e5)); // days left to answer
+  function renderRk() {
+    const L = Mock.reklamacje();
+    document.getElementById('rk-lista').innerHTML = L.map(r => `<div class="p-row" data-rk="${E(r.id)}" style="flex-direction:column;align-items:stretch">
+      <div class="p-top"><span><b>${E(r.klientka)}</b> · ${E(r.usluga)} · ${r.cena} zł ${r.przyklad ? '<span class="p-badge blue">przykład</span>' : ''}</span><span class="p-badge ${ST_RK[r.status][1]}">${ST_RK[r.status][0]}</span></div>
+      <p style="margin:0;line-height:1.5">${E(r.opis)}</p>
+      <span class="p-mut">Zgłoszona ${E(r.data.split('-').reverse().join('.'))} · oczekuje: ${r.oczekuje === 'zwrot' ? 'zwrotu części ceny' : 'bezpłatnej poprawki'}${r.foto ? ' · dołączyła zdjęcie' : ''}${r.status === 'nowa' ? ` · zostało ${Mock.plural(dni(r.data), ['dzień', 'dni', 'dni'])} na odpowiedź` : ''}</span>
+      ${r.odp ? `<span style="padding:8px 10px;border-radius:10px;background:#fff">Odpowiedź: ${E(r.odp)}</span>` : ''}
+      ${r.status === 'nowa' ? '<div class="p-acts"><button type="button" class="p-btn sm pri" data-rka="poprawka">Umów bezpłatną poprawkę</button><button type="button" class="p-btn sm" data-rka="zwrot">Zwróć część kwoty</button><button type="button" class="p-btn sm dng" data-rka="odrzucona">Odrzuć z uzasadnieniem</button></div>' : ''}</div>`).join('')
+      || '<span class="p-mut">Brak reklamacji.</span>';
+  }
+  const ustaw = (id, zm) => { Mock.setReklamacje(Mock.reklamacje().map(r => (r.id === id ? { ...r, ...zm } : r))); renderRk(); PS.refresh(); };
+  document.getElementById('rk-lista').addEventListener('click', e => {
+    const b = e.target.closest('[data-rka]'); if (!b) return;
+    const id = b.closest('[data-rk]').dataset.rk, r = Mock.reklamacje().find(x => x.id === id), a = b.dataset.rka;
+    if (a === 'poprawka') PS.modal({ title: 'Bezpłatna poprawka', ok: 'Wyślij klientce', body: `<label class="p-lab">Wiadomość dla klientki<textarea class="p-in" name="t" rows="3" required>Przepraszamy. Zapraszamy na bezpłatną poprawkę, wybierz dogodny termin.</textarea></label>`,
+      onOk: f => ustaw(id, { status: 'poprawka', odp: f.t.value.trim() }), toast: 'Klientka dostała zaproszenie na poprawkę' });
+    if (a === 'zwrot') PS.modal({ title: 'Zwrot części kwoty', ok: 'Zwróć', body: `<label class="p-lab">Kwota zwrotu (do ${r.cena} zł)<input class="p-in" type="number" name="k" min="1" max="${r.cena}" required value="${Math.round(r.cena / 2)}"></label><label class="p-lab">Wiadomość<textarea class="p-in" name="t" rows="2" required>Przepraszamy, zwracamy część kwoty.</textarea></label><span class="p-mut">Zwrot idzie tą samą metodą, którą klientka zapłaciła.</span>`,
+      onOk: f => { const k = +f.k.value; if (!(k > 0 && k <= r.cena)) { Mock.toast(`Kwota od 1 do ${r.cena} zł`); return false; } ustaw(id, { status: 'zwrot', kwota: k, odp: f.t.value.trim() }); }, toast: f => `Zlecono zwrot ${f.k.value} zł` });
+    if (a === 'odrzucona') PS.modal({ title: 'Odrzuć reklamację', ok: 'Odrzuć', cls: 'dark', body: `<label class="p-lab">Uzasadnienie (widzi klientka)<textarea class="p-in" name="t" rows="3" required minlength="10" placeholder="np. odprysk po uderzeniu, zgodnie z zaleceniami…"></textarea></label>`,
+      onOk: f => { if (f.t.value.trim().length < 10) { Mock.toast('Napisz uzasadnienie, co najmniej 10 znaków'); return false; } ustaw(id, { status: 'odrzucona', odp: f.t.value.trim() }); }, toast: 'Reklamacja odrzucona, klientka dostała uzasadnienie' });
+  });
+  renderRk();
+  if (location.hash === '#reklamacje') document.getElementById('reklamacje').scrollIntoView();
 });
 </script>
 </body>

@@ -31,6 +31,12 @@
           <label class="p-lab">Adres<input class="p-in" id="ad" value="[ulica numer, miasto]"></label>
         </section>
 
+        <section class="p-card" aria-labelledby="lok-h">
+          <div class="p-top"><h2 id="lok-h" class="p-h2">Lokalizacje</h2><button type="button" class="p-btn sm" id="lok-add">+ Dodaj lokalizację</button></div>
+          <div id="lok" style="display: flex; flex-direction: column; gap: 8px"></div>
+          <span class="p-mut">Każda lokalizacja ma swój adres, godziny i zespół. Klientki widzą je na stronie studia, a panel przełączasz w nagłówku.</span>
+        </section>
+
         <section class="p-card">
           <h2>Godziny otwarcia</h2>
           <div class="p-tw"><table class="p-tbl" style="min-width: 380px"><thead><tr><th>Dzień</th><th>Od</th><th>Do</th><th>Zamknięte</th></tr></thead><tbody id="godz"></tbody></table></div>
@@ -191,6 +197,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   if (location.hash === '#kanaly') $('kanaly').scrollIntoView();
   $('save').addEventListener('click', () => { Mock.set('profil', { ...S, ph: S.ph.filter(p => !p.src) }); Mock.toast('Zapisano profil studia'); });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, rLok = () => { document.getElementById('lok').innerHTML = PS.lokalizacje().map((l, i) => `<div class="p-row"><span><b>${E(l.n)}</b><br><span class="p-mut">${E(l.adres)}</span></span>${i === 0 ? '<span class="p-badge">główna</span>' : ''}</div>`).join(''); };
+  document.getElementById('lok-add').addEventListener('click', () => PS.modal({ title: 'Nowa lokalizacja', ok: 'Dodaj',
+    body: '<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. [Studio 1] – Mokotów"></label><label class="p-lab">Adres<input class="p-in" name="a" required placeholder="[ulica, numer], [miasto]"></label>',
+    onOk: f => { if (!f.n.value.trim() || !f.a.value.trim()) return false; Mock.set('lokalizacje', [...PS.lokalizacje(), { n: f.n.value.trim(), adres: f.a.value.trim() }]); rLok(); PS.refresh(); },
+    toast: f => 'Dodano lokalizację: ' + f.n.value.trim() }));
+  rLok();
 });
 </script>
 </body>

@@ -131,6 +131,8 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
 
   function notes() {
     const list = [];
+    Mock.reklamacje().filter(r => r.status === 'nowa').forEach(r =>
+      list.push({ id: 'rk' + r.id, t: 'Reklamacja', d: `${r.klientka} · ${r.usluga}: ${r.opis.slice(0, 50)}${r.opis.length > 50 ? '…' : ''}`, href: 'opinie-studio.html#reklamacje', isNew: true }));
     Mock.get('visits', []).filter(v => v.status === 'nadchodząca' && !v.zrodlo).slice(0, 3).forEach(v =>
       list.push({ id: 'v' + v.id, t: 'Nowa rezerwacja', d: `${v.klientka || 'Klientka online'} · ${v.opis || v.usluga || 'wizyta'} · ${[v.dzien, v.godzina].filter(Boolean).join(' ')}`, href: 'panel.html#nowe', isNew: true }));
     list.push(
@@ -204,7 +206,10 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       const u = studioUser() || {};
       bar.innerHTML = `<details class="pn-user"><summary aria-label="Konto: ${esc(u.imie || '[Właścicielka]')}, ${esc(roleOf(u.rola).n)}"><b>${esc(u.imie || '[Właścicielka]')}</b><small>${esc(roleOf(u.rola).n)}</small></summary><div class="pn-menu"><button type="button" id="pn-out">Wyloguj</button></div></details>` +
         `<button type="button" class="pn-bell" id="pn-bell" aria-label="Powiadomienia"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i></i></button>`;
+      const L = lokalizacje(), wyb = Mock.get('lokalizacja', 0) || 0;
+      if (L.length > 1) bar.insertAdjacentHTML('afterbegin', `<label class="pn-lok" style="display:flex;align-items:center;gap:6px;margin-right:auto;font-size:13px;color:#625860">Lokalizacja<select id="pn-lok" class="p-in s" style="max-width:220px">${L.map((l, i) => `<option value="${i}"${i === wyb ? ' selected' : ''}>${esc(l.n)}</option>`).join('')}</select></label>`);
       main.prepend(bar);
+      const ls = bar.querySelector('#pn-lok'); if (ls) ls.addEventListener('change', () => { Mock.set('lokalizacja', +ls.value); Mock.toast('Panel: ' + L[+ls.value].n); });
       bar.querySelector('.pn-bell').addEventListener('click', openBell);
       bar.querySelector('#pn-out').addEventListener('click', logout);
       const det = bar.querySelector('details');
@@ -249,6 +254,9 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     });
   }
 
-  window.PS = { ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, zl: n => `${Math.round(n)} zł`, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
+  // locations: shortcut: only a label in the header, the mock does not split data per location; real data would be filtered by the chosen one
+  const LOK0 = [{ n: '[Studio 1] – Centrum', adres: '[ulica, numer], [miasto]' }, { n: '[Studio 1] – Mokotów', adres: '[ulica, numer], [miasto]' }];
+  const lokalizacje = () => Mock.get('lokalizacje', null) || LOK0;
+  window.PS = { lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, zl: n => `${Math.round(n)} zł`, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
   init();
 })();

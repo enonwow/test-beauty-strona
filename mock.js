@@ -119,6 +119,61 @@
     if (d - t > pol) d.setFullYear(d.getFullYear() - 1); else if (t - d > pol) d.setFullYear(d.getFullYear() + 1);
     return d;
   }
+  const iso = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; // "2026-10-20", for <input type=date> and code dates
+
+  // Discount codes set by the studio (promocje.html, tab "Kody") and typed by clients in termin.html.
+  // typ 'proc' = percent, 'zl' = amount; kategorie [] = all services; limit 0 = no limit; od/do inclusive.
+  const KODY_SEED = () => [
+    { kod: 'JESIEN20', typ: 'proc', wart: 20, od: iso(dzien(-10)), do: iso(dzien(40)), kategorie: [], limit: 50, uzyto: 12, on: true },
+    { kod: 'NOWA30', typ: 'zl', wart: 30, od: iso(dzien(-30)), do: iso(dzien(60)), kategorie: ['Rzęsy'], limit: 0, uzyto: 3, on: true },
+    { kod: 'LATO15', typ: 'proc', wart: 15, od: iso(dzien(-120)), do: iso(dzien(-30)), kategorie: [], limit: 0, uzyto: 41, on: true }];
+  const kody = () => get('kody', null) || KODY_SEED();
+  const setKody = l => set('kody', l);
+  // a typed code against the list: { kod, rabat, opis } or { blad } with a reason the client can act on
+  function sprawdzKod(wpis, kategoria, kwota, lista = kody(), dzis = iso(teraz())) {
+    const k = String(wpis || '').trim().toUpperCase(); if (!k) return null;
+    const x = lista.find(z => z.kod === k && z.on);
+    if (!x) return { blad: 'Nie znamy takiego kodu. Sprawdź pisownię.' };
+    if (dzis < x.od) return { blad: `Kod działa od ${x.od.split('-').reverse().slice(0, 2).join('.')}.` };
+    if (dzis > x.do) return { blad: 'Ten kod już wygasł.' };
+    if (x.limit && x.uzyto >= x.limit) return { blad: 'Ten kod został już wykorzystany.' };
+    if (x.kategorie.length && !x.kategorie.includes(kategoria)) return { blad: `Ten kod działa tylko na: ${x.kategorie.join(', ').toLowerCase()}.` };
+    const rabat = Math.min(kwota, x.typ === 'proc' ? Math.round(kwota * x.wart / 100) : x.wart);
+    return { kod: x.kod, rabat, opis: x.typ === 'proc' ? `−${x.wart}%` : `−${x.wart} zł` };
+  }
+  // Passes and packages (karnety.html sells them in the studio, salon.html online). Sold: { k, tel, n, t, us, cena, ile, data, do, doIso }
+  // t 'pakiet' = ile visits left, t 'czasowy' = unlimited until doIso.
+  const KARNETY_SEED = [
+    { id: 1, n: 'Pakiet 5× hybryda', t: 'pakiet', cena: 600, ile: 5, dni: 180, us: 'Manicure hybrydowy' },
+    { id: 2, n: 'Karnet miesięczny: hybryda bez limitu', t: 'czasowy', cena: 450, ile: 0, dni: 30, us: 'Manicure hybrydowy' },
+    { id: 3, n: 'Pakiet 3× uzupełnienie rzęs', t: 'pakiet', cena: 400, ile: 3, dni: 120, us: 'Uzupełnienie rzęs 1:1' }];
+  const karnety = () => get('karnety.oferta', KARNETY_SEED);
+  const sprzedane = () => get('karnety.sprzedane', []) || [];
+  const cyfry = s => String(s || '').replace(/\D/g, '').slice(-9); // phone numbers compared by their last 9 digits
+  // the first pass of this client (by phone, else by name) that covers the service today
+  function karnetDla(usluga, tel, imie, lista = sprzedane(), dzis = iso(teraz())) {
+    const i = lista.findIndex(s => s.us === usluga && (cyfry(tel) ? cyfry(s.tel) === cyfry(tel) : imie && s.k === imie)
+      && (!s.doIso || dzis <= s.doIso) && (s.t === 'czasowy' || s.ile > 0));
+    return i < 0 ? null : { i, s: lista[i] };
+  }
+  // Complaints after a visit (wizyty.html files them, opinie-studio.html answers). status: nowa | poprawka | zwrot | odrzucona
+  const REKL_SEED = () => [{ id: 'rk1', visitId: null, klientka: '[Klientka A]', usluga: 'Hybryda jednolita', cena: 140, opis: 'Po trzech dniach odprysk na dwóch paznokciach prawej dłoni.', oczekuje: 'poprawka', foto: 'dlon.jpg', data: iso(dzien(-1)), status: 'nowa', przyklad: true }];
+  const reklamacje = () => get('reklamacje', null) || REKL_SEED();
+  const setReklamacje = l => set('reklamacje', l);
+  // Stock (magazyn.html, products used on a visit in panel.html) and aftercare texts per category (cennik.html, wizyty.html, marketing.html)
+  const MAGAZYN_SEED = [
+    { n: 'Lakier hybrydowy, burgund', k: 'Paznokcie', s: 6, p: 2, u: 'szt.' }, { n: 'Żel budujący, przezroczysty', k: 'Paznokcie', s: 2, p: 3, u: 'szt.' },
+    { n: 'Baza hybrydowa', k: 'Paznokcie', s: 4, p: 2, u: 'szt.' }, { n: 'Top bez przemywania', k: 'Paznokcie', s: 3, p: 2, u: 'szt.' }, { n: 'Velvet, puder', k: 'Paznokcie', s: 5, p: 2, u: 'szt.' },
+    { n: 'Klej do rzęs', k: 'Rzęsy', s: 3, p: 2, u: 'szt.' }, { n: 'Rzęsy 0,07 C 12 mm', k: 'Rzęsy', s: 8, p: 3, u: 'taśm' }, { n: 'Płatki hydrożelowe', k: 'Rzęsy', s: 10, p: 4, u: 'par' },
+    { n: 'Henna do brwi, brąz', k: 'Brwi', s: 4, p: 2, u: 'szt.' }];
+  const magazyn = () => get('magazyn', MAGAZYN_SEED);
+  const ZAL_SEED = {
+    Paznokcie: 'Przez 24 h unikaj gorącej wody i sauny. Do sprzątania zakładaj rękawiczki. Nie podważaj odprysków: przyjdź na bezpłatną poprawkę. Smaruj skórki oliwką raz dziennie.',
+    'Rzęsy': 'Przez 24 h nie mocz rzęs i unikaj pary. Nie używaj tłustych kosmetyków do oczu. Czesz rzęsy szczoteczką rano. Nie śpij twarzą w poduszce przez pierwszą noc.',
+    Brwi: 'Przez 24 h nie myj brwi i nie nakładaj makijażu. Unikaj peelingów okolicy brwi przez 3 dni.',
+    Fryzjer: 'Myj włosy szamponem do włosów farbowanych, pierwszy raz po 48 h. Chroń kolor przed słońcem i chlorem.',
+    Kosmetologia: 'Przez 3 dni unikaj słońca, sauny i basenu. Stosuj krem z filtrem SPF 50. Nie drap i nie zdzieraj złuszczającego się naskórka.' };
+  const zalecenia = () => ({ ...ZAL_SEED, ...(get('zalecenia', {}) || {}) });
   const odDzis = d => Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - dzien(0)) / 864e5); // whole days from today
   const priceAfter = (cena, rabat) => Math.round(cena * (100 - rabat) / 100);
 
@@ -170,6 +225,8 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
 [hidden]{display:none !important}
 .mock-zglos{min-height:28px;padding:2px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.6);background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}
 .mock-zglos:hover{background:rgba(255,255,255,.12)}
+.nav-x{display:none !important}
+@media (min-width:1024px){.nav-x{display:flex !important}.nav-firma{margin-left:auto;border:1px solid #9E1F50;border-radius:10px;color:#9E1F50 !important;font-weight:700;min-height:44px !important}.nav-firma:hover{background:#F6EDF1}.nav.d-tabbar{grid-auto-columns:max-content}}
 .mock-dzis{padding:2px 10px;border-radius:999px;background:#FFF1E0;color:#8A3B12;font-weight:700;white-space:nowrap}
 .mock-zglos:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
 @media (max-width:1023px){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:16px !important}}
@@ -208,6 +265,9 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
     });
     document.addEventListener('change', e => { if (e.target.dataset.toastChange) toast(e.target.dataset.toastChange); });
     bindTexts(document);
+    // news and the studio sign-up in the shared top menu (desktop only: the phone tab bar keeps its 4 tabs)
+    const tab = document.querySelector('.nav.d-tabbar');
+    if (tab) tab.insertAdjacentHTML('beforeend', `<a href="aktualnosci.html" class="nav-x"${/aktualnosci\.html$/.test(location.pathname) ? ' aria-current="page"' : ''}><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 9h3v8a2 2 0 0 1-2 2"></path><path d="M8 9h5M8 13h5"></path></svg>Aktualności</a><a href="dla-studiow.html" class="nav-x nav-firma">Dla studiów: załóż konto salonu</a>`);
     // "Zgłoś problem" in the mock bar on every page; the dialog code loads only when someone clicks it
     const bar = document.querySelector('.mock-bar');
     if (bar) {
@@ -241,7 +301,7 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
 
   window.Mock = { get, set, reset, lookup, toast, addVisit, bindTexts, zl, dur, plural,
     happyHours, setHappyHours, promoFor, happyToday, priceAfter, weekday, fotoKat, nipOk, polec,
-    teraz, dzien, SKR, MIES, MIESD, dm, krotko, dlugo, zKrotko, odDzis, ustawDzis, testowa };
+    teraz, dzien, SKR, MIES, MIESD, dm, krotko, dlugo, zKrotko, odDzis, ustawDzis, testowa, iso, kody, setKody, sprawdzKod, karnety, sprzedane, karnetDla, reklamacje, setReklamacje, magazyn, zalecenia };
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 
   console.assert((() => {
@@ -251,6 +311,13 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
   console.assert(fotoKat('Rzęsy') === 'zdjecia/k-rzesy.jpg' && fotoKat('Kosmetologia') === 'zdjecia/k-kosmetyka.jpg' && fotoKat(undefined) === 'zdjecia/k-paznokcie.jpg', 'mock.js fotoKat');
   console.assert(krotko(new Date(2026, 9, 20)) === 'wt 20.10' && dlugo(new Date(2026, 9, 20)) === 'Wtorek, 20 października'
     && odDzis(dzien(40)) === 40 && odDzis(zKrotko(krotko(dzien(40)))) === 40 && odDzis(zKrotko(krotko(dzien(-150)))) === -150 && zKrotko('bez daty') === null && PIN_OK.test('2026-10-20T18:30') && !PIN_OK.test('2026-10-20 18:30'), 'mock.js daty');
+  console.assert((() => { const L = [{ kod: 'A10', typ: 'proc', wart: 10, od: '2026-01-01', do: '2026-12-31', kategorie: [], limit: 2, uzyto: 1, on: true },
+      { kod: 'B5', typ: 'zl', wart: 50, od: '2026-01-01', do: '2026-12-31', kategorie: ['Rzęsy'], limit: 0, uzyto: 0, on: true }], d = '2026-06-01';
+    return sprawdzKod(' a10 ', 'Paznokcie', 140, L, d).rabat === 14 && sprawdzKod('B5', 'Rzęsy', 40, L, d).rabat === 40 && !!sprawdzKod('B5', 'Brwi', 70, L, d).blad
+      && !!sprawdzKod('A10', 'X', 100, L, '2027-01-01').blad && !!sprawdzKod('ZZ', 'X', 100, L, d).blad && sprawdzKod('', 'X', 1, L, d) === null; })(), 'mock.js sprawdzKod');
+  console.assert((() => { const L = [{ k: 'Ola', tel: '600 100 200', us: 'Mani', t: 'pakiet', ile: 0, doIso: '2026-12-31' }, { k: 'Ola', tel: '+48600100200', us: 'Mani', t: 'pakiet', ile: 2, doIso: '2026-12-31' },
+      { k: 'Ewa', tel: '', us: 'Mani', t: 'czasowy', ile: 0, doIso: '2026-01-31' }];
+    return karnetDla('Mani', '600100200', '', L, '2026-06-01').i === 1 && karnetDla('Mani', '', 'Ewa', L, '2026-06-01') === null && karnetDla('Mani', '', 'Ewa', L, '2026-01-15').i === 2 && karnetDla('Inna', '600100200', '', L, '2026-06-01') === null; })(), 'mock.js karnetDla');
   console.assert(nipOk('123-456-32-18') && !nipOk('1234563217') && !nipOk('12345') && !nipOk(''), 'mock.js nipOk');
   console.assert(zl(-15) === '−15 zł' && dur(105) === '1 h 45 min' && dur(60) === '1 h' && plural(1, ['a', 'b', 'c']) === '1 a'
     && plural(3, ['a', 'b', 'c']) === '3 b' && plural(12, ['a', 'b', 'c']) === '12 c' && plural(22, ['a', 'b', 'c']) === '22 b', 'mock.js formats');

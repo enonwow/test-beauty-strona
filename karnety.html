@@ -34,19 +34,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, KL = ['[Klientka A]', '[Klientka B]', '[Klientka D]', '[Klientka E]'];
-  const SEED = [
-    { id: 1, n: 'Pakiet 5× hybryda', t: 'pakiet', cena: 600, ile: 5, dni: 180, us: 'Manicure hybrydowy' },
-    { id: 2, n: 'Karnet miesięczny: hybryda bez limitu', t: 'czasowy', cena: 450, ile: 0, dni: 30, us: 'Manicure hybrydowy' },
-    { id: 3, n: 'Pakiet 3× uzupełnienie rzęs', t: 'pakiet', cena: 400, ile: 3, dni: 120, us: 'Uzupełnienie rzęs 1:1' }];
-  let O = Mock.get('karnety.oferta', SEED), SP = Mock.get('karnety.sprzedane', []);
+  let O = Mock.karnety(), SP = Mock.sprzedane(); // shared with the client page (salon.html sells online)
   const sv = () => { Mock.set('karnety.oferta', O); Mock.set('karnety.sprzedane', SP); };
 
   function render() {
     document.getElementById('oferta').innerHTML = O.map(o => `<section class="p-card"><div class="p-top"><h2 class="p-h2" style="font-size:17px">${E(o.n)}</h2><span class="p-badge ${o.t === 'pakiet' ? 'blue' : ''}">${o.t === 'pakiet' ? 'pakiet' : 'karnet czasowy'}</span></div>
-      <span style="color:#625860">${E(o.us)} · ${o.t === 'pakiet' ? o.ile + ' wizyt' : 'bez limitu wizyt'} · ważny ${o.dni} dni</span>
+      <span style="color:#625860">${E(o.us)} · ${o.t === 'pakiet' ? Mock.plural(o.ile, ['wizyta', 'wizyty', 'wizyt']) : 'bez limitu wizyt'} · ważny ${o.dni} dni</span>
       <b style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px">${o.cena} zł</b>
       <div class="p-acts"><button type="button" class="p-btn dark" data-sell="${o.id}">Sprzedaj klientce</button><button type="button" class="p-btn sm dng" data-del="${o.id}">Usuń</button></div></section>`).join('') || '<span class="p-mut">Brak karnetów. Dodaj pierwszy przyciskiem „+ Nowy”.</span>';
-    document.getElementById('sprzedane').innerHTML = SP.map((s, i) => `<div class="p-row"><span><b>${E(s.k)}</b> · ${E(s.n)}<br><span class="p-mut">sprzedano ${E(s.data)} · ${E(s.cena)} zł · ${s.t === 'pakiet' ? (s.ile > 0 ? 'zostało ' + s.ile + ' wizyt' : 'wykorzystany') : 'do ' + E(s.do)}</span></span>
+    document.getElementById('sprzedane').innerHTML = SP.map((s, i) => `<div class="p-row"><span><b>${E(s.k)}</b> · ${E(s.n)}${s.online ? ' <span class="p-badge blue">kupiony online</span>' : ''}<br><span class="p-mut">sprzedano ${E(s.data)} · ${E(s.cena)} zł · ${s.t === 'pakiet' ? (s.ile > 0 ? 'zostało ' + Mock.plural(s.ile, ['wizyta', 'wizyty', 'wizyt']) : 'wykorzystany') : 'do ' + E(s.do)}</span></span>
       ${s.t === 'pakiet' && s.ile > 0 ? `<button type="button" class="p-btn sm" data-use="${i}">Odlicz wizytę</button>` : s.t === 'pakiet' ? '<span class="p-badge ok">komplet</span>' : '<span class="p-badge ok">aktywny</span>'}</div>`).join('') || '<span class="p-mut">Jeszcze nic nie sprzedano.</span>';
   }
   document.getElementById('oferta').addEventListener('click', e => {
@@ -54,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (s) { const o = O.find(x => x.id === +s.dataset.sell); PS.modal({
       title: 'Sprzedaj: ' + o.n, ok: 'Sprzedaj za ' + o.cena + ' zł',
       body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map(k => `<option>${E(k)}</option>`).join('')}</select></label><label class="p-lab">Płatność<select class="p-in" name="m"><option>gotówka</option><option>karta</option><option>BLIK</option></select></label>`,
-      onOk: f => { const end = Mock.dzien(o.dni); SP.unshift({ k: f.k.value, n: o.n, t: o.t, cena: o.cena, ile: o.ile, data: Mock.dzien(0).toLocaleDateString('pl-PL'), do: end.toLocaleDateString('pl-PL') }); sv(); render(); },
+      onOk: f => { const end = Mock.dzien(o.dni); SP.unshift({ k: f.k.value, tel: '', n: o.n, t: o.t, us: o.us, cena: o.cena, ile: o.ile, data: Mock.dzien(0).toLocaleDateString('pl-PL'), do: end.toLocaleDateString('pl-PL'), doIso: Mock.iso(end) }); sv(); render(); },
       toast: f => `Sprzedano karnet: ${f.k.value}, ${o.cena} zł`
     }); }
     if (d) { const o = O.find(x => x.id === +d.dataset.del); PS.modal({ title: 'Usunąć z oferty?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">${E(o.n)} zniknie z oferty. Karnety już sprzedane klientkom nadal działają.</p>`, onOk: () => { O = O.filter(x => x !== o); sv(); render(); }, toast: 'Usunięto z oferty' }); }

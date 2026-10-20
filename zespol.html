@@ -25,6 +25,7 @@
     <div data-choice role="tablist" aria-label="Sekcje" class="p-pills">
       <button type="button" role="tab" class="p-pill" aria-selected="true" aria-controls="tab-zespol">Zespół i grafik</button>
       <button type="button" role="tab" class="p-pill" aria-selected="false" aria-controls="tab-sprzet">Sprzęt i gabinety</button>
+      <button type="button" role="tab" class="p-pill" aria-selected="false" aria-controls="tab-wyn">Czas pracy i wynagrodzenia</button>
     </div>
 
     <div id="tab-zespol" style="display: flex; flex-direction: column; gap: 16px">
@@ -78,6 +79,19 @@
         <h2 id="kcw-h">Kto co widzi</h2>
         <div class="p-tw"><table class="p-tbl" id="kcw" style="min-width: 640px"></table></div>
         <span class="p-mut">Tabela pokazuje pozycje menu panelu dla każdej roli. W makiecie menu chowa pozycje, ale adresy stron nie są blokowane.</span>
+      </section>
+    </div>
+
+    <div id="tab-wyn" hidden style="display: flex; flex-direction: column; gap: 16px">
+      <section class="p-card" aria-labelledby="cp-h">
+        <h2 id="cp-h" class="p-h2">Czas pracy dziś</h2>
+        <div id="cp" style="display: flex; flex-direction: column; gap: 8px"></div>
+        <span class="p-mut">Stylistka klika „Zaczynam” i „Kończę” na swoim telefonie. Godziny porównujemy z grafikiem.</span>
+      </section>
+      <section class="p-card" aria-labelledby="wy-h">
+        <div class="p-top"><h2 id="wy-h" class="p-h2">Rozliczenie miesiąca</h2><button type="button" class="p-btn sm" id="wy-exp">Eksport dla księgowej (CSV)</button></div>
+        <div class="p-tw"><table class="p-tbl"><thead><tr><th>Osoba</th><th style="text-align: right">Utarg z usług</th><th style="text-align: right">Prowizja</th><th style="text-align: right">Podstawa</th><th style="text-align: right">Do wypłaty</th></tr></thead><tbody id="wy"></tbody></table></div>
+        <span class="p-mut">Do wypłaty = podstawa + utarg × prowizja. Kwoty brutto, przykładowe. Prowizję i podstawę zmienisz w polach.</span>
       </section>
     </div>
 
@@ -176,7 +190,27 @@ document.addEventListener('DOMContentLoaded', () => {
     toast: f => `Dodano stanowisko: ${f.n.value.trim()}`
   }));
 
-  renderGrafik(); renderInv(); renderStan();
+  // --- pay from commission: base + turnover × rate ---
+  const doWyplaty = o => Math.round(o.podstawa + o.utarg * o.proc / 100);
+  console.assert(doWyplaty({ podstawa: 3000, utarg: 10000, proc: 10 }) === 4000 && doWyplaty({ podstawa: 0, utarg: 9000, proc: 40 }) === 3600, 'zespol doWyplaty');
+  let WY = Mock.get('zespol.wyn', [{ k: '[Stylistka 1]', utarg: 9800, proc: 40, podstawa: 0 }, { k: '[Stylistka 2]', utarg: 7200, proc: 10, podstawa: 3000 }]);
+  const renderWy = () => { document.getElementById('wy').innerHTML = WY.map((o, i) => `<tr><td><b>${E(o.k)}</b></td><td style="text-align:right">${o.utarg.toLocaleString('pl-PL')} zł</td>
+      <td style="text-align:right"><input class="p-in s" type="number" min="0" max="100" data-wy="${i}" data-f="proc" value="${o.proc}" aria-label="Prowizja ${E(o.k)} (%)" style="width:70px"> %</td>
+      <td style="text-align:right"><input class="p-in s" type="number" min="0" step="100" data-wy="${i}" data-f="podstawa" value="${o.podstawa}" aria-label="Podstawa ${E(o.k)} (zł)" style="width:90px"> zł</td>
+      <td style="text-align:right;font-weight:700">${doWyplaty(o).toLocaleString('pl-PL')} zł</td></tr>`).join(''); };
+  document.getElementById('wy').addEventListener('change', e => { const t = e.target.closest('[data-wy]'); if (!t) return; WY[+t.dataset.wy][t.dataset.f] = Math.max(0, +t.value || 0); Mock.set('zespol.wyn', WY); renderWy(); Mock.toast('Zapisano'); });
+  document.getElementById('wy-exp').addEventListener('click', () => Mock.toast('Pobrano rozliczenie: ' + WY.map(o => `${o.k} ${doWyplaty(o)} zł`).join(', ')));
+  // --- working time today: start / end, compared with today's schedule ---
+  const dzisI = Mock.weekday(Mock.dzien(0)), dzisIso = Mock.iso(Mock.teraz()), hm = d => `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+  const renderCp = () => { const L = (Mock.get('czasPracy', []) || []).filter(x => x.data === dzisIso);
+    document.getElementById('cp').innerHTML = Object.keys(G).map(k => { const z = L.find(x => x.k === k), plan = G[k][dzisI] || '—';
+      const stan = !z ? 'nie zaczęła' : z.koniec ? `${z.start}–${z.koniec}` : `pracuje od ${z.start}`;
+      const btn = !z ? `<button type="button" class="p-btn sm pri" data-cp="${E(k)}">Zaczynam pracę</button>` : !z.koniec ? `<button type="button" class="p-btn sm" data-cp="${E(k)}">Kończę pracę</button>` : '<span class="p-badge ok">zakończony</span>';
+      return `<div class="p-row"><span><b>${E(k)}</b><br><span class="p-mut">grafik: ${E(plan)} · ${E(stan)}</span></span>${btn}</div>`; }).join(''); };
+  document.getElementById('cp').addEventListener('click', e => { const b = e.target.closest('[data-cp]'); if (!b) return;
+    const L = Mock.get('czasPracy', []) || [], k = b.dataset.cp, z = L.find(x => x.k === k && x.data === dzisIso), t = hm(Mock.teraz());
+    if (z) z.koniec = t; else L.push({ k, data: dzisIso, start: t }); Mock.set('czasPracy', L); renderCp(); Mock.toast(z ? `${k}: koniec pracy ${t}` : `${k}: początek pracy ${t}`); });
+  renderGrafik(); renderInv(); renderStan(); renderWy(); renderCp();
 });
 </script>
 </body>

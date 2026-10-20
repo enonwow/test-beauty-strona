@@ -95,6 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (v.potwierdzona) w.msgs.push({ od: 'sys', t: 'online', txt: 'Klientka potwierdziła przybycie' });
       if (v.faktura) w.msgs.push({ od: 'sys', t: 'online', txt: `Prosi o fakturę: ${v.faktura.firma}, NIP ${v.faktura.nip}` });
     });
+    Mock.reklamacje().filter(r => !r.przyklad).forEach(r => {
+      const w = out[r.klientka] = out[r.klientka] || { info: r.usluga, msgs: [] };
+      w.msgs.push({ od: 'sys', t: r.data.split('-').reverse().slice(0, 2).join('.'), txt: `Reklamacja: ${r.opis}` });
+      if (r.odp) w.msgs.push({ od: 'sys', t: '', txt: `Odpowiedź studia na reklamację: ${r.odp}` });
+    });
     Object.entries(sent).forEach(([k, l]) => { (out[k] = out[k] || { info: '', msgs: [] }).msgs.push(...l); });
     return out;
   };

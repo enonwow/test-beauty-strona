@@ -37,6 +37,7 @@
       <button type="button" role="tab" class="p-pill" data-tab="hh" aria-selected="true" id="tab-hh">Happy hours</button>
       <button type="button" role="tab" class="p-pill" data-tab="flash" aria-selected="false">Flash sale</button>
       <button type="button" role="tab" class="p-pill" data-tab="last" aria-selected="false">Last minute</button>
+      <button type="button" role="tab" class="p-pill" data-tab="kody" aria-selected="false">Kody rabatowe</button>
     </div>
 
     <!-- Happy hours: lista ofert + edycja -->
@@ -44,6 +45,13 @@
       <section aria-label="Lista happy hours" id="hh-list" style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 10px"></section>
       <form id="hh-form" novalidate aria-label="Edycja happy hours" class="p-card" style="flex: 1 1 400px; padding: 18px; gap: 14px"></form>
     </div>
+
+    <!-- Kody rabatowe: klientka wpisuje kod przy wyborze terminu -->
+    <section id="t-kody" hidden class="p-card" aria-labelledby="kody-h">
+      <div class="p-top"><h2 id="kody-h" class="p-h2">Kody rabatowe</h2><button type="button" class="p-btn pri sm" id="kod-add">+ Nowy kod</button></div>
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Kod</th><th>Rabat</th><th>Ważny</th><th>Usługi</th><th>Użycia</th><th>Stan</th><th><span class="p-sr">Akcje</span></th></tr></thead><tbody id="kody"></tbody></table></div>
+      <span class="p-mut">Klientka wpisuje kod przy wyborze terminu. Kod nie łączy się z happy hours: liczymy większy rabat. Kody na influencerki i kampanie na Instagramie warto robić osobne, żeby widzieć, który działa.</span>
+    </section>
 
     <!-- Flash sale i last minute -->
     <div id="t-fl" hidden style="display: flex; flex-direction: column; gap: 16px">
@@ -231,10 +239,35 @@ document.addEventListener('DOMContentLoaded', () => {
   $('tabs').addEventListener('click', e => {
     const t = e.target.closest('[data-tab]'); if (!t) return;
     document.querySelectorAll('#tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', String(b === t)));
-    const hh = t.dataset.tab === 'hh';
-    $('t-hh').hidden = !hh; $('t-fl').hidden = hh; $('hh-add').hidden = !hh;
-    if (!hh) { cur = t.dataset.tab; flCard(); flFill(); }
+    const hh = t.dataset.tab === 'hh', ko = t.dataset.tab === 'kody';
+    $('t-hh').hidden = !hh; $('t-fl').hidden = hh || ko; $('t-kody').hidden = !ko; $('hh-add').hidden = !hh;
+    if (ko) renderKody(); else if (!hh) { cur = t.dataset.tab; flCard(); flFill(); }
   });
+
+  // --- kody rabatowe ---
+  const dzis = Mock.iso(Mock.teraz()), dmy = s => s.split('-').reverse().join('.');
+  function renderKody() {
+    $('kody').innerHTML = Mock.kody().map((k, i) => {
+      const stan = !k.on ? ['wyłączony', ''] : dzis > k.do ? ['wygasł', 'warn'] : k.limit && k.uzyto >= k.limit ? ['wykorzystany', 'warn'] : dzis < k.od ? ['zaplanowany', 'blue'] : ['aktywny', 'ok'];
+      return `<tr><td><b>${E(k.kod)}</b></td><td>${k.typ === 'proc' ? `−${k.wart}%` : `−${k.wart} zł`}</td><td>${dmy(k.od)} – ${dmy(k.do)}</td><td>${k.kategorie.length ? E(k.kategorie.join(', ')) : 'wszystkie'}</td><td>${k.uzyto}${k.limit ? ' z ' + k.limit : ''}</td><td><span class="p-badge ${stan[1]}">${stan[0]}</span></td><td><button type="button" class="p-btn sm" data-kod="${i}">${k.on ? 'Wyłącz' : 'Włącz'}</button></td></tr>`;
+    }).join('');
+  }
+  $('kody').addEventListener('click', e => { const b = e.target.closest('[data-kod]'); if (!b) return; const l = Mock.kody(); l[+b.dataset.kod].on = !l[+b.dataset.kod].on; Mock.setKody(l); renderKody(); Mock.toast(l[+b.dataset.kod].on ? 'Kod włączony' : 'Kod wyłączony'); });
+  $('kod-add').addEventListener('click', () => PS.modal({
+    title: 'Nowy kod rabatowy', ok: 'Dodaj kod',
+    body: `<label class="p-lab">Kod (litery i cyfry)<input class="p-in" name="kod" required pattern="[A-Za-z0-9]{3,20}" style="text-transform:uppercase" placeholder="np. INSTA15"></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="p-lab" style="flex:1">Rabat<input class="p-in" name="wart" type="number" min="1" max="500" required value="15"></label><label class="p-lab" style="flex:1">Rodzaj<select class="p-in" name="typ"><option value="proc">%</option><option value="zl">zł</option></select></label><label class="p-lab" style="flex:1">Limit użyć (0 = bez)<input class="p-in" name="limit" type="number" min="0" value="0"></label></div>
+      <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" required value="${dzis}" min="${dzis}"></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" required value="${Mock.iso(Mock.dzien(30))}" min="${dzis}"></label></div>
+      <label class="p-lab">Tylko na kategorię<select class="p-in" name="kat"><option value="">wszystkie usługi</option>${KAT.map(k => `<option>${k}</option>`).join('')}</select></label><p class="hh-err" id="kod-err" role="alert" hidden></p>`,
+    onOk: f => {
+      const kod = f.kod.value.trim().toUpperCase(), err = f.querySelector('#kod-err'), l = Mock.kody();
+      const bl = !/^[A-Z0-9]{3,20}$/.test(kod) ? 'Kod: 3–20 liter lub cyfr, bez spacji.' : l.some(x => x.kod === kod) ? 'Taki kod już jest.' : f.do.value < f.od.value ? 'Data końca jest przed początkiem.' : f.typ.value === 'proc' && +f.wart.value > 90 ? 'Rabat procentowy najwyżej 90%.' : '';
+      if (bl) { err.textContent = bl; err.hidden = false; return false; }
+      l.unshift({ kod, typ: f.typ.value, wart: +f.wart.value, od: f.od.value, do: f.do.value, kategorie: f.kat.value ? [f.kat.value] : [], limit: +f.limit.value || 0, uzyto: 0, on: true });
+      Mock.setKody(l); renderKody();
+    },
+    toast: f => 'Dodano kod ' + f.kod.value.trim().toUpperCase()
+  }));
 
   window.addEventListener('storage', () => { H = Mock.happyHours(); if (!H.some(x => x.id === sel)) sel = H[0] && H[0].id; pick(sel); });
   pick(sel);

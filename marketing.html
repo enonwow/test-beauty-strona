@@ -26,19 +26,30 @@
         <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Czas na uzupełnienie</b><span style="color: #625860; font-size: 12px">SMS po 3 tyg. z przyciskiem „Powtórz stylizację”</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>włączone</span></label></div>
         <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Wróć do nas</b><span style="color: #625860; font-size: 12px">gdy klientka nie była od 8 tygodni</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>wyłączone</span></label></div>
         <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Zwolnił się termin</b><span style="color: #625860; font-size: 12px">do osób z listy oczekujących</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>włączone</span></label></div>
+        <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F0E8EC"><span style="display: flex; flex-direction: column"><b>Zalecenia po zabiegu</b><span style="color: #625860; font-size: 12px">e-mail 1 h po wizycie, treść z cennika · <button type="button" id="zal-pv" style="padding: 0; border: 0; background: none; color: #9E1F50; font: inherit; text-decoration: underline; cursor: pointer; min-height: 24px">podgląd</button></span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>włączone</span></label></div>
         <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0"><span style="display: flex; flex-direction: column"><b>Prośba o opinię</b><span style="color: #625860; font-size: 12px">raz, 2 h po wizycie</span></span><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked data-auto style="width: 20px; height: 20px; accent-color: #9E1F50"><span>włączone</span></label></div>
         <span style="color: #625860; font-size: 12px">„Czas na uzupełnienie” i „Zwolnił się termin” to wiadomości o wizytach. Pozostałe idą tylko do klientek ze zgodą marketingową.</span>
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
-        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Nowa kampania SMS</h2>
+        <h2 id="kamp-h" style="margin: 0; font-size: 16px; font-weight: 700">Nowa kampania SMS</h2>
+        <div id="kanal" data-choice role="group" aria-label="Kanał kampanii" class="p-pills"><button type="button" class="p-pill" aria-pressed="true" data-value="sms">SMS</button><button type="button" class="p-pill" aria-pressed="false" data-value="email">E-mail</button></div>
+        <label id="temat-w" hidden class="p-lab">Temat e-maila<input id="temat" class="p-in" value="Jesienna kolekcja już w kreatorze"></label>
         <label for="tresc" style="color: #625860; font-size: 13px">Treść</label>
         <textarea id="tresc" rows="4" class="p-in">[NazwaStudia]: nowa kolekcja jesień 2026 już w kreatorze. Sprawdź cenę i wolne terminy: [link]</textarea>
         <div style="display: flex; justify-content: space-between; color: #625860; font-size: 12px"><span id="cnt" aria-live="polite">0 znaków · 1 SMS</span><span>stopka z wypisem dodawana automatycznie</span></div>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Odbiorczynie<select id="grupa" class="p-in" data-toast-change="Zmieniono grupę odbiorczyń"><option selected>Wszystkie ze zgodą</option><option>Paznokcie, ostatnie 3 miesiące</option><option>Rzęsy</option></select></label>
         <div class="p-box"><span>Wyślemy do</span><b id="odb">[liczba] klientek ze zgodą</b></div>
-        <div style="display: flex; flex-direction: column; gap: 6px"><span class="p-mut">Podgląd na telefonie klientki</span><div style="max-width: 280px; padding: 12px 14px; border-radius: 16px 16px 16px 4px; background: #F0E8EC"><span id="prev" style="white-space: pre-wrap; word-break: break-word; line-height: 1.4"></span><br><span class="p-mut">Wypis: odpowiedz STOP</span></div></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><span class="p-mut" id="prev-l">Podgląd na telefonie klientki</span><div id="prev-box" style="max-width: 280px; padding: 12px 14px; border-radius: 16px 16px 16px 4px; background: #F0E8EC"><b id="prev-temat" hidden style="display: block; margin-bottom: 6px"></b><span id="prev" style="white-space: pre-wrap; word-break: break-word; line-height: 1.4"></span><br><span class="p-mut" id="prev-stop">Wypis: odpowiedz STOP</span></div></div>
         <button type="button" id="plan" class="p-btn pri">Zaplanuj wysyłkę</button>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="wyr-h">
+        <h2 id="wyr-h" style="margin: 0; font-size: 16px; font-weight: 700">Wyróżnienie w wyszukiwarce</h2>
+        <label class="p-chk"><input type="checkbox" id="wyr-on">Pokazuj studio wyżej w wynikach (z oznaczeniem „Reklama”)</label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Stała opłata<select id="wyr-st" class="p-in s"><option value="10">10 zł / dzień</option><option value="20" selected>20 zł / dzień</option><option value="35">35 zł / dzień</option></select></label>
+        <div id="wyr-stat" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px"></div>
+        <span class="p-mut">Płacisz stałą kwotę za dzień, bez prowizji od wizyt. Rozliczenie na fakturze z abonamentem, każdy dzień widać w raportach.</span>
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
@@ -92,14 +103,38 @@ document.addEventListener('DOMContentLoaded', () => {
     c.nextElementSibling.textContent = c.checked ? 'włączone' : 'wyłączone';
     Mock.toast(c.checked ? 'Automat włączony' : 'Automat wyłączony');
   }));
+  document.getElementById('zal-pv').addEventListener('click', () => PS.modal({ title: 'Podgląd e-maila', noOk: true,
+    body: `<div style="border:1px solid #E4D9DE;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;line-height:1.5"><span class="p-mut">Od: [Nazwa studia] · Temat: Jak dbać o paznokcie po wizycie</span><b>Dzień dobry, [Imię]!</b><span>Dziękujemy za wizytę. Kilka rad na najbliższe dni:</span><span>${PS.esc(Mock.zalecenia().Paznokcie)}</span><span class="p-mut">Coś nie tak? Zgłoś reklamację w „Moich wizytach”. Wypis z e-maili: [link]</span></div>` }));
   const t = document.getElementById('tresc'), cnt = document.getElementById('cnt'), prev = document.getElementById('prev');
   // shortcut: polskie litery wymuszają kodowanie Unicode (70 znaków w SMS, 67 w wielu); bez nich 160/153, nie liczymy znaków rozszerzonych GSM.
   function upd() {
     const v = t.value, n = v.length, uni = /[^\x20-\x7E\n]/.test(v), one = uni ? 70 : 160, multi = uni ? 67 : 153;
     cnt.textContent = n + ' znaków · ' + (n <= one ? 1 : Math.ceil(n / multi)) + ' SMS' + (uni ? ' (polskie litery)' : '');
     prev.textContent = v || 'Wpisz treść wiadomości';
+    const pt = document.getElementById('prev-temat'), tm = document.getElementById('temat'); if (pt && tm) { pt.hidden = !(tm.closest('label').hidden === false); pt.textContent = tm.value; }
   }
-  t.addEventListener('input', upd); upd();
+  t.addEventListener('input', upd);
+  let kanal = 'sms';
+  document.getElementById('kanal').addEventListener('mock:choice', e => {
+    kanal = e.detail.value; const em = kanal === 'email', $ = id => document.getElementById(id);
+    $('kamp-h').textContent = em ? 'Nowa kampania e-mail' : 'Nowa kampania SMS'; $('temat-w').hidden = !em; $('cnt').hidden = em;
+    $('prev-l').textContent = em ? 'Podgląd e-maila' : 'Podgląd na telefonie klientki'; $('prev-box').style.maxWidth = em ? '420px' : '280px'; $('prev-box').style.borderRadius = em ? '12px' : '16px 16px 16px 4px';
+    $('prev-stop').textContent = em ? 'Wypis z e-maili: [link] · wysyłamy tylko do klientek ze zgodą e-mail' : 'Wypis: odpowiedz STOP';
+    $('odb').textContent = em ? '[liczba] klientek ze zgodą e-mail' : '[liczba] klientek ze zgodą';
+    upd();
+  });
+  document.getElementById('temat').addEventListener('input', upd);
+  upd();
+  // paid highlight: a flat daily fee and what it brought (sample numbers for the last 7 days)
+  const W = Mock.get('wyroznienie', { on: false, st: 20 }), wyr = () => {
+    const $ = id => document.getElementById(id); $('wyr-on').checked = W.on; $('wyr-st').value = String(W.st);
+    const dni = 7, koszt = W.st * dni, rez = W.on ? 9 : 0;
+    $('wyr-stat').innerHTML = [['Wyświetlenia', W.on ? '1 240' : '0'], ['Kliknięcia', W.on ? '186' : '0'], ['Rezerwacje', String(rez)], ['Koszt 7 dni', `${W.on ? koszt : 0} zł`], ['Koszt rezerwacji', rez ? `${Math.round(koszt / rez)} zł` : '—']]
+      .map(([a, b]) => `<div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">${a}</span><b>${b}</b></div>`).join('');
+  };
+  document.getElementById('wyr-on').addEventListener('change', e => { W.on = e.target.checked; Mock.set('wyroznienie', W); wyr(); Mock.toast(W.on ? 'Wyróżnienie włączone od jutra' : 'Wyróżnienie wyłączone'); });
+  document.getElementById('wyr-st').addEventListener('change', e => { W.st = +e.target.value; Mock.set('wyroznienie', W); wyr(); Mock.toast('Zapisano stawkę'); });
+  wyr();
   document.getElementById('grupa').addEventListener('change', e => { document.getElementById('odb').textContent = '[liczba] klientek: ' + e.target.selectedOptions[0].text.toLowerCase(); });
   const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   document.getElementById('plan').addEventListener('click', () => PS.modal({
