@@ -88,7 +88,38 @@
       && (!h.kategorie.length || h.kategorie.includes(kategoria)));
     return hit.sort((a, b) => b.rabat - a.rabat)[0] || null;
   }
-  const happyToday = (d = new Date()) => happyHours().filter(h => h.on && h.naGlownej && h.dni.includes(weekday(d)));
+  const happyToday = (d = teraz()) => happyHours().filter(h => h.on && h.naGlownej && h.dni.includes(weekday(d)));
+
+  // "Today" for the whole mock is the device's date and time. A test date pins it for demos and tests (Narzędzia makiety, or the address):
+  // ?dzis=2026-10-20 pins the day (the clock stays real), ?dzis=2026-10-20T18:30 also the time, ?dzis=teraz goes back to the device.
+  // Visits store their day as "wt 20.10" (krotko), without the year.
+  const PIN = PREFIX + 'dzis', PIN_OK = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
+  function ustawDzis(v) { try { if (v && PIN_OK.test(v)) localStorage.setItem(PIN, v); else localStorage.removeItem(PIN); } catch {} }
+  const testowa = () => { try { const p = localStorage.getItem(PIN); return p && PIN_OK.test(p) ? p : null; } catch { return null; } };
+  { const q = new URLSearchParams(location.search).get('dzis'); if (q === 'teraz') ustawDzis(null); else if (PIN_OK.test(q || '')) ustawDzis(q); }
+  function teraz() {
+    const p = testowa(); if (!p) return new Date();
+    const [y, m, d] = p.slice(0, 10).split('-').map(Number), n = new Date();
+    const [h, mi] = p.length > 10 ? p.slice(11).split(':').map(Number) : [n.getHours(), n.getMinutes()];
+    return new Date(y, m - 1, d, h, mi, p.length > 10 ? 0 : n.getSeconds()); // the pinned day, at the pinned or the real time of day
+  }
+  const dzien = (n = 0) => { const t = teraz(); return new Date(t.getFullYear(), t.getMonth(), t.getDate() + n); }; // today + n days, at 00:00
+  const SKR = ['nd', 'pon', 'wt', 'śr', 'czw', 'pt', 'sob'];
+  const DNI = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+  const MIES = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'];
+  const MIESD = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+  const p2 = n => String(n).padStart(2, '0');
+  const dm = d => `${d.getDate()}.${p2(d.getMonth() + 1)}`; // "20.10"
+  const krotko = d => `${SKR[d.getDay()]} ${dm(d)}`; // "wt 20.10"
+  const dlugo = d => { const s = `${DNI[d.getDay()]}, ${d.getDate()} ${MIESD[d.getMonth()]}`; return s[0].toUpperCase() + s.slice(1); }; // "Wtorek, 20 października"
+  // "wt 20.10" -> Date; the year is the one that puts the day within half a year of today
+  function zKrotko(s) {
+    const m = /(\d{1,2})\.(\d{1,2})/.exec(s || ''); if (!m) return null;
+    const t = dzien(0), d = new Date(t.getFullYear(), +m[2] - 1, +m[1]), pol = 183 * 864e5;
+    if (d - t > pol) d.setFullYear(d.getFullYear() - 1); else if (t - d > pol) d.setFullYear(d.getFullYear() + 1);
+    return d;
+  }
+  const odDzis = d => Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - dzien(0)) / 864e5); // whole days from today
   const priceAfter = (cena, rabat) => Math.round(cena * (100 - rabat) / 100);
 
   const zl = n => `${n < 0 ? '−' : ''}${Math.abs(Math.round(n))} zł`;
@@ -139,11 +170,20 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
 [hidden]{display:none !important}
 .mock-zglos{min-height:28px;padding:2px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.6);background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}
 .mock-zglos:hover{background:rgba(255,255,255,.12)}
+.mock-dzis{padding:2px 10px;border-radius:999px;background:#FFF1E0;color:#8A3B12;font-weight:700;white-space:nowrap}
 .mock-zglos:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
 @media (max-width:1023px){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:16px !important}}
 /* Netlify's injected badge covered the creators' 72 px bottom bar (Dalej button) */
 @media (max-width:1023px){#nl-badge-frame{bottom:80px !important}}
-@media (prefers-reduced-motion:reduce){.mock-toast{transition:none}}`;
+@media (prefers-reduced-motion:reduce){.mock-toast{transition:none}}
+/* booking steps (termin, zadatek): <ol class="kroki"> with li.ok for done steps and aria-current="step" */
+.kroki{display:flex;gap:6px;margin:0;padding:12px 20px 0;list-style:none;font:12px 'DM Sans',system-ui,sans-serif;color:#625860}
+.kroki li{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.kroki li::before{content:"";height:4px;border-radius:2px;background:#E4D9DE}
+.kroki li.ok::before,.kroki li[aria-current]::before{background:#9E1F50}
+.kroki li[aria-current]{color:#1E1A1D;font-weight:700}
+.kroki .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (min-width:1024px){.kroki{max-width:560px;padding-left:0;padding-right:0}}`;
 
   // injected at load (not in init) so [hidden] wins before first paint
   const style = document.createElement('style');
@@ -173,18 +213,45 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
     if (bar) {
       const b = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-zglos', textContent: 'Zgłoś problem' });
       b.addEventListener('click', () => import('./zgloszenie.js').then(m => m.otworz()).catch(() => toast('Nie udało się otworzyć formularza.')));
-      bar.append(' · ', b);
+      const n = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-zglos', textContent: 'Narzędzia' });
+      n.addEventListener('click', () => import('./narzedzia.js').then(m => m.otworz()).catch(() => toast('Nie udało się otworzyć narzędzi.')));
+      bar.append(' · ', b, ' ', n);
+      if (testowa()) { // a pinned date must not be forgotten: it changes every page
+        const t = teraz(), d = Object.assign(document.createElement('span'), { className: 'mock-dzis', textContent: `Data testowa: ${krotko(t)}, ${t.getHours()}:${p2(t.getMinutes())}` });
+        bar.append(' · ', d);
+      }
     }
   }
 
+  // category → sample photo for small thumbnails (booking summary, visit cards) instead of flat colour blocks
+  const FOTO = { Paznokcie: 'k-paznokcie', 'Rzęsy': 'k-rzesy', Brwi: 'k-brwi', Fryzjer: 'k-fryzjer', Kosmetyka: 'k-kosmetyka', Kosmetologia: 'k-kosmetyka' };
+  const fotoKat = k => `zdjecia/${FOTO[k] || 'k-paznokcie'}.jpg`;
+
+  // Polish tax id: 10 digits, last one = weighted sum of the first nine mod 11 (10 is never valid)
+  const nipOk = s => { const d = String(s || '').replace(/[\s-]/g, ''); if (!/^\d{10}$/.test(d)) return false;
+    const k = [6, 5, 7, 2, 3, 4, 5, 6, 7].reduce((a, w, i) => a + w * d[i], 0) % 11; return k !== 10 && k === +d[9]; };
+
+  // referral invite (potwierdzenie, konto): system share sheet, else copy; the friend lands on the studio page with ?polec
+  async function polec(studio, imie) {
+    const url = new URL(`salon.html?s=${encodeURIComponent(studio)}&polec=1${imie ? '&od=' + encodeURIComponent(imie) : ''}`, location.href).href;
+    const text = `Polecam ${studio}. Z tym linkiem masz 20 zł zniżki na pierwszą wizytę:`;
+    try { if (navigator.share) { await navigator.share({ title: 'Zaproszenie do studia', text, url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(text + ' ' + url); toast('Skopiowano zaproszenie z linkiem'); } catch { toast('Link: ' + url); }
+  }
+
   window.Mock = { get, set, reset, lookup, toast, addVisit, bindTexts, zl, dur, plural,
-    happyHours, setHappyHours, promoFor, happyToday, priceAfter, weekday };
+    happyHours, setHappyHours, promoFor, happyToday, priceAfter, weekday, fotoKat, nipOk, polec,
+    teraz, dzien, SKR, MIES, MIESD, dm, krotko, dlugo, zKrotko, odDzis, ustawDzis, testowa };
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 
   console.assert((() => {
     try { localStorage.setItem(PREFIX + '__t', '1'); } catch { return true; } // no storage: nothing to check
     set('__t', { a: { b: 2 } }); const ok = lookup('__t.a.b') === 2; localStorage.removeItem(PREFIX + '__t'); return ok;
   })(), 'mock.js store lookup');
+  console.assert(fotoKat('Rzęsy') === 'zdjecia/k-rzesy.jpg' && fotoKat('Kosmetologia') === 'zdjecia/k-kosmetyka.jpg' && fotoKat(undefined) === 'zdjecia/k-paznokcie.jpg', 'mock.js fotoKat');
+  console.assert(krotko(new Date(2026, 9, 20)) === 'wt 20.10' && dlugo(new Date(2026, 9, 20)) === 'Wtorek, 20 października'
+    && odDzis(dzien(40)) === 40 && odDzis(zKrotko(krotko(dzien(40)))) === 40 && odDzis(zKrotko(krotko(dzien(-150)))) === -150 && zKrotko('bez daty') === null && PIN_OK.test('2026-10-20T18:30') && !PIN_OK.test('2026-10-20 18:30'), 'mock.js daty');
+  console.assert(nipOk('123-456-32-18') && !nipOk('1234563217') && !nipOk('12345') && !nipOk(''), 'mock.js nipOk');
   console.assert(zl(-15) === '−15 zł' && dur(105) === '1 h 45 min' && dur(60) === '1 h' && plural(1, ['a', 'b', 'c']) === '1 a'
     && plural(3, ['a', 'b', 'c']) === '3 b' && plural(12, ['a', 'b', 'c']) === '12 c' && plural(22, ['a', 'b', 'c']) === '22 b', 'mock.js formats');
   console.assert((() => {

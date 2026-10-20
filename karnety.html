@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (s) { const o = O.find(x => x.id === +s.dataset.sell); PS.modal({
       title: 'Sprzedaj: ' + o.n, ok: 'Sprzedaj za ' + o.cena + ' zł',
       body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map(k => `<option>${E(k)}</option>`).join('')}</select></label><label class="p-lab">Płatność<select class="p-in" name="m"><option>gotówka</option><option>karta</option><option>BLIK</option></select></label>`,
-      onOk: f => { const end = new Date(2026, 9, 20 + o.dni); SP.unshift({ k: f.k.value, n: o.n, t: o.t, cena: o.cena, ile: o.ile, data: '20.10.2026', do: end.toLocaleDateString('pl-PL') }); sv(); render(); },
+      onOk: f => { const end = Mock.dzien(o.dni); SP.unshift({ k: f.k.value, n: o.n, t: o.t, cena: o.cena, ile: o.ile, data: Mock.dzien(0).toLocaleDateString('pl-PL'), do: end.toLocaleDateString('pl-PL') }); sv(); render(); },
       toast: f => `Sprzedano karnet: ${f.k.value}, ${o.cena} zł`
     }); }
     if (d) { const o = O.find(x => x.id === +d.dataset.del); PS.modal({ title: 'Usunąć z oferty?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">${E(o.n)} zniknie z oferty. Karnety już sprzedane klientkom nadal działają.</p>`, onOk: () => { O = O.filter(x => x !== o); sv(); render(); }, toast: 'Usunięto z oferty' }); }

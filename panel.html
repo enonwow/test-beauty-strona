@@ -19,7 +19,7 @@
 
   <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
     <div class="p-top">
-      <h1 class="p-h1">Wtorek, 20 października</h1>
+      <h1 class="p-h1" id="dzis-h">Dziś</h1>
       <div class="p-acts">
         <div role="group" aria-label="Widok" style="display: flex; border: 1px solid #E4D9DE; border-radius: 10px; overflow: hidden; background: #FFFFFF">
           <span aria-current="page" style="min-height: 44px; padding: 0 14px; background: #1E1A1D; color: #FFFFFF; display: flex; align-items: center">Dzień</span>
@@ -76,6 +76,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const dd = n => Mock.dm(Mock.dzien(n)); // "20.10" for today + n days
+  document.getElementById('dzis-h').textContent = Mock.dlugo(Mock.dzien(0));
   const E = PS.esc, KC = { p: ['#F6EDF1', '#625860'], r: ['#EAF0F7', '#4E5A66'], b: ['#EEF3EA', '#4E5A66'] };
   const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
   const fmt = KalDrag.fmt;
@@ -84,15 +86,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const parseDur = s => { const h = /(\d+)\s*h/.exec(s || ''), m = /(\d+)\s*min/.exec(s || ''); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0); };
   // gaps: [{od, dl}] = luka w bloku (np. działanie farby): od minut od startu wizyty, dl minut wolnych
   const BASE = {
-    a: { col: 1, t: '9:00', dur: 75, name: '[Klientka A]', phone: '[telefon]', info: '2. wizyta · ostatnio 5 tyg. temu', kind: 'p', svc: 'Hybryda jednolita', items: [['Manicure hybrydowy', 140]], hist: ['17.10, 18:30 · rezerwacja z wyszukiwarki', '17.10, 18:30 · SMS z potwierdzeniem doręczony', '19.10, 9:00 · przypomnienie SMS (zaplanowane)'] },
-    j: { col: 1, t: '10:25', dur: 40, name: '[Klientka J] i [Klientka J2]', phone: '[telefon]', info: 'dwie osoby naraz', kind: 'p', svc: 'Mini manicure', osoby: 2, items: [['Mini manicure × 2 osoby', 70]], przyklad: true, hist: ['16.10, 19:00 · rezerwacja dla dwóch osób z wyszukiwarki'] },
-    b: { col: 1, t: '11:15', dur: 110, name: '[Klientka B]', phone: '[telefon]', info: '4. wizyta · ostatnio 3 tyg. temu', kind: 'p', svc: 'Hybryda M · velvet × 10', items: [['Manicure hybrydowy', 140], ['Długość M', 10], ['Velvet × 10 paz.', 50]], note: 'Lakier: [marka, kod odcienia]', hist: ['18.10, 21:04 · rezerwacja z linku na Instagramie', '18.10, 21:04 · SMS z potwierdzeniem doręczony', '19.10, 11:15 · przypomnienie SMS (zaplanowane)'] },
-    c: { col: 1, t: '14:00', dur: 175, name: '[Klientka C]', phone: '[telefon]', info: '1. wizyta', kind: 'p', svc: 'Przedłużanie L · french', items: [['Przedłużanie (tipsy / szablon)', 200], ['Długość L', 20], ['French', 20]], smsFail: true, hist: ['16.10, 12:40 · rezerwacja z wyszukiwarki', '19.10, 8:00 · przypomnienie SMS NIE DOTARŁO (numer poza zasięgiem)'] },
-    k: { col: 1, t: '17:05', dur: 40, name: '[Klientka K2]', phone: '[telefon]', info: 'wizyta u klientki', kind: 'p', svc: 'Zdjęcie hybrydy u klientki', dojazd: { adres: '[ulica, miasto]', oplata: 30, strefa: 'do 10 km' }, items: [['Zdjęcie hybrydy', 20]], hist: ['17.10, 8:20 · rezerwacja z dojazdem'] },
-    d: { col: 2, t: '9:30', dur: 90, name: '[Klientka D]', phone: '[telefon]', info: '3. wizyta · ostatnio 3 tyg. temu', kind: 'r', svc: 'Rzęsy 1:1 · uzupełnienie', items: [['Uzupełnienie rzęs 1:1', 150]], przyklad: true, hist: ['15.10, 20:10 · rezerwacja z linku na Instagramie', '15.10, 20:10 · SMS z potwierdzeniem doręczony'] },
-    m: { col: 2, t: '11:15', dur: 50, name: '[Klientka M]', phone: '[telefon]', info: 'trzy usługi w jednej wizycie', kind: 'p', svc: '3 usługi', items: [['Zdjęcie hybrydy', 20], ['Naprawa paznokcia (cena przykładowa)', 15], ['Regulacja brwi (cena przykładowa)', 40]], przyklad: true, hist: ['17.10, 20:40 · rezerwacja z koszyka usług'] },
-    g: { col: 2, t: '12:15', dur: 60, name: '[Klientka I]', phone: '[telefon]', info: '2. wizyta', kind: 'b', svc: 'Brwi: henna + regulacja', items: [['Henna + regulacja brwi', 70]], gaps: [{ od: 30, dl: 15 }], przyklad: true, hist: ['14.10, 9:15 · rezerwacja telefoniczna'] },
-    e: { col: 2, t: '13:30', dur: 120, name: '[Klientka E]', phone: '[telefon]', info: '5. wizyta · ostatnio 4 tyg. temu', kind: 'p', svc: 'Żel · french', items: [['Żel na naturalnej płytce', 170], ['French', 20]], hist: ['12.10, 17:55 · rezerwacja z wyszukiwarki', '12.10, 17:55 · SMS z potwierdzeniem doręczony'] }
+    a: { col: 1, t: '9:00', dur: 75, name: '[Klientka A]', phone: '[telefon]', info: '2. wizyta · ostatnio 5 tyg. temu', kind: 'p', svc: 'Hybryda jednolita', items: [['Manicure hybrydowy', 140]], potw: true, hist: [`${dd(-3)}, 18:30 · rezerwacja z wyszukiwarki`, `${dd(-3)}, 18:30 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 9:05 · klientka odpisała TAK`] },
+    j: { col: 1, t: '10:25', dur: 40, name: '[Klientka J] i [Klientka J2]', phone: '[telefon]', info: 'dwie osoby naraz', kind: 'p', svc: 'Mini manicure', osoby: 2, items: [['Mini manicure × 2 osoby', 70]], przyklad: true, hist: [`${dd(-4)}, 19:00 · rezerwacja dla dwóch osób z wyszukiwarki`] },
+    b: { col: 1, t: '11:15', dur: 110, name: '[Klientka B]', phone: '[telefon]', info: '4. wizyta · ostatnio 3 tyg. temu', kind: 'p', svc: 'Hybryda M · velvet × 10', items: [['Manicure hybrydowy', 140], ['Długość M', 10], ['Velvet × 10 paz.', 50]], note: 'Lakier: [marka, kod odcienia]', potw: false, hist: [`${dd(-2)}, 21:04 · rezerwacja z linku na Instagramie`, `${dd(-2)}, 21:04 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 11:15 · przypomnienie SMS (zaplanowane)`] },
+    c: { col: 1, t: '14:00', dur: 175, name: '[Klientka C]', phone: '[telefon]', info: '1. wizyta', kind: 'p', svc: 'Przedłużanie L · french', items: [['Przedłużanie (tipsy / szablon)', 200], ['Długość L', 20], ['French', 20]], smsFail: true, potw: false, hist: [`${dd(-4)}, 12:40 · rezerwacja z wyszukiwarki`, `${dd(-1)}, 8:00 · przypomnienie SMS NIE DOTARŁO (numer poza zasięgiem)`] },
+    k: { col: 1, t: '17:05', dur: 40, name: '[Klientka K2]', phone: '[telefon]', info: 'wizyta u klientki', kind: 'p', svc: 'Zdjęcie hybrydy u klientki', dojazd: { adres: '[ulica, miasto]', oplata: 30, strefa: 'do 10 km' }, items: [['Zdjęcie hybrydy', 20]], hist: [`${dd(-3)}, 8:20 · rezerwacja z dojazdem`] },
+    d: { col: 2, t: '9:30', dur: 90, name: '[Klientka D]', phone: '[telefon]', info: '3. wizyta · ostatnio 3 tyg. temu', kind: 'r', svc: 'Rzęsy 1:1 · uzupełnienie', items: [['Uzupełnienie rzęs 1:1', 150]], przyklad: true, hist: [`${dd(-5)}, 20:10 · rezerwacja z linku na Instagramie`, `${dd(-5)}, 20:10 · SMS z potwierdzeniem doręczony`] },
+    m: { col: 2, t: '11:15', dur: 50, name: '[Klientka M]', phone: '[telefon]', info: 'trzy usługi w jednej wizycie', kind: 'p', svc: '3 usługi', items: [['Zdjęcie hybrydy', 20], ['Naprawa paznokcia (cena przykładowa)', 15], ['Regulacja brwi (cena przykładowa)', 40]], przyklad: true, hist: [`${dd(-3)}, 20:40 · rezerwacja z koszyka usług`] },
+    g: { col: 2, t: '12:15', dur: 60, name: '[Klientka I]', phone: '[telefon]', info: '2. wizyta', kind: 'b', svc: 'Brwi: henna + regulacja', items: [['Henna + regulacja brwi', 70]], gaps: [{ od: 30, dl: 15 }], przyklad: true, hist: [`${dd(-6)}, 9:15 · rezerwacja telefoniczna`] },
+    e: { col: 2, t: '13:30', dur: 120, name: '[Klientka E]', phone: '[telefon]', info: '5. wizyta · ostatnio 4 tyg. temu', kind: 'p', svc: 'Żel · french', items: [['Żel na naturalnej płytce', 170], ['French', 20]], potw: true, faktura: { nip: '1234563218', firma: '[Firma klientki E] sp. z o.o.' }, hist: [`${dd(-8)}, 17:55 · rezerwacja z wyszukiwarki`, `${dd(-8)}, 17:55 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 13:40 · klientka potwierdziła w aplikacji`] }
   };
   const LOCK = [{ col: 2, a: 960, b: 1016, name: 'Blokada ręczna' }]; // stała blokada w kolumnie 2
   const SHORT = [['Zdjęcie hybrydy', 15, 20], ['Naprawa paznokcia (cena przykładowa)', 10, 15], ['Parafina na dłonie (cena przykładowa)', 15, 25]]; // [nazwa, minuty, zł]
@@ -115,15 +117,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const dur = (us ? cum : 0) || v.czas || parseDur(v.czasTekst) || 60;
     const k = (us ? us[0].kategoria : v.kategoria) === 'Rzęsy' ? 'r' : (us ? us[0].kategoria : v.kategoria) === 'Brwi' ? 'b' : 'p';
     if (v.dojazd) items.push([`Dojazd (${v.dojazd.strefa || 'strefa'})`, Number(v.dojazd.oplata) || 0]);
-    return { col: v.stylistka === '[Stylistka 2]' ? 2 : 1, t: v.godzina, dur, name: v.klientka || 'Klientka online', phone: v.tel || '[telefon]', info: [v.zrodlo === 'panel' ? 'dodana ręcznie w panelu' : 'rezerwacja online', v.dlaKogo && v.dlaKogo.imie ? 'dla: ' + v.dlaKogo.imie : ''].filter(Boolean).join(' · '),
-      kind: k, svc: us && us.length > 1 ? us.length + ' usługi' : items[0][0], items, gaps, osoby: v.osoby > 1 ? v.osoby : 0, dojazd: v.dojazd || null, przyklad: k !== 'p' || v.zrodlo === 'panel', hist: [v.zrodlo === 'panel' ? 'dodana w panelu ręcznie' : 'rezerwacja online od klientki'] };
+    // discounts the client already saw at booking, so "Razem" matches her confirmation
+    if (v.promo && v.promo.kwota) items.push([`Happy hours „${v.promo.nazwa}” −${v.promo.rabat}%`, -v.promo.kwota]);
+    if (v.polecenie) items.push([`Zniżka z polecenia${v.polecenie.od ? ' (' + v.polecenie.od + ')' : ''}`, -20]);
+    return { col: v.stylistka === '[Stylistka 2]' ? 2 : 1, t: v.godzina, dur, name: v.klientka || 'Klientka online', phone: v.tel || '[telefon]', info: [v.zrodlo === 'panel' ? 'dodana ręcznie w panelu' : 'rezerwacja online', v.dlaKogo && v.dlaKogo.imie ? 'dla: ' + v.dlaKogo.imie : '', v.polecenie ? `z polecenia${v.polecenie.od ? ': ' + v.polecenie.od : ''}` : ''].filter(Boolean).join(' · '),
+      kind: k, svc: us && us.length > 1 ? us.length + ' usługi' : items[0][0], items, gaps, osoby: v.osoby > 1 ? v.osoby : 0, dojazd: v.dojazd || null, przyklad: k !== 'p' || v.zrodlo === 'panel', potw: !!v.potwierdzona, faktura: v.faktura || null,
+      hist: [v.zrodlo === 'panel' ? 'dodana w panelu ręcznie' : 'rezerwacja online od klientki', ...(v.potwierdzona ? ['klientka potwierdziła przybycie'] : [])] };
   }
   function all() {
     const out = {};
     Object.entries(BASE).forEach(([id, b]) => { out[id] = { gaps: [], ...b }; });
     Mock.get('visits', []).forEach(v => {
       const m = /(\d{1,2})\.(\d{1,2})/.exec(v.dzien || '');
-      if (!m || +m[1] !== 20 || +m[2] !== 10 || !v.godzina || v.status === 'odwołana' || v.status === 'odbyta') return;
+      if (!m || Mock.odDzis(Mock.zKrotko(v.dzien)) !== 0 || !v.godzina || v.status === 'odwołana' || v.status === 'odbyta') return;
       out['v' + v.id] = fromVisit(v);
     });
     Mock.get('panel.mini', []).forEach(x => { out[x.id] = { col: x.col, t: x.t, dur: x.dur, name: x.name, phone: '[telefon]', info: 'w luce po przerwie w usłudze', kind: 'p', svc: x.svc, items: [[x.svc, x.price]], gaps: [], przyklad: true, hist: ['dodana w luce w wizycie ' + x.host] }; });
@@ -163,13 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
       b.setAttribute('aria-keyshortcuts', 'Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight');
       b.title = 'Przeciągnij albo Alt + strzałki, żeby przenieść';
       b.style.cssText = `position:absolute;top:${top}px;left:6px;right:6px;height:${h}px;box-sizing:border-box;padding:6px 10px;border-radius:10px;border:0;background:${bg};color:#1E1A1D;font:inherit;text-align:left;cursor:grab;display:flex;flex-direction:column;gap:1px;overflow:hidden;${id === sel ? 'box-shadow:0 0 0 2px #9E1F50;' : ''}`;
-      const tags = [v.osoby ? v.osoby + ' os.' : '', v.dojazd ? 'dojazd' : '', st(id).paid ? 'rozliczona' : ''].filter(Boolean);
-      const names = v.items.filter(i => !/^Dojazd/.test(i[0])).map(i => i[0]);
+      const tags = [v.potw ? '✓' : '', v.osoby ? v.osoby + ' os.' : '', v.dojazd ? 'dojazd' : '', st(id).paid ? 'rozliczona' : ''].filter(Boolean);
+      const names = v.items.filter(i => !/^Dojazd/.test(i[0]) && i[1] >= 0).map(i => i[0]);
       const lines = names.length > 1 ? names : [v.svc];
       let cap = Math.max(0, Math.floor((h - 12) / 17) - 1);
       if (v.gaps.length) cap = Math.min(cap, Math.max(0, Math.floor((v.gaps[0].od * PPM - 6) / 17) - 1)); // tekst nie wchodzi w lukę
       const shown = lines.length <= cap ? lines : cap < 1 ? [] : cap === 1 ? [v.svc] : lines.slice(0, cap - 1).concat('+' + (lines.length - cap + 1) + ' więcej');
-      b.innerHTML = `<span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fmt(toMin(v.t))} · ${E(v.name)}${tags.length ? ' · ' + tags.join(' · ') : ''}</span>` + shown.map(l => `<span style="color:${mut};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(l)}</span>`).join('');
+      b.innerHTML = `<span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fmt(toMin(v.t))} · ${E(v.name)}${tags.length ? ' · ' + tags.join(' · ') : ''}${v.potw ? '<span class="p-sr">, klientka potwierdziła</span>' : ''}</span>` + shown.map(l => `<span style="color:${mut};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(l)}</span>`).join('');
       colEl(v.col).append(b);
       v.gaps.forEach(g => {
         const gd = document.createElement('div'); gd.className = 'gap';
@@ -181,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderDetail() {
     const V = all(), v = V[sel] || V.b, s = st(sel), t = v.t, end = fmt(toMin(t) + v.dur), tot = total(sel, v);
-    const rows = v.items.map(i => `<div style="display:flex;justify-content:space-between;gap:8px"><span>${E(i[0])}</span><span>${i[1]} zł</span></div>`).join('') +
+    const rows = v.items.map(i => `<div style="display:flex;justify-content:space-between;gap:8px${i[1] < 0 ? ';color:#1F6B47' : ''}"><span>${E(i[0])}</span><span style="white-space:nowrap">${i[1] < 0 ? '−' + -i[1] : i[1]} zł</span></div>`).join('') +
       (s.extras || []).map(i => `<div style="display:flex;justify-content:space-between;gap:8px"><span>${E(i[0])}<br><small style="color:#625860">powód: ${E(i[2])}</small></span><span>${i[1] > 0 ? '+' : ''}${i[1]} zł</span></div>`).join('');
     const gap = v.gaps[0];
     document.getElementById('detail').innerHTML = `
@@ -191,9 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
       <span style="color:#625860">${E(v.phone)} · ${E(v.info)}</span>
       ${v.dojazd ? `<span style="color:#625860">Dojazd: ${E(v.dojazd.adres)}, ${E(v.dojazd.strefa || '')}, opłata ${E(v.dojazd.oplata)} zł</span>` : ''}
     </div>
+    ${v.potw === undefined ? '' : v.potw ? '<div class="p-row" style="background:#E6F2EC;color:#1F6B47"><span><b>Klientka potwierdziła przybycie.</b></span></div>'
+      : `<div class="p-row"><span><b>Czeka na potwierdzenie.</b> SMS „Odpisz TAK albo NIE” wysłany ${v.smsFail ? 'bez skutku' : 'dziś o 9:00'}.</span><button type="button" class="p-btn sm" data-act="ponag">Zadzwoń lub przypomnij</button></div>`}
+    ${v.faktura ? `<span class="p-mut">Faktura na firmę: ${E(v.faktura.firma)}, NIP ${E(v.faktura.nip)}</span>` : ''}
     ${v.smsFail ? `<div class="p-row" style="background:#FFF1E0;color:#8A3B12"><span><b>SMS nie dotarł.</b> Numer poza zasięgiem.</span><button type="button" class="p-btn sm" data-act="sms">Wyślij ponownie</button></div>` : ''}
     <div style="border:1px solid #E4D9DE;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px">
-      <h3 style="margin:0;font-size:14px;font-weight:700">${v.items.length > 1 ? 'Usługi w wizycie' : 'Karta stylizacji'}</h3>${rows}
+      <h3 style="margin:0;font-size:14px;font-weight:700">${v.items.filter(i => i[1] >= 0).length > 1 ? 'Usługi w wizycie' : 'Karta stylizacji'}</h3>${rows}
       <hr class="p-sep"><div style="display:flex;justify-content:space-between;font-weight:700"><span>Razem</span><span>${tot} zł</span></div>
       ${v.note ? `<span style="color:#625860;font-size:12px">${E(v.note)}</span>` : ''}
       ${v.przyklad ? '<span style="color:#625860;font-size:12px">Cena przykładowa.</span>' : ''}
@@ -226,14 +235,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="p-acts">${ok ? '' : '<button type="button" class="p-btn sm dark" data-act="ok">Potwierdź</button>'}<button type="button" class="p-btn sm" data-act="no">Odrzuć</button></div></div>`;
     };
     document.getElementById('nowe-list').innerHTML = vs.map(v => row(v)).join('') +
-      row({ id: 'ex', klientka: '[Klientka G]', opis: 'Hybryda M', cena: 150, czasTekst: '1 h 20 min', dzien: 'śr 21.10', godzina: '9:00', stylistka: '[Stylistka 1]' }, true);
+      row({ id: 'ex', klientka: '[Klientka G]', opis: 'Hybryda M', cena: 150, czasTekst: '1 h 20 min', dzien: Mock.krotko(Mock.dzien(1)), godzina: '9:00', stylistka: '[Stylistka 1]' }, true);
   }
 
   function renderQuotes() {
     const stt = PS.quoteState();
-    const list = PS.QUOTES.filter(q => !(stt[q.id] && stt[q.id].status === 'wysłana')).map(q => ({ k: q.klientka, o: q.opis, c: q.kolor }))
+    const list = PS.QUOTES.filter(q => !(stt[q.id] && stt[q.id].status === 'wysłana')).map(q => ({ k: q.klientka, o: q.opis, c: q.kolor, foto: q.foto }))
       .concat(Mock.get('quotes', []).filter(q => q.status !== 'wysłana' && !(stt[q.id] && stt[q.id].status === 'wysłana')).map(q => ({ k: q.klientka || 'Klientka online', o: q.opis || 'zdjęcie inspiracji', c: '#C98C8C' })));
-    document.getElementById('wyc-list').innerHTML = list.slice(0, 3).map(q => `<div class="p-row"><div style="display:flex;gap:12px;align-items:center"><div role="img" aria-label="Zdjęcie inspiracji od klientki" style="width:48px;height:48px;border-radius:10px;background:${q.c};flex:none"></div><div style="display:flex;flex-direction:column;gap:2px"><b>${E(q.k)}</b><span style="color:#625860">„${E(q.o)}”</span></div></div><a class="p-btn" href="paznokcie.html">Odtwórz w kreatorze</a></div>`).join('') || '<span class="p-mut">Wszystkie wyceny odesłane.</span>';
+    document.getElementById('wyc-list').innerHTML = list.slice(0, 3).map(q => `<div class="p-row"><div style="display:flex;gap:12px;align-items:center">${q.foto ? `<img src="${E(q.foto)}" alt="Zdjęcie inspiracji od klientki" width="48" height="48" style="width:48px;height:48px;border-radius:10px;object-fit:cover;flex:none">` : `<div role="img" aria-label="Zdjęcie inspiracji od klientki" style="width:48px;height:48px;border-radius:10px;background:${q.c};flex:none"></div>`}<div style="display:flex;flex-direction:column;gap:2px"><b>${E(q.k)}</b><span style="color:#625860">„${E(q.o)}”</span></div></div><a class="p-btn" href="paznokcie.html">Odtwórz w kreatorze</a></div>`).join('') || '<span class="p-mut">Wszystkie wyceny odesłane.</span>';
   }
 
   const WAIT = [['[Klientka K]', 'hybryda, chce sobotę przed południem'], ['[Klientka L]', 'rzęsy 2D, dowolny dzień po 16:00']];
@@ -256,23 +265,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const a = e.target.closest('[data-act]'); if (!a) return;
     const V = all(), v = V[sel], s = st(sel), tot = total(sel, v);
     if (a.dataset.act === 'sms') { Mock.toast('SMS wysłany ponownie'); }
+    if (a.dataset.act === 'ponag') { Mock.toast(`Wysłano drugi SMS z prośbą o potwierdzenie: ${v.name}`); }
     if (a.dataset.act === 'pay') PS.modal({
       title: 'Rozlicz wizytę', ok: 'Rozlicz',
       body: `<fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Metoda płatności</legend>${['gotówka', 'karta', 'BLIK'].map((m, i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="metoda" value="${m}"${i ? '' : ' checked'}>${m}</label>`).join('')}</fieldset>
         <label class="p-lab">Rabat (%)<input class="p-in" name="rabat" type="number" min="0" max="100" value="0"></label>
-        <div class="p-box"><span>Do zapłaty</span><b id="do-zaplaty">${tot} zł</b></div>`,
-      onOpen: f => f.rabat.addEventListener('input', () => { f.querySelector('#do-zaplaty').textContent = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100)) + ' zł'; }),
+        <div class="p-box"><span>Do zapłaty</span><b id="do-zaplaty">${tot} zł</b></div>
+        <fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Dokument</legend>${[['paragon', 'Paragon fiskalny'], ['faktura', 'Faktura']].map(([k, l]) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="dok" value="${k}"${(k === 'faktura') === !!v.faktura ? ' checked' : ''}>${l}</label>`).join('')}</fieldset>
+        <div id="fv-pola" style="display:${v.faktura ? 'flex' : 'none'};flex-direction:column;gap:8px"><label class="p-lab">NIP nabywcy<input class="p-in" name="nip" inputmode="numeric" value="${E(v.faktura ? v.faktura.nip : '')}"></label><label class="p-lab">Nazwa firmy<input class="p-in" name="firma" value="${E(v.faktura ? v.faktura.firma : '')}"></label><p id="nip-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p></div>
+        <span class="p-mut">Paragon drukuje kasa fiskalna studia. Fakturę wystawiamy z numeracją FV/numer/miesiąc/rok, a klientka pobierze ją w swoich wizytach.</span>`,
+      onOpen: f => {
+        f.rabat.addEventListener('input', () => { f.querySelector('#do-zaplaty').textContent = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100)) + ' zł'; });
+        f.querySelectorAll('[name=dok]').forEach(r => r.addEventListener('change', () => { f.querySelector('#fv-pola').style.display = f.dok.value === 'faktura' ? 'flex' : 'none'; }));
+      },
       onOk: f => {
-        const kwota = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100));
-        s.paid = { metoda: f.metoda.value, kwota }; save();
-        const tx = Mock.get('panel.tx', []); tx.push({ id: Date.now(), t: s.t || v.t, klientka: v.name, opis: v.svc, metoda: f.metoda.value, kwota }); Mock.set('panel.tx', tx);
-        renderAll(); Mock.toast(`Wizyta rozliczona: ${kwota} zł, ${f.metoda.value}`); return true;
+        const kwota = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100)), fv = f.dok.value === 'faktura', err = f.querySelector('#nip-err');
+        if (fv && (!Mock.nipOk(f.nip.value) || !f.firma.value.trim())) { err.textContent = Mock.nipOk(f.nip.value) ? 'Wpisz nazwę firmy.' : 'Sprawdź NIP: 10 cyfr z poprawną sumą kontrolną.'; err.hidden = false; return false; }
+        const tx = Mock.get('panel.tx', []), nr = fv ? `FV/${tx.filter(x => x.dok && x.dok.typ === 'faktura').length + 15}/10/2026` : `paragon nr ${String(tx.length + 2).padStart(4, '0')}`; // kasa.html seeds FV/14 and paragon 0001
+        const dok = fv ? { typ: 'faktura', nr, nip: f.nip.value.replace(/[\s-]/g, ''), firma: f.firma.value.trim() } : { typ: 'paragon', nr };
+        s.paid = { metoda: f.metoda.value, kwota, dok }; save();
+        tx.push({ id: Date.now(), t: s.t || v.t, klientka: v.name, opis: v.svc, metoda: f.metoda.value, kwota, dok }); Mock.set('panel.tx', tx);
+        renderAll(); Mock.toast(`Wizyta rozliczona: ${kwota} zł, ${f.metoda.value}, ${fv ? 'faktura ' + nr : 'paragon wydrukowany'}`); return true;
       }
     });
     if (a.dataset.act === 'move') PS.modal({
       title: 'Przenieś wizytę', ok: 'Przenieś',
       body: `<label class="p-lab">Stylistka<select class="p-in" name="c"><option value="1"${v.col === 1 ? ' selected' : ''}>[Stylistka 1]</option><option value="2"${v.col === 2 ? ' selected' : ''}>[Stylistka 2]</option></select></label>
-        <label class="p-lab">Nowa godzina (wtorek 20.10)<select class="p-in" name="t">${SLOTS.map(x => `<option${toMin(x) === toMin(v.t) ? ' selected' : ''}>${x}</option>`).join('')}</select></label>
+        <label class="p-lab">Nowa godzina (${Mock.dlugo(Mock.dzien(0)).toLowerCase()})<select class="p-in" name="t">${SLOTS.map(x => `<option${toMin(x) === toMin(v.t) ? ' selected' : ''}>${x}</option>`).join('')}</select></label>
         <p class="hh-err" id="move-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p><span class="p-mut">Klientka dostanie SMS z nową godziną. Zmianę da się cofnąć.</span>`,
       onOk: f => {
         const reason = check(sel, colEl(+f.c.value), toMin(f.t.value), v.dur), err = f.querySelector('#move-err');

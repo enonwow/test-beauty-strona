@@ -73,11 +73,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const sel = document.getElementById('okres'), lbl = document.getElementById('okres-lbl'), chart = document.getElementById('chart'), x = document.getElementById('chart-x');
+  const T = Mock.dzien(0), M = m => Mock.MIES[m][0].toUpperCase() + Mock.MIES[m].slice(1);
+  const PON = Mock.dzien(-Mock.weekday(T)), SOB = Mock.dzien(5 - Mock.weekday(T));
+  const TYG = PON.getMonth() === SOB.getMonth() ? `${PON.getDate()}–${SOB.getDate()} ${Mock.MIESD[SOB.getMonth()]}` : `${PON.getDate()} ${Mock.MIESD[PON.getMonth()]} – ${SOB.getDate()} ${Mock.MIESD[SOB.getMonth()]}`;
   const DATA = {
-    tydzien: { t: 'Ten tydzień, 19–24 października', vs: 'vs poprzedni tydzień', h: 'Utarg dziennie', bars: [40, 65, 80, 55, 70, 30], lab: ['pn', 'wt', 'śr', 'cz', 'pt', 'sb'] },
-    miesiac: { t: 'Październik 2026', vs: 'vs wrzesień', h: 'Utarg tygodniowo', bars: [55, 70, 62, 85], lab: ['1–5', '6–12', '13–19', '20–26'] }
+    tydzien: { t: `Ten tydzień, ${TYG}`, vs: 'vs poprzedni tydzień', h: 'Utarg dziennie', bars: [40, 65, 80, 55, 70, 30], lab: ['pn', 'wt', 'śr', 'cz', 'pt', 'sb'] },
+    miesiac: { t: `${M(T.getMonth())} ${T.getFullYear()}`, vs: `vs ${Mock.MIES[(T.getMonth() + 11) % 12]}`, h: 'Utarg tygodniowo', bars: [55, 70, 62, 85], lab: ['1–5', '6–12', '13–19', '20–26'] }
   };
   let last = 'miesiac';
+  lbl.textContent = DATA.miesiac.t; sel.querySelector('[value=miesiac]').textContent = DATA.miesiac.t;
   function draw(d, text) {
     lbl.textContent = text;
     document.getElementById('vs').textContent = d.vs;

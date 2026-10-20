@@ -15,10 +15,12 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .b1{flex:1;min-height:44px;border-radius:10px;border:1px solid #1E1A1D;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
 .b2{flex:1;min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
 .b2:hover{color:#1E1A1D;background:#FAF6F8}
-.btn{min-height:48px;border-radius:12px;border:0;background:#1E1A1D;color:#fff;font:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;padding:0 16px}
-.btn:hover{background:#3a3338;color:#fff}
+.btn{min-height:48px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;padding:0 16px}
+.btn:hover{background:#7A173D;color:#fff}
 .btn-r{background:#9E1F50}.btn-r:hover{background:#7A173D}
 .row{display:flex;justify-content:space-between;gap:12px}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
 .cell{min-height:52px;text-align:center;border-radius:10px;border:1px solid #C9B6BF;font:inherit;font-size:20px;min-width:0;width:100%;box-sizing:border-box;padding:0}
 .cell.f{border:2px solid #9E1F50;font-weight:700}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -59,13 +61,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <span style="font-size:12px;color:#625860">Kod: [KOD-PROJEKTU]</span>
     </div>
     <div style="padding:16px;display:flex;gap:14px">
-      <div aria-hidden="true" style="display:flex;gap:5px;align-items:flex-end;flex:none">
-        <div data-sw style="width:14px;height:30px;border-radius:7px 7px 3px 3px;background:#5B1630"></div>
-        <div data-sw style="width:15px;height:38px;border-radius:8px 8px 3px 3px;background:#5B1630"></div>
-        <div data-sw style="width:15px;height:42px;border-radius:8px 8px 3px 3px;background:#5B1630"></div>
-        <div data-sw style="width:15px;height:38px;border-radius:8px 8px 3px 3px;background:#5B1630"></div>
-        <div data-sw style="width:13px;height:28px;border-radius:7px 7px 3px 3px;background:#5B1630"></div>
-      </div>
+      <img id="kat-foto" src="zdjecia/k-paznokcie.jpg" alt="" width="88" height="88" style="width:88px;height:88px;object-fit:cover;border-radius:14px;flex:none;background:#E4D9DE">
       <dl style="margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px">
         <dt style="color:#625860">Kategoria</dt><dd id="kat" style="margin:0">Paznokcie</dd>
         <dt style="color:#625860">Usługa</dt><dd id="usl" style="margin:0">Manicure hybrydowy</dd>
@@ -111,6 +107,18 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     </div>
   </section>
 
+  <section id="kolejna" class="o5" hidden aria-labelledby="kol-h" style="margin:22px 20px 0;padding:14px 16px;border-radius:14px;border:1px solid #E4D9DE;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
+    <h2 id="kol-h" style="margin:0;font-size:16px">Kolejna wizyta</h2>
+    <span id="kol-txt"></span>
+    <div id="kol-wybor" data-choice role="group" aria-label="Jak często" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="chip" aria-pressed="true" data-value="1">Raz</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="3">3 wizyty, co <span class="kol-tyg"></span></button>
+    </div>
+    <ul id="kol-lista" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px"></ul>
+    <button type="button" id="kol-btn" class="b2" style="flex:none;font-weight:500">Zarezerwuj</button>
+    <span style="color:#625860;font-size:12px">Ta sama godzina, stylistka i usługa w cenie z cennika. Studio potwierdzi termin SMS-em, a każdą wizytę przełożysz osobno.</span>
+  </section>
+
   <section id="po-odw" class="o6" hidden style="padding:22px 20px 0;display:flex;flex-direction:column;gap:8px">
     <a href="paznokcie.html" class="btn btn-r">Zarezerwuj ponownie</a>
     <a href="wizyty.html" class="b2">Moje wizyty</a>
@@ -127,18 +135,24 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px">
       <li>historia stylizacji</li><li>„Powtórz” jednym kliknięciem</li><li>przełożenie wizyty bez SMS-a</li><li>ulubione studia</li>
     </ul>
-    <button type="button" id="konto-btn" class="btn">Utwórz konto</button>
+    <button type="button" id="konto-btn" class="b2" style="flex:none;font-weight:500">Utwórz konto</button>
   </section>
 
   <section class="o7" style="margin:22px 20px 0;padding:14px 16px;border-radius:14px;background:#FAF6F8;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
     <div style="display:flex;gap:10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"></path><path d="M10.5 20a1.5 1.5 0 0 0 3 0"></path></svg><span>SMS z przypomnieniem dzień przed wizytą. Link w SMS-ie pozwala przełożyć lub odwołać wizytę bez logowania.</span></div>
     <div style="display:flex;gap:10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 4v5h-5"></path></svg><span id="przyp-txt">Za około 3 tygodnie przypomnimy o uzupełnieniu, a „Powtórz” zarezerwuje tę samą stylizację.</span></div>
   </section>
+
+  <section id="polec" class="o7" aria-labelledby="polec-h" style="margin:12px 20px 0;padding:14px 16px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
+    <h2 id="polec-h" style="margin:0;font-size:16px">Poleć studio koleżance</h2>
+    <span>Ona dostaje <b>20 zł</b> zniżki na pierwszą wizytę, a Ty 20 zł na następną, gdy przyjdzie.</span>
+    <button type="button" id="polec-btn" class="b2" style="flex:none;font-weight:500;background:#fff">Wyślij zaproszenie</button>
+  </section>
   </div>
   </div>
 
   <footer style="margin-top:auto;padding:20px;color:#625860;font-size:12px;line-height:1.5;border-top:1px solid #F0E8EC;margin-top:22px">
-    Po wizycie możesz wystawić opinię. Zmiana statusu wizyty przez studio jest widoczna w historii. <a href="wizyty.html" style="display:inline-block;padding:14px 0">Moje wizyty</a>
+    Po wizycie możesz wystawić opinię. Zmiana statusu wizyty przez studio jest widoczna w historii. <a href="wizyty.html" style="display:flex;align-items:center;width:max-content;min-height:44px;font-size:14px;font-weight:500">Moje wizyty</a>
   </footer>
 </div>
 
@@ -180,10 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const B = Mock.get('booking', {}) || {};
   const DN = { pon: 'Poniedziałek', wt: 'Wtorek', 'śr': 'Środa', czw: 'Czwartek', pt: 'Piątek', sob: 'Sobota', nd: 'Niedziela' };
   const MIES = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
-  const KOL = { Paznokcie: '#5B1630', 'Rzęsy': '#2F5A86', Brwi: '#3F6B2E', Fryzjer: '#8A4B12', Kosmetyka: '#5B3A86' };
-  const NOW = new Date(2026, 9, 19, 9, 0); // makieta: "dziś" to poniedziałek 19.10, 9:00
+  const NOW = Mock.teraz(); // device date (or the day pinned with ?dzis=)
   const cena = B.cena != null ? Number(B.cena) : 200;
-  const dm = (B.dzien || 'wt 20.10').match(/^(\S+)\s+(\d{1,2})\.(\d{2})/);
+  const dm = (B.dzien || Mock.krotko(Mock.dzien(1))).match(/^(\S+)\s+(\d{1,2})\.(\d{2})/);
 
   if (dm) {
     $('#kiedy').textContent = `${DN[dm[1]] || dm[1]}, ${+dm[2]} ${MIES[dm[3] - 1]}` + (B.godzina ? ` · ${B.godzina}${B.koniec ? '–' + B.koniec : ''}` : '');
@@ -198,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dopisz = (k, v) => { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.style.color = '#625860'; dd.style.margin = '0'; dt.textContent = k; dd.textContent = v; $('#dla').parentElement.append(dt, dd); };
   if (B.dojazd) dopisz('Adres', B.dojazd.adres);
   if (osoby > 1) dopisz('Osoby', String(osoby));
-  document.querySelectorAll('[data-sw]').forEach(x => (x.style.background = KOL[B.kategoria] || '#5B1630'));
+  $('#kat-foto').src = Mock.fotoKat(B.kategoria);
   // v2 creator fields (all optional): price range with reason, line items, test, series, notes
   const cenaMax = B.cenaMax != null ? Number(B.cenaMax) : cena, cenaMin = B.cenaMin != null ? Number(B.cenaMin) : cenaMax;
   const zakres = (a, b) => (a === b ? `${a} zł` : `${a}–${b} zł`);
@@ -314,12 +327,43 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (visit && visit.status === 'odwołana') odwolana();
 
+  // next visit: same weekday, hour, stylist and price N weeks later (refills); not for tests, consultations or series
+  const TYG = { Paznokcie: 3, 'Rzęsy': 3, Brwi: 5, Fryzjer: 6 }[B.kategoria];
+  const dzienPo = (s, dni) => { const x = Mock.zKrotko(s); return Mock.krotko(new Date(x.getFullYear(), x.getMonth(), x.getDate() + dni)); }; // "wt 20.10" + days
+  if (TYG && visit && visit.status === 'nadchodząca' && !B.seria && !visit.typ && dm && B.godzina) {
+    let ile = 1;
+    const daty = () => Array.from({ length: ile }, (_, i) => dzienPo(B.dzien, 7 * TYG * (i + 1)));
+    const juz = () => visits.filter(v => v.poprzednia === visit.id && v.status === 'nadchodząca').reverse(); // visits are stored newest first
+    const paint = () => {
+      const zrobione = juz();
+      $('#kol-wybor').hidden = $('#kol-btn').hidden = !!zrobione.length;
+      $('#przyp-txt').parentElement.hidden = !!zrobione.length; // "we'll remind you in 3 weeks" is moot once it is booked
+      $('#kol-lista').innerHTML = '';
+      (zrobione.length ? zrobione.map(v => `✓ ${v.dzien}, ${v.godzina}–${v.koniec}`) : daty().map(d => `${d}, ${B.godzina}–${B.koniec}`)).forEach(t => { const li = document.createElement('li'); li.textContent = t; $('#kol-lista').appendChild(li); });
+      $('#kol-txt').textContent = zrobione.length ? `Zarezerwowano: ${Mock.plural(zrobione.length, ['wizyta', 'wizyty', 'wizyt'])}. Znajdziesz je w „Moich wizytach”.` : `${B.kategoria === 'Fryzjer' ? 'Odrost' : 'Uzupełnienie'} robi się zwykle co ${Mock.plural(TYG, ['tydzień', 'tygodnie', 'tygodni'])}. Zarezerwuj od razu, zanim zniknie Twoja godzina.`;
+    };
+    document.querySelectorAll('.kol-tyg').forEach(x => (x.textContent = `${TYG} tyg.`));
+    $('#kol-wybor').addEventListener('mock:choice', e => { ile = +e.detail.value; paint(); });
+    $('#kol-btn').addEventListener('click', () => {
+      const { id, zadatek, testId, polecenie, ...reszta } = visit, // the referral discount was for the first visit only
+        p = visit.promo, D = visit.dojazd ? Number(visit.dojazd.oplata) || 0 : 0;
+      const ceny = p ? { cena: p.cenaMaxPrzed + D, cenaMin: p.cenaMinPrzed + D, cenaMax: p.cenaMaxPrzed + D, promo: null } : {}; // happy hours were for that one slot
+      daty().forEach((dzien, i) => visits.unshift({ ...reszta, ...ceny, id: Date.now() + i, dzien, status: 'nadchodząca', poprzednia: visit.id, potwierdzona: false }));
+      Mock.set('visits', visits); paint();
+      Mock.toast(ile > 1 ? `Zarezerwowano ${ile} kolejne wizyty` : 'Zarezerwowano kolejną wizytę');
+    });
+    $('#kolejna').hidden = false; paint();
+  }
+
+  // referral: the link carries a code; the friend sees the discount on the studio page
+  $('#polec-btn').addEventListener('click', () => Mock.polec(B.studio || '[Studio 1]', (Mock.get('user', {}) || {}).imie || (B.kontakt && B.kontakt.imie)));
+
   // dialog text depends on the 24 h rule against the mocked "now"
   document.querySelector('[data-open="#odw"]').addEventListener('click', () => {
     let txt = 'Odwołanie jest bezpłatne.';
     if (dm && B.godzina) {
       const [h, m] = B.godzina.split(':');
-      const start = new Date(2026, dm[3] - 1, +dm[2], +h, +m);
+      const d0 = Mock.zKrotko(B.dzien || Mock.krotko(Mock.dzien(1))), start = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate(), +h, +m);
       const wczesnie = start - NOW >= 24 * 3600 * 1000;
       if (B.zadatek) txt = wczesnie ? `Odwołujesz więcej niż 24 h przed wizytą: zaliczka ${B.zadatek} zł wróci na Twoje konto w ciągu 5 dni roboczych.` : `Do wizyty zostało mniej niż 24 h: zaliczki ${B.zadatek} zł nie zwracamy.`;
       else txt = wczesnie ? 'Odwołujesz więcej niż 24 h przed wizytą. Nie wpłacałaś zaliczki, więc nic nie tracisz.' : 'Do wizyty zostało mniej niż 24 h, ale nie wpłacałaś zaliczki, więc nic nie tracisz.';

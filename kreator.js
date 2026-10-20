@@ -248,8 +248,10 @@
     await ready(); // mock.js is deferred: wait for it before reading saved choices
     const root = document.getElementById('kreator'), bar = document.getElementById('kreator-bar');
     let c;
+    // loading state: placeholders in the shape of the first step until the price list arrives
+    root.innerHTML = `<div role="status" aria-label="Wczytuję cennik" style="display: flex; flex-direction: column; gap: 10px; padding-top: 20px">${[[40, 22], [100, 56], [100, 56], [100, 56]].map(([w, h]) => `<span style="width: ${w}%; height: ${h}px; border-radius: 14px; background: #F6EDF1"></span>`).join('')}</div>`;
     try { const res = await fetch(`cenniki/${cfg.kat}.json`); if (!res.ok) throw new Error('HTTP ' + res.status); c = await res.json(); }
-    catch (e) { root.innerHTML = `<p style="padding: 20px 0; color: #A3262A">Nie udało się wczytać cennika (${esc(e.message)}). Otwórz stronę przez serwer HTTP.</p>`; return; }
+    catch (e) { root.innerHTML = `<div role="alert" style="margin-top: 20px; padding: 16px; border-radius: 14px; background: #FFF1E0; color: #8A3B12; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; line-height: 1.45">Nie udało się wczytać cennika, więc nie policzymy ceny. Sprawdź połączenie i spróbuj ponownie. <small>(${esc(e.message)})</small><button type="button" onclick="location.reload()" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #8A3B12; background: #FFFFFF; color: #8A3B12; font: inherit; font-weight: 700; cursor: pointer">Spróbuj ponownie</button></div>`; return; }
     Kreator.selfCheck(cfg.kat, c);
     const steps = cfg.steps(c), wycen = w => WYCEN[cfg.kat](c, w), key = 'kreator_' + cfg.kat;
     const defaults = cfg.defaults(c);

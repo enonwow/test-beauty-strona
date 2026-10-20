@@ -14,7 +14,10 @@
 h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
 .chip{min-height:44px;padding:0 12px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:13px;cursor:pointer}
-.chip[aria-pressed=true]{border-color:#1E1A1D;background:#1E1A1D;color:#fff;font-weight:700}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#F6EDF1;color:#1E1A1D;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
+/* phone: quick filters in one swipeable row instead of three wrapped rows */
+#filtry{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+#filtry .chip{flex:none;white-space:nowrap}
 .chip[aria-pressed=true]:not(#chip-kiedy):not(#mapa-btn)::before{content:"\2713\00a0";content:"\2713\00a0" / ""}
 .card{position:relative;border:1px solid #E4D9DE;border-radius:16px;overflow:hidden}
 .card>a.main{display:flex;gap:12px;padding:14px 56px 14px 14px;text-decoration:none;color:#1E1A1D}
@@ -66,7 +69,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   #mapa[hidden]{display:flex !important}
   #mapa{margin:12px 0 0 !important}
   #lista{padding-top:4px !important}
-  #filtry{flex-direction:column;align-items:flex-start}
+  #filtry{flex-direction:column;align-items:flex-start;flex-wrap:wrap;overflow:visible}
+  .d-aside-left .o2{flex-direction:column;align-items:flex-start}
   #filtry .chip,#wiecej,.d-aside-left .sel{min-height:44px}
   .d-aside-left .sel{width:100%}
 }
@@ -89,7 +93,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <div class="d-cols">
   <!-- on the phone the wrappers vanish (display:contents) and "order" restores the original sequence -->
   <div class="d-aside d-aside-left">
-  <div id="filtry" class="o1" data-choice="multi" role="group" aria-label="Filtry" style="padding:12px 20px 0;display:flex;gap:6px;flex-wrap:wrap">
+  <div id="filtry" class="o1" data-choice="multi" role="group" aria-label="Filtry" style="padding:12px 20px 0;display:flex;gap:6px">
     <button type="button" class="chip" aria-pressed="true" data-f="kiedy" id="chip-kiedy">Dziś ✕</button>
     <button type="button" class="chip" aria-pressed="false" data-f="po16">Po 16:00</button>
     <button type="button" class="chip" aria-pressed="false" data-f="do200">Do 200 zł</button>
@@ -97,8 +101,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <button type="button" class="chip" aria-pressed="false" data-f="km2">Do 2 km</button>
     <button type="button" class="chip" aria-pressed="false" data-f="hh" id="chip-hh">Happy hours</button>
   </div>
-  <div class="o2" style="padding:6px 20px 0"><button type="button" id="wiecej" class="chip" data-open="#dlg-filtry">Więcej filtrów</button></div>
-  <div class="o4" style="padding:8px 20px 0;display:flex;justify-content:space-between;align-items:center;gap:10px">
+  <div class="o2" style="padding:8px 20px 0;display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <button type="button" id="wiecej" class="chip" data-open="#dlg-filtry" style="flex:none">Więcej filtrów</button>
     <span id="szukano" hidden style="color:#625860;font-size:12px"></span>
     <label for="sort" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Sortuj</label>
     <select id="sort" class="sel" style="margin-left:auto"><option value="slot">Najbliższy termin</option><option value="km">Najbliżej</option><option value="cena">Najtaniej</option></select>
@@ -289,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const q = (search.q || '').trim();
   const kat = CATS.find(c => c === q.toLowerCase());
   // studios with a happy-hours offer today (mock today = Monday 19.10.2026): [Studio 1] from the studio's offers, [Studio 2] is a fixed example
-  const HH_STUDIA = Mock.happyToday(new Date(2026, 9, 19)).length ? ['[Studio 1]', '[Studio 2]'] : [];
+  const HH_STUDIA = Mock.happyToday().length ? ['[Studio 1]', '[Studio 2]'] : [];
   const F = { po16: false, do200: false, blik: false, km2: false, hh: false, od: null, do: null, pay: [], udog: [] };
   let favs = Mock.get('favorites', []);
 
@@ -372,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // slot links carry studio, day and hour: termin.html?s=[Studio 1]&t=14:30&d=19 (mock "today" = Monday 19.10, "Jutro" = 20.10)
-  const dzienSzukania = search.kiedy === 'Jutro' ? 20 : 19, DNI = { 19: 'pon 19.10', 20: 'wt 20.10' };
+  const dzienSzukania = search.kiedy === 'Jutro' ? 1 : 0, DNI = { 0: Mock.krotko(Mock.dzien(0)), 1: Mock.krotko(Mock.dzien(1)) }; // d = days from today
   document.querySelectorAll('.slots a').forEach(a => {
     const studio = a.closest('.card').dataset.n, godzina = a.classList.contains('o') ? '' : a.textContent.trim();
     a.href = `termin.html?s=${encodeURIComponent(studio)}` + (godzina ? `&t=${godzina}&d=${dzienSzukania}` : '');

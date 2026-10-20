@@ -2,15 +2,15 @@
 // Strona wstawia <nav id="panel-nav"></nav> (opcjonalnie data-active="panel.html") i ładuje mock.js, a potem ten plik (oba defer).
 (function () {
   const NAV = [
-    ['Dzień pracy', [['Kalendarz', 'panel.html'], ['Wyceny', 'wyceny.html', 'badge'], ['Klientki', 'klientki.html']]],
+    ['Dzień pracy', [['Kalendarz', 'panel.html'], ['Wyceny', 'wyceny.html', 'badge'], ['Wiadomości', 'wiadomosci.html'], ['Klientki', 'klientki.html']]],
     ['Sprzedaż', [['Kasa', 'kasa.html'], ['Karnety i pakiety', 'karnety.html'], ['Promocje', 'promocje.html'], ['Marketing', 'marketing.html']]],
     ['Studio', [['Cennik i kreator', 'cennik.html'], ['Zespół i grafik', 'zespol.html'], ['Magazyn', 'magazyn.html'], ['Profil studia', 'profil-studia.html'], ['Formularze i zgody', 'formularze.html'], ['Opinie', 'opinie-studio.html']]],
     ['', [['Raporty', 'raporty.html'], ['Ustawienia', 'ustawienia.html']]]
   ];
   // Prośby o wycenę ze stałych przykładów; wyceny.html i panel.html czytają to samo.
   const QUOTES = [
-    { id: 'q1', klientka: '[Klientka F]', opis: 'Takie jak na zdjęciu, ale krótsze', zrodlo: 'inspiracja z Instagrama', kolor: '#C98C8C' },
-    { id: 'q2', klientka: '[Klientka H]', opis: 'Francuz z drobnymi cyrkoniami, długość L', zrodlo: 'zdjęcie ze strony studia', kolor: '#3E2A4A' }
+    { id: 'q1', klientka: '[Klientka F]', opis: 'Takie jak na zdjęciu, ale krótsze', zrodlo: 'inspiracja z Instagrama', kolor: '#C98C8C', foto: 'zdjecia/dlon-4-mini.jpg' },
+    { id: 'q2', klientka: '[Klientka H]', opis: 'Francuz z drobnymi cyrkoniami, długość L', zrodlo: 'zdjęcie ze strony studia', kolor: '#3E2A4A', foto: 'zdjecia/styl-micro-french.jpg' }
   ];
 
   const CSS = `
@@ -59,7 +59,7 @@ textarea.p-in{padding:10px 12px;resize:vertical}
 .pn-a:hover{background:#FAF6F8;color:#1E1A1D}
 .pn-a[aria-current]{background:#F6EDF1;font-weight:700}
 .pn-n{min-width:22px;height:22px;border-radius:11px;background:#9E1F50;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.pn-bar{display:flex;justify-content:flex-end;gap:8px;align-items:center;margin-bottom:-8px}
+.pn-bar{display:flex;justify-content:flex-end;gap:8px;align-items:center;margin-bottom:-8px;width:100%;box-sizing:border-box} /* full row also in pages whose main wraps cards side by side (klientki) */
 .pn-user{position:relative}.pn-user summary{list-style:none;min-height:44px;padding:0 12px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;display:flex;flex-direction:column;justify-content:center;cursor:pointer;line-height:1.2}
 .pn-user summary::-webkit-details-marker{display:none}.pn-user summary small{color:#625860;font-size:12px}
 .pn-user summary:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -72,7 +72,7 @@ textarea.p-in{padding:10px 12px;resize:vertical}
 @media (max-width:1023px){main button,aside button,dialog button,main select,dialog select,main input:not([type=checkbox]):not([type=radio]),dialog input:not([type=checkbox]):not([type=radio]),main a.p-btn,main a[style*=min-height]{min-height:44px !important}main button[aria-label]{min-width:44px !important}}
 .pn-ntf{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;background:#FAF6F8;text-decoration:none;color:#1E1A1D}
 .pn-ntf.new{background:#F6EDF1}
-@media (max-width:720px){.pn{max-width:none;flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:10px 12px;border-right:0;border-bottom:1px solid #F0E8EC}.pn-g{display:none}.pn-a{white-space:nowrap;flex:none}.pn-logo{display:none !important}}
+@media (max-width:1023px){.pn{max-width:none;flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:10px 12px;border-right:0;border-bottom:1px solid #F0E8EC}.pn-g{display:none}.pn-a{white-space:nowrap;flex:none}.pn-logo{display:none !important}}
 dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
 
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -103,9 +103,9 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
   const SVC = [['Manicure hybrydowy', 'Paznokcie', 140, 75], ['Żel na naturalnej płytce', 'Paznokcie', 170, 105], ['Przedłużanie (tipsy / szablon)', 'Paznokcie', 200, 150], ['Uzupełnienie żelu', 'Paznokcie', 180, 120],
     ['Rzęsy 1:1 (cena przykładowa)', 'Rzęsy', 150, 90], ['Brwi: henna + regulacja (cena przykładowa)', 'Brwi', 70, 45]];
   const SLOTS = []; for (let m = 540; m <= 1050; m += 15) SLOTS.push(`${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`);
-  // "+ Wizyta": o = {days: [[etykieta, 'wt 20.10'], ...] | null, dzien, godz, stylistka, done()}
+  // "+ Wizyta": o = {days: [[etykieta, 'wt 20.10'], ...] | null, dzien, godz, stylistka, done()}; without days: today
   function visitModal(o = {}) {
-    const days = o.days || [[o.dzien || 'wt 20.10', o.dzien || 'wt 20.10']];
+    const dz = o.dzien || Mock.krotko(Mock.dzien(0)), days = o.days || [[dz, dz]];
     modal({
       title: 'Nowa wizyta', ok: 'Dodaj',
       body: `<label class="p-lab">Klientka<input class="p-in" name="kl" required placeholder="Imię i nazwisko"></label>
@@ -134,7 +134,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     Mock.get('visits', []).filter(v => v.status === 'nadchodząca' && !v.zrodlo).slice(0, 3).forEach(v =>
       list.push({ id: 'v' + v.id, t: 'Nowa rezerwacja', d: `${v.klientka || 'Klientka online'} · ${v.opis || v.usluga || 'wizyta'} · ${[v.dzien, v.godzina].filter(Boolean).join(' ')}`, href: 'panel.html#nowe', isNew: true }));
     list.push(
-      { id: 'n1', t: 'Nowa rezerwacja', d: '[Klientka G] · hybryda M · śr 21.10, 9:00', href: 'panel.html#nowe', isNew: true },
+      { id: 'n1', t: 'Nowa rezerwacja', d: `[Klientka G] · hybryda M · ${Mock.krotko(Mock.dzien(1))}, 9:00`, href: 'panel.html#nowe', isNew: true },
       { id: 'n2', t: 'SMS nie dotarł', d: '[Klientka C] · przypomnienie na jutro 14:00 (numer poza zasięgiem)', href: 'klientki.html', isNew: true },
       { id: 'n3', t: 'Prośba o wycenę', d: '[Klientka H] wysłała zdjęcie inspiracji', href: 'wyceny.html', isNew: true },
       { id: 'n4', t: 'Niski stan w magazynie', d: 'Żel budujący: zostało 2 szt.', href: 'magazyn.html', isNew: false },
@@ -189,6 +189,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     if (nav) {
       const cur = nav.dataset.active || file();
       nav.className = 'pn';
+      nav.parentElement.style.alignContent = 'flex-start'; // when the menu wraps above the content, its row must not stretch to fill the page's min-height
       nav.setAttribute('aria-label', 'Menu panelu');
       nav.innerHTML = `<div class="pn-logo" style="display:flex;gap:10px;align-items:center;padding:0 8px 12px"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">NS</div><span style="font-weight:700">[Nazwa studia]</span></div>` +
         NAV.map(([g, items0], i) => { const items = items0.filter(it => !roleOf((studioUser() || {}).rola).hide.includes(it[1])); return (g ? `<div class="pn-g">${g}</div>` : '<div style="flex:1 1 auto"></div><hr class="p-sep" style="margin:8px 0">') +

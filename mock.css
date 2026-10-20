@@ -1,4 +1,7 @@
 /* Shared base for the static mockups (salon, rzesy, termin, potwierdzenie, panel); screen styles stay inline. */
+/* Shared tokens: one source for the palette; pages that still hardcode hex use the same values. */
+:root { --accent:#9E1F50; --accent-hover:#7A173D; --ink:#1E1A1D; --muted:#625860; --line:#E4D9DE; --tint:#F6EDF1; --tint-2:#FAF6F8;
+  accent-color:#9E1F50; } /* native checkboxes, radios and sliders in the brand colour instead of browser blue */
 body { margin:0; background:#F4EEF1; color:#1E1A1D; font-family:'DM Sans', system-ui, sans-serif; }
 h1, h2 { font-family:'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif; }
 a { color:#9E1F50; } a:hover { color:#7A173D; }
@@ -10,7 +13,9 @@ a { color:#9E1F50; } a:hover { color:#7A173D; }
 .nav.d-tabbar a { min-height:52px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; text-decoration:none; color:#625860; font-size:12px; }
 .nav.d-tabbar a[aria-current] { color:#9E1F50; font-weight:700; }
 @media (min-width:1024px) {
-  .nav.d-tabbar { margin-top:0; grid-template-columns:repeat(4,auto); justify-content:start; gap:8px; border-top:0; border-bottom:1px solid #F0E8EC; padding:6px 20px; }
+  .nav.d-tabbar { margin-top:0; grid-template-columns:none; grid-auto-flow:column; justify-content:start; align-items:center; gap:8px; border-top:0; border-bottom:1px solid #F0E8EC; padding:6px 20px; }
+  /* the desktop top bar carries the brand, like a normal site header */
+  .nav.d-tabbar::before { content:'[Nazwa aplikacji]'; margin-right:24px; font:700 20px 'Bricolage Grotesque', 'DM Sans', sans-serif; color:#9E1F50; }
   .nav.d-tabbar a { flex-direction:row; gap:8px; padding:0 16px; font-size:14px; min-height:48px; }
 }
 @media (max-width:1023px) {

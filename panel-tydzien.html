@@ -106,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const MON = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'], DN = ['pon', 'wt', 'śr', 'czw', 'pt', 'sob'];
   const KC = { Paznokcie: '#F6EDF1', Rzęsy: '#EAF0F7', Brwi: '#EEF3EA' };
   let w = 0;
-  const day = i => new Date(2026, 9, 19 + 7 * w + i);
+  const PON = Mock.dzien(-Mock.weekday(Mock.dzien(0))); // Monday of the current week
+  const day = i => new Date(PON.getFullYear(), PON.getMonth(), PON.getDate() + 7 * w + i);
   const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
   function render() {
@@ -143,10 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('prev').addEventListener('click', () => { w--; render(); });
   document.getElementById('next').addEventListener('click', () => { w++; render(); });
   document.getElementById('who').addEventListener('change', () => { filter(); Mock.toast(document.getElementById('who').selectedOptions[0].text === 'Wszystkie' ? 'Pokazuję cały zespół' : 'Filtr: ' + document.getElementById('who').selectedOptions[0].text); });
-  const openAdd = (dzien, godz) => PS.visitModal({ days: DN.map((n, i) => [`${n} ${day(i).getDate()}`, `${n} ${day(i).getDate()}.${day(i).getMonth() + 1}`]), dzien, godz, done: render });
-  document.getElementById('add-visit').addEventListener('click', () => openAdd(`wt ${day(1).getDate()}.${day(1).getMonth() + 1}`, '10:00'));
+  const minal = i => day(i) < Mock.dzien(0); // the day is before today
+  const lab = i => `${DN[i]} ${day(i).getDate()}.${day(i).getMonth() + 1}`;
+  const openAdd = (dzien, godz) => {
+    const dni = DN.map((n, i) => i).filter(i => !minal(i));
+    if (!dni.length) return Mock.toast('Ten tydzień już minął. Przejdź do następnego tygodnia.');
+    PS.visitModal({ days: dni.map(i => [`${DN[i]} ${day(i).getDate()}`, lab(i)]), dzien: dni.some(i => lab(i) === dzien) ? dzien : lab(dni[0]), godz, done: render });
+  };
+  document.getElementById('add-visit').addEventListener('click', () => openAdd(lab(1), '10:00'));
   const FREE = { 'pn 15:00': [0, '15:00'], 'śr 9:00': [2, '9:00'], 'sob 13:30': [5, '13:30'] };
-  document.querySelectorAll('[data-free]').forEach(b => b.addEventListener('click', () => { const [i, t] = FREE[b.dataset.free]; openAdd(`${DN[i]} ${day(i).getDate()}.${day(i).getMonth() + 1}`, t); }));
+  document.querySelectorAll('[data-free]').forEach(b => b.addEventListener('click', () => { const [i, t] = FREE[b.dataset.free]; if (minal(i)) return Mock.toast('Ten termin już minął.'); openAdd(lab(i), t); }));
 
   // --- przeciąganie wizyt między dniami i godzinami ---
   const fmt = KalDrag.fmt, PPM = 0.8, DAY0 = 540, DAY1 = 1080;

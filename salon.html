@@ -54,6 +54,13 @@ h2{margin:0;font-size:18px;font-weight:700}
 .ocena .mut{color:#625860}
 .ocena:hover{color:#1E1A1D}.ocena:hover .mut{text-decoration:underline}
 .gw{width:16px;height:16px;flex:none;fill:#9E1F50}
+/* one meta line under the name: rating · open now · address · directions (wraps on phones) */
+.meta{display:flex;flex-wrap:wrap;align-items:center;column-gap:6px;font-size:13px;color:#625860}
+.meta .ocena{min-height:44px;font-size:13px}
+.meta a{color:#1E1A1D;font-weight:500}
+#status b{font-weight:700}
+#status .on{color:#1F6B47}#status .off{color:#A3262A}
+@media (max-width:1023px){.meta{column-gap:14px}.meta>[aria-hidden]{display:none}} /* phone: the line wraps, dots would dangle at line ends */
 #hh-baner summary{min-height:44px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;list-style:none}
 #hh-baner summary::-webkit-details-marker{display:none}
 #hh-baner summary::after{content:"";margin-left:auto;flex:none;width:8px;height:8px;border-right:2px solid #625860;border-bottom:2px solid #625860;transform:rotate(45deg) translateY(-3px)}
@@ -61,8 +68,9 @@ h2{margin:0;font-size:18px;font-weight:700}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
 @media (max-width:1023px){
   [role=tablist]{position:sticky;top:0;z-index:4;background:#FFFFFF}
-  /* the cart bar sits right above the sticky tab bar (tab bar: 1px border + 6px + 52px link + bottom padding) */
-  .koszyk{bottom:calc(59px + max(10px, env(safe-area-inset-bottom)))}
+  /* detail page: one bottom bar only (the visit bar with the main action); back button in the header replaces the tab bar */
+  .nav.d-tabbar{display:none}
+  .koszyk{padding-bottom:max(12px, env(safe-area-inset-bottom))}
 }
 @media (min-width:1024px){
   .gal{aspect-ratio:auto;height:340px}
@@ -83,12 +91,16 @@ h2{margin:0;font-size:18px;font-weight:700}
     </a>
     <button type="button" id="serce" class="heart" aria-pressed="false" aria-label="Dodaj studio do ulubionych" style="margin-left:auto"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
     <div id="galeria" class="gal" role="group" aria-label="Zdjęcia prac studia"></div>
-    <div id="naglowek" style="display:flex;gap:14px;align-items:center;flex:1 1 100%;min-width:0">
+    <div id="naglowek" style="display:flex;gap:14px;align-items:flex-start;flex:1 1 100%;min-width:0">
       <div id="logo" style="width:56px;height:56px;border-radius:16px;background:#9E1F50;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px;flex:none">S1</div>
       <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
         <h1 id="nazwa" style="margin:0;font-size:22px;font-weight:700">[Studio 1]</h1>
-        <div style="color:#625860;font-size:13px">[ulica, numer lokalu], [miasto]</div>
-        <a href="opinie.html" class="ocena" aria-label="Ocena 4,9 na 5, 128 opinii, tylko od osób po wizycie"><svg class="gw" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><b>4,9</b><span class="mut">· 128 opinii · tylko po wizycie</span></a>
+        <div class="meta">
+          <a href="opinie.html" class="ocena" aria-label="Ocena 4,9 na 5, 128 opinii, tylko od osób po wizycie"><svg class="gw" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.6 6.6-.8z"></path></svg><b>4,9</b><span class="mut">(128)</span></a>
+          <span aria-hidden="true">·</span><span id="status"></span>
+          <span aria-hidden="true">·</span><span>[ulica, numer lokalu], [miasto]</span>
+          <span aria-hidden="true">·</span><a id="dojazd" href="https://www.google.com/maps/search/?api=1&amp;query=%5Bulica%2C%20numer%20lokalu%5D%2C%20%5Bmiasto%5D" target="_blank" rel="noopener">Jak dojechać</a>
+        </div>
       </div>
     </div>
   </header>
@@ -102,6 +114,8 @@ h2{margin:0;font-size:18px;font-weight:700}
       <span style="color:#625860;font-size:12px">Rabat naliczymy sam, gdy wybierzesz godzinę w tych przedziałach.</span>
     </span>
   </details>
+
+  <div id="polec-baner" hidden role="status" style="margin:12px 20px 0;padding:12px 14px;border-radius:14px;background:#E6F2EC;color:#1F6B47;font-size:14px;line-height:1.4"></div>
 
   <div role="tablist" aria-label="Sekcje strony studia" data-choice style="margin:12px 20px 0;display:flex;border-bottom:1px solid #E4D9DE">
     <button type="button" class="tab" role="tab" id="t-uslugi" aria-controls="p-uslugi" aria-selected="true">Usługi</button>
@@ -363,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // the bar is there from the start: empty it leads to the services, filled it leads to the dates
     $('#koszyk').classList.toggle('pusty', !n); $('#k-czysc').hidden = !n;
     $('#k-dalej').textContent = n ? 'Wybierz termin' : 'Wybierz usługę';
-    if (!n) { $('#k-txt').textContent = 'Nie wybrano jeszcze usługi'; $('#k-powod').hidden = true; return; }
+    if (!n) { $('#k-txt').textContent = `${Mock.plural(document.querySelectorAll('#p-uslugi .add, #p-uslugi a.us').length, ['usługa', 'usługi', 'usług'])} do wyboru`; $('#k-powod').hidden = true; return; }
     const sum = k => koszyk.uslugi.reduce((a, u) => a + u[k], 0);
     $('#k-txt').textContent = `${Mock.plural(n, ['usługa', 'usługi', 'usług'])} · ${zl(sum('cenaMin'), sum('cenaMax'))} · ${Mock.dur(sum('czas'))}`;
     const powody = koszyk.uslugi.map(u => u.powod).filter(Boolean);
@@ -389,6 +403,29 @@ document.addEventListener('DOMContentLoaded', () => {
     location.href = 'termin.html';
   });
   paintKoszyk();
+
+  // invited by a friend (link from "Poleć koleżance"); the studio applies the discount at payment
+  const qp = new URLSearchParams(location.search);
+  if (qp.has('polec')) {
+    const od = (qp.get('od') || '').slice(0, 30);
+    $('#polec-baner').textContent = `${od ? od + ' poleca' : 'Koleżanka poleca'} to studio: masz 20 zł zniżki na pierwszą wizytę. Studio odliczy ją przy płatności.`;
+    $('#polec-baner').hidden = false;
+    Mock.set('polecenie', { studio: nazwa, od });
+  }
+
+  // open now: same hours as the "Informacje" tab (0 = Monday)
+  const GODZ = [[9, 19], [9, 19], [9, 19], [9, 19], [9, 19], [9, 15], null];
+  const otwarte = d => {
+    const w = Mock.weekday(d), g = GODZ[w], h = d.getHours() + d.getMinutes() / 60;
+    if (g && h >= g[0] && h < g[1]) return { on: true, txt: `do ${g[1]}:00` };
+    if (g && h < g[0]) return { on: false, txt: `otwarcie dziś ${g[0]}:00` };
+    for (let i = 1; i <= 7; i++) { const n = GODZ[(w + i) % 7]; if (n) return { on: false, txt: `otwarcie ${i === 1 ? 'jutro' : ['w poniedziałek', 'we wtorek', 'w środę', 'w czwartek', 'w piątek', 'w sobotę', 'w niedzielę'][(w + i) % 7]} ${n[0]}:00` }; }
+    return { on: false, txt: '' };
+  };
+  console.assert(otwarte(new Date(2026, 9, 19, 10)).txt === 'do 19:00' && otwarte(new Date(2026, 9, 24, 16)).txt === 'otwarcie w poniedziałek 9:00'
+    && otwarte(new Date(2026, 9, 20, 7)).txt === 'otwarcie dziś 9:00' && otwarte(new Date(2026, 9, 19, 20)).txt === 'otwarcie jutro 9:00', 'salon otwarte');
+  const o = otwarte(Mock.teraz());
+  $('#status').innerHTML = `<b class="${o.on ? 'on' : 'off'}">${o.on ? 'Otwarte' : 'Zamknięte'}</b> ${o.txt}`;
 
   // happy hours of this studio (offers are kept for [Studio 1] in the mock)
   const aktywne = nazwa === '[Studio 1]' ? Mock.happyHours().filter(h => h.on) : [];

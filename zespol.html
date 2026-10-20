@@ -92,6 +92,10 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, DAYS = ['pn', 'wt', 'śr', 'cz', 'pt', 'sb', 'nd'];
+  const PON = Mock.dzien(-Mock.weekday(Mock.dzien(0))), dt = i => new Date(PON.getFullYear(), PON.getMonth(), PON.getDate() + i); // Monday of this week + i
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const zakres = (a, b) => (a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${Mock.MIESD[b.getMonth()]}` : `${a.getDate()} ${Mock.MIESD[a.getMonth()]} – ${b.getDate()} ${Mock.MIESD[b.getMonth()]}`);
+  document.getElementById('gr-h').textContent = 'Grafik: ' + zakres(dt(0), dt(6));
   const P = { 1: '#F6EDF1', 2: '#EAF0F7' };
   const DEF = { '[Stylistka 1]': ['9–18', '9–18', '9–18', 'urlop', '10–18', '9–14', '—'], '[Stylistka 2]': ['12–20', '9–17', '9–17', '9–17', '9–17', '—', '—'] };
   let G = Mock.get('zespol.grafik', DEF);
@@ -111,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const b = e.target.closest('[data-r]'); if (!b) return;
     const r = b.dataset.r, i = +b.dataset.i, v = G[r][i], m = /^(\d+)–(\d+)$/.exec(v);
     PS.modal({
-      title: `${r}: ${DAYS[i]} ${19 + i} października`, ok: 'Zapisz',
+      title: `${r}: ${DAYS[i]} ${dt(i).getDate()} ${Mock.MIESD[dt(i).getMonth()]}`, ok: 'Zapisz',
       body: `<label class="p-lab">Dzień<select class="p-in" name="typ"><option value="p"${m ? ' selected' : ''}>Pracuje</option><option value="w"${v === '—' ? ' selected' : ''}>Dzień wolny</option><option value="u"${v === 'urlop' ? ' selected' : ''}>Urlop</option></select></label>
         <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<select class="p-in" name="od">${hrs(m ? +m[1] : 9)}</select></label><label class="p-lab" style="flex:1">Do<select class="p-in" name="do">${hrs(m ? +m[2] : 18)}</select></label></div>`,
       onOk: f => { if (f.typ.value === 'p' && +f.od.value >= +f.do.value) { Mock.toast('Godzina końca musi być po początku'); return false; } G[r][i] = f.typ.value === 'p' ? `${f.od.value}–${f.do.value}` : f.typ.value === 'w' ? '—' : 'urlop'; saveG(); renderGrafik(); },
@@ -121,12 +125,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('vac').addEventListener('click', () => PS.modal({
     title: 'Nowy urlop', ok: 'Zapisz urlop',
     body: `<label class="p-lab">Osoba<select class="p-in" name="o">${Object.keys(G).map(r => `<option>${E(r)}</option>`).join('')}</select></label>
-      <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" value="2026-10-22" required></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" value="2026-10-23" required></label></div>
+      <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" value="${iso(Mock.dzien(2))}" min="${iso(Mock.dzien(0))}" required></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" value="${iso(Mock.dzien(3))}" min="${iso(Mock.dzien(0))}" required></label></div>
       <span class="p-mut">Wizyty w tych dniach pokażemy do przełożenia.</span>`,
-    onOk: f => { if (f.do.value < f.od.value) { Mock.toast('Data końca jest przed początkiem'); return false; } for (let i = 0; i < 7; i++) { const d = `2026-10-${19 + i}`; if (d >= f.od.value && d <= f.do.value) G[f.o.value][i] = 'urlop'; } saveG(); renderGrafik(); },
+    onOk: f => { if (f.do.value < f.od.value) { Mock.toast('Data końca jest przed początkiem'); return false; } for (let i = 0; i < 7; i++) { const d = iso(dt(i)); if (d >= f.od.value && d <= f.do.value) G[f.o.value][i] = 'urlop'; } saveG(); renderGrafik(); },
     toast: f => `Zapisano urlop: ${f.o.value}`
   }));
-  document.getElementById('copy').addEventListener('click', () => Mock.toast('Grafik skopiowany na 26 października – 1 listopada'));
+  document.getElementById('copy').addEventListener('click', () => Mock.toast('Grafik skopiowany na ' + zakres(dt(7), dt(13))));
   document.getElementById('print').addEventListener('click', () => Mock.toast('Przygotowano grafik do wydruku (PDF)'));
 
   let inv = Mock.get('zespol.inv', []);

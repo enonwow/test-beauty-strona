@@ -42,6 +42,17 @@
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Program poleceń</h2>
+        <label class="p-chk"><input type="checkbox" checked data-toast-change="Zapisano">Klientki mogą polecać studio (przycisk „Poleć koleżance”)</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <label class="p-lab" style="flex: 1 1 140px">Zniżka dla nowej klientki (zł)<input class="p-in" type="number" min="0" step="5" value="20" data-toast-change="Zapisano"></label>
+          <label class="p-lab" style="flex: 1 1 140px">Nagroda dla polecającej (zł)<input class="p-in" type="number" min="0" step="5" value="20" data-toast-change="Zapisano"></label>
+        </div>
+        <div class="p-box"><span>W październiku z polecenia</span><b>[liczba] nowych klientek · [kwota] zniżek</b></div>
+        <span class="p-mut">Nagroda dla polecającej nalicza się dopiero po odbytej wizycie nowej klientki. Wizyta z polecenia ma w kalendarzu dopisek „z polecenia”.</span>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Kanały rezerwacji</h2>
         <span style="color: #625860; font-size: 12px; line-height: 1.45">Więcej sposobów na rezerwację: widżet na Twoją stronę www, kod QR do wydruku i przycisk „Zarezerwuj” w Google.</span>
         <a class="p-btn" href="profil-studia.html#kanaly">Ustaw kanały rezerwacji</a>
@@ -90,9 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   t.addEventListener('input', upd); upd();
   document.getElementById('grupa').addEventListener('change', e => { document.getElementById('odb').textContent = '[liczba] klientek: ' + e.target.selectedOptions[0].text.toLowerCase(); });
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   document.getElementById('plan').addEventListener('click', () => PS.modal({
+    onOpen: f => { f.d.min = iso(Mock.dzien(0)); f.d.value = iso(Mock.dzien(2)); }, // a campaign cannot be planned in the past
     title: 'Zaplanuj wysyłkę', ok: 'Zaplanuj',
-    body: '<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Data<input class="p-in" type="date" name="d" value="2026-10-22" required></label><label class="p-lab" style="flex:1">Godzina<input class="p-in" type="time" name="g" value="11:00" required></label></div><span class="p-mut">SMS dostaną tylko klientki z aktywną zgodą marketingową. Wiadomość będzie można odwołać do chwili wysyłki.</span>',
+    body: '<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Data<input class="p-in" type="date" name="d" required></label><label class="p-lab" style="flex:1">Godzina<input class="p-in" type="time" name="g" value="11:00" required></label></div><span class="p-mut">SMS dostaną tylko klientki z aktywną zgodą marketingową. Wiadomość będzie można odwołać do chwili wysyłki.</span>',
     toast: f => 'Kampania zaplanowana na ' + f.d.value.split('-').reverse().join('.') + ', ' + f.g.value
   }));
   document.getElementById('kwota').addEventListener('click', () => PS.modal({

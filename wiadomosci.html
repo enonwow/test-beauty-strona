@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – wiadomości</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+<style>
+.wt{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:16px;align-items:start}
+.wl{display:flex;flex-direction:column;gap:4px;padding:8px}
+.wl button{min-height:64px;padding:10px 12px;border:0;border-radius:12px;background:none;font:inherit;color:#1E1A1D;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.wl button:hover{background:#FAF6F8}
+.wl button[aria-pressed=true]{background:#F6EDF1}
+.wl .top{display:flex;justify-content:space-between;gap:8px}
+.wl .new b::after{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#9E1F50;margin-left:6px;vertical-align:middle}
+.wl small{color:#625860;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wm{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding:4px}
+.msg{max-width:78%;padding:10px 12px;border-radius:14px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg small{display:block;margin-top:4px;font-size:12px;opacity:.75}
+.msg.kl{align-self:flex-start;background:#F0E8EC;border-bottom-left-radius:4px}
+.msg.st{align-self:flex-end;background:#1E1A1D;color:#FFFFFF;border-bottom-right-radius:4px}
+.msg.sys{align-self:center;max-width:100%;background:none;color:#625860;font-size:13px;text-align:center;padding:4px}
+.ch{padding:2px 8px;border-radius:999px;background:#FFFFFF;color:#625860;font-size:11px;font-weight:700;border:1px solid #E4D9DE}
+@media (max-width:860px){.wt{grid-template-columns:minmax(0,1fr)}.wm{max-height:none}}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Wiadomości</h1><span class="p-mut">SMS, WhatsApp i e-mail od klientek w jednym miejscu, obok ich wizyt i wycen.</span></div>
+
+    <div class="wt">
+      <section class="p-card" style="padding:0" aria-labelledby="wl-h">
+        <h2 id="wl-h" class="p-sr">Rozmowy</h2>
+        <div id="lista" class="wl" role="group" aria-label="Rozmowy"></div>
+      </section>
+
+      <section id="watek" class="p-card" aria-labelledby="w-h">
+        <div class="p-top">
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><h2 id="w-h" class="p-h2"></h2><span id="w-info" class="p-mut"></span></div>
+          <div class="p-acts"><a class="p-btn sm" href="klientki.html">Karta klientki</a><a class="p-btn sm" href="panel.html">Kalendarz</a></div>
+        </div>
+        <div id="wm" class="wm" aria-live="polite"></div>
+        <hr class="p-sep">
+        <form id="odp" style="display:flex;flex-direction:column;gap:8px">
+          <div class="p-pills" role="group" aria-label="Gotowe odpowiedzi">
+            <button type="button" class="p-pill" data-wzor="Dzień dobry! Potwierdzam wizytę, do zobaczenia.">Potwierdzam wizytę</button>
+            <button type="button" class="p-pill" data-wzor="Proszę wybrać stylizację w kreatorze, od razu zobaczy Pani cenę i wolne terminy: [link do kreatora]">Link do kreatora</button>
+            <button type="button" class="p-pill" data-wzor="Czy może Pani przesłać zdjęcie paznokci? Wtedy dokładnie wycenię uzupełnienie.">Poproś o zdjęcie</button>
+          </div>
+          <label class="p-lab">Odpowiedź<textarea id="tresc" class="p-in" rows="3" required maxlength="1000"></textarea></label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between">
+            <label class="p-lab">Kanał<select id="kanal" class="p-in"><option>SMS</option><option>WhatsApp</option><option>e-mail</option></select></label>
+            <button class="p-btn pri">Wyślij</button>
+          </div>
+          <span class="p-mut">Odpowiadasz tym kanałem, którym napisała klientka. Wiadomości o wizytach nie wymagają zgody marketingowej.</span>
+        </form>
+      </section>
+    </div>
+  </main>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, $ = s => document.querySelector(s), dd = n => Mock.dm(Mock.dzien(n)); // "20.10" for today + n days
+  // seed threads; od: 'kl' klientka, 'st' studio, 'sys' an automatic event from the calendar
+  const SEED = {
+    '[Klientka B]': { info: 'wizyta dziś 11:15 · hybryda M · velvet', msgs: [
+      { od: 'sys', t: `${dd(-2)}, 21:04`, txt: `Rezerwacja z linku na Instagramie: ${Mock.krotko(Mock.dzien(0))}, 11:15` },
+      { od: 'kl', k: 'WhatsApp', t: `${dd(-1)}, 18:02`, txt: 'Dzień dobry, czy mogę jutro zmienić kolor na nude? Velvet zostaje na następny raz :)' }] },
+    '[Klientka F]': { info: 'prośba o wycenę ze zdjęcia', msgs: [
+      { od: 'sys', t: `${dd(-1)}, 16:40`, txt: 'Prośba o wycenę: zdjęcie inspiracji z Instagrama' },
+      { od: 'kl', k: 'SMS', t: `${dd(-1)}, 16:41`, txt: 'Takie jak na zdjęciu, ale krótsze. Ile to wyjdzie?' }] },
+    '[Klientka D]': { info: 'wizyta dziś 9:30 · rzęsy 1:1, uzupełnienie', msgs: [
+      { od: 'sys', t: `${dd(-1)}, 9:30`, txt: 'SMS z prośbą o potwierdzenie doręczony' },
+      { od: 'kl', k: 'SMS', t: `${dd(-1)}, 9:41`, txt: 'TAK' },
+      { od: 'sys', t: `${dd(-1)}, 9:41`, txt: 'Wizyta potwierdzona: w kalendarzu ✓' }], czytane: true },
+    '[Klientka A]': { info: `ostatnia wizyta ${dd(0)} · hybryda jednolita`, msgs: [
+      { od: 'st', k: 'SMS', t: `${dd(-3)}, 19:00`, txt: 'Dziękujemy za wizytę! Zapraszamy ponownie.' },
+      { od: 'kl', k: 'SMS', t: `${dd(-3)}, 19:12`, txt: 'Dziękuję, było super!' }], czytane: true }
+  };
+  // online bookings from the client pages become threads with automatic events
+  const watki = () => {
+    const out = JSON.parse(JSON.stringify(SEED)), sent = Mock.get('wiadomosci', {}) || {};
+    (Mock.get('visits', []) || []).filter(v => !v.zrodlo && v.klientka).slice(0, 5).forEach(v => {
+      const w = out[v.klientka] = out[v.klientka] || { info: `${v.dzien}, ${v.godzina} · ${v.opis || v.usluga}`, msgs: [] };
+      w.msgs.push({ od: 'sys', t: 'online', txt: `Rezerwacja online: ${v.opis || v.usluga}, ${v.dzien} ${v.godzina}${v.status === 'odwołana' ? ' (odwołana przez klientkę)' : ''}` });
+      if (v.potwierdzona) w.msgs.push({ od: 'sys', t: 'online', txt: 'Klientka potwierdziła przybycie' });
+      if (v.faktura) w.msgs.push({ od: 'sys', t: 'online', txt: `Prosi o fakturę: ${v.faktura.firma}, NIP ${v.faktura.nip}` });
+    });
+    Object.entries(sent).forEach(([k, l]) => { (out[k] = out[k] || { info: '', msgs: [] }).msgs.push(...l); });
+    return out;
+  };
+  const read = () => Mock.get('wiadomosci.czytane', []) || [];
+  const nowa = (k, w) => !w.czytane && !read().includes(k) && w.msgs.some(m => m.od === 'kl') && w.msgs[w.msgs.length - 1].od !== 'st';
+  let sel = new URLSearchParams(location.search).get('k');
+
+  function render() {
+    const W = watki();
+    if (!W[sel]) sel = Object.keys(W)[0];
+    if (!read().includes(sel)) Mock.set('wiadomosci.czytane', [...read(), sel]);
+    $('#lista').innerHTML = Object.entries(W).map(([k, w]) => {
+      const last = w.msgs[w.msgs.length - 1] || { txt: '' };
+      return `<button type="button" data-k="${E(k)}" aria-pressed="${k === sel}" class="${nowa(k, w) && k !== sel ? 'new' : ''}"><span class="top"><b>${E(k)}</b><small>${E(last.t || '')}</small></span><small>${last.od === 'st' ? 'Ty: ' : ''}${E(last.txt)}</small></button>`;
+    }).join('');
+    const w = W[sel];
+    $('#w-h').textContent = sel; $('#w-info').textContent = w.info;
+    $('#wm').innerHTML = w.msgs.map(m => `<div class="msg ${m.od}">${E(m.txt)}${m.od === 'sys' ? '' : `<small>${E(m.t)}${m.k ? ` · <span class="ch">${E(m.k)}</span>` : ''}</small>`}</div>`).join('');
+    $('#wm').scrollTop = $('#wm').scrollHeight;
+    const k = [...w.msgs].reverse().find(m => m.od === 'kl' && m.k);
+    $('#kanal').value = k ? k.k : 'SMS';
+  }
+  $('#lista').addEventListener('click', e => {
+    const b = e.target.closest('[data-k]'); if (!b) return;
+    sel = b.dataset.k; history.replaceState(null, '', '?k=' + encodeURIComponent(sel)); render();
+    if (matchMedia('(max-width:860px)').matches) $('#watek').scrollIntoView({ block: 'start' });
+  });
+  document.querySelectorAll('[data-wzor]').forEach(b => b.addEventListener('click', () => { $('#tresc').value = b.dataset.wzor; $('#tresc').focus(); }));
+  $('#odp').addEventListener('submit', e => {
+    e.preventDefault();
+    const txt = $('#tresc').value.trim(); if (!txt) return $('#tresc').focus();
+    const sent = Mock.get('wiadomosci', {}) || {}, d = Mock.teraz();
+    (sent[sel] = sent[sel] || []).push({ od: 'st', k: $('#kanal').value, t: `dziś, ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`, txt });
+    Mock.set('wiadomosci', sent); $('#tresc').value = ''; render();
+    Mock.toast(`Wysłano ${$('#kanal').value === 'e-mail' ? 'e-mail' : $('#kanal').value} do ${sel}`);
+  });
+  render();
+  window.addEventListener('storage', render);
+});
+</script>
+</body>
+</html>

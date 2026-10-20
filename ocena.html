@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!ocena) return Mock.toast('Wybierz ocenę od 1 do 5 gwiazdek');
     const tagi = [...document.querySelectorAll('#tagi [aria-pressed=true]')].map(b => b.textContent.trim());
     const r = Mock.get('reviews', []);
-    r.unshift({ studio, ocena, tekst: $('#tresc').value.trim(), opis, tagi, data: new Date(2026, 9, 19).toLocaleDateString('pl-PL') });
+    r.unshift({ studio, ocena, tekst: $('#tresc').value.trim(), opis, tagi, data: Mock.teraz().toLocaleDateString('pl-PL') });
     Mock.set('reviews', r);
     Mock.toast('Opinia opublikowana. Dziękujemy!');
     setTimeout(() => (location.href = 'opinie.html'), 700);

@@ -18,7 +18,7 @@
 
   <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
     <div class="p-top">
-      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Kasa</h1><span class="p-mut">Wtorek, 20 października. Wizyty rozliczone w kalendarzu trafiają tu od razu.</span></div>
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Kasa</h1><span class="p-mut"><span id="dzis">Dziś</span>. Wizyty rozliczone w kalendarzu trafiają tu od razu.</span></div>
       <div class="p-acts">
         <button type="button" class="p-btn sm" id="in">Wpłata do kasy</button>
         <button type="button" class="p-btn sm" id="out">Wypłata z kasy</button>
@@ -37,7 +37,7 @@
 
     <section class="p-card" aria-labelledby="tx-h">
       <h2 id="tx-h" class="p-h2">Transakcje dnia</h2>
-      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Godzina</th><th>Klientka</th><th>Za co</th><th>Metoda</th><th style="text-align: right">Kwota</th></tr></thead><tbody id="tx"></tbody></table></div>
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Godzina</th><th>Klientka</th><th>Za co</th><th>Metoda</th><th>Dokument</th><th style="text-align: right">Kwota</th></tr></thead><tbody id="tx"></tbody></table></div>
     </section>
 
     <section class="p-card" aria-labelledby="gc-h">
@@ -55,13 +55,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, FUND = 200;
+  document.getElementById('dzis').textContent = Mock.dlugo(Mock.dzien(0));
   const SEED = [
-    { t: '9:00', k: '[Klientka A]', o: 'Hybryda jednolita', m: 'gotówka', v: 140 },
-    { t: '9:30', k: '[Klientka D]', o: 'Rzęsy 1:1 · uzupełnienie (cena przykładowa)', m: 'karta', v: 150 }
+    { t: '9:00', k: '[Klientka A]', o: 'Hybryda jednolita', m: 'gotówka', v: 140, dok: { typ: 'paragon', nr: 'paragon nr 0001' } },
+    { t: '9:30', k: '[Klientka D]', o: 'Rzęsy 1:1 · uzupełnienie (cena przykładowa)', m: 'karta', v: 150, dok: { typ: 'faktura', nr: 'FV/14/10/2026', nip: '1234563218', firma: '[Firma klientki D]' } }
   ];
   const CARDS = [{ code: 'KARTA-DEMO-1', v: 100, od: '[kupująca], na urodziny' }, { code: 'KARTA-DEMO-2', v: 200, od: '[kupująca], prezent' }];
   const zl = n => n.toLocaleString('pl-PL') + ' zł';
-  const tx = () => SEED.concat(Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota })), Mock.get('kasa.gc', []).map(x => ({ t: x.t, k: '[klientka]', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })));
+  const tx = () => SEED.concat(Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota, dok: x.dok })), Mock.get('kasa.gc', []).map(x => ({ t: x.t, k: '[klientka]', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })));
+  const dokTxt = d => (!d ? '<span class="p-mut">–</span>' : d.typ === 'faktura' ? `<span class="p-badge blue" title="${E(d.firma)}, NIP ${E(d.nip)}">${E(d.nr)}</span>` : `<span class="p-mut">${E(d.nr)}</span>`);
   const ruch = () => Mock.get('kasa.ruch', []);
 
   function render() {
@@ -73,14 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('s-got').textContent = zl(got);
     document.getElementById('s-bez').textContent = zl(total - got);
     document.getElementById('s-kasa').textContent = zl(FUND + got + inn - out);
-    document.getElementById('tx').innerHTML = T.map(x => `<tr><td>${E(x.t)}</td><td>${E(x.k)}</td><td>${E(x.o)}</td><td><span class="p-chip">${E(x.m)}</span></td><td style="text-align:right;font-weight:700">${zl(x.v)}</td></tr>`).join('') +
-      R.map(r => `<tr><td>${E(r.t)}</td><td colspan="2">${r.typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy'}: ${E(r.o)}</td><td><span class="p-chip">gotówka</span></td><td style="text-align:right;font-weight:700;color:${r.typ === 'wpłata' ? '#1F6B47' : '#A3262A'}">${r.typ === 'wpłata' ? '+' : '−'}${zl(r.v)}</td></tr>`).join('');
+    document.getElementById('tx').innerHTML = T.map(x => `<tr><td>${E(x.t)}</td><td>${E(x.k)}</td><td>${E(x.o)}</td><td><span class="p-chip">${E(x.m)}</span></td><td>${dokTxt(x.dok)}</td><td style="text-align:right;font-weight:700">${zl(x.v)}</td></tr>`).join('') +
+      R.map(r => `<tr><td>${E(r.t)}</td><td colspan="2">${r.typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy'}: ${E(r.o)}</td><td><span class="p-chip">gotówka</span></td><td><span class="p-mut">KW/KP</span></td><td style="text-align:right;font-weight:700;color:${r.typ === 'wpłata' ? '#1F6B47' : '#A3262A'}">${r.typ === 'wpłata' ? '+' : '−'}${zl(r.v)}</td></tr>`).join('');
     const used = Mock.get('kasa.gc', []).map(x => x.code);
     document.getElementById('gc').innerHTML = CARDS.map(c => `<div class="p-row"><span><b>${E(c.code)}</b> · ${zl(c.v)}<br><span class="p-mut">${E(c.od)}</span></span>${used.includes(c.code) ? '<span class="p-badge ok">zrealizowana</span>' : `<button type="button" class="p-btn sm" data-code="${c.code}">Zrealizuj</button>`}</div>`).join('');
     const closed = Mock.get('kasa.zamkniety', null), bn = document.getElementById('closed');
     bn.hidden = !closed; if (closed) bn.textContent = `Dzień zamknięty o ${closed.t}. Utarg ${zl(total)}, w szufladzie ${closed.policzono} zł${closed.roznica ? ` (różnica ${closed.roznica > 0 ? '+' : ''}${closed.roznica} zł)` : ', bez różnicy'}.`;
   }
-  const now = () => new Date().toTimeString().slice(0, 5);
+  const now = () => Mock.teraz().toTimeString().slice(0, 5);
   function cash(typ) {
     PS.modal({
       title: typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy', ok: 'Zapisz',

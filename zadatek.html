@@ -47,6 +47,12 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     </a>
     <h1 style="margin:0;font-size:20px;font-weight:700">Zaliczka</h1>
   </header>
+  <ol class="kroki" aria-label="Etapy rezerwacji">
+    <li class="ok"><span class="sr">Zrobione: </span>Usługa</li>
+    <li class="ok"><span class="sr">Zrobione: </span>Termin i dane</li>
+    <li aria-current="step">Zaliczka</li>
+    <li>Gotowe</li>
+  </ol>
 
   <div class="d-cols">
   <div class="d-aside">
@@ -58,8 +64,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <div class="row"><span>Do zapłaty w studiu</span><b><span id="reszta">140</span> zł</b></div>
   </section>
 
-  <section aria-label="Zasady zaliczki" style="margin:16px 20px 0;padding:14px;border-radius:14px;border:2px solid #1E1A1D;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45">
-    <b style="font-size:15px">Przeczytaj, zanim zapłacisz</b>
+  <section aria-label="Zasady zaliczki" style="margin:16px 20px 0;padding:14px 16px;border-radius:14px;border:1px solid #E4D9DE;background:#FAF6F8;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45">
+    <b style="font-size:15px;display:flex;align-items:center;gap:8px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>Przeczytaj, zanim zapłacisz</b>
     <span>Odwołasz do <b id="termin-odw">poniedziałku 19.10, 11:15</b> (24 h przed): zaliczka wraca automatycznie w ciągu 5 dni roboczych.</span>
     <span>Odwołasz później albo nie przyjdziesz: zaliczki nie zwracamy.</span>
     <span>Studio odwoła wizytę: zawsze zwrot całości.</span>
@@ -133,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const m = B.dzien.match(/(\d{1,2})\.(\d{2})/);
     if (m) {
       const [h, mi] = B.godzina.split(':');
-      const d = new Date(2026, m[2] - 1, +m[1], +h, +mi - 24 * 60);
+      const d0 = Mock.zKrotko(B.dzien), d = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate(), +h, +mi - 24 * 60);
       const dnia = ['niedzieli', 'poniedziałku', 'wtorku', 'środy', 'czwartku', 'piątku', 'soboty'][d.getDay()];
       $('#termin-odw').textContent = `${dnia} ${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}, ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
     }

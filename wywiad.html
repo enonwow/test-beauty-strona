@@ -50,7 +50,7 @@ const BOX = {
 };
 
 async function start() {
-  if (!KAT[kat]) { root.innerHTML = '<p style="padding-top: 20px">Nie wiemy, którego zabiegu dotyczą pytania. <a href="salon.html">Wybierz usługę w studiu</a>.</p>'; return; }
+  if (!KAT[kat]) { root.innerHTML = '<div style="margin-top: 24px; padding: 24px 20px; border-radius: 16px; background: #FAF6F8; display: flex; flex-direction: column; align-items: flex-start; gap: 10px"><h2 style="margin: 0; font-size: 18px">Najpierw wybierz zabieg</h2><p style="margin: 0; color: #625860; line-height: 1.5">Pytania zależą od zabiegu, a nie wiemy jeszcze, który wybierasz. Wybierz usługę w studiu albo ułóż ją w kreatorze.</p><a href="salon.html" style="margin-top: 4px; min-height: 48px; padding: 0 20px; border-radius: 12px; background: #9E1F50; color: #FFFFFF; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center">Wybierz usługę</a></div>'; return; }
   document.getElementById('wstecz').href = KAT[kat].plik;
   booking = window.Mock?.get('booking', null);
   if (!booking || booking.kat !== kat) { root.innerHTML = `<p style="padding-top: 20px; line-height: 1.5">Najpierw skonfiguruj zabieg, żeby pytania dotyczyły tego, co wybierzesz. <a href="${KAT[kat].plik}">Przejdź do kreatora</a>.</p>`; return; }

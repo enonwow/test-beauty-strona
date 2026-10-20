@@ -22,6 +22,14 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .inp{min-height:52px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:16px;box-sizing:border-box;width:100%}
 .doc{max-height:260px;overflow:auto;padding:14px;border:1px solid #E4D9DE;border-radius:14px;background:#FAF6F8;font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:8px}
 .doc p{margin:0}
+/* studio tablet: the client signs with a stylus, so the pad is big */
+body.studio #pad{height:min(42vh,340px)}
+body.studio .d-page{max-width:900px}
+body.studio .d-main{max-width:none}
+body.studio .doc{max-height:32vh;font-size:16px}
+.pen{display:flex;gap:8px;align-items:center;font-size:13px;color:#1F6B47}
+#d-img{display:block;width:100%;max-width:420px;height:auto;border:1px solid #E4D9DE;border-radius:12px;background:#fff}
+.pin{min-height:56px;font-size:24px;letter-spacing:.4em;text-align:center}
 #pad{display:block;width:100%;height:160px;border:1px dashed #A99BA2;border-radius:12px;background:#fff;touch-action:none;cursor:crosshair}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
 .d-cols{flex:1}
@@ -34,10 +42,10 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 <div class="app d-page">
 
   <header style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
-    <a href="wizyty.html" data-back aria-label="Wróć" class="back">
+    <a href="wizyty.html" id="wstecz" data-back aria-label="Wróć" class="back">
       <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
     </a>
-    <div style="display:flex;flex-direction:column"><h1 style="margin:0;font-size:20px;font-weight:700">Podpisz przed wizytą</h1><span id="studio" style="color:#625860;font-size:13px">[Nazwa studia]</span></div>
+    <div style="display:flex;flex-direction:column"><h1 id="tytul" style="margin:0;font-size:20px;font-weight:700">Podpisz przed wizytą</h1><span id="studio" style="color:#625860;font-size:13px">[Nazwa studia]</span></div>
   </header>
 
   <div class="d-cols"><div class="d-main">
@@ -47,14 +55,18 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <div id="doc" class="doc" tabindex="0" role="region" aria-labelledby="dt"></div>
 
     <div style="display:flex;flex-direction:column;gap:8px">
-      <b>Twój podpis</b>
+      <b id="pad-t">Twój podpis</b>
       <div role="group" aria-label="Sposób podpisu" style="display:flex;gap:6px;flex-wrap:wrap">
         <button type="button" class="tab" id="m-draw" aria-pressed="true">Narysuj</button>
         <button type="button" class="tab" id="m-type" aria-pressed="false">Wpisz imię i nazwisko</button>
       </div>
       <div id="p-draw" style="display:flex;flex-direction:column;gap:8px">
         <canvas id="pad" aria-label="Pole podpisu odręcznego. Jeśli nie możesz rysować, wybierz „Wpisz imię i nazwisko”." role="img"></canvas>
-        <button type="button" class="tab" id="clear" style="align-self:flex-start">Wyczyść</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button type="button" class="tab" id="undo" disabled>Cofnij</button>
+          <button type="button" class="tab" id="clear">Wyczyść</button>
+          <span id="pen" class="pen" hidden role="status"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>Rysik wykryty: dotyk dłoni jest pomijany, nacisk zmienia grubość linii</span>
+        </div>
       </div>
       <div id="p-type" hidden style="display:flex;flex-direction:column;gap:6px">
         <label for="typed" style="font-size:13px;color:#625860">Wpisz imię i nazwisko jako podpis</label>
@@ -71,21 +83,38 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <section id="done" hidden aria-live="polite" style="padding:24px 20px;display:flex;flex-direction:column;gap:14px">
     <div style="width:56px;height:56px;border-radius:50%;background:#E6F2EC;color:#1F6B47;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></div>
     <h2 style="margin:0;font-size:24px">Podpisano</h2>
+    <img id="d-img" hidden alt="Złożony podpis">
+    <p id="oddaj" hidden style="margin:0;padding:12px 14px;border-radius:12px;background:#FFF1E0;color:#8A3B12;line-height:1.45">Dziękujemy! Oddaj tablet stylistce.</p>
     <div style="padding:14px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:6px">
       <b id="d-doc"></b>
       <span id="d-kiedy"></span>
       <span style="color:#625860;font-size:14px">Kod dokumentu: <b id="d-kod" style="color:#1E1A1D"></b></span>
     </div>
     <button type="button" class="btn out" id="pdf">Pobierz kopię (PDF)</button>
-    <a href="wizyty.html" class="btn">Wróć do wizyt</a>
+    <a href="wizyty.html" id="d-wroc" class="btn">Wróć do wizyt</a>
+    <button type="button" id="d-panel" class="btn" hidden data-open="#pin">Zakończ (stylistka)</button>
     <span style="color:#625860;font-size:12px;line-height:1.4">To zwykły podpis elektroniczny (forma dokumentowa). Kopia trafi do Ciebie e-mailem.</span>
   </section>
 
   </div></div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+<dialog id="pin" aria-labelledby="pin-t">
+  <form id="pin-f" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="pin-t" style="margin:0;font-size:18px">Powrót do panelu</h2>
+    <p style="margin:0;font-size:14px;line-height:1.45">Tablet jest w trybie klientki, żeby nie mogła zajrzeć do panelu. Wpisz PIN stylistki. W makiecie działa każdy 4-cyfrowy PIN.</p>
+    <input id="pin-in" class="inp pin" type="password" inputmode="numeric" autocomplete="off" maxlength="4" aria-label="PIN stylistki" aria-describedby="pin-err">
+    <span id="pin-err" role="alert" hidden style="color:#A3262A;font-size:13px">Wpisz 4 cyfry.</span>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn out" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Wróć do panelu</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+import { createPad } from './podpis-pad.js';
+{ // module scripts run after the DOM is parsed
   const $ = s => document.querySelector(s);
   // Treści to wzory do sprawdzenia z prawnikiem, nazwy w nawiasach to miejsca na dane studia.
   const DOCS = {
@@ -107,41 +136,36 @@ document.addEventListener('DOMContentLoaded', () => {
       'Zgodę mogę wycofać w każdej chwili, a studio usunie zdjęcia w ciągu [x] dni.',
       'Brak zgody nie wpływa na możliwość skorzystania z usług.']]
   };
-  const q = new URLSearchParams(location.search).get('doc');
+  const qp = new URLSearchParams(location.search), q = qp.get('doc');
+  // studio mode: the stylist hands a tablet to the client at reception (?tryb=studio&k=imię&wroc=klientki|formularze)
+  const studio = qp.get('tryb') === 'studio', kl = (qp.get('k') || '').slice(0, 60);
+  const wroc = { klientki: 'klientki.html', formularze: 'formularze.html' }[qp.get('wroc')] || 'panel.html';
   const doc = DOCS[q] ? q : 'rodo';
   const B = Mock.get('booking', {}) || {};
   $('#studio').textContent = B.studio || '[Nazwa studia]';
+  if (studio) {
+    document.body.classList.add('studio');
+    $('#tytul').textContent = 'Podpis w studiu';
+    $('#studio').textContent = `Dla: ${kl || '[Klientka]'} · tablet studia`;
+    $('#pad-t').textContent = 'Podpis klientki (rysikiem albo palcem)';
+    const w = $('#wstecz'); w.removeAttribute('data-back'); w.href = '#'; w.dataset.open = '#pin'; w.setAttribute('aria-label', 'Zakończ (PIN stylistki)');
+    $('#d-wroc').hidden = true; $('#d-panel').hidden = false; $('#oddaj').hidden = false;
+  }
+  $('#pin-in').addEventListener('input', () => { $('#pin-err').hidden = true; });
+  $('#pin-f').addEventListener('submit', e => {
+    e.preventDefault();
+    const ok = /^\d{4}$/.test($('#pin-in').value); $('#pin-err').hidden = ok;
+    if (ok) location.href = wroc + (kl && wroc === 'klientki.html' ? '?k=' + encodeURIComponent(kl) : '');
+  });
   $('#dt').textContent = DOCS[doc][0];
   $('#doc').innerHTML = DOCS[doc][1].map(p => `<p>${p.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))}</p>`).join('');
 
-  // --- pole podpisu (pointer events: palec, rysik i mysz) ---
-  const cv = $('#pad'), ctx = cv.getContext('2d');
-  let ink = false, drawing = false, last = null, travel = 0;
-  function size() {
-    const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-    if (!r.width) return;
-    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1E1A1D';
-  }
-  const pt = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-  cv.addEventListener('pointerdown', e => {
-    drawing = true; travel = 0; cv.setPointerCapture(e.pointerId); last = pt(e);
-    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(last.x + 0.01, last.y); ctx.stroke();
-  });
-  cv.addEventListener('pointermove', e => {
-    if (!drawing) return;
-    const p = pt(e);
-    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
-    travel += Math.hypot(p.x - last.x, p.y - last.y); last = p;
-    if (travel > 12) ink = true; // samo kliknięcie nie jest podpisem
-    refresh();
-  });
-  const end = () => { drawing = false; refresh(); };
-  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
-  $('#clear').addEventListener('click', () => { ctx.clearRect(0, 0, cv.width, cv.height); ink = false; refresh(); });
-  window.addEventListener('resize', () => { if (!ink) size(); });
-  size();
+  // --- pole podpisu: palec, rysik i mysz (podpis-pad.js) ---
+  const cv = $('#pad');
+  const pad = createPad(cv, { onChange: () => refresh(), onPen: () => { $('#pen').hidden = false; } });
+  $('#undo').addEventListener('click', () => pad.undo());
+  $('#clear').addEventListener('click', () => pad.clear());
+  const size = pad.size;
 
   let mode = 'odręczny';
   function setMode(m) {
@@ -154,10 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#m-draw').addEventListener('click', () => setMode('odręczny'));
   $('#m-type').addEventListener('click', () => setMode('wpisany'));
 
-  const signed = () => (mode === 'odręczny' ? ink : $('#typed').value.trim().length >= 3);
+  const signed = () => (mode === 'odręczny' ? pad.travel() > 12 : $('#typed').value.trim().length >= 3); // a single tap is not a signature
   function refresh() {
     const ready = signed() && $('#ok').checked;
-    $('#go').disabled = !ready;
+    $('#go').disabled = !ready; $('#undo').disabled = !pad.strokes;
     $('#hint').textContent = ready ? 'Gotowe do podpisania.' : !signed() ? 'Aby podpisać: złóż podpis i zaznacz zgodę.' : 'Zaznacz, że zapoznałaś się z dokumentem.';
   }
   $('#typed').addEventListener('input', refresh); $('#ok').addEventListener('change', refresh);
@@ -167,10 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     if ($('#go').disabled) return;
     const user = Mock.get('user', null) || {};
-    const klientka = mode === 'wpisany' ? $('#typed').value.trim() : (user.imie || '[Klientka]');
-    const now = new Date();
-    // zapisujemy tylko dane o podpisie, nigdy obrazka z pola podpisu
-    const entry = { doc, nazwa: DOCS[doc][0], klientka, data: now.toISOString(), sposob: mode };
+    const klientka = studio ? kl || '[Klientka]' : mode === 'wpisany' ? $('#typed').value.trim() : (user.imie || '[Klientka]');
+    const sposob = mode === 'wpisany' ? 'wpisany' + (studio ? ' na tablecie w studiu' : '') : studio ? (pad.penSeen ? 'odręczny rysikiem w studiu' : 'odręczny na tablecie w studiu') : mode;
+    const now = Mock.teraz();
+    // zapisujemy tylko dane o podpisie, nigdy obrazka z pola podpisu (obrazek widać raz na ekranie potwierdzenia)
+    const entry = { doc, nazwa: DOCS[doc][0], klientka, data: now.toISOString(), sposob };
+    if (studio && mode === 'odręczny') { $('#d-img').src = cv.toDataURL('image/png'); $('#d-img').hidden = false; }
     Mock.set('podpisy', [entry, ...Mock.get('podpisy', [])]);
     $('#f').hidden = true; $('#done').hidden = false;
     $('#d-doc').textContent = entry.nazwa;
@@ -181,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   $('#pdf').addEventListener('click', () => Mock.toast('Kopia (PDF) została pobrana'));
   refresh();
-});
+}
 </script>
 </body>
 </html>

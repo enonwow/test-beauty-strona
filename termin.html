@@ -69,13 +69,19 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     </a>
     <h1 id="tytul" style="margin:0;font-size:20px;font-weight:700">Wybierz termin</h1>
   </header>
+  <ol id="kroki" class="kroki" aria-label="Etapy rezerwacji">
+    <li class="ok"><span class="sr">Zrobione: </span>Usługa</li>
+    <li aria-current="step">Termin i dane</li>
+    <li id="krok-zal">Zaliczka</li>
+    <li>Gotowe</li>
+  </ol>
 
   <div class="d-cols">
   <!-- phone: wrappers vanish and "order" keeps the old sequence; desktop: summary + button stick on the right -->
   <div class="d-aside">
   <div class="o1" style="margin:16px 20px 0;padding:14px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:10px">
     <div style="display:flex;gap:12px;align-items:center">
-      <div aria-hidden="true" style="width:44px;height:44px;border-radius:10px;background:#5B1630;flex:none"></div>
+      <img id="sum-foto" src="zdjecia/k-paznokcie.jpg" alt="" width="52" height="52" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
       <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
         <span id="opis-sum" style="font-weight:500" data-bind="booking.opis">Manicure hybrydowy · M · velvet × 10</span>
         <span style="color:#625860;font-size:13px"><span id="cena-txt">200 zł</span> · <span id="czas-txt">1 h 50 min</span> · <span data-bind="booking.studio">[Studio 1]</span></span>
@@ -152,18 +158,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   </section>
 
   <section class="sec">
-    <h2>Październik 2026</h2>
-    <div id="dni" data-choice role="group" aria-label="Dzień" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px">
-      <button type="button" class="day" aria-pressed="false" data-value="19"><small>pon</small><b>19</b></button>
-      <button type="button" class="day" aria-pressed="true" data-value="20"><small>wt</small><b>20</b></button>
-      <button type="button" class="day" aria-pressed="false" data-value="21"><small>śr</small><b>21</b></button>
-      <button type="button" class="day brak" aria-pressed="false" data-value="22" aria-label="czwartek 22, brak wolnych godzin"><small>czw</small><b>22</b></button>
-      <button type="button" class="day" aria-pressed="false" data-value="23"><small>pt</small><b>23</b></button>
-      <button type="button" class="day" aria-pressed="false" data-value="24"><small>sob</small><b>24</b></button>
-      <button type="button" class="day" aria-pressed="false" data-value="26"><small>pon</small><b>26</b></button>
-      <button type="button" class="day" aria-pressed="false" data-value="27"><small>wt</small><b>27</b></button>
-      <button type="button" class="day" aria-pressed="false" data-value="28"><small>śr</small><b>28</b></button>
-    </div>
+    <h2 id="mies-h">Najbliższe dni</h2>
+    <div id="dni" data-choice role="group" aria-label="Dzień" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px"></div>
     <span id="dni-note" style="color:#625860;font-size:12px">Przekreślone dni nie mają okna na <span id="czas-txt2">1 h 50 min</span>. Kliknij, żeby zapisać się na listę oczekujących.</span>
   </section>
 
@@ -172,6 +168,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <p style="margin:0;color:#625860;font-size:13px;line-height:1.4">Pokazujemy tylko godziny, w których zmieści się cała wizyta.</p>
     <div id="sloty" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px"></div>
     <p id="slot-err" class="err" role="alert" tabindex="-1" hidden style="margin:0"></p>
+    <p id="kolizja" hidden style="margin:0;color:#625860;font-size:13px;line-height:1.45"></p>
     <p id="t-info" role="status" hidden style="margin:0;padding:10px 12px;border-radius:10px;background:#FFF1E0;color:#8A3B12;font-size:13px;line-height:1.4"></p>
     <span id="hh-note" hidden style="color:#625860;font-size:13px;line-height:1.4">Godziny z rabatem są oznaczone. Wizyta musi zacząć się w przedziale happy hours.</span>
     <div id="brak" hidden style="padding:14px;border-radius:12px;background:#FFF1E0;color:#8A3B12;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.4">
@@ -192,6 +189,12 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <label for="tel">Telefon (SMS z potwierdzeniem i przypomnieniem)</label>
       <input id="tel" class="inp" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="tel-err">
       <span id="tel-err" class="err" hidden></span>
+    </div>
+    <label style="display:flex;gap:10px;align-items:center;min-height:44px;font-size:14px"><input id="fv" type="checkbox" style="width:22px;height:22px;margin:0;flex:none">Potrzebuję faktury na firmę</label>
+    <div id="fv-box" hidden style="display:flex;flex-direction:column;gap:12px">
+      <div class="fld"><label for="nip">NIP</label><input id="nip" class="inp" type="text" inputmode="numeric" autocomplete="off" placeholder="np. 123-456-32-18" aria-describedby="nip-err"><span id="nip-err" class="err" hidden></span></div>
+      <div class="fld"><label for="firma">Nazwa firmy</label><input id="firma" class="inp" type="text" autocomplete="organization" aria-describedby="firma-err"><span id="firma-err" class="err" hidden></span></div>
+      <span style="color:#625860;font-size:12px;line-height:1.4">Studio wystawi fakturę po wizycie. Pobierzesz ją w „Moich wizytach”. Bez faktury dostajesz paragon.</span>
     </div>
     <div id="dla-w" class="fld">
       <span id="dla-h" style="font-size:13px;color:#625860">Dla kogo jest wizyta?</span>
@@ -244,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const B = qs && qs !== B0.studio ? { ...(B0.uslugi ? {} : B0), studio: qs } : B0; // another studio than the cart: start without the cart
   if (B !== B0) Mock.set('booking', B);
   const b = { ...DEF, ...B, cena: B.cena != null ? Number(B.cena) : DEF.cena, czas: Number(B.czas) || DEF.czas };
+  $('#sum-foto').src = Mock.fotoKat(b.kategoria);
   if (B !== B0) { $('#opis-sum').textContent = b.opis; document.querySelector('[data-bind="booking.studio"]').textContent = b.studio; } // mock.js already bound the old booking
   const user = Mock.get('user', {}) || {};
   const przeloz = new URLSearchParams(location.search).has('przeloz');
@@ -261,11 +265,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const czasTekst = konsult ? fmtMin(b.czas) : (b.czasTekst || fmtMin(b.czas));
   const cenaTxt = konsult ? '0 zł' : (cenaMax > cenaMin ? `${cenaMin}–${cenaMax} zł` : `${cenaMax} zł`);
 
-  const DN = { 19: ['pon', 'Poniedziałek'], 20: ['wt', 'Wtorek'], 21: ['śr', 'Środa'], 22: ['czw', 'Czwartek'], 23: ['pt', 'Piątek'], 24: ['sob', 'Sobota'], 26: ['pon', 'Poniedziałek'], 27: ['wt', 'Wtorek'], 28: ['śr', 'Środa'] };
-  const SLOTS = { 19: ['12:00', '14:30', '15:00', '16:40', '17:30', '18:00', '19:15'], 20: ['9:00', '11:15', '14:30', '16:40'], 21: ['10:00', '12:30', '15:00'], 22: [], 23: ['9:30', '13:00', '16:00'], 24: ['10:00', '12:00'], 26: ['10:00', '13:00'], 27: ['9:00', '12:00', '15:30'], 28: ['11:00', '14:00'] };
   const toMin = s => { const [h, m] = s.split(':'); return h * 60 + +m; };
   const toStr = n => Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0');
-  const sel = { styl: B.stylistka || 'Dowolna', day: 20, slot: '11:15', osoby: 1, dla: 'ja', dojazd: false, strefa: 0 };
+  // the next 9 opening days from today (closed on Sundays); a day's key is its offset from today, so key * 1440 + minutes orders slots in time
+  const WZOR = [['12:00', '14:30', '15:00', '16:40', '17:30', '18:00', '19:15'], ['9:00', '11:15', '14:30', '16:40'], ['10:00', '12:30', '15:00'], [], ['9:30', '13:00', '16:00'], ['10:00', '12:00'], ['10:00', '13:00'], ['9:00', '12:00', '15:30'], ['11:00', '14:00']]; // sample free hours, the 4th day is fully booked
+  const DNI_N = []; for (let n = 0; DNI_N.length < 9; n++) if (Mock.dzien(n).getDay() !== 0) DNI_N.push(n);
+  const T0 = Mock.teraz(), juzMin = T0.getHours() * 60 + T0.getMinutes() + 30; // today: only hours at least 30 min ahead
+  const SLOTS = {}, DN = {};
+  DNI_N.forEach((n, k) => { SLOTS[n] = WZOR[k].filter(t => n > 0 || toMin(t) >= juzMin); DN[n] = Mock.SKR[Mock.dzien(n).getDay()]; });
+  const kr = n => Mock.krotko(Mock.dzien(n)), dl = n => Mock.dlugo(Mock.dzien(n)); // "wt 20.10", "Wtorek, 20 października"
+  const sel = { styl: B.stylistka || 'Dowolna', day: DNI_N[0], slot: null, osoby: 1, dla: 'ja', dojazd: false, strefa: 0 };
   // services chosen on the studio page (cart); several services = one visit with the summed time
   const uslugi = Array.isArray(B.uslugi) && B.uslugi.length ? B.uslugi : null;
   const mozna = !przeloz && uslugi && !konsult && !test48;
@@ -278,12 +287,17 @@ document.addEventListener('DOMContentLoaded', () => {
   let sent = false, step = 1, test = null; // test48h: step 1 = test slot, step 2 = treatment slot
   const dur = () => (test48 && step === 1 ? testMin : b.czas);
   const minStart = () => (test && step === 2 ? test.day * 1440 + toMin(test.slot) + 48 * 60 : 0);
-  const valid = d => SLOTS[d].filter(s => toMin(s) + dur() <= 20 * 60 && d * 1440 + toMin(s) >= minStart() && miejsca(d, s) >= sel.osoby);
+  // the client's own upcoming visits (any studio): a new visit for herself may not overlap them; the visit being moved does not count
+  const moje = () => (sel.dla === 'inna' ? [] : (Mock.get('visits', []) || []).filter(v => v.status === 'nadchodząca' && !v.dlaKogo && v.id !== B.visitId && v.id !== B.testVisitId && v.godzina && v.koniec && Mock.zKrotko(v.dzien))
+    .map(v => ({ d: Mock.odDzis(Mock.zKrotko(v.dzien)), od: toMin(v.godzina), do: toMin(v.koniec), v })));
+  const kolizja = (d, s) => moje().find(z => z.d === d && toMin(s) < z.do && z.od < toMin(s) + dur());
+  const valid = d => SLOTS[d].filter(s => toMin(s) + dur() <= 20 * 60 && d * 1440 + toMin(s) >= minStart() && miejsca(d, s) >= sel.osoby && !kolizja(d, s));
+  sel.day = DNI_N.find(n => valid(n).length) ?? DNI_N[0]; // start on the first day where the whole visit fits (late in the day, today may have none)
 
-  // happy hours: only for the treatment itself (no test, consultation, reschedule or series); day 19.10 is a Monday
+  // happy hours: only for the treatment itself (no test, consultation, reschedule or series); the weekday comes from the real date of the day
   // with several services the discount applies only when the offer covers every category in the cart (the lowest rate wins)
   const promoAll = (d, s) => {
-    const hits = [...new Set(uslugi ? uslugi.map(u => u.kategoria) : [b.kategoria])].map(k => Mock.promoFor(k, (d - 19) % 7, s.padStart(5, '0')));
+    const hits = [...new Set(uslugi ? uslugi.map(u => u.kategoria) : [b.kategoria])].map(k => Mock.promoFor(k, Mock.weekday(Mock.dzien(d)), s.padStart(5, '0')));
     return hits.includes(null) ? null : hits.sort((x, y) => x.rabat - y.rabat)[0];
   };
   const promoAt = (d, s) => (konsult || przeloz || B.seria || (test48 && step === 1) ? null : promoAll(d, s));
@@ -300,7 +314,8 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#czas-txt').textContent = czasTekst; $('#czas-txt2').textContent = czasTekst;
   $('#zad-kw').textContent = zadatek;
   $('#zad').checked = Mock.get('studioZadatek', true);
-  $('#zad').addEventListener('change', e => Mock.set('studioZadatek', e.target.checked));
+  const krokZal = () => { $('#krok-zal').hidden = $('#zad-lab').hidden || !$('#zad').checked; };
+  $('#zad').addEventListener('change', e => { Mock.set('studioZadatek', e.target.checked); krokZal(); });
   if (user.imie) $('#imie').value = user.imie;
   if (user.tel) $('#tel').value = user.tel;
   if (cenaMax > cenaMin && !konsult && B.powodPrzedzialu && !przeloz) { $('#powod').hidden = false; $('#powod').textContent = `Dlaczego widełki: ${String(B.powodPrzedzialu).replace(/[.\s]+$/, '')}.`; }
@@ -325,6 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (blokada && !przeloz) { $('#blok').hidden = false; $('#rez-btn').disabled = true; }
   if (test48 && !przeloz) $('#krok').hidden = false;
   if (cenaMax === 0 || konsult) $('#zad-lab').hidden = true;
+  if (przeloz) $('#kroki').hidden = true;
+  krokZal();
 
   // several services in one visit
   if (uslugi) {
@@ -363,8 +380,11 @@ document.addEventListener('DOMContentLoaded', () => {
       $('#innaimie').value = x ? x.imie : ''; $('#innatel').value = x ? x.tel || '' : ''; $('#zapisz-bliska').hidden = !!x;
     });
   }
-  $('#dla').addEventListener('mock:choice', e => { sel.dla = e.detail.value; $('#inna').hidden = sel.dla !== 'inna'; });
+  $('#dla').addEventListener('mock:choice', e => { sel.dla = e.detail.value; $('#inna').hidden = sel.dla !== 'inna'; draw(); });
 
+  $('#dni').innerHTML = DNI_N.map(n => { const d = Mock.dzien(n); return `<button type="button" class="day" aria-pressed="false" data-value="${n}"><small>${n === 0 ? 'dziś' : DN[n]}</small><b>${d.getDate()}</b></button>`; }).join('');
+  { const a = Mock.dzien(DNI_N[0]), z = Mock.dzien(DNI_N[DNI_N.length - 1]), M = m => Mock.MIES[m][0].toUpperCase() + Mock.MIES[m].slice(1);
+    $('#mies-h').textContent = a.getMonth() === z.getMonth() ? `${M(a.getMonth())} ${a.getFullYear()}` : `${M(a.getMonth())}${a.getFullYear() !== z.getFullYear() ? ' ' + a.getFullYear() : ''} – ${Mock.MIES[z.getMonth()]} ${z.getFullYear()}`; }
   const chip = [...document.querySelectorAll('#styl .chip')].find(c => c.dataset.value === sel.styl);
   if (chip) document.querySelectorAll('#styl .chip').forEach(c => c.setAttribute('aria-pressed', String(c === chip)));
   else sel.styl = 'Dowolna';
@@ -396,13 +416,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (step === 1) $('#krok-txt').innerHTML = `<b>Krok 1 z 2: test uczuleniowy (${testMin} min).</b> Najpierw krótki test na skórze. Zabieg zarezerwujesz najwcześniej 48 h po teście.`;
     else {
       const m = minStart(), d = Math.floor(m / 1440);
-      $('#krok-txt').innerHTML = `<b>Krok 2 z 2: zabieg.</b> Test: ${DN[test.day][0]} ${test.day}.10, ${test.slot}–${toStr(toMin(test.slot) + testMin)}. Zabieg najwcześniej ${DN[d] ? DN[d][0] : ''} ${d}.10, ${toStr(m % 1440)}; wcześniejsze terminy są wyszarzone.`;
+      $('#krok-txt').innerHTML = `<b>Krok 2 z 2: zabieg.</b> Test: ${kr(test.day)}, ${test.slot}–${toStr(toMin(test.slot) + testMin)}. Zabieg najwcześniej ${kr(d)}, ${toStr(m % 1440)}; wcześniejsze terminy są wyszarzone.`;
     }
   }
   function draw() {
     document.querySelectorAll('#dni .day').forEach(btn => {
       const d = +btn.dataset.value, ok = valid(d).length > 0;
       btn.classList.toggle('brak', !ok && !minStart());
+      if (!ok && !minStart()) btn.setAttribute('aria-label', `${dl(d)}, brak wolnych godzin`); else btn.removeAttribute('aria-label');
       btn.disabled = !ok && !!minStart();
     });
     if (minStart() && !valid(sel.day).length) {
@@ -412,17 +433,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#dni .day').forEach(btn => btn.setAttribute('aria-pressed', String(+btn.dataset.value === sel.day)));
     const list = valid(sel.day);
     if (!list.includes(sel.slot)) sel.slot = null;
-    $('#dzien-tyt').textContent = `${DN[sel.day][1]}, ${sel.day} października`;
+    $('#dzien-tyt').textContent = `${dl(sel.day)}`;
     $('#sloty').innerHTML = list.map(s => { const p = promoAt(sel.day, s); return `<button type="button" class="slot" data-t="${s}" aria-pressed="${s === sel.slot}"${p ? ` aria-label="${s}, rabat ${p.rabat}%"` : ''}><b>${s}</b>${p ? `<span class="pr">−${p.rabat}%</span>` : ''}</button>`; }).join('');
     $('#hh-note').hidden = !list.some(s => promoAt(sel.day, s));
+    const kol = [...new Set(SLOTS[sel.day].map(s => kolizja(sel.day, s)).filter(Boolean))];
+    $('#kolizja').hidden = !kol.length;
+    $('#kolizja').textContent = kol.length ? 'Nie pokazujemy godzin, w których masz już wizytę: ' + kol.map(z => `${z.v.dzien}, ${z.v.godzina}–${z.v.koniec} w ${z.v.studio}`).join('; ') + '.' : '';
     $('#brak').hidden = list.length > 0;
     $('#brak-lista').hidden = !!minStart();
-    $('#brak-txt').textContent = minStart() ? 'Brak wolnych godzin w terminach dostępnych po teście. Zmień termin testu.' : `${DN[sel.day][1]}, ${sel.day}.10: brak wolnego okna na ${fmtMin(dur())}.`;
-    $('#lista-txt').textContent = `Damy znać SMS-em, gdy w dniu ${DN[sel.day][0]} ${sel.day}.10 zwolni się okno na ${fmtMin(dur())}.`;
+    $('#brak-txt').textContent = minStart() ? 'Brak wolnych godzin w terminach dostępnych po teście. Zmień termin testu.' : `${dl(sel.day)}: brak wolnego okna na ${fmtMin(dur())}.`;
+    $('#lista-txt').textContent = `Damy znać SMS-em, gdy w dniu ${kr(sel.day)} zwolni się okno na ${fmtMin(dur())}.`;
     $('#dni-note').hidden = !!minStart();
     $('#czas-txt2').textContent = fmtMin(dur());
     const dla = sel.styl === 'Dowolna' ? '' : ' · ' + sel.styl;
-    $('#wizyta').textContent = sel.slot ? `${label()}: ${DN[sel.day][0]} ${sel.day}.10, ${sel.slot}–${toStr(toMin(sel.slot) + dur())}${dla}` : 'Wybierz godzinę.';
+    $('#wizyta').textContent = sel.slot ? `${label()}: ${kr(sel.day)}, ${sel.slot}–${toStr(toMin(sel.slot) + dur())}${dla}` : 'Wybierz godzinę.';
     setBtn(); stepInfo();
   }
   $('#sloty').addEventListener('click', e => {
@@ -434,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // an hour clicked on the results page (?t=14:30&d=19): select it, or explain and jump to the nearest free one
   const qt = qp.get('t');
   if (qt && !przeloz) {
-    const d0 = DN[+qp.get('d')] ? +qp.get('d') : 19, t0 = qt.replace(/^0/, '');
+    const d0 = SLOTS[+qp.get('d')] ? +qp.get('d') : DNI_N[0], t0 = qt.replace(/^0/, '');
     sel.day = d0;
     if (valid(d0).includes(t0)) sel.slot = t0;
     else {
@@ -446,10 +470,13 @@ document.addEventListener('DOMContentLoaded', () => {
       sel.slot = null;
       if (best) { sel.day = best.d; sel.slot = best.t; }
       $('#t-info').hidden = false;
-      $('#t-info').textContent = best ? `Godzina ${t0} ${powod}. Zaznaczyliśmy najbliższy wolny termin: ${DN[best.d][0]} ${best.d}.10, ${best.t}.` : `Godzina ${t0} ${powod}. Wybierz inny dzień.`;
+      $('#t-info').textContent = best ? `Godzina ${t0} ${powod}. Zaznaczyliśmy najbliższy wolny termin: ${kr(best.d)}, ${best.t}.` : `Godzina ${t0} ${powod}. Wybierz inny dzień.`;
     }
   }
-  ['imie', 'tel', 'innaimie', 'd-adres'].forEach(id => $('#' + id).addEventListener('input', () => { $('#' + id + '-err').hidden = true; $('#' + id).setAttribute('aria-invalid', 'false'); }));
+  $('#fv').addEventListener('change', e => { $('#fv-box').hidden = !e.target.checked; });
+  if (przeloz) $('#fv').parentElement.hidden = true;
+  if (user.faktura) { $('#fv').checked = true; $('#fv-box').hidden = false; $('#nip').value = user.faktura.nip; $('#firma').value = user.faktura.firma; }
+  ['imie', 'tel', 'innaimie', 'd-adres', 'nip', 'firma'].forEach(id => $('#' + id).addEventListener('input', () => { $('#' + id + '-err').hidden = true; $('#' + id).setAttribute('aria-invalid', 'false'); }));
   $('#krok-zmien').addEventListener('click', () => { step = 1; sel.slot = null; test = null; draw(); });
   draw();
 
@@ -464,7 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ['slot', true, () => (sel.slot ? '' : 'Wybierz godzinę wizyty.')],
       ['imie', true, () => ($('#imie').value.trim() ? '' : 'Wpisz imię.')],
       ['tel', true, () => { const n = $('#tel').value.replace(/[^0-9]/g, '').length; return n >= 9 && n <= 12 ? '' : 'Wpisz numer telefonu, np. 600 100 200.'; }],
-      ['innaimie', inna0, () => ($('#innaimie').value.trim() ? '' : 'Wpisz imię osoby, która przyjdzie.')]
+      ['innaimie', inna0, () => ($('#innaimie').value.trim() ? '' : 'Wpisz imię osoby, która przyjdzie.')],
+      ['nip', !przeloz && $('#fv').checked, () => (Mock.nipOk($('#nip').value) ? '' : 'Sprawdź NIP: 10 cyfr, np. 123-456-32-18.')],
+      ['firma', !przeloz && $('#fv').checked, () => ($('#firma').value.trim() ? '' : 'Wpisz nazwę firmy.')]
     ];
     let pierwszy = null;
     pola.forEach(([id, aktywne, test]) => {
@@ -482,20 +511,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const inna = inna0, imie = $('#imie').value.trim(), adres = $('#d-adres').value.trim();
     sent = true; // one click = one visit
     $('#rez-btn').disabled = true; $('#rez-btn').setAttribute('aria-busy', 'true'); $('#btn-txt').textContent = przeloz ? 'Przekładam…' : 'Rezerwuję…';
-    const dzien = `${DN[sel.day][0]} ${sel.day}.10`, godzina = sel.slot, koniec = toStr(toMin(godzina) + dur());
+    const dzien = `${kr(sel.day)}`, godzina = sel.slot, koniec = toStr(toMin(godzina) + dur());
     const klientka = inna ? $('#innaimie').value.trim() : (przeloz && B.klientka) || imie;
     const dlaKogo = przeloz ? B.dlaKogo || null : inna ? { imie: klientka, tel: $('#innatel').value.trim() } : null;
     const dojazd = przeloz ? B.dojazd || null : sel.dojazd ? { adres, oplata: STREFY[sel.strefa].oplata, strefa: STREFY[sel.strefa].strefa } : null;
     const osoby = przeloz ? B.osoby || 1 : sel.osoby;
+    const faktura = przeloz ? B.faktura || null : $('#fv').checked ? { nip: $('#nip').value.replace(/[\s-]/g, ''), firma: $('#firma').value.trim() } : null;
+    if (faktura && user.zalogowana) Mock.set('user', { ...user, faktura }); // next booking fills the invoice fields
     if (inna && $('#zapisz-b').checked && !$('#zapisz-bliska').hidden) Mock.set('bliscy', [...bliscy, { imie: klientka, tel: dlaKogo.tel }]);
     const visits = Mock.get('visits', []);
     const kontakt = { imie, tel: $('#tel').value.trim() }; // who booked (not necessarily who comes): used to create an account from the confirmation
-    const base = { kategoria: b.kategoria, studio: b.studio, stylistka: sel.styl, klientka, kontakt, dlaKogo, osoby, dojazd, status: 'nadchodząca' };
+    const base = { kategoria: b.kategoria, studio: b.studio, stylistka: sel.styl, klientka, kontakt, dlaKogo, osoby, dojazd, faktura, polecenie: (Mock.get('polecenie', null) || {}).studio === b.studio ? Mock.get('polecenie') : null, status: 'nadchodząca' };
     const pr = pricing();
     const promo = pr.p ? { id: pr.p.id, nazwa: pr.p.nazwa, rabat: pr.p.rabat, kwota: pr.rMax - (pr.max - pr.D), cenaMinPrzed: pr.rMin, cenaMaxPrzed: pr.rMax } : null;
     const price = { cena: pr.max, cenaMin: pr.min, cenaMax: pr.max, ...(przeloz ? {} : { promo, bazaCena: { min: cenaMin, max: cenaMax } }) }; // prices already after the discount
     const extra = { uslugi: B.uslugi || null, bazaCena: { min: cenaMin, max: cenaMax }, cenaMin: pr.min, cenaMax: pr.max, promo, powodPrzedzialu: B.powodPrzedzialu || '', pozycje: B.pozycje || [], uwagi: B.uwagi || [], seria: B.seria || null, sciezka };
-    let main, bk = { ...b, stylistka: sel.styl, dzien, godzina, koniec, klientka, kontakt, dlaKogo, osoby, dojazd };
+    let main, bk = { ...b, stylistka: sel.styl, dzien, godzina, koniec, klientka, kontakt, dlaKogo, osoby, dojazd, faktura };
     if (konsult && !przeloz) {
       main = { ...base, usluga: 'Konsultacja', opis: 'Konsultacja przed zabiegiem · ' + b.opis, cena: 0, czasTekst: czasTekst, czas: b.czas, typ: 'konsultacja', dzien, godzina, koniec };
       bk = { ...bk, opis: main.opis, cena: 0, cenaMin: 0, cenaMax: 0, powodPrzedzialu: '', pozycje: [{ nazwa: 'Konsultacja', cena: 0, min: b.czas }], czasTekst, seria: null };
@@ -507,13 +538,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const idx = visits.findIndex(v => v.id === B.visitId);
     const t0 = Date.now();
     if (idx >= 0) {
-      Object.assign(visits[idx], { dzien, godzina, koniec, stylistka: sel.styl, status: 'nadchodząca' }, przeloz || konsult ? {} : { cena: pr.max, cenaMin: pr.min, cenaMax: pr.max, promo, osoby, dlaKogo, dojazd, klientka });
+      Object.assign(visits[idx], { dzien, godzina, koniec, stylistka: sel.styl, status: 'nadchodząca' }, przeloz || konsult ? {} : { cena: pr.max, cenaMin: pr.min, cenaMax: pr.max, promo, osoby, dlaKogo, dojazd, klientka, faktura });
       main.id = visits[idx].id;
     } else {
       main.id = t0 + 1; visits.unshift(main);
     }
     if (test48 && !przeloz && test) {
-      const tv = { ...base, usluga: 'Test uczuleniowy', opis: 'Test uczuleniowy przed: ' + b.opis, cena: 0, czasTekst: fmtMin(testMin), czas: testMin, typ: 'test', dzien: `${DN[test.day][0]} ${test.day}.10`, godzina: test.slot, koniec: toStr(toMin(test.slot) + testMin), zabiegId: main.id };
+      const tv = { ...base, usluga: 'Test uczuleniowy', opis: 'Test uczuleniowy przed: ' + b.opis, cena: 0, czasTekst: fmtMin(testMin), czas: testMin, typ: 'test', dzien: `${kr(test.day)}`, godzina: test.slot, koniec: toStr(toMin(test.slot) + testMin), zabiegId: main.id };
       const ti = visits.findIndex(v => v.id === B.testVisitId);
       if (ti >= 0) { Object.assign(visits[ti], tv); tv.id = visits[ti].id; } else { tv.id = t0; visits.unshift(tv); }
       bk = { ...bk, testDzien: tv.dzien, testGodzina: tv.godzina, testKoniec: tv.koniec, testVisitId: tv.id };
@@ -522,6 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Mock.set('visits', visits);
     Mock.set('booking', { ...bk, visitId: main.id });
     if (uslugi && !przeloz) Mock.set('koszyk', { studio: b.studio, uslugi: [] }); // the cart is spent
+    if (base.polecenie) Mock.set('polecenie', null); // the referral discount is for the first visit only
     const needZad = !przeloz && !konsult && pr.max > 0 && $('#zad').checked && !B.zadatek;
     Mock.toast(przeloz ? 'Wizyta przełożona' : konsult ? 'Konsultacja zarezerwowana' : 'Termin zarezerwowany');
     setTimeout(() => (location.href = needZad ? 'zadatek.html' : 'potwierdzenie.html'), 600);

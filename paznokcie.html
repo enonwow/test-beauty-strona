@@ -10,15 +10,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"><!-- not render-blocking: the 3D/photo canvas must not wait for fonts -->
 <link rel="stylesheet" href="mock.css">
+<link rel="stylesheet" href="desktop.css">
 <style>
   :root { --bg:#FFFFFF; --panel:#fff; --ink:#1E1A1D; --muted:#625860; --line:#E4D9DE; --accent:#9E1F50; --tint:#F6EDF1; }
   * { box-sizing:border-box; }
-  html, body { margin:0; height:100%; font-family:'DM Sans', system-ui, sans-serif; color:var(--ink); background:var(--bg); }
-  body { display:flex; flex-direction:column; }
-  #app { display:flex; flex:1; min-height:0; }
+  html, body { margin:0; font-family:'DM Sans', system-ui, sans-serif; color:var(--ink); }
   [hidden] { display:none !important; }
-  #view { flex:1; position:relative; min-width:0; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 35%, #fff, #eadcd6); }
-  #view canvas { display:block; width:100%; height:100%; touch-action:none; }
+  #view { position:relative; min-width:0; overflow:hidden; border-radius:16px; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 35%, #fff, #eadcd6); }
+  #view canvas { display:block; width:100%; height:100%; touch-action:none; } /* photo mode: resize() makes it cover the frame, zoomed onto the nails */
   #video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transform:scaleX(-1); background:#000; }
   #photoEmpty { color:var(--muted); padding:24px; text-align:center; }
   #photoTools, #demoTools { display:grid; gap:10px; margin-top:10px; }
@@ -33,19 +32,32 @@
   .file input { position:absolute; opacity:0; width:1px; height:1px; }
   .chips button:disabled { opacity:.4; cursor:default; }
   #editor { display:block; width:100%; max-width:300px; margin:0 auto; background:var(--bg); border-radius:8px; cursor:crosshair; touch-action:none; }
-  #panel { width:380px; overflow-y:auto; background:var(--panel); border-left:1px solid var(--line); padding:16px; }
-  @media (max-width:760px) { /* the page scrolls; the picture stays pinned above the options */
-    html, body { height:auto; min-height:100%; }
-    #app { flex-direction:column; flex:none; }
-    #view { flex:none; height:42vh; position:sticky; top:0; z-index:6; }
-    #panel { width:auto; overflow:visible; border-left:0; border-top:1px solid var(--line); padding-bottom:104px; }
-    #book { display:none; } /* the bottom bar has it */
+  .d-main { padding:0 20px; }
+  #side { display:flex; flex-direction:column; gap:12px; }
+  #pcard { display:none; flex-direction:column; gap:8px; padding:12px 16px; border-radius:16px; background:#1E1A1D; color:#fff; }
+  #pcard .pc-top { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  #cardPrice { font-family:'Bricolage Grotesque', sans-serif; font-size:24px; font-weight:700; }
+  #cardTime { color:#E9DEE3; font-size:14px; white-space:nowrap; }
+  #cardLines { display:flex; flex-direction:column; gap:8px; }
+  #cardLines div { display:flex; justify-content:space-between; gap:12px; font-size:14px; color:#E9DEE3; }
+  #cardLines span:last-child { white-space:nowrap; color:#fff; }
+  #pcard .pc-note { color:#E9DEE3; font-size:12px; line-height:1.45; }
+  .pc-go { display:flex; align-items:center; justify-content:center; min-height:48px; border-radius:12px; background:#fff; color:#1E1A1D; font-weight:700; text-decoration:none; }
+  .pc-go:hover { color:#1E1A1D; }
+  #kroki a { flex:1 1 auto; min-width:44px; display:flex; flex-direction:column; gap:4px; min-height:44px; font-size:12px; color:var(--ink); text-decoration:none; white-space:nowrap; }
+  #kroki a::before { content:''; height:4px; border-radius:2px; background:var(--accent); }
+  @media (max-width:1023px) { /* phone and tablet: the picture stays pinned above the steps, at most 35% of the screen */
+    #side { order:-1; position:sticky; top:0; z-index:6; background:#fff; padding:8px 20px; }
+    #view { height:min(35vh, 280px); }
+    .step { scroll-margin-top:310px; }
   }
+  @media (min-width:1024px) { #view { aspect-ratio:4/3; } #pcard { display:flex; } #pbar { display:none !important; } }
+  #hint { margin-top:16px; }
   .sub { font-size:12px; color:var(--muted); margin:0 0 8px; }
-  .step { margin:14px 0; }
-  .step h2 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px; font-weight:600; }
+  .step { margin:20px 0; }
+  .step h2 { font-size:15px; color:var(--ink); margin:0 0 10px; font-weight:700; } /* same step heading as the other creators (kreator.js) */
   .chips { display:flex; flex-wrap:wrap; gap:6px; }
-  .chips button { border:1px solid var(--line); background:#fff; color:var(--ink); padding:6px 10px; border-radius:999px; cursor:pointer; font:inherit; font-size:13px; }
+  .chips button { border:1px solid var(--line); background:#fff; color:var(--ink); padding:6px 12px; border-radius:999px; cursor:pointer; font:inherit; font-size:14px; }
   .chips button[aria-pressed=true] { background:var(--tint); border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); } /* 2 px accent frame without moving the layout */
   .chips button[aria-pressed=true]::before { content:'\2713'; margin-right:5px; color:var(--accent); font-weight:700; }
   .swatches { display:flex; flex-wrap:wrap; align-items:center; }
@@ -63,14 +75,13 @@
   #quote td:last-child { text-align:right; white-space:nowrap; }
   #total { font-size:15px; font-weight:600; margin:8px 0; }
   #pbar { display:none; }
-  @media (max-width:760px) {
-    #pbar { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:20; align-items:center; gap:12px; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); border-radius:16px 16px 0 0; background:#1E1A1D; color:#fff; box-shadow:0 -6px 20px rgba(30,26,29,.18); }
+  @media (max-width:1023px) {
+    #pbar { display:flex; position:fixed; left:50%; transform:translateX(-50%); width:100%; max-width:390px; bottom:0; z-index:20; align-items:center; gap:12px; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); border-radius:16px 16px 0 0; background:#1E1A1D; color:#fff; box-shadow:0 -6px 20px rgba(30,26,29,.18); }
     #pbar .pb-info { flex:1; min-width:0; display:flex; flex-direction:column; }
     #pbPrice { font-family:'Bricolage Grotesque', sans-serif; font-size:20px; font-weight:700; }
     #pbTime { color:#E9DEE3; font-size:13px; }
     #pbar a { display:inline-flex; align-items:center; min-height:48px; padding:0 20px; border-radius:12px; background:#fff; color:#1E1A1D; font-weight:700; text-decoration:none; }
   }
-  .cta { display:block; margin-top:10px; padding:12px; border-radius:12px; background:var(--ink); color:#fff; text-align:center; text-decoration:none; font-weight:600; }
   #recipe { padding-left:20px; font-size:13px; line-height:1.5; margin:0; }
   #recipe li { margin-bottom:4px; }
   @media (max-width:1023px) { /* 44 px touch targets on phones and tablets; desktop keeps the compact chips */
@@ -89,6 +100,7 @@
 </head>
 <body>
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="d-page" style="min-height: 100vh; background: #FFFFFF; display: flex; flex-direction: column">
 <header style="padding: 16px 20px 12px; display: flex; align-items: center; gap: 12px">
   <a href="start.html" data-back aria-label="Wróć" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4D9DE; display: flex; align-items: center; justify-content: center; color: #1E1A1D; flex: none">
     <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
@@ -97,14 +109,13 @@
     <span style="color: #625860; font-size: 12px">Paznokcie · [Nazwa studia]</span>
     <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Kreator paznokci</h1>
   </div>
+  <button type="button" id="odNowa" style="min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #625860; font: inherit; font-size: 13px; cursor: pointer">Od nowa</button>
 </header>
-<div id="app">
-  <div id="view">
-    <div id="err">Ta przeglądarka nie obsługuje WebGL.</div>
-    <video id="video" playsinline muted hidden></video>
-    <p id="photoEmpty" hidden>Włącz kamerę albo wgraj zdjęcie grzbietu dłoni.</p>
-  </div>
-  <aside id="panel">
+<nav id="kroki" aria-label="Kroki" style="padding: 0 20px 12px; display: flex; gap: 2px; border-bottom: 1px solid #F0E8EC">
+  <a href="#krok-1">Usługa</a><a href="#krok-2">Kształt</a><a href="#krok-3">Kolor</a><a href="#krok-5">Efekt</a><a href="#krok-6">Wzór</a><a href="#krok-7">Top</a><a href="#krok-8">Zdobienia</a>
+</nav>
+<div class="d-cols" style="flex: 1">
+  <main class="d-main">
     <p class="sub" id="hint">Wybierz przykładową dłoń albo wgraj własne zdjęcie. Kliknij paznokieć, żeby go wybrać.</p>
     <section class="step">
       <h2 id="h-mode">Podgląd</h2>
@@ -142,8 +153,8 @@
       </div>
     </section>
     <div id="controls"></div>
-    <section class="step">
-      <h2 id="h-deco">7. Zdobienia</h2>
+    <section class="step" id="krok-8">
+      <h2 id="h-deco">8. Zdobienia</h2>
       <div class="chips" id="presetChips" role="group" aria-labelledby="h-deco"></div>
       <div class="range"><label for="arcN" class="sub">Cyrkonie w łuku</label><input type="range" id="arcN" min="1" max="9" step="1" value="5"><output id="arcNOut">5</output></div>
       <div class="chips"><button type="button" id="advToggle" aria-pressed="false">Układam i maluję samodzielnie (tryb zaawansowany)</button></div>
@@ -159,16 +170,33 @@
         <p class="sub">Dodatki 3D: kliknij, żeby dodać; przeciągnij, żeby przesunąć; kółko myszy zmienia rozmiar. Malowanie: przeciągnij pędzlem albo kliknij stemplem. Prawy przycisk lub dwuklik usuwa element pod kursorem. Ctrl + Z cofa, Ctrl + Y ponawia.</p>
       </div>
     </section>
-    <section class="step">
-      <h2>Wycena i karta stylizacji</h2>
+    <section class="step m-only"><!-- on desktop the dark card in the side column shows the same lines -->
+      <h2>Wycena</h2>
       <table id="quote"></table>
       <p id="total"></p>
+    </section>
+    <section class="step">
+      <h2>Karta stylizacji</h2>
       <div class="chips"><button type="button" id="copyLink">Kopiuj link</button><button type="button" id="png">Pobierz kartę PNG</button></div>
-      <a href="termin.html" id="book" data-book class="cta">Wybierz termin</a>
       <p class="sub" id="code" aria-live="polite"></p>
     </section>
     <section class="step"><h2>Proces wykonania</h2><ol id="recipe"></ol></section>
-  </aside>
+  </main>
+  <div id="side" class="d-aside">
+    <div id="view">
+      <div id="err">Ta przeglądarka nie obsługuje WebGL.</div>
+      <video id="video" playsinline muted hidden></video>
+      <p id="photoEmpty" hidden>Włącz kamerę albo wgraj zdjęcie grzbietu dłoni.</p>
+    </div>
+    <div id="pcard" role="region" aria-label="Cena i czas">
+      <div class="pc-top"><span id="cardPrice"></span><span id="cardTime"></span></div>
+      <div id="cardLines"></div>
+      <div style="height: 1px; background: #4A4247"></div>
+      <span class="pc-note">Cena brutto i czas wynikają z wyborów w kreatorze, nie ze zdjęcia.</span>
+      <a href="termin.html" id="book" data-book class="pc-go">Dalej: wybierz termin</a>
+    </div>
+  </div>
+</div>
 </div>
 <div id="pbar" role="region" aria-label="Cena i czas">
   <div class="pb-info"><span id="pbPrice"></span><span id="pbTime"></span></div>
@@ -534,7 +562,9 @@ function quote(s, P) {
   if (mt && mattes) add(mt, qty(mt, mattes, mattes), 'Top matowy');
   return { items, total:Math.round(items.reduce((a, i) => a + i.price, 0)*100)/100, minutes:items.reduce((a, i) => a + i.minutes, 0) };
 }
-const zl = v => v.toFixed(2).replace('.', ',') + ' zł';
+// whole złoty like the other creators ("200 zł"); grosze only when the price really has them
+const zl = v => { const r = Math.round(v * 100) / 100; return (Number.isInteger(r) ? String(r) : r.toFixed(2).replace('.', ',')) + ' zł'; };
+console.assert(zl(175) === '175 zł' && zl(12.5) === '12,50 zł' && zl(0.1 + 0.2) === '0,30 zł', 'paznokcie zl');
 const hm = m => (m >= 60 ? `${Math.floor(m/60)} h ` : '') + `${m % 60} min`;
 
 // ---------- scene ----------
@@ -679,7 +709,13 @@ function renderQuote(s) {
     return tr;
   }));
   document.getElementById('total').textContent = `Razem ${zl(lastQuote.total)} brutto · ok. ${hm(lastQuote.minutes)}`;
-  document.getElementById('pbPrice').textContent = zl(lastQuote.total); document.getElementById('pbTime').textContent = `ok. ${hm(lastQuote.minutes)}`;
+  document.getElementById('pbPrice').textContent = document.getElementById('cardPrice').textContent = zl(lastQuote.total);
+  document.getElementById('pbTime').textContent = document.getElementById('cardTime').textContent = `ok. ${hm(lastQuote.minutes)}`;
+  document.getElementById('cardLines').replaceChildren(...lastQuote.items.map(i => {
+    const row = document.createElement('div');
+    row.append(Object.assign(document.createElement('span'), { textContent:i.label }), Object.assign(document.createElement('span'), { textContent:zl(i.price) }));
+    return row;
+  }));
   document.getElementById('code').textContent = `Kod projektu: ${designCode(s)} · ${P.salon ?? ''}`;
 }
 
@@ -787,14 +823,23 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const onPhoto = () => mode !== '3d'; // "photo" and "demo" both show the photo scene
 let dirty = true; // render on demand: the loop only draws after a change or while the orbit is still moving
 function renderFrame() { onPhoto() ? renderer.render(photo.scene, photo.camera) : renderer.render(scene, camera); }
+function frameOf(w, h) {
+  const { width:iw, height:ih } = photo.img, cover = Math.max(w/iw, h/ih);
+  const pts = photo.cal ? photo.cal.nails.flatMap(n => [n.cuticle, n.tip]) : photo.hands.flatMap(hd => FINGER_IDS.map(f => [hd[FINGER_LM[f][1]].x*iw, hd[FINGER_LM[f][1]].y*ih]));
+  if (!pts.length) return { k:cover, fx:iw/2, fy:ih/2 };
+  const xs = pts.map(q => q[0]), ys = pts.map(q => q[1]), pad = 0.08*Math.max(iw, ih), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  return { k:Math.max(cover, Math.min(w/(x1 - x0 + 2*pad), h/(y1 - y0 + 2*pad))), fx:(x0 + x1)/2, fy:(y0 + y1)/2 };
+}
 function resize() {
   dirty = true;
   const { clientWidth:w, clientHeight:h } = view, el = renderer.domElement;
   if (onPhoto() && photo.img) {
-    const k = Math.min(w/photo.img.width, h/photo.img.height), cw = Math.floor(photo.img.width*k), ch = Math.floor(photo.img.height*k);
-    renderer.setSize(cw, ch, false); el.style.width = cw + 'px'; el.style.height = ch + 'px';
+    // The photo covers the frame (no pale bars), zoomed onto the nails and centred on them; the frame clips the rest.
+    const { k, fx, fy } = frameOf(w, h), cw = Math.ceil(photo.img.width*k), ch = Math.ceil(photo.img.height*k);
+    renderer.setSize(cw, ch, false);
+    Object.assign(el.style, { position:'absolute', width:cw + 'px', height:ch + 'px', left:clamp(w/2 - fx*k, w - cw, 0) + 'px', top:clamp(h/2 - fy*k, h - ch, 0) + 'px' });
   } else {
-    renderer.setSize(w, h, false); el.style.width = el.style.height = '100%';
+    renderer.setSize(w, h, false); Object.assign(el.style, { position:'static', width:'100%', height:'100%' });
     camera.aspect = w / h; camera.updateProjectionMatrix();
   }
 }
@@ -977,7 +1022,7 @@ async function setPhoto(src, preset = null, cal = null) { // preset: a demo entr
   photoStatus('Szukam dłoni…');
   try { photo.hands = (await landmarker()).detect(c).landmarks; }
   catch (e) { photoStatus(`Nie udało się wczytać wykrywania dłoni (${e.message}). Sprawdź internet i spróbuj ponownie.`); return; }
-  placePhotoNails(); syncPhotoUI(); // enables "Dodaj do demo"
+  resize(); placePhotoNails(); syncPhotoUI(); // enables "Dodaj do demo"; resize: the frame zooms onto the detected hand
   photoStatus(photo.hands.length ? `Wykryte dłonie: ${photo.hands.length}. Przeciągnij paznokieć, żeby go przesunąć; kółko myszy zmienia rozmiar, Alt + kółko długość, Shift + kółko obraca.`
     : 'Nie wykryto dłoni. Pokaż grzbiet dłoni z lekko rozstawionymi palcami, w dobrym świetle, i spróbuj ponownie.');
 }
@@ -1221,6 +1266,7 @@ const sections = {};
 const chip = (v, label, onclick) => { const b = Object.assign(document.createElement('button'), { type:'button', textContent:label, onclick }); b.dataset.v = v; return b; };
 for (const u of UI) {
   const sec = document.createElement('section'); sec.className = 'step';
+  const num = /^(\d)\./.exec(u.title); if (num) sec.id = 'krok-' + num[1]; // targets of the steps bar
   const h = document.createElement('h2'); h.textContent = u.title; h.id = 'h-' + u.key; sec.append(h);
   const box = document.createElement('div'); box.setAttribute('role', 'group'); box.setAttribute('aria-labelledby', h.id);
   if (u.type === 'chips') {
@@ -1291,6 +1337,7 @@ function selectNail(id, add) {
   syncUI(); drawEditor();
 }
 addEventListener('hashchange', () => { state = parseHash(location.hash); rebuild(); syncUI(); });
+$('odNowa').onclick = () => { state = parseHash(''); sel = [...FINGER_IDS]; commit(); }; // back to the default styling (one undo step)
 
 // ---------- decorations + painting: presets and the 2D editor of the first selected nail ----------
 for (const [k, p] of Object.entries(PRESETS)) $('presetChips').append(chip(k, p.label, () => applyDeco(p.items(nailLength(state), +$('arcN').value))));

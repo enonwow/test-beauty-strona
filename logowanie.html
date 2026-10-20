@@ -16,7 +16,6 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
 .cell.f{border:2px solid #9E1F50;font-weight:700}
 .btn{min-height:52px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .btn:hover{background:#7A173D}
-.btn-d{background:#1E1A1D}.btn-d:hover{background:#3a3338}
 .lnk{border:0;background:none;color:#9E1F50;font:inherit;text-decoration:underline;cursor:pointer;padding:0;min-height:44px}
 .lnk:disabled{color:#625860;text-decoration:none;cursor:default}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -48,9 +47,9 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
     </div>
   </div>
 
-  <button type="button" id="wyslij" class="btn btn-d">Wyślij kod SMS</button>
+  <button type="button" id="wyslij" class="btn">Wyślij kod SMS</button>
 
-  <fieldset style="margin:0;padding:12px;border:1px solid #E4D9DE;border-radius:16px;display:flex;flex-direction:column;gap:10px">
+  <fieldset id="kod-box" hidden style="margin:0;padding:12px;border:1px solid #E4D9DE;border-radius:16px;display:flex;flex-direction:column;gap:10px">
     <legend style="padding:0 6px;font-size:13px;color:#625860">Kod z SMS-a</legend>
     <div id="kod" style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px">
       <input class="cell" aria-label="Cyfra 1" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
@@ -64,7 +63,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
     <span style="color:#625860;font-size:12px">W makiecie działa każdy 6-cyfrowy kod.</span>
   </fieldset>
 
-  <button type="submit" class="btn">Zaloguj</button>
+  <button type="submit" id="zaloguj" class="btn" hidden>Zaloguj</button>
 
   <p style="margin:0;margin-top:auto;color:#625860;font-size:12px;line-height:1.5">Logując się lub zakładając konto, akceptujesz [regulamin] i [politykę prywatności]. Nie wysyłamy reklam bez Twojej osobnej zgody.</p>
 </form>
@@ -122,6 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function wyslij() {
     if (digits().length < 9) { $('#tel').focus(); return Mock.toast('Wpisz 9-cyfrowy numer telefonu'); }
     Mock.toast('Kod wysłany SMS-em na +48 ' + digits());
+    // one primary button at a time: the code field and "Zaloguj" appear once the code is on its way
+    $('#kod-box').hidden = $('#zaloguj').hidden = false; $('#wyslij').hidden = true;
     odliczanie(42); cells[0].focus();
   }
   $('#wyslij').addEventListener('click', wyslij);
@@ -145,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('#log').addEventListener('submit', e => {
     e.preventDefault();
+    if ($('#kod-box').hidden) return wyslij(); // Enter in the phone field sends the code
     if (digits().length < 9) { $('#tel').focus(); return Mock.toast('Wpisz 9-cyfrowy numer telefonu'); }
     if (cells.some(c => !c.value)) { (cells.find(c => !c.value)).focus(); return Mock.toast('Wpisz 6-cyfrowy kod z SMS-a'); }
     tel = $('#tel').value.trim();

@@ -19,7 +19,7 @@
   <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
     <div class="p-top">
       <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Formularze i zgody</h1><span class="p-mut">Klientka wypełnia formularz w telefonie przed pierwszą wizytą. Treści poniżej to wzory, sprawdź je z prawnikiem.</span></div>
-      <button type="button" class="p-btn pri" id="newform">+ Nowy formularz</button>
+      <div class="p-acts"><a class="p-btn" id="plik-btn" href="podpis-dokument.html?wroc=formularze">Podpisz plik na tablecie</a><button type="button" class="p-btn pri" id="newform">+ Nowy formularz</button></div>
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('pv').innerHTML = `<b style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px">${E(x.n)}</b>` + x.q.map((q, i) => {
       const L = `${E(q.t)}${q.r ? ' *' : ''}`;
       if (q.y === 'tak') return `<fieldset style="border:0;padding:0;margin:0"><legend style="padding:0 0 4px">${L}</legend><label class="p-chk" style="display:inline-flex;margin-right:14px"><input type="radio" name="p${i}"> Tak</label><label class="p-chk" style="display:inline-flex"><input type="radio" name="p${i}"> Nie</label></fieldset>`;
-      if (q.y === 'podpis') return `<label class="p-lab">${L}<span style="height:56px;border:1px dashed #A99BA2;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#625860">podpis palcem</span></label>`;
+      if (q.y === 'podpis') return `<label class="p-lab">${L}<span style="height:56px;border:1px dashed #A99BA2;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#625860">podpis rysikiem lub palcem</span></label>`;
       if (q.y === 'dlugi') return `<label class="p-lab">${L}<textarea class="p-in" rows="2"></textarea></label>`;
       if (q.y === 'data') return `<label class="p-lab">${L}<input class="p-in" type="date"></label>`;
       if (q.y === 'wybor') return `<label class="p-lab">${L}<select class="p-in"><option>Wybierz</option><option>Opcja 1</option><option>Opcja 2</option></select></label>`;
@@ -122,14 +122,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!x) { $('sign').innerHTML = ''; return; }
     if (!PS.addon('podpisy')) { $('sign').innerHTML = PS.signUpsell(); return; }
     $('sign').innerHTML = `<b>Podpis elektroniczny</b>` + (doc
-      ? `<span class="p-mut">Podpisano: ${nPodp(x.id)}. Klientka podpisuje w telefonie palcem albo wpisuje imię i nazwisko.</span><div class="p-acts"><button type="button" class="p-btn sm dark" id="send">Wyślij do podpisu</button><a class="p-btn sm" id="tablet" href="podpis.html?doc=${doc}" target="_blank" rel="noopener">Podpis na tablecie w studiu</a></div>`
+      ? `<span class="p-mut">Podpisano: ${nPodp(x.id)}. Klientka podpisuje w swoim telefonie albo w studiu na tablecie, rysikiem lub palcem.</span><div class="p-acts"><button type="button" class="p-btn sm dark" id="send">Wyślij do podpisu</button><button type="button" class="p-btn sm" id="tablet">Podpis na tablecie w studiu</button></div>`
       : '<span class="p-mut">Podpis elektroniczny jest w makiecie dostępny dla formularzy wzorcowych (RODO, wywiad rzęs, zdjęcia).</span>');
   }
   function renderOst() {
     if (!PS.addon('podpisy')) { $('ost').innerHTML = PS.signUpsell(); return; }
-    $('ost').innerHTML = podp().slice(0, 6).map((p, i) => `<div class="p-row"><span><b>${E(p.klientka)}</b> · ${E(DOCNAME[p.doc])}${p.przyklad ? ' <span class="p-badge blue">przykład</span>' : ''}<br><span class="p-mut">${kiedy(p.data)} · podpis ${p.sposob}</span></span><button type="button" class="p-btn sm" data-prev="${i}" aria-label="Podgląd: ${E(DOCNAME[p.doc])}, ${E(p.klientka)}">Podgląd</button></div>`).join('');
+    $('ost').innerHTML = podp().slice(0, 6).map((p, i) => `<div class="p-row"><span><b>${E(p.klientka)}</b> · ${E((DOCNAME[p.doc] || p.nazwa))}${p.przyklad ? ' <span class="p-badge blue">przykład</span>' : ''}<br><span class="p-mut">${kiedy(p.data)} · podpis ${p.sposob}</span></span><button type="button" class="p-btn sm" data-prev="${i}" aria-label="Podgląd: ${E((DOCNAME[p.doc] || p.nazwa))}, ${E(p.klientka)}">Podgląd</button></div>`).join('');
   }
   $('sign').addEventListener('click', e => {
+    if (e.target.closest('#tablet')) {
+      const doc = DOCMAP[f().id];
+      PS.modal({
+        title: 'Podpis na tablecie: ' + DOCNAME[doc], ok: 'Przekaż tablet klientce',
+        body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map(k => `<option>${E(k)}</option>`).join('')}</select></label>
+          <span class="p-mut">Tablet przejdzie w tryb klientki: widzi tylko dokument i pole podpisu. Do panelu wrócisz po wpisaniu swojego PIN-u.</span>`,
+        onOk: fm => { location.href = `podpis.html?tryb=studio&doc=${doc}&wroc=formularze&k=${encodeURIComponent(fm.k.value)}`; }
+      });
+      return;
+    }
     if (!e.target.closest('#send')) return;
     const doc = DOCMAP[f().id];
     PS.modal({
@@ -137,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
       body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map(k => `<option>${E(k)}</option>`).join('')}</select></label>
         <fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Kanał</legend>${['SMS', 'e-mail'].map((c, i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="c" value="${c}"${i ? '' : ' checked'}>${c}</label>`).join('')}</fieldset>
         <span class="p-mut">Klientka dostanie link do podpisu w telefonie. Link działa 7 dni.</span>`,
-      onOk: fm => { const l = Mock.get('podprosby', []); l.unshift({ doc, klientka: fm.k.value, kanal: fm.c.value, data: new Date().toISOString() }); Mock.set('podprosby', l); },
+      onOk: fm => { const l = Mock.get('podprosby', []); l.unshift({ doc, klientka: fm.k.value, kanal: fm.c.value, data: Mock.teraz().toISOString() }); Mock.set('podprosby', l); },
       toast: fm => `Wysłano do podpisu: ${fm.k.value} (${fm.c.value})`
     });
   });
@@ -145,13 +155,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const b = e.target.closest('[data-prev]'); if (!b) return;
     const p = podp()[+b.dataset.prev], form = F.find(x => DOCMAP[x.id] === p.doc);
     PS.modal({
-      title: DOCNAME[p.doc], noOk: true,
+      title: (DOCNAME[p.doc] || p.nazwa), noOk: true,
       body: `<div style="max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:8px;line-height:1.45">${form ? form.q.filter(q => q.y !== 'podpis').map(q => `<p style="margin:0">${E(q.t)}</p>`).join('') : ''}</div>
-        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><b>${E(p.klientka)}</b><span>Podpisano elektronicznie ${kiedy(p.data)}</span><span class="p-mut">Podpis ${p.sposob}, bez zapisanego obrazka</span></div>`
+        <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><b>${E(p.klientka)}</b><span>Podpisano elektronicznie ${kiedy(p.data)}</span><span class="p-mut">${p.doc === 'plik' ? `Podpis ${E(p.sposob)} · ${E(p.strony)} str. · ${E(p.podpisy)} podp. · kod ${E(p.kod)}. Makieta nie przechowuje pliku ani PDF z podpisem.` : `Podpis ${p.sposob}, bez zapisanego obrazka`}</span></div>`
     });
   });
   window.addEventListener('storage', () => { renderList(); renderSign(); renderOst(); }); // podpis złożony w drugiej karcie
   renderList(); renderEditor(); renderOst();
+  $('plik-btn').hidden = !PS.addon('podpisy');
 });
 </script>
 </body>

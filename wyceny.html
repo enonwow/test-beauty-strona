@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const all = () => {
     const st = PS.quoteState();
     const own = Mock.get('quotes', []).map(q => ({ id: q.id, k: q.klientka || 'Klientka online', o: q.opis || 'zdjęcie inspiracji', z: 'wysłane ze strony studia', c: '#C98C8C', kat: q.kategoria, tel: q.tel || q.telefon, foto: q.foto || q.zdjecie, nowa: true }));
-    return PS.QUOTES.map(q => ({ id: q.id, k: q.klientka, o: q.opis, z: q.zrodlo, c: q.kolor, kat: 'Paznokcie' })).concat(own).map(q => ({ ...q, st: st[q.id] }));
+    return PS.QUOTES.map(q => ({ id: q.id, k: q.klientka, o: q.opis, z: q.zrodlo, c: q.kolor, foto: q.foto, kat: 'Paznokcie' })).concat(own).map(q => ({ ...q, st: st[q.id] }));
   };
   function render() {
     const l = all(), sent = x => x.st && x.st.status === 'wysłana';
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lista').innerHTML = v.map(q => `
       <article class="p-card" data-id="${E(q.id)}">
         <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-          ${q.foto && String(q.foto).startsWith('data:') ? `<img src="${E(q.foto)}" alt="Zdjęcie inspiracji od klientki" style="width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none">` : `<div role="img" aria-label="Zdjęcie inspiracji od klientki" style="width:72px;height:72px;border-radius:12px;background:${E(q.c)};flex:none"></div>`}
+          ${q.foto && /^(data:image\/|zdjecia\/)/.test(String(q.foto)) ? `<img src="${E(q.foto)}" alt="Zdjęcie inspiracji od klientki" style="width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none">` : `<div role="img" aria-label="Zdjęcie inspiracji od klientki" style="width:72px;height:72px;border-radius:12px;background:${E(q.c)};flex:none"></div>`}
           <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:200px">
             <span><b>${E(q.k)}</b> ${sent(q) ? '<span class="p-badge ok">wysłana</span>' : '<span class="p-badge warn">do odesłania</span>'}</span>
             <span style="color:#625860">${E(q.z)}${q.tel ? ' · ' + E(q.tel) : ''}</span>

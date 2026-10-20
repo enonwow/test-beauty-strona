@@ -20,16 +20,22 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .cd.v{background:#9E1F50;color:#fff;font-weight:700}
 .cd.u{border:2px dashed #9E1F50;color:#9E1F50;font-weight:700}
 .cd.s{box-shadow:0 0 0 2px #fff,0 0 0 4px #1E1A1D}
+.cd:disabled{color:#A99BA2;cursor:default}
 .vc{border:1px solid #E4D9DE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .vc .top{display:flex;gap:12px;align-items:center}
-.vc .sw{width:48px;height:48px;border-radius:12px;flex:none}
+.vc .sw{width:56px;height:56px;border-radius:12px;flex:none;object-fit:cover;background:#E4D9DE}
 .vc .tx{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
 .vc small{color:#625860;font-size:13px}
 .vb{display:flex;gap:8px}
 .vb button,.vb a{flex:1;min-height:44px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none}
-.vb .dk{background:#1E1A1D;color:#fff;border-color:#1E1A1D;font-weight:500}
+.vb .dk{background:#9E1F50;color:#fff;border-color:#9E1F50;font-weight:700}
 .vb .rd{color:#A3262A}
 .vb a:hover{color:#1E1A1D}.vb a.dk:hover{color:#fff}
+.pot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:#FFF1E0;color:#8A3B12;font-size:14px}
+.pot button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#1E1A1D;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.pot.ok{background:#E6F2EC;color:#1F6B47;font-weight:700}
+.dok{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.dok .r{display:flex;justify-content:space-between;gap:12px}
 .badge{align-self:flex-start;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
 .row-v{min-height:44px;border:1px solid #E4D9DE;border-radius:12px;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;text-align:left;padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
 .btn{min-height:44px;padding:0 16px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none}
@@ -99,7 +105,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <section style="padding:22px 20px 0;display:flex;flex-direction:column;gap:10px">
       <h2 style="margin:0;font-size:18px;font-weight:700">Moje stylizacje</h2>
       <div style="border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center">
-        <span aria-hidden="true" style="width:44px;height:44px;border-radius:10px;background:#5B1630;flex:none"></span>
+        <img src="zdjecia/styl-velvet-burgund.jpg" alt="" width="52" height="52" loading="lazy" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
           <span style="font-weight:500">Velvet burgund · 29 września</span>
           <span style="color:#625860;font-size:13px">[Studio 1] · 200 zł · <a href="ocena.html?s=%5BStudio%201%5D&amp;o=Hybryda%20M%20%C2%B7%20velvet%20%C3%97%2010">Oceń</a></span>
@@ -107,7 +113,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
         <a href="paznokcie.html" class="btn" style="min-height:44px;padding:0 12px;font-size:14px;font-weight:500">Powtórz</a>
       </div>
       <div style="border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center">
-        <span aria-hidden="true" style="width:44px;height:44px;border-radius:10px;background:#2F5A86;flex:none"></span>
+        <img src="zdjecia/k-rzesy.jpg" alt="" width="52" height="52" loading="lazy" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
           <span style="font-weight:500">Rzęsy 2D–3D, 11–12 mm, CC · 6 października</span>
           <span style="color:#625860;font-size:13px">[Studio 2] · uzupełnienie za ok. 3 tyg.</span>
@@ -124,6 +130,18 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <a href="konto.html"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Profil</a>
   </nav>
 </div>
+
+<dialog id="dok" aria-labelledby="dok-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="dok-t" style="margin:0;font-size:18px">Paragon fiskalny</h2>
+    <div id="dok-tresc" class="dok"></div>
+    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Dokument wystawia studio. Paragon jest kopią z kasy fiskalnej, a fakturę studio wysyła też e-mailem.</p>
+    <div style="display:flex;gap:8px">
+      <button type="button" data-close style="flex:1;min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer">Zamknij</button>
+      <button type="button" data-toast="Makieta: tu pobierzesz PDF" style="flex:1;min-height:48px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer">Pobierz PDF</button>
+    </div>
+  </div>
+</dialog>
 
 <dialog id="odw" aria-labelledby="odw-t">
   <div style="display:flex;flex-direction:column;gap:12px">
@@ -142,37 +160,41 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const KOL = { Paznokcie: '#5B1630', 'Rzęsy': '#2F5A86', Brwi: '#3F6B2E', Fryzjer: '#8A4B12', Kosmetyka: '#5B3A86' };
   const MIES = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
   const MIESG = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
   const DNI = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
-  const NOW = new Date(2026, 9, 19, 9, 0); // makieta: "dziś" to poniedziałek 19.10
-  const SAMPLE = { id: 'przyklad', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: '[Studio 1]', stylistka: '[Stylistka 1]', dzien: 'wt 20.10', godzina: '11:15', koniec: '13:05', klientka: '', status: 'nadchodząca' };
+  const NOW = Mock.teraz(); // device date (or the day pinned with ?dzis=)
+  const pozniej = n => { let d = Mock.dzien(n); while (d.getDay() === 0) d = Mock.dzien(++n); return d; }; // n days ahead, skipping Sunday (closed)
+  const SUG = Mock.dzien(7); // suggested refill in the calendar
+  const SAMPLE = { id: 'przyklad', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: '[Studio 1]', stylistka: '[Stylistka 1]', dzien: Mock.krotko(pozniej(1)), godzina: '11:15', koniec: '13:05', klientka: '', status: 'nadchodząca' };
   let pending = null;
+  // a finished sample visit, so the history shows how a receipt or invoice is downloaded
+  const HIST = [{ id: 'hist1', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czasTekst: '1 h 50 min', studio: '[Studio 1]', stylistka: '[Stylistka 1]', dzien: Mock.krotko(pozniej(-21)), godzina: '11:15', koniec: '13:05', status: 'odbyta', dokNr: `FV/31/${String(pozniej(-21).getMonth() + 1).padStart(2, '0')}/${pozniej(-21).getFullYear()}`, faktura: { nip: '1234563218', firma: '[Twoja firma]' } }];
 
   const all = () => {
     const v = Mock.get('visits', []);
     return v.length ? v : [{ ...SAMPLE, ...(Mock.get('wizytyPrzyklad', {}) || {}) }];
   };
-  const when = v => { const m = String(v.dzien || '').match(/(\d{1,2})\.(\d{2})/); return m ? { d: +m[1], m: +m[2] - 1 } : null; };
-  const stamp = v => { const w = when(v) || { d: 1, m: 0 }; const [h, mi] = String(v.godzina || '0:00').split(':'); return new Date(2026, w.m, w.d, +h, +mi); };
+  const when = v => { const d = Mock.zKrotko(v.dzien); return d ? { d: d.getDate(), m: d.getMonth(), y: d.getFullYear() } : null; };
+  const stamp = v => { const w = when(v) || { d: 1, m: 0, y: 2000 }; const [h, mi] = String(v.godzina || '0:00').split(':'); return new Date(w.y, w.m, w.d, +h, +mi); };
   const czasMin = v => { if (v.czas) return +v.czas; const t = String(v.czasTekst || ''); const h = t.match(/(\d+)\s*h/), m = t.match(/(\d+)\s*min/); return (h ? h[1] * 60 : 0) + (m ? +m[1] : 0) || 110; };
+  const maKolejna = () => up().some(v => v.poprzednia); // a refill booked from the confirmation replaces the suggested one
   const up = () => all().filter(v => v.status === 'nadchodząca').sort((a, b) => stamp(a) - stamp(b));
   // a test and its treatment are one booking: cancelling one cancels the other
   const partner = (l, v) => l.find(x => x.id === v.testId || x.id === v.zabiegId);
   const setStatus = (id, status) => {
-    if (id === SAMPLE.id) return Mock.set('wizytyPrzyklad', { status });
+    if (id === SAMPLE.id) return Mock.set('wizytyPrzyklad', { ...(Mock.get('wizytyPrzyklad', {}) || {}), status });
     const l = Mock.get('visits', []), v = l.find(x => x.id === id);
     if (v) { v.status = status; const p = partner(l, v); if (p) p.status = status; Mock.set('visits', l); }
   };
   const toBooking = v => {
     const t = v.testId && all().find(x => x.id === v.testId);
     return { kategoria: v.kategoria, usluga: v.usluga, opis: v.opis, cena: v.cena, czas: czasMin(v), czasTekst: v.czasTekst, studio: v.studio, stylistka: v.stylistka, dzien: v.dzien, godzina: v.godzina, koniec: v.koniec, klientka: v.klientka, zadatek: v.zadatek, visitId: v.id,
-      cenaMin: v.cenaMin, cenaMax: v.cenaMax, powodPrzedzialu: v.powodPrzedzialu, pozycje: v.pozycje, uwagi: v.uwagi, seria: v.seria, sciezka: v.sciezka, promo: v.promo, kontakt: v.kontakt, uslugi: v.uslugi, osoby: v.osoby, dlaKogo: v.dlaKogo, dojazd: v.dojazd, bazaCena: v.bazaCena,
+      cenaMin: v.cenaMin, cenaMax: v.cenaMax, powodPrzedzialu: v.powodPrzedzialu, pozycje: v.pozycje, uwagi: v.uwagi, seria: v.seria, sciezka: v.sciezka, promo: v.promo, kontakt: v.kontakt, uslugi: v.uslugi, osoby: v.osoby, dlaKogo: v.dlaKogo, dojazd: v.dojazd, bazaCena: v.bazaCena, faktura: v.faktura,
       ...(t ? { testDzien: t.dzien, testGodzina: t.godzina, testKoniec: t.koniec, testMin: t.czas, testVisitId: t.id } : {}) };
   };
   const cenaTxt = v => (v.cenaMin != null && v.cenaMax > v.cenaMin ? `${v.cenaMin}–${v.cenaMax}` : v.cena);
-  const find = id => all().find(v => String(v.id) === String(id));
+  const find = id => all().concat(HIST).find(v => String(v.id) === String(id));
 
   const KREATORY = { paznokcie: 'paznokcie.html', 'rzęsy': 'rzesy.html', brwi: 'brwi.html', fryzjer: 'fryzjer.html', kosmetologia: 'kosmetyka.html', kosmetyka: 'kosmetyka.html' };
   const doStudia = v => 'salon.html?s=' + encodeURIComponent(v.studio || '[Studio 1]');
@@ -187,16 +209,20 @@ document.addEventListener('DOMContentLoaded', () => {
       btns = `<a href="${esc(doStudia(v))}" class="dk">Zarezerwuj ponownie</a><button type="button" data-a="karta">Karta</button>`;
     } else if (v.status === 'odbyta') {
       badge = '<span class="badge" style="background:#E6F2EC;color:#1F6B47">Odbyta</span>';
-      btns = `<a href="ocena.html?s=${encodeURIComponent(v.studio || '')}&o=${encodeURIComponent(v.opis || '')}">Oceń</a><a href="${esc(KREATORY[(v.kategoria || '').toLowerCase()] || doStudia(v))}" class="dk">Powtórz</a>`;
+      btns = `<button type="button" data-a="dok">${v.faktura ? 'Faktura' : 'Paragon'}</button><a href="ocena.html?s=${encodeURIComponent(v.studio || '')}&o=${encodeURIComponent(v.opis || '')}">Oceń</a><a href="${esc(KREATORY[(v.kategoria || '').toLowerCase()] || doStudia(v))}" class="dk">Powtórz</a>`;
     } else {
       if (v.typ !== 'test') { // consents signed on podpis.html (Mock "podpisy")
         const signed = new Set((Mock.get('podpisy', []) || []).map(p => p.doc));
         const todo = ['rodo', ...(v.kategoria === 'Rzęsy' ? ['wywiad-rzesy'] : [])].filter(d => !signed.has(d));
-        badge = todo.length ? `<small>Zgody: <a href="podpis.html?doc=${todo[0]}" style="display:inline-block;padding:12px 0;font-weight:500">do podpisu${todo.length > 1 ? ` (${todo.length})` : ''}</a></small>` : '<small style="color:#1F6B47">Zgody: podpisane</small>';
+        badge = todo.length ? `<small>Zgody: <a href="podpis.html?doc=${todo[0]}" style="display:inline-flex;align-items:center;min-height:44px;font-weight:500">do podpisu${todo.length > 1 ? ` (${todo.length})` : ''}</a></small>` : '<small style="color:#1F6B47">Zgody: podpisane</small>';
       }
+      const h = (stamp(v) - NOW) / 3600000;
+      if (h > 0 && h <= 48) badge += v.potwierdzona ? '<div class="pot ok">✓ Potwierdziłaś przybycie</div>'
+        : '<div class="pot"><span>Studio prosi o potwierdzenie wizyty.</span><button type="button" data-a="potwierdz">Potwierdzam, będę</button></div>';
+      if (v.faktura) badge += `<small>Faktura na: ${esc(v.faktura.firma)}, NIP ${esc(v.faktura.nip)}</small>`;
       btns = `<button type="button" data-a="przeloz">Przełóż</button><button type="button" data-a="odwolaj" class="rd">Odwołaj</button><button type="button" data-a="karta" class="dk">Karta</button>`;
     }
-    return `<div class="vc" data-id="${id}"><div class="top"><span class="sw" aria-hidden="true" style="background:${KOL[v.kategoria] || '#5B1630'}"></span><span class="tx">
+    return `<div class="vc" data-id="${id}"><div class="top"><img class="sw" src="${Mock.fotoKat(v.kategoria)}" alt="" width="56" height="56"><span class="tx">
       <b>${esc(v.dzien)}, ${esc(v.godzina)}${v.koniec ? '–' + esc(v.koniec) : ''} · ${esc(v.studio)}</b>
       ${Array.isArray(v.uslugi) && v.uslugi.length > 1 ? v.uslugi.map(u => `<small>${esc(u.usluga)} · ${esc(Mock.dur(u.czas))}</small>`).join('') + `<small>Razem ${esc(cenaTxt(v))} zł</small>` : `<small>${esc(v.opis)} · ${esc(cenaTxt(v))} zł</small>`}
       ${v.osoby > 1 || v.dojazd ? `<small>${v.osoby > 1 ? `${esc(v.osoby)} osoby naraz` : ''}${v.osoby > 1 && v.dojazd ? ' · ' : ''}${v.dojazd ? `dojazd do klientki (${esc(v.dojazd.strefa)}), ${esc(v.dojazd.adres)}` : ''}</small>` : ''}
@@ -205,7 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // calendar
   const first = up()[0], w0 = first && when(first);
-  let cur = { y: 2026, m: w0 ? w0.m : 9 }, sel = w0 ? `${w0.d}.${w0.m}` : '19.9';
+  let cur = { y: w0 ? w0.y : NOW.getFullYear(), m: w0 ? w0.m : NOW.getMonth() }, sel = w0 ? `${w0.d}.${w0.m}` : `${NOW.getDate()}.${NOW.getMonth()}`;
+  const tenDzien = (d, D) => cur.y === D.getFullYear() && cur.m === D.getMonth() && d === D.getDate();
 
   function renderCal() {
     $('#m-nazwa').textContent = `${MIES[cur.m]} ${cur.y}`;
@@ -213,26 +240,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const dnie = new Set(up().map(v => { const w = when(v); return w && `${w.d}.${w.m}`; }));
     let h = '<span></span>'.repeat(off);
     for (let d = 1; d <= dim; d++) {
-      const k = `${d}.${cur.m}`, t = cur.m === 9 && d === 19, vis = dnie.has(k), sug = cur.m === 9 && d === 27;
+      const k = `${d}.${cur.m}`, t = tenDzien(d, NOW), vis = dnie.has(k), sug = tenDzien(d, SUG) && !maKolejna();
       const cls = ['cd', t && 't', vis && 'v', !vis && sug && 'u', k === sel && 's'].filter(Boolean).join(' ');
       const lab = `${d} ${MIESG[cur.m]}${t ? ', dziś' : ''}${vis ? ': wizyta' : sug ? ': proponowane uzupełnienie' : ''}`;
-      h += `<button type="button" class="${cls}" data-k="${k}" aria-label="${lab}" aria-pressed="${k === sel}">${d}</button>`;
+      const minal = new Date(cur.y, cur.m, d) < Mock.dzien(0) && !vis;
+      h += `<button type="button" class="${cls}" data-k="${k}" aria-label="${lab}${minal ? ', minął' : ''}" aria-pressed="${k === sel}"${minal ? ' disabled' : ''}>${d}</button>`;
     }
     $('#kal').innerHTML = h;
   }
   function renderDay() {
     const [d, m] = sel.split('.').map(Number);
-    $('#dzien-h').textContent = `${DNI[new Date(2026, m, d).getDay()]}, ${d} ${MIESG[m]}`;
+    $('#dzien-h').textContent = `${DNI[new Date(cur.y, m, d).getDay()]}, ${d} ${MIESG[m]}`;
     const items = up().filter(v => { const w = when(v); return w && w.d === d && w.m === m; });
     let h = items.map(card).join('');
-    if (m === 9 && d === 27) h += `<div class="vc" style="border:2px dashed #9E1F50"><b>Proponowane uzupełnienie</b><small>Około 3 tygodnie po ostatniej stylizacji. Wolne terminy zależą od studia.</small><div class="vb"><a href="paznokcie.html" class="dk">Umów uzupełnienie</a></div></div>`;
+    if (m === SUG.getMonth() && d === SUG.getDate() && !maKolejna()) h += `<div class="vc" style="border:2px dashed #9E1F50"><b>Proponowane uzupełnienie</b><small>Około 3 tygodnie po ostatniej stylizacji. Wolne terminy zależą od studia.</small><div class="vb"><a href="paznokcie.html" class="dk">Umów uzupełnienie</a></div></div>`;
     if (!h) h = `<p style="margin:0;color:#625860;font-size:14px">Brak wizyt tego dnia.</p><div class="vb"><a href="wyniki.html">Znajdź wolny termin</a></div>`;
     $('#dzien-lista').innerHTML = h;
   }
   function renderRest() {
     const u = up();
     $('#wszystkie').innerHTML = u.length ? u.map(v => `<button type="button" class="row-v" data-k="${(when(v) || {}).d}.${(when(v) || {}).m}"><span>${esc(v.dzien)}, ${esc(v.godzina)}</span><span style="color:#625860">${esc(v.studio)} · ${esc(v.cena)} zł</span></button>`).join('') : '<p style="margin:0;color:#625860;font-size:14px">Nie masz nadchodzących wizyt.</p>';
-    const past = all().filter(v => v.status !== 'nadchodząca');
+    const past = all().filter(v => v.status !== 'nadchodząca').concat(HIST);
     $('#hist-lista').innerHTML = past.length ? past.map(card).join('') : '<p style="margin:0;color:#625860;font-size:14px">Odbyte i odwołane wizyty pojawią się tutaj.</p>';
   }
   const renderAll = () => { renderCal(); renderDay(); renderRest(); };
@@ -243,6 +271,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (k) { const [d, m] = k.dataset.k.split('.').map(Number); cur.m = m; sel = `${d}.${m}`; renderAll(); return; }
     const a = e.target.closest('[data-a]'); if (!a) return;
     const v = find(a.closest('.vc').dataset.id); if (!v) return;
+    if (a.dataset.a === 'potwierdz') {
+      const l = Mock.get('visits', []), x = l.find(y => y.id === v.id);
+      if (x) { x.potwierdzona = true; Mock.set('visits', l); } else Mock.set('wizytyPrzyklad', { ...(Mock.get('wizytyPrzyklad', {}) || {}), potwierdzona: true });
+      renderAll(); Mock.toast('Dziękujemy, studio wie, że będziesz'); return;
+    }
+    if (a.dataset.a === 'dok') {
+      const fv = !!v.faktura;
+      $('#dok-t').textContent = fv ? `Faktura ${v.dokNr || ''}`.trim() : 'Paragon fiskalny';
+      $('#dok-tresc').innerHTML = `<div class="r"><span>Sprzedawca</span><b>${esc(v.studio)}, NIP [NIP studia]</b></div>${fv ? `<div class="r"><span>Nabywca</span><b>${esc(v.faktura.firma)}, NIP ${esc(v.faktura.nip)}</b></div>` : ''}
+        <div class="r"><span>Data</span><b>${esc(v.dzien)}</b></div><div class="r"><span>${esc(v.opis)}</span><b>${esc(cenaTxt(v))} zł</b></div>
+        <div class="r"><span>Stawka VAT</span><b>[stawka studia]</b></div><div class="r" style="border-top:1px solid #F0E8EC;padding-top:6px"><span>Razem brutto</span><b>${esc(cenaTxt(v))} zł</b></div>`;
+      $('#dok').showModal(); return;
+    }
     if (a.dataset.a === 'karta' || a.dataset.a === 'przeloz') {
       Mock.set('booking', toBooking(v));
       location.href = a.dataset.a === 'karta' ? 'potwierdzenie.html' : 'termin.html?przeloz=1';

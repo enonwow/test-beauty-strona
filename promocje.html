@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function pv() {
     const d = draft, s = SAMPLE[d.kategorie[0]] || SAMPLE.Paznokcie, rab = Math.min(50, Math.max(0, d.rabat || 0)), po = Mock.priceAfter(s[1], rab);
-    const todayIn = d.dni.includes(Mock.weekday(new Date()));
+    const todayIn = d.dni.includes(Mock.weekday(Mock.teraz()));
     return `<div style="padding:14px;border-radius:14px;background:#FAF6F8;display:flex;flex-direction:column;gap:8px">
         <span style="color:#625860;font-size:12px;font-weight:700;letter-spacing:.04em">TAK ZOBACZY TO KLIENTKA</span>
         <div style="background:#fff;border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px">

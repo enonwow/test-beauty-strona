@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Podpis na dokumencie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<style>
+body{margin:0;background:#FAF6F8}
+.app{max-width:900px;margin:0 auto;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif}
+.back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff;cursor:pointer;padding:0}
+.btn{min-height:52px;padding:0 18px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;box-sizing:border-box}
+.btn:hover{background:#7A173D;color:#fff}
+.btn:disabled{background:#C9B6BF;color:#fff;cursor:not-allowed}
+.btn.out{background:#fff;color:#1E1A1D;border:1px solid #1E1A1D}.btn.out:hover{background:#FAF6F8}
+.tab{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer}
+.tab:disabled{color:#A99BA2;cursor:default}
+.inp{min-height:52px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:16px;box-sizing:border-box;width:100%;background:#fff}
+.sec{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:180px;padding:20px;border:2px dashed #C9B6BF;border-radius:16px;background:#FAF6F8;text-align:center;cursor:pointer}
+.drop.on{border-color:#9E1F50;background:#F6EDF1}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop:focus-within{outline:2px solid #9E1F50;outline-offset:2px}
+.err{margin:0;padding:12px 14px;border-radius:12px;background:#FDECEC;color:#A3262A;font-size:14px;line-height:1.45}
+.pages{display:flex;flex-direction:column;gap:16px}
+.page{position:relative;border:1px solid #E4D9DE;border-radius:4px;box-shadow:0 2px 10px rgba(30,26,29,.08);background:#fff;touch-action:manipulation}
+.page canvas{display:block;width:100%;height:auto;border-radius:4px}
+.page .nr{position:absolute;top:8px;right:8px;padding:2px 8px;border-radius:999px;background:rgba(30,26,29,.65);color:#fff;font-size:12px}
+.sig{position:absolute;padding:0;border:0;border-radius:6px;background:transparent;cursor:pointer}
+.sig img{display:block;width:100%;height:auto}
+.sig:hover,.sig:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+/* detected signature line: the box sits on the line, like "Sign here" tags */
+.pole{position:absolute;height:44px;transform:translateY(-100%);box-sizing:border-box;border:2px dashed #9E1F50;border-radius:8px;background:rgba(255,241,224,.92);color:#8A3B12;font:700 14px 'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 8px;cursor:pointer;white-space:nowrap;overflow:hidden}
+.pole:hover{background:#FFE7C7}
+span.pole{cursor:default;font-weight:500;background:rgba(255,241,224,.75)}
+body.klientka .page{cursor:crosshair}
+.hint{margin:0;padding:12px 14px;border-radius:12px;background:#F6EDF1;line-height:1.45}
+.bar{position:sticky;bottom:0;z-index:5;padding:12px 20px max(12px,env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E4D9DE;box-shadow:0 -2px 8px rgba(30,26,29,.08);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+#pad{display:block;width:100%;height:min(38vh,300px);border:1px dashed #A99BA2;border-radius:12px;background:#fff;touch-action:none;cursor:crosshair}
+dialog.big{width:min(760px,calc(100% - 24px))}
+.pen{display:flex;gap:8px;align-items:center;font-size:13px;color:#1F6B47}
+.pin{min-height:56px;font-size:24px;letter-spacing:.4em;text-align:center}
+.row{display:flex;justify-content:space-between;gap:12px}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div class="app">
+
+  <header style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F0E8EC">
+    <a href="formularze.html" id="wstecz" aria-label="Wróć do panelu" class="back"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></a>
+    <div style="display:flex;flex-direction:column;min-width:0"><h1 id="tytul" style="margin:0;font-size:20px;font-weight:700">Podpis na dokumencie</h1><span id="podtytul" style="color:#625860;font-size:13px">Krok 1 z 2: stylistka przygotowuje dokument</span></div>
+  </header>
+
+  <!-- 1. stylistka: plik i klientka -->
+  <section id="s-plik" class="sec">
+    <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#625860">Klientka
+      <select id="kl" class="inp" style="color:#1E1A1D"></select></label>
+    <label class="drop" id="drop">
+      <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path><path d="M12 17v-6M9 14l3-3 3 3"></path></svg>
+      <b>Wybierz plik albo przeciągnij go tutaj</b>
+      <span style="color:#625860;font-size:13px">PDF, JPG lub PNG · do 15 MB · do 20 stron</span>
+      <input id="plik" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" aria-describedby="formaty">
+    </label>
+    <p id="formaty" style="margin:0;color:#625860;font-size:13px;line-height:1.45">Plik Worda zapisz najpierw jako PDF (Plik → Zapisz jako → PDF). Zdjęcie dokumentu z telefonu też zadziała.</p>
+    <button type="button" id="przyklad" class="tab" style="align-self:flex-start">Wypróbuj na przykładowym dokumencie</button>
+    <p id="err" class="err" role="alert" hidden></p>
+    <div id="info" hidden class="row" style="padding:12px 14px;border-radius:12px;background:#E6F2EC;color:#1F6B47;align-items:center"><span id="info-t"></span><button type="button" id="zmien" class="tab">Zmień plik</button></div>
+    <div id="podglad" class="pages" aria-label="Podgląd dokumentu"></div>
+    <button type="button" id="przekaz" class="btn" disabled>Przekaż tablet klientce</button>
+    <span style="color:#625860;font-size:12px;line-height:1.4">Makieta: plik zostaje tylko w tej przeglądarce i znika po zamknięciu strony. Nigdzie go nie wysyłamy.</span>
+  </section>
+
+  <!-- 2. klientka: podpisuje w wybranych miejscach -->
+  <section id="s-klientka" class="sec" hidden>
+    <p class="hint"><b>Przeczytaj dokument.</b> Stuknij w miejsce, w którym chcesz się podpisać, i złóż podpis rysikiem albo palcem. Podpis możesz dodać w kilku miejscach.</p>
+    <div id="strony" class="pages" aria-label="Dokument do podpisu"></div>
+  </section>
+  <div id="bar" class="bar" hidden>
+    <label style="display:flex;gap:10px;align-items:center;min-height:44px"><input type="checkbox" id="ok" style="width:22px;height:22px;flex:none;accent-color:#9E1F50">Zapoznałam się z dokumentem</label>
+    <span id="ile" style="color:#625860;font-size:14px">Brak podpisu</span>
+    <button type="button" id="zatwierdz" class="btn" disabled style="flex:1 1 220px">Zatwierdź podpis</button>
+  </div>
+
+  <!-- 3. gotowe: klientka oddaje tablet, stylistka pobiera PDF -->
+  <section id="s-gotowe" class="sec" hidden aria-live="polite">
+    <div style="width:56px;height:56px;border-radius:50%;background:#E6F2EC;color:#1F6B47;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></div>
+    <h2 style="margin:0;font-size:24px">Podpisano</h2>
+    <p id="oddaj" style="margin:0;padding:12px 14px;border-radius:12px;background:#FFF1E0;color:#8A3B12;line-height:1.45">Dziękujemy! Oddaj tablet stylistce.</p>
+    <button type="button" id="koniec" class="btn" data-open="#pin">Zakończ (stylistka)</button>
+    <div id="wynik" hidden style="display:flex;flex-direction:column;gap:12px">
+      <div style="padding:14px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:6px">
+        <b id="w-plik"></b><span id="w-opis"></span><span style="color:#625860;font-size:14px">Kod dokumentu: <b id="w-kod" style="color:#1E1A1D"></b></span>
+      </div>
+      <button type="button" id="pobierz" class="btn">Pobierz podpisany PDF</button>
+      <button type="button" class="btn out" data-toast="Makieta: kopia PDF wysłana klientce e-mailem">Wyślij kopię klientce e-mailem</button>
+      <a id="w-panel" href="formularze.html" class="btn out">Wróć do panelu</a>
+    </div>
+    <span style="color:#625860;font-size:12px;line-height:1.4">To zwykły podpis elektroniczny (forma dokumentowa).</span>
+  </section>
+</div>
+
+<dialog id="d-pad" class="big" aria-labelledby="d-pad-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="d-pad-t" style="margin:0;font-size:18px">Twój podpis</h2>
+    <canvas id="pad" aria-label="Pole podpisu odręcznego" role="img"></canvas>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button type="button" class="tab" id="undo" disabled>Cofnij</button>
+      <button type="button" class="tab" id="clear">Wyczyść</button>
+      <span id="pen" class="pen" hidden role="status">Rysik wykryty: dotyk dłoni jest pomijany</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn out" data-close style="flex:1">Anuluj</button>
+      <button type="button" id="wstaw" class="btn" style="flex:1" disabled>Wstaw podpis</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="d-usun" aria-labelledby="d-usun-t">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="d-usun-t" style="margin:0;font-size:18px">Usunąć ten podpis?</h2>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn out" data-close style="flex:1">Zostaw</button>
+      <button type="button" id="usun-ok" class="btn" style="flex:1;background:#A3262A">Usuń</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="pin" aria-labelledby="pin-t">
+  <form id="pin-f" novalidate style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="pin-t" style="margin:0;font-size:18px">PIN stylistki</h2>
+    <p style="margin:0;font-size:14px;line-height:1.45">Tablet jest w trybie klientki, żeby nie mogła zajrzeć do panelu. W makiecie działa każdy 4-cyfrowy PIN.</p>
+    <input id="pin-in" class="inp pin" type="password" inputmode="numeric" autocomplete="off" maxlength="4" aria-label="PIN stylistki" aria-describedby="pin-err">
+    <span id="pin-err" role="alert" hidden style="color:#A3262A;font-size:13px">Wpisz 4 cyfry.</span>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn out" data-close style="flex:1">Anuluj</button>
+      <button type="submit" class="btn" style="flex:1">Dalej</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+import { createPad } from './podpis-pad.js';
+const $ = s => document.querySelector(s);
+const PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/';
+const PDFLIB = 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
+const MAX_MB = 15, MAX_STRON = 20;
+const qp = new URLSearchParams(location.search);
+const wroc = { klientki: 'klientki.html', formularze: 'formularze.html' }[qp.get('wroc')] || 'formularze.html';
+const KL = ['[Klientka A]', '[Klientka B]', '[Klientka D]', '[Klientka E]', '[Klientka F]'];
+const k0 = (qp.get('k') || '').slice(0, 60);
+[...new Set([k0, ...KL].filter(Boolean))].forEach(k => $('#kl').append(new Option(k, k, false, k === k0)));
+$('#wstecz').href = wroc; $('#w-panel').href = wroc + (wroc === 'klientki.html' ? '?k=' + encodeURIComponent($('#kl').value) : '');
+
+// --- 1. file: checked by its first bytes, not by the name ---
+// doc = { name, typ: 'pdf' | 'jpg' | 'png', bytes: Uint8Array, pages: [{ w, h, canvas, pola }] }  (w, h in PDF points)
+// pola: signature lines found on the page, [{ x0, x1, y }] as fractions of the page, y = the line (text baseline)
+let doc = null, sigs = [];
+function rodzaj(b, name = '') {
+  if (b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46) return 'pdf'; // %PDF
+  if (b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF) return 'jpg';
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47) return 'png';
+  if (/\.docx?$/i.test(name)) return 'word';
+  if (/\.hei[cf]$/i.test(name)) return 'heic';
+  return null;
+}
+console.assert(rodzaj([0x25, 0x50, 0x44, 0x46]) === 'pdf' && rodzaj([0xFF, 0xD8, 0xFF, 0xE0]) === 'jpg' && rodzaj([0x89, 0x50, 0x4E, 0x47]) === 'png'
+  && rodzaj([0x50, 0x4B, 3, 4], 'umowa.docx') === 'word' && rodzaj([0x50, 0x4B, 3, 4], 'umowa.pdf') === null, 'podpis-dokument rodzaj');
+const BLAD = {
+  word: 'To plik Worda. Zapisz go jako PDF (Plik → Zapisz jako → PDF) i wgraj jeszcze raz.',
+  heic: 'To zdjęcie w formacie HEIC. Wyślij je jako JPG albo zrób zrzut ekranu dokumentu.',
+  null: 'Tego pliku nie odczytamy. Wgraj PDF, JPG albo PNG.'
+};
+const blad = t => { $('#err').textContent = t; $('#err').hidden = !t; };
+
+async function renderPdf(bytes) {
+  const pdfjs = await import(PDFJS + 'pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.mjs';
+  const pdf = await pdfjs.getDocument({ data: bytes.slice() }).promise; // pdf.js takes ownership of the buffer, pdf-lib needs it later
+  if (pdf.numPages > MAX_STRON) throw new Error(`Dokument ma ${pdf.numPages} stron. W makiecie podpiszesz najwyżej ${MAX_STRON}.`);
+  const pages = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const p = await pdf.getPage(i), v1 = p.getViewport({ scale: 1 }), v = p.getViewport({ scale: 1400 / v1.width });
+    const c = document.createElement('canvas'); c.width = v.width; c.height = v.height;
+    await p.render({ canvasContext: c.getContext('2d'), viewport: v }).promise;
+    // signature lines: runs of underscores or dots in the text layer ("Data i podpis: ________")
+    // shortcut: horizontal text only and a proportional split of the item width; scans have no text layer, so the client taps the line
+    const pola = [];
+    for (const it of (await p.getTextContent()).items) {
+      const m = /_{4,}|\.{8,}|…{3,}/.exec(it.str || ''); if (!m || !it.width) continue;
+      const t = pdfjs.Util.transform(v.transform, it.transform), wpx = it.width * v.scale, n = it.str.length;
+      pola.push({ x0: (t[4] + wpx * m.index / n) / v.width, x1: (t[4] + wpx * (m.index + m[0].length) / n) / v.width, y: t[5] / v.height });
+    }
+    pages.push({ w: v1.width, h: v1.height, canvas: c, pola });
+  }
+  return pages;
+}
+async function renderImg(bytes, typ) {
+  const img = await createImageBitmap(new Blob([bytes], { type: typ === 'png' ? 'image/png' : 'image/jpeg' }));
+  const c = document.createElement('canvas'), k = Math.min(1, 1600 / img.width); c.width = img.width * k; c.height = img.height * k;
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return [{ w: 595, h: 595 * img.height / img.width, canvas: c, pola: [] }]; // a photo becomes one A4-wide PDF page
+}
+async function wczytaj(bytes, name, pola) {
+  blad(''); doc = null; sigs = []; $('#przekaz').disabled = true; $('#podglad').innerHTML = '';
+  const typ = rodzaj(bytes, name);
+  if (!['pdf', 'jpg', 'png'].includes(typ)) return blad(BLAD[typ]);
+  $('#info').hidden = false; $('#info-t').textContent = 'Wczytuję dokument…'; $('#drop').hidden = true;
+  try {
+    const pages = typ === 'pdf' ? await renderPdf(bytes) : await renderImg(bytes, typ);
+    doc = { name, typ, bytes, pages };
+    if (pola) pages[0].pola = pola; // the sample document knows where its line is
+  } catch (e) {
+    $('#info').hidden = true; $('#drop').hidden = false;
+    return blad(e.name === 'PasswordException' ? 'Ten PDF jest zabezpieczony hasłem. Wgraj wersję bez hasła.' : e.message && e.message.startsWith('Dokument ma') ? e.message : 'Nie udało się otworzyć pliku. Może jest uszkodzony?');
+  }
+  const n = doc.pages.reduce((a, p) => a + p.pola.length, 0);
+  $('#info-t').textContent = `${name} · ${Mock.plural(doc.pages.length, ['strona', 'strony', 'stron'])} · ${n ? 'pola podpisu: ' + n : 'bez wykrytych pól, klientka stuknie linię'}`;
+  rysujStrony($('#podglad'), false);
+  $('#przekaz').disabled = false;
+}
+async function zPliku(f) {
+  if (!f) return;
+  if (f.size > MAX_MB * 1024 * 1024) return blad(`Plik ma ${(f.size / 1048576).toFixed(1)} MB. Limit to ${MAX_MB} MB.`);
+  let bytes;
+  try { bytes = new Uint8Array(await f.arrayBuffer()); } catch { return blad('Nie udało się odczytać pliku. Wybierz go jeszcze raz.'); }
+  await wczytaj(bytes, f.name);
+}
+$('#plik').addEventListener('change', e => zPliku(e.target.files[0]));
+['dragenter', 'dragover'].forEach(t => $('#drop').addEventListener(t, e => { e.preventDefault(); $('#drop').classList.add('on'); }));
+['dragleave', 'drop'].forEach(t => $('#drop').addEventListener(t, () => $('#drop').classList.remove('on')));
+$('#drop').addEventListener('drop', e => { e.preventDefault(); zPliku(e.dataTransfer.files[0]); });
+$('#zmien').addEventListener('click', () => { doc = null; $('#plik').value = ''; $('#info').hidden = true; $('#drop').hidden = false; $('#podglad').innerHTML = ''; $('#przekaz').disabled = true; $('#plik').focus(); });
+
+// sample document drawn on a canvas, so the mock works without any file at hand
+$('#przyklad').addEventListener('click', () => {
+  const c = document.createElement('canvas'); c.width = 1240; c.height = 1754; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#1E1A1D';
+  x.font = "700 44px 'DM Sans', sans-serif"; x.fillText('Zgoda na zabieg: przedłużanie rzęs', 110, 170);
+  x.font = "26px 'DM Sans', sans-serif";
+  ['[Nazwa studia], [adres]', '', 'Ja, niżej podpisana, oświadczam, że:', '1. Poinformowałam stylistkę o alergiach, chorobach oczu i noszeniu soczewek.',
+    '2. Wiem, że klej do rzęs może uczulać, a przy podrażnieniu zgłoszę się do studia.', '3. Otrzymałam zalecenia po zabiegu i je rozumiem.',
+    '4. Zgadzam się na wykonanie zabiegu: przedłużanie rzęs metodą 1:1.', '', 'Dokument przykładowy w makiecie, treść do sprawdzenia z prawnikiem.']
+    .forEach((t, i) => x.fillText(t, 110, 260 + i * 52));
+  x.strokeStyle = '#A99BA2'; x.lineWidth = 2;
+  x.beginPath(); x.moveTo(110, 1420); x.lineTo(560, 1420); x.moveTo(700, 1420); x.lineTo(1130, 1420); x.stroke();
+  x.font = "22px 'DM Sans', sans-serif"; x.fillStyle = '#625860'; x.fillText('data', 110, 1456); x.fillText('podpis klientki', 700, 1456);
+  c.toBlob(async b => wczytaj(new Uint8Array(await b.arrayBuffer()), 'Zgoda na zabieg (przykład).png', [{ x0: 700 / 1240, x1: 1130 / 1240, y: 1420 / 1754 }]));
+});
+
+// pages with fields and placed signatures; sig = { page, pole, x, y, wf, ar, url }: top-left corner and width as fractions of the page
+function rysujStrony(root, klikalne) {
+  root.innerHTML = '';
+  doc.pages.forEach((p, i) => {
+    const d = document.createElement('div'); d.className = 'page'; d.dataset.i = i;
+    if (klikalne) { d.setAttribute('role', 'button'); d.tabIndex = 0; d.setAttribute('aria-label', `Strona ${i + 1}: stuknij, żeby dodać podpis w tym miejscu`); }
+    const c = document.createElement('canvas'); c.width = p.canvas.width; c.height = p.canvas.height; c.getContext('2d').drawImage(p.canvas, 0, 0);
+    const nr = document.createElement('span'); nr.className = 'nr'; nr.textContent = `${i + 1} / ${doc.pages.length}`;
+    d.append(c, nr);
+    p.pola.forEach((f, k) => {
+      if (sigs.some(s => s.page === i && s.pole === k)) return;
+      const b = document.createElement(klikalne ? 'button' : 'span'); b.className = 'pole'; b.dataset.k = k;
+      if (klikalne) { b.type = 'button'; b.textContent = 'Podpisz tutaj'; } else b.textContent = 'Pole podpisu';
+      b.style.cssText = `left:${f.x0 * 100}%;top:${f.y * 100}%;width:${Math.max(f.x1 - f.x0, 0.14) * 100}%`;
+      d.append(b);
+    });
+    sigs.forEach((s, j) => {
+      if (s.page !== i) return;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'sig'; b.dataset.j = j; b.setAttribute('aria-label', 'Podpis: stuknij, żeby usunąć');
+      b.style.cssText = `left:${s.x * 100}%;top:${s.y * 100}%;width:${s.wf * 100}%`;
+      const im = new Image(); im.src = s.url; im.alt = ''; b.append(im); d.append(b);
+    });
+    root.append(d);
+  });
+}
+
+// --- 2. client mode ---
+const kl = () => $('#kl').value;
+$('#przekaz').addEventListener('click', () => {
+  document.body.classList.add('klientka');
+  $('#s-plik').hidden = true; $('#s-klientka').hidden = false; $('#bar').hidden = false;
+  $('#tytul').textContent = 'Podpis dokumentu'; $('#podtytul').textContent = `Dla: ${kl()} · tablet studia`;
+  const w = $('#wstecz'); w.href = '#'; w.dataset.open = '#pin'; w.setAttribute('aria-label', 'Zakończ (PIN stylistki)');
+  const n = doc.pages.reduce((a, p) => a + p.pola.length, 0);
+  $('#s-klientka .hint').innerHTML = n
+    ? '<b>Przeczytaj dokument.</b> Stuknij pole „Podpisz tutaj” i złóż podpis rysikiem albo palcem. Inną linię też możesz stuknąć, np. na parafę.'
+    : '<b>Przeczytaj dokument.</b> Stuknij linię, na której ma być podpis, i złóż podpis rysikiem albo palcem. Podpis możesz dodać w kilku miejscach.';
+  rysujStrony($('#strony'), true); stan(); scrollTo(0, 0);
+});
+let gdzie = null, doUsuniecia = null;
+const pad = createPad($('#pad'), { onChange: () => { $('#wstaw').disabled = pad.travel() <= 12; $('#undo').disabled = !pad.strokes; }, onPen: () => { $('#pen').hidden = false; } });
+$('#undo').addEventListener('click', () => pad.undo());
+$('#clear').addEventListener('click', () => pad.clear());
+function otworzPad(a) { // a = { page, pole, x0, x1, y } for a detected field, or { page, cx, y } for a tap on a line
+  gdzie = a;
+  $('#d-pad').showModal(); pad.size(); pad.clear();
+}
+$('#strony').addEventListener('click', e => {
+  const s = e.target.closest('.sig');
+  if (s) { doUsuniecia = +s.dataset.j; $('#d-usun').showModal(); return; }
+  const d = e.target.closest('.page'); if (!d) return;
+  const f = e.target.closest('.pole'), i = +d.dataset.i;
+  if (f) return otworzPad({ page: i, pole: +f.dataset.k, ...doc.pages[i].pola[+f.dataset.k] });
+  const r = d.getBoundingClientRect();
+  otworzPad({ page: i, pole: null, cx: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height });
+});
+$('#strony').addEventListener('keydown', e => { // keyboard: Enter on a page puts the signature in its lower right part
+  const d = e.target.closest('.page'); if (!d || e.target !== d || (e.key !== 'Enter' && e.key !== ' ')) return;
+  e.preventDefault(); otworzPad({ page: +d.dataset.i, pole: null, cx: 0.7, y: 0.8 });
+});
+const p2 = n => String(n).padStart(2, '0');
+const teraz = () => { const d = Mock.teraz(); return `${p2(d.getDate())}.${p2(d.getMonth() + 1)}.${d.getFullYear()}, ${p2(d.getHours())}:${p2(d.getMinutes())}`; };
+// the stamp stands on the line: the bottom of the ink touches it (a pen dips a little below), the name and date go under the line
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+function postaw(p, png, a) {
+  const pole = a.x1 != null;
+  const wf = pole ? clamp((a.x1 - a.x0) * 0.9, 0.18, 0.4) : clamp(png.w / 700, 0.18, 0.32);
+  const ar = png.h / png.w, hf = wf * ar * p.w / p.h;
+  const x = pole ? a.x0 + (a.x1 - a.x0 - wf) / 2 : a.cx - wf / 2;
+  return { wf, ar, x: clamp(x, 0, 1 - wf), y: clamp(a.y - hf * png.ink + hf * 0.04, 0, 1 - hf) };
+}
+console.assert((() => { const s = postaw({ w: 1, h: 1 }, { w: 100, h: 50, ink: 0.6 }, { x0: 0.5, x1: 0.9, y: 0.5 }), hf = s.wf * s.ar;
+  return Math.abs(s.y + hf * 0.6 - 0.5) < 0.01 && Math.abs(s.x + s.wf / 2 - 0.7) < 1e-9; })(), 'podpis-dokument postaw');
+$('#wstaw').addEventListener('click', () => {
+  const png = pad.toPNG(`${kl()} · ${teraz()}`); if (!png) return;
+  sigs.push({ page: gdzie.page, pole: gdzie.pole, ...postaw(doc.pages[gdzie.page], png, gdzie), url: png.url, pen: pad.penSeen });
+  $('#d-pad').close(); rysujStrony($('#strony'), true); stan();
+});
+$('#usun-ok').addEventListener('click', () => { sigs.splice(doUsuniecia, 1); $('#d-usun').close(); rysujStrony($('#strony'), true); stan(); });
+function stan() { // with detected fields every field must be signed; without them one signature anywhere is enough
+  const pol = doc.pages.reduce((a, p) => a + p.pola.length, 0), wPolu = sigs.filter(s => s.pole != null).length, inne = sigs.length - wPolu;
+  $('#ile').textContent = pol ? `Pola podpisu: ${wPolu} z ${pol}${inne ? ` · inne: ${inne}` : ''}` : sigs.length ? `Podpisy: ${sigs.length}` : 'Brak podpisu';
+  $('#zatwierdz').disabled = !((pol ? wPolu === pol : sigs.length) && $('#ok').checked);
+}
+$('#ok').addEventListener('change', stan);
+
+let kod = '';
+$('#zatwierdz').addEventListener('click', () => {
+  if ($('#zatwierdz').disabled) return;
+  const now = Mock.teraz(); kod = 'DOK-' + now.getTime().toString(36).toUpperCase().slice(-6);
+  // only facts about the signature are kept in the mock store; the file and the signature image stay in this page's memory
+  Mock.set('podpisy', [{ doc: 'plik', nazwa: doc.name, klientka: kl(), data: now.toISOString(), sposob: (sigs.some(s => s.pen) ? 'odręczny rysikiem' : 'odręczny na tablecie') + ' w studiu, na wgranym pliku', strony: doc.pages.length, podpisy: sigs.length, kod }, ...Mock.get('podpisy', [])]);
+  $('#s-klientka').hidden = true; $('#bar').hidden = true; $('#s-gotowe').hidden = false;
+  $('#w-plik').textContent = doc.name;
+  $('#w-opis').textContent = `${kl()} · ${teraz()} · ${Mock.plural(sigs.length, ['podpis', 'podpisy', 'podpisów'])} na ${Mock.plural(new Set(sigs.map(s => s.page)).size, ['stronie', 'stronach', 'stronach'])}`;
+  $('#w-kod').textContent = kod;
+  scrollTo(0, 0); Mock.toast('Podpisano');
+});
+
+// --- PIN: back to the stylist ---
+$('#pin-in').addEventListener('input', () => { $('#pin-err').hidden = true; });
+$('#pin-f').addEventListener('submit', e => {
+  e.preventDefault();
+  const ok = /^\d{4}$/.test($('#pin-in').value); $('#pin-err').hidden = ok; if (!ok) return;
+  $('#pin').close(); $('#pin-in').value = '';
+  if ($('#s-gotowe').hidden) { location.href = wroc; return; } // cancelled before signing
+  document.body.classList.remove('klientka');
+  $('#oddaj').hidden = true; $('#koniec').hidden = true; $('#wynik').hidden = false;
+  $('#tytul').textContent = 'Dokument podpisany'; $('#podtytul').textContent = 'Krok 2 z 2: stylistka zapisuje PDF';
+  const w = $('#wstecz'); delete w.dataset.open; w.href = $('#w-panel').href; w.setAttribute('aria-label', 'Wróć do panelu');
+});
+
+// --- signed PDF: the original pages (or the photo as a page) with the signature images on top ---
+const loadPdfLib = () => window.PDFLib ? Promise.resolve(window.PDFLib) : new Promise((ok, no) => { const s = document.createElement('script'); s.src = PDFLIB; s.onload = () => ok(window.PDFLib); s.onerror = no; document.head.append(s); });
+async function podpisanyPdf() {
+  const { PDFDocument } = await loadPdfLib();
+  let out;
+  if (doc.typ === 'pdf') out = await PDFDocument.load(doc.bytes, { ignoreEncryption: true });
+  else {
+    out = await PDFDocument.create();
+    const img = doc.typ === 'png' ? await out.embedPng(doc.bytes) : await out.embedJpg(doc.bytes), p = doc.pages[0];
+    out.addPage([p.w, p.h]).drawImage(img, { x: 0, y: 0, width: p.w, height: p.h });
+  }
+  for (const s of sigs) {
+    // shortcut: assumes pages without /Rotate and with the crop box at 0,0 (typical scans and exports); rotated PDFs would need the page matrix
+    const page = out.getPage(s.page), { width: W, height: H } = page.getSize(), img = await out.embedPng(s.url);
+    const w = s.wf * W, h = w * s.ar;
+    page.drawImage(img, { x: s.x * W, y: H - s.y * H - h, width: w, height: h }); // PDF y grows upwards
+  }
+  out.setTitle(doc.name); out.setSubject(`Podpisano w studiu: ${kl()}, kod ${kod}`); out.setProducer('Makieta rezerwacji beauty');
+  return out.save();
+}
+$('#pobierz').addEventListener('click', async () => {
+  $('#pobierz').disabled = true; $('#pobierz').textContent = 'Przygotowuję PDF…';
+  try {
+    const bytes = await podpisanyPdf(), a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+    a.download = doc.name.replace(/\.[^.]+$/, '') + ' – podpisany.pdf'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    Mock.toast('Pobrano podpisany PDF');
+  } catch { Mock.toast('Nie udało się przygotować PDF. Spróbuj jeszcze raz.'); }
+  $('#pobierz').disabled = false; $('#pobierz').textContent = 'Pobierz podpisany PDF';
+});
+window.podpisanyPdf = podpisanyPdf; // used by the automated check
+</script>
+</body>
+</html>
