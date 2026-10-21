@@ -11,7 +11,7 @@ const ROLE = [['właścicielka', 'Właścicielka'], ['menedzerka', 'Menedżerka'
 
 // a visit as termin.html saves it
 function wizyta(d, od, min, extra = {}) {
-  return { id: Date.now() + Math.floor(Math.random() * 1000), kategoria: 'Paznokcie', studio: '[Studio 1]', stylistka: '[Stylistka 1]', klientka: 'Kasia', kontakt: { imie: 'Kasia', tel: '600100200' },
+  return { id: Date.now() + Math.floor(Math.random() * 1000), kategoria: 'Paznokcie', studio: 'Studio Malwa', stylistka: 'Magda', klientka: 'Kasia', kontakt: { imie: 'Kasia', tel: '600100200' },
     osoby: 1, dlaKogo: null, dojazd: null, status: 'nadchodząca', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy', cena: 140, cenaMin: 140, cenaMax: 140,
     czas: min, czasTekst: Mock.dur(min), dzien: Mock.krotko(d), godzina: hm(od), koniec: hm(od + min), ...extra };
 }
@@ -36,16 +36,16 @@ const SCEN = [
     Mock.set('user', { imie: 'Kasia', tel: '600100200', email: 'kasia@example.com', zalogowana: true, zgody: { regulamin: true, marketing: false } }); return 'konto.html';
   }],
   ['Nowa klientka z polecenia', 'Bez konta, z linku od koleżanki: baner 20 zł zniżki w salonie.', () => {
-    Mock.set('user', null); Mock.set('polecenie', null); return 'salon.html?s=%5BStudio%201%5D&polec=1&od=Ola';
+    Mock.set('user', null); Mock.set('polecenie', null); return 'salon.html?s=Studio%20Malwa&polec=1&od=Ola';
   }],
   ['Kod rabatowy z kampanii', 'Rezerwacja z linku z kodem JESIEN20: termin od razu liczy −20%.', () => {
-    Mock.set('koszyk', null); Mock.set('booking', { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy', cena: 140, cenaMin: 140, cenaMax: 140, czas: 75, czasTekst: '1 h 15 min', studio: '[Studio 1]' }); return 'termin.html?kod=JESIEN20';
+    Mock.set('koszyk', null); Mock.set('booking', { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy', cena: 140, cenaMin: 140, cenaMax: 140, czas: 75, czasTekst: '1 h 15 min', studio: 'Studio Malwa' }); return 'termin.html?kod=JESIEN20';
   }],
   ['Klientka z karnetem', 'Kasia ma „Pakiet 5× hybryda” (zostały 3 wizyty): przy rezerwacji widzi „Rozlicz z karnetu”.', () => {
     const o = Mock.karnety()[0], end = Mock.dzien(150);
     Mock.set('user', { imie: 'Kasia', tel: '600100200', zalogowana: true });
     Mock.set('karnety.sprzedane', [{ k: 'Kasia', tel: '600100200', n: o.n, t: o.t, us: o.us, cena: o.cena, ile: 3, data: Mock.dzien(-30).toLocaleDateString('pl-PL'), do: end.toLocaleDateString('pl-PL'), doIso: Mock.iso(end), online: true }]);
-    Mock.set('koszyk', null); Mock.set('booking', { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy', cena: 140, cenaMin: 140, cenaMax: 140, czas: 75, czasTekst: '1 h 15 min', studio: '[Studio 1]' }); return 'termin.html';
+    Mock.set('koszyk', null); Mock.set('booking', { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy', cena: 140, cenaMin: 140, cenaMax: 140, czas: 75, czasTekst: '1 h 15 min', studio: 'Studio Malwa' }); return 'termin.html';
   }],
   ['Reklamacja po wizycie', 'Odbyta wizyta Kasi w historii: „Zgłoś reklamację”, a w panelu (Opinie) studio na nią odpowiada.', () => {
     Mock.set('user', { imie: 'Kasia', tel: '600100200', zalogowana: true });
@@ -60,8 +60,8 @@ const SCEN = [
   }],
   ['Studio: dziś dwie rezerwacje online', 'W kalendarzu: Ola z fakturą (potwierdziła) i Ewa z polecenia (czeka na potwierdzenie).', () => {
     Mock.set('visits', [
-      wizyta(Mock.dzien(0), 17 * 60, 60, { klientka: 'Ola', kontakt: { imie: 'Ola', tel: '600200300' }, stylistka: '[Stylistka 2]', potwierdzona: true, faktura: { nip: '1234563218', firma: 'Ola Beauty' } }),
-      wizyta(Mock.dzien(0), 13 * 60 + 5, 45, { klientka: 'Ewa', kontakt: { imie: 'Ewa', tel: '600300400' }, usluga: 'Zdjęcie hybrydy', opis: 'Zdjęcie hybrydy', cena: 60, cenaMin: 60, cenaMax: 60, polecenie: { studio: '[Studio 1]', od: 'Kasia' } })
+      wizyta(Mock.dzien(0), 17 * 60, 60, { klientka: 'Ola', kontakt: { imie: 'Ola', tel: '600200300' }, stylistka: 'Ewelina', potwierdzona: true, faktura: { nip: '1234563218', firma: 'Ola Beauty' } }),
+      wizyta(Mock.dzien(0), 13 * 60 + 5, 45, { klientka: 'Ewa', kontakt: { imie: 'Ewa', tel: '600300400' }, usluga: 'Zdjęcie hybrydy', opis: 'Zdjęcie hybrydy', cena: 60, cenaMin: 60, cenaMax: 60, polecenie: { studio: 'Studio Malwa', od: 'Kasia' } })
     ]); return 'panel.html';
   }]
 ];
@@ -85,6 +85,10 @@ const CSS = `
 #narz .chk input{width:20px;height:20px;accent-color:#9E1F50;flex:none}
 #narz .mut{color:#625860;font-size:12px;line-height:1.45;margin:0}
 #narz .stan{padding:8px 12px;border-radius:10px;background:#FAF6F8;font-size:14px}`;
+
+// a scenario opened from a test link (?scen=N): prepares the data and returns the page to open
+export function scenariusz(i) { const s = SCEN[i]; return s ? s[2]() : null; }
+export const SCENARIUSZE = SCEN.map(([n, o]) => [n, o]);
 
 export function otworz() {
   let d = $('#narz');
@@ -133,6 +137,11 @@ export function otworz() {
       <h3 id="n-reset">Dane makiety</h3>
       <p class="mut">Usuwa wizyty, konto klientki, koszyk, podpisy, wiadomości i ustawienia panelu. Data testowa też wraca do prawdziwej.</p>
       <button type="button" class="b dng" id="n-wyczysc" style="align-self:flex-start">Wyczyść dane makiety</button>
+    </section>
+    <section aria-labelledby="n-uw">
+      <h3 id="n-uw">Uwagi z testów</h3>
+      <p class="mut">Zapisane na tym urządzeniu: <b id="n-uw-n">${(Mock.get('zgloszenia', []) || []).length}</b>. Zostają po wyczyszczeniu danych makiety.</p>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="b" id="n-uw-pobierz">Pobierz (JSON)</button><button type="button" class="b dng" id="n-uw-usun">Usuń uwagi</button></span>
     </section>`;
 
   const przeladuj = (msg, url) => { Mock.toast(msg); setTimeout(() => (url ? (location.href = url) : location.reload()), 500); };
@@ -161,6 +170,17 @@ export function otworz() {
   w.addEventListener('click', () => { // two clicks: deleting everything needs a second look
     if (!w.dataset.pewno) { w.dataset.pewno = '1'; w.textContent = 'Na pewno? Kliknij jeszcze raz'; return; }
     Mock.reset(); przeladuj('Dane makiety wyczyszczone', 'start.html');
+  });
+  d.querySelector('#n-uw-pobierz').addEventListener('click', () => {
+    const l = Mock.get('zgloszenia', []) || [];
+    if (!l.length) return Mock.toast('Nie ma zapisanych uwag');
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([JSON.stringify(l, null, 2)], { type: 'application/json' })), download: `uwagi-${Mock.iso(Mock.teraz())}.json` });
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  const u = d.querySelector('#n-uw-usun');
+  u.addEventListener('click', () => { // two clicks, like the data reset
+    if (!u.dataset.pewno) { u.dataset.pewno = '1'; u.textContent = 'Na pewno? Kliknij jeszcze raz'; return; }
+    Mock.set('zgloszenia', []); d.querySelector('#n-uw-n').textContent = '0'; u.textContent = 'Usuń uwagi'; delete u.dataset.pewno; Mock.toast('Usunięto uwagi');
   });
   if (!d.open) d.showModal();
 }

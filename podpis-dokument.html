@@ -152,7 +152,7 @@ const PDFLIB = 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'
 const MAX_MB = 15, MAX_STRON = 20;
 const qp = new URLSearchParams(location.search);
 const wroc = { klientki: 'klientki.html', formularze: 'formularze.html' }[qp.get('wroc')] || 'formularze.html';
-const KL = ['[Klientka A]', '[Klientka B]', '[Klientka D]', '[Klientka E]', '[Klientka F]'];
+const KL = ['Anna K.', 'Basia W.', 'Dorota S.', 'Ewa P.', 'Felicja R.'];
 const k0 = (qp.get('k') || '').slice(0, 60);
 [...new Set([k0, ...KL].filter(Boolean))].forEach(k => $('#kl').append(new Option(k, k, false, k === k0)));
 $('#wstecz').href = wroc; $('#w-panel').href = wroc + (wroc === 'klientki.html' ? '?k=' + encodeURIComponent($('#kl').value) : '');
@@ -243,7 +243,7 @@ $('#przyklad').addEventListener('click', () => {
   x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#1E1A1D';
   x.font = "700 44px 'DM Sans', sans-serif"; x.fillText('Zgoda na zabieg: przedłużanie rzęs', 110, 170);
   x.font = "26px 'DM Sans', sans-serif";
-  ['[Nazwa studia], [adres]', '', 'Ja, niżej podpisana, oświadczam, że:', '1. Poinformowałam stylistkę o alergiach, chorobach oczu i noszeniu soczewek.',
+  ['Studio Malwa, ul. Puławska 24, 02-512 Warszawa', '', 'Ja, niżej podpisana, oświadczam, że:', '1. Poinformowałam stylistkę o alergiach, chorobach oczu i noszeniu soczewek.',
     '2. Wiem, że klej do rzęs może uczulać, a przy podrażnieniu zgłoszę się do studia.', '3. Otrzymałam zalecenia po zabiegu i je rozumiem.',
     '4. Zgadzam się na wykonanie zabiegu: przedłużanie rzęs metodą 1:1.', '', 'Dokument przykładowy w makiecie, treść do sprawdzenia z prawnikiem.']
     .forEach((t, i) => x.fillText(t, 110, 260 + i * 52));

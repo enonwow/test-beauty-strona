@@ -26,11 +26,11 @@
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
-      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Utarg</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[kwota]</b><span style="color: #625860; font-size: 12px"><span id="vs">vs wrzesień</span>: [zmiana]</span></div>
-      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Wizyty</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[liczba]</b><span style="color: #625860; font-size: 12px">średnio [kwota] za wizytę</span></div>
-      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nieobecności</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[x]%</b><span style="color: #625860; font-size: 12px">z zaliczką: [x]%</span></div>
-      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nowe klientki</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[liczba]</b><span style="color: #625860; font-size: 12px">prowizja dla nas: 0 zł</span></div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Utarg</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px" id="k-ut"></b><span style="color: #625860; font-size: 12px"><span id="vs">vs wrzesień</span>: <span id="k-zm"></span></span></div>
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Wizyty</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px" id="k-wiz"></b><span style="color: #625860; font-size: 12px">średnio <span id="k-sr"></span> za wizytę</span></div>
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nieobecności</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px" id="k-nb"></b><span style="color: #625860; font-size: 12px">z zaliczką: <span id="k-nbz"></span></span></div>
+      <div style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="color: #625860">Nowe klientki</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px" id="k-nowe"></b><span style="color: #625860; font-size: 12px">prowizja dla nas: 0 zł</span></div>
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
@@ -47,10 +47,10 @@
 
       <section style="flex: 1 1 300px; min-width: 0; background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Skąd przyszły klientki</h2>
-        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Link na Instagramie</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 60%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
-        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Wyszukiwarka</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 25%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
-        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Polecenie</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 10%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
-        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Dodane ręcznie</span><b>[x]%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 5%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Link na Instagramie</span><b>60%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 60%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Wyszukiwarka</span><b>25%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 25%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Polecenie</span><b>10%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 10%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; justify-content: space-between"><span>Dodane ręcznie</span><b>5%</b></span><span style="height: 8px; border-radius: 4px; background: #F0E8EC"><span style="display: block; width: 5%; height: 8px; border-radius: 4px; background: #9E1F50"></span></span></div>
         <span style="color: #625860; font-size: 12px">Słupki poglądowe. Za żadne źródło nie płacisz prowizji.</span>
       </section>
     </div>
@@ -61,8 +61,8 @@
         <table style="width: 100%; min-width: 560px; border-collapse: collapse; text-align: left">
           <thead><tr style="color: #625860; font-size: 12px"><th style="padding: 8px; font-weight: 500">Osoba</th><th style="padding: 8px; font-weight: 500">Wizyty</th><th style="padding: 8px; font-weight: 500">Utarg</th><th style="padding: 8px; font-weight: 500">Prowizja</th><th style="padding: 8px; font-weight: 500">Czas planowany / faktyczny</th></tr></thead>
           <tbody>
-            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">[Stylistka 1]</td><td style="padding: 10px 8px">[liczba]</td><td style="padding: 10px 8px">[kwota]</td><td style="padding: 10px 8px">—</td><td style="padding: 10px 8px">[x] h / [y] h</td></tr>
-            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">[Stylistka 2]</td><td style="padding: 10px 8px">[liczba]</td><td style="padding: 10px 8px">[kwota]</td><td style="padding: 10px 8px">[kwota]</td><td style="padding: 10px 8px">[x] h / [y] h</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">Magda</td><td style="padding: 10px 8px">54</td><td style="padding: 10px 8px">10 260 zł</td><td style="padding: 10px 8px">—</td><td style="padding: 10px 8px">152 h / 148 h</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">Ewelina</td><td style="padding: 10px 8px">44</td><td style="padding: 10px 8px">8140 zł</td><td style="padding: 10px 8px">3256 zł</td><td style="padding: 10px 8px">152 h / 155 h</td></tr>
           </tbody>
         </table>
       </div>
@@ -101,8 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const PON = Mock.dzien(-Mock.weekday(T)), SOB = Mock.dzien(5 - Mock.weekday(T));
   const TYG = PON.getMonth() === SOB.getMonth() ? `${PON.getDate()}–${SOB.getDate()} ${Mock.MIESD[SOB.getMonth()]}` : `${PON.getDate()} ${Mock.MIESD[PON.getMonth()]} – ${SOB.getDate()} ${Mock.MIESD[SOB.getMonth()]}`;
   const DATA = {
-    tydzien: { t: `Ten tydzień, ${TYG}`, vs: 'vs poprzedni tydzień', h: 'Utarg dziennie', bars: [40, 65, 80, 55, 70, 30], lab: ['pn', 'wt', 'śr', 'cz', 'pt', 'sb'] },
-    miesiac: { t: `${M(T.getMonth())} ${T.getFullYear()}`, vs: `vs ${Mock.MIES[(T.getMonth() + 11) % 12]}`, h: 'Utarg tygodniowo', bars: [55, 70, 62, 85], lab: ['1–5', '6–12', '13–19', '20–26'] }
+    tydzien: { t: `Ten tydzień, ${TYG}`, vs: 'vs poprzedni tydzień', h: 'Utarg dziennie', f: 0.25, bars: [40, 65, 80, 55, 70, 30], lab: ['pn', 'wt', 'śr', 'cz', 'pt', 'sb'] },
+    miesiac: { t: `${M(T.getMonth())} ${T.getFullYear()}`, vs: `vs ${Mock.MIES[(T.getMonth() + 11) % 12]}`, h: 'Utarg tygodniowo', f: 1, bars: [55, 70, 62, 85], lab: ['1–5', '6–12', '13–19', '20–26'] }
   };
   const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   let last = 'miesiac';
@@ -114,13 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
     chart.setAttribute('aria-label', 'Wykres poglądowy: ' + d.h.toLowerCase() + ', ' + text);
     chart.innerHTML = d.bars.map((b, i) => `<div style="height:${b}%;border-radius:8px 8px 0 0;background:${i === d.bars.length - 1 ? '#9E1F50' : '#E7B7C0'}"></div>`).join('');
     x.innerHTML = d.lab.map(l => `<span>${l}</span>`).join('');
+    kafle(d.f);
   }
   sel.addEventListener('change', () => {
     if (sel.value !== 'zakres') { last = sel.value; draw(DATA[sel.value], DATA[sel.value].t); Mock.toast('Okres: ' + DATA[sel.value].t); return; }
     PS.modal({
       title: 'Własny okres', ok: 'Pokaż',
       body: `<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Od<input class="p-in" type="date" name="od" value="${iso(Mock.dzien(1 - T.getDate()))}" required></label><label class="p-lab" style="flex:1">Do<input class="p-in" type="date" name="do" value="${iso(T)}" required></label></div>`,
-      onOk: f => { if (f.do.value < f.od.value) { Mock.toast('Data końca jest przed początkiem'); return false; } last = 'zakres'; draw({ vs: 'vs poprzedni okres', h: 'Utarg w okresie', bars: [50, 60, 45, 75, 65], lab: ['1', '2', '3', '4', '5'] }, f.od.value.split('-').reverse().join('.') + ' – ' + f.do.value.split('-').reverse().join('.')); },
+      onOk: f => { if (f.do.value < f.od.value) { Mock.toast('Data końca jest przed początkiem'); return false; } last = 'zakres'; draw({ vs: 'vs poprzedni okres', h: 'Utarg w okresie', f: Math.max(1, (new Date(f.do.value) - new Date(f.od.value)) / 864e5 + 1) / 30, bars: [50, 60, 45, 75, 65], lab: ['1', '2', '3', '4', '5'] }, f.od.value.split('-').reverse().join('.') + ' – ' + f.do.value.split('-').reverse().join('.')); },
       toast: 'Zmieniono okres raportu'
     }).addEventListener('close', () => { if (last !== 'zakres') sel.value = last; });
   });
@@ -128,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, V = Mock.get('visits', []) || [];
   const pasek = (nazwa, wart, proc, opis) => `<div style="display:flex;flex-direction:column;gap:4px"><span style="display:flex;justify-content:space-between;gap:8px"><span>${E(nazwa)}</span><b>${E(wart)}</b></span><span style="height:8px;border-radius:4px;background:#F0E8EC" role="img" aria-label="${E(nazwa)}: ${E(opis || wart)}"><span style="display:block;width:${Math.min(100, proc)}%;height:8px;border-radius:4px;background:#9E1F50"></span></span></div>`;
   const kafel = (t, v, o) => `<div style="padding:12px;border-radius:12px;background:#FAF6F8;display:flex;flex-direction:column;gap:2px"><span class="p-mut">${E(t)}</span><b style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px">${E(v)}</b><span class="p-mut">${E(o)}</span></div>`;
-  [['[Stylistka 1]', 31, 38], ['[Stylistka 2]', 24, 38]].forEach(([n, h, g]) => { document.getElementById('obl').insertAdjacentHTML('beforeend', pasek(n, `${Math.round(h / g * 100)}%`, h / g * 100, `${h} z ${g} godzin`)); });
+  [['Magda', 31, 38], ['Ewelina', 24, 38]].forEach(([n, h, g]) => { document.getElementById('obl').insertAdjacentHTML('beforeend', pasek(n, `${Math.round(h / g * 100)}%`, h / g * 100, `${h} z ${g} godzin`)); });
   const POP = { 'Manicure hybrydowy': 46, 'Uzupełnienie rzęs 1:1': 21, 'Żel na naturalnej płytce': 18, 'Henna + regulacja brwi': 15, 'Przedłużanie (tipsy / szablon)': 12 };
   V.filter(v => v.status !== 'odwołana').forEach(v => { const n = v.usluga || v.opis; if (n) POP[n] = (POP[n] || 0) + 1; });
   const top = Object.entries(POP).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -160,6 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('wyr-r').innerHTML = W.on ? `<span><b>Wyróżnienie w wyszukiwarce</b><br><span class="p-mut">${W.st} zł / dzień · 9 rezerwacji w 7 dni · ${Math.round(W.st * 7 / 9)} zł za rezerwację</span></span><b>${W.st * 7} zł</b>` : '<span class="p-mut">Wyróżnienie jest wyłączone. Włączysz je w Marketingu.</span>';
 
   document.getElementById('exp').addEventListener('click', () => Mock.toast('Pobrano CSV dla księgowej: ' + lbl.textContent));
+  // top tiles: the same month as the sections below (turnover from costs and profit, visits and cancellations from "Powracalność"), scaled to the chosen period
+  function kafle(f) {
+    const zl = n => Math.round(n).toLocaleString('pl-PL') + ' zł', set = (id, t) => { document.getElementById(id).textContent = t; };
+    const NB = 5, ZAL = [1, 64], odbyte = wszystkie - odwolane - NB; // no-shows: all, and among visits with a deposit
+    set('k-ut', zl(UTARG * f)); set('k-zm', '+8%');
+    set('k-wiz', String(Math.round(odbyte * f))); set('k-sr', zl(UTARG / odbyte));
+    set('k-nb', Math.round(NB / wszystkie * 100) + '%'); set('k-nbz', Math.round(ZAL[0] / ZAL[1] * 100) + '%');
+    set('k-nowe', String(Math.max(1, Math.round(14 * f))));
+  }
   draw(DATA.miesiac, DATA.miesiac.t);
 });
 </script>

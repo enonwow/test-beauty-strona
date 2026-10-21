@@ -9,15 +9,15 @@
   ];
   // Prośby o wycenę ze stałych przykładów; wyceny.html i panel.html czytają to samo.
   const QUOTES = [
-    { id: 'q1', klientka: '[Klientka F]', opis: 'Takie jak na zdjęciu, ale krótsze', zrodlo: 'inspiracja z Instagrama', kolor: '#C98C8C', foto: 'zdjecia/dlon-4-mini.jpg' },
-    { id: 'q2', klientka: '[Klientka H]', opis: 'Francuz z drobnymi cyrkoniami, długość L', zrodlo: 'zdjęcie ze strony studia', kolor: '#3E2A4A', foto: 'zdjecia/styl-micro-french.jpg' }
+    { id: 'q1', klientka: 'Felicja R.', opis: 'Takie jak na zdjęciu, ale krótsze', zrodlo: 'inspiracja z Instagrama', kolor: '#C98C8C', foto: 'zdjecia/dlon-4-mini.jpg' },
+    { id: 'q2', klientka: 'Hania Z.', opis: 'Francuz z drobnymi cyrkoniami, długość L', zrodlo: 'zdjęcie ze strony studia', kolor: '#3E2A4A', foto: 'zdjecia/styl-micro-french.jpg' }
   ];
 
   const CSS = `
 .p-btn{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;box-sizing:border-box}
 .p-btn:hover{background:#FAF6F8;color:#1E1A1D}
 .p-btn.pri{background:#9E1F50;border-color:#9E1F50;color:#fff;font-weight:700}.p-btn.pri:hover{background:#7A173D;color:#fff}
-.p-btn.dark{background:#1E1A1D;border-color:#1E1A1D;color:#fff;font-weight:500}.p-btn.dark:hover{background:#3a3438;color:#fff}
+.p-btn.dark{background:#fff;border-color:#9E1F50;color:#9E1F50;font-weight:700}.p-btn.dark:hover{background:#F6EDF1;color:#9E1F50} /* secondary action: burgundy is the only action colour */
 .p-btn.dng{color:#A3262A;border-color:#A3262A}
 .p-btn.dash{border-style:dashed;border-color:#A99BA2}
 .p-btn.sm{min-height:40px;padding:0 12px}
@@ -41,7 +41,7 @@ textarea.p-in{padding:10px 12px;resize:vertical}
 .p-mut{color:#625860;font-size:12px;line-height:1.45}
 .p-pills{display:flex;gap:6px;flex-wrap:wrap}
 .p-pill{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer}
-.p-pill[aria-pressed="true"],.p-pill[aria-selected="true"]{background:#1E1A1D;border-color:#1E1A1D;color:#fff}
+.p-pill[aria-pressed="true"],.p-pill[aria-selected="true"]{background:#fff;border-color:#9E1F50;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 .p-tw{overflow-x:auto}
 .p-tbl{width:100%;border-collapse:collapse;text-align:left;min-width:520px}
 .p-tbl th{padding:8px 6px;font-weight:500;color:#625860;font-size:12px}
@@ -59,7 +59,8 @@ textarea.p-in{padding:10px 12px;resize:vertical}
 .pn-a:hover{background:#FAF6F8;color:#1E1A1D}
 .pn-a[aria-current]{background:#F6EDF1;font-weight:700}
 .pn-n{min-width:22px;height:22px;border-radius:11px;background:#9E1F50;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.pn-bar{display:flex;justify-content:flex-end;gap:8px;align-items:center;margin-bottom:-8px;width:100%;box-sizing:border-box} /* full row also in pages whose main wraps cards side by side (klientki) */
+.pn-bar{display:flex;justify-content:flex-end;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:-8px;width:100%;box-sizing:border-box}
+@media (max-width:639px){.pn-lok{flex:1 1 100%;margin:0 !important}.pn-lok select{flex:1 1 auto;max-width:none !important}} /* phone: location switch on its own row, label kept */ /* full row also in pages whose main wraps cards side by side (klientki) */
 .pn-user{position:relative}.pn-user summary{list-style:none;min-height:44px;padding:0 12px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;display:flex;flex-direction:column;justify-content:center;cursor:pointer;line-height:1.2}
 .pn-user summary::-webkit-details-marker{display:none}.pn-user summary small{color:#625860;font-size:12px}
 .pn-user summary:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -110,12 +111,12 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       title: 'Nowa wizyta', ok: 'Dodaj',
       body: `<label class="p-lab">Klientka<input class="p-in" name="kl" required placeholder="Imię i nazwisko"></label>
         <label class="p-lab">Usługa<select class="p-in" name="us">${SVC.map((s, i) => `<option value="${i}">${esc(s[0])} · ${s[2]} zł</option>`).join('')}</select></label>
-        <label class="p-lab">Stylistka<select class="p-in" name="st"><option${o.stylistka === '[Stylistka 2]' ? '' : ' selected'}>[Stylistka 1]</option><option${o.stylistka === '[Stylistka 2]' ? ' selected' : ''}>[Stylistka 2]</option></select></label>
+        <label class="p-lab">Stylistka<select class="p-in" name="st"><option${o.stylistka === 'Ewelina' ? '' : ' selected'}>Magda</option><option${o.stylistka === 'Ewelina' ? ' selected' : ''}>Ewelina</option></select></label>
         <label class="p-lab"${o.days ? '' : ' hidden'}>Dzień<select class="p-in" name="dz">${days.map(d => `<option value="${esc(d[1])}"${d[1] === o.dzien ? ' selected' : ''}>${esc(d[0])}</option>`).join('')}</select></label>
         <label class="p-lab">Godzina<select class="p-in" name="t">${SLOTS.map(x => `<option${x === (o.godz || '10:00') ? ' selected' : ''}>${x}</option>`).join('')}</select></label>`,
       onOk(f) {
         const s = SVC[+f.us.value];
-        Mock.addVisit({ kategoria: s[1], usluga: s[0], opis: s[0], cena: s[2], czas: s[3], czasTekst: window.PS.min(s[3]), studio: '[Studio 1]', stylistka: f.st.value, dzien: f.dz.value, godzina: f.t.value, klientka: f.kl.value.trim(), status: 'nadchodząca', zrodlo: 'panel' });
+        Mock.addVisit({ kategoria: s[1], usluga: s[0], opis: s[0], cena: s[2], czas: s[3], czasTekst: window.PS.min(s[3]), studio: 'Studio Malwa', stylistka: f.st.value, dzien: f.dz.value, godzina: f.t.value, klientka: f.kl.value.trim(), status: 'nadchodząca', zrodlo: 'panel' });
         if (o.done) o.done();
       },
       toast: f => `Dodano wizytę: ${f.kl.value.trim()}, ${f.t.value}`
@@ -136,11 +137,11 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     Mock.get('visits', []).filter(v => v.status === 'nadchodząca' && !v.zrodlo).slice(0, 3).forEach(v =>
       list.push({ id: 'v' + v.id, t: 'Nowa rezerwacja', d: `${v.klientka || 'Klientka online'} · ${v.opis || v.usluga || 'wizyta'} · ${[v.dzien, v.godzina].filter(Boolean).join(' ')}`, href: 'panel.html#nowe', isNew: true }));
     list.push(
-      { id: 'n1', t: 'Nowa rezerwacja', d: `[Klientka G] · hybryda M · ${Mock.krotko(Mock.dzien(1))}, 9:00`, href: 'panel.html#nowe', isNew: true },
-      { id: 'n2', t: 'SMS nie dotarł', d: '[Klientka C] · przypomnienie na jutro 14:00 (numer poza zasięgiem)', href: 'klientki.html', isNew: true },
-      { id: 'n3', t: 'Prośba o wycenę', d: '[Klientka H] wysłała zdjęcie inspiracji', href: 'wyceny.html', isNew: true },
+      { id: 'n1', t: 'Nowa rezerwacja', d: `Gosia L. · hybryda M · ${Mock.krotko(Mock.dzien(1))}, 9:00`, href: 'panel.html#nowe', isNew: true },
+      { id: 'n2', t: 'SMS nie dotarł', d: 'Celina M. · przypomnienie na jutro 14:00 (numer poza zasięgiem)', href: 'klientki.html', isNew: true },
+      { id: 'n3', t: 'Prośba o wycenę', d: 'Hania Z. wysłała zdjęcie inspiracji', href: 'wyceny.html', isNew: true },
       { id: 'n4', t: 'Niski stan w magazynie', d: 'Żel budujący: zostało 2 szt.', href: 'magazyn.html', isNew: false },
-      { id: 'n5', t: 'Nowa opinia', d: '[Klientka A] oceniła wizytę, czeka na odpowiedź', href: 'opinie-studio.html', isNew: false });
+      { id: 'n5', t: 'Nowa opinia', d: 'Anna K. oceniła wizytę, czeka na odpowiedź', href: 'opinie-studio.html', isNew: false });
     return list;
   }
   const readIds = () => Mock.get('panel.read', []);
@@ -180,6 +181,9 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     { k: 'stylistka', n: 'Stylistka podstawowa', hide: ['kasa.html', 'raporty.html', 'ustawienia.html', 'zespol.html', 'profil-studia.html', 'marketing.html', 'cennik.html', 'karnety.html', 'promocje.html', 'magazyn.html', 'formularze.html', 'opinie-studio.html'] }
   ];
   const studioUser = () => Mock.get('studioUser', null);
+  const nazwa = () => (Mock.get('profil', {}) || {}).nm || 'Studio Malwa'; // saved by onboarding.html and profil-studia.html
+  const inicjaly = n => n.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+  console.assert(inicjaly('Studio Testowe') === 'ST' && inicjaly('Studio Malwa') === 'SM', 'inicjaly');
   const roleOf = k => ROLES.find(r => r.k === k) || ROLES[0];
   function logout() { Mock.set('studioUser', null); Mock.toast('Wylogowano'); setTimeout(() => { location.href = 'panel-logowanie.html'; }, 500); }
 
@@ -193,7 +197,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       nav.className = 'pn';
       nav.parentElement.style.alignContent = 'flex-start'; // when the menu wraps above the content, its row must not stretch to fill the page's min-height
       nav.setAttribute('aria-label', 'Menu panelu');
-      nav.innerHTML = `<div class="pn-logo" style="display:flex;gap:10px;align-items:center;padding:0 8px 12px"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">NS</div><span style="font-weight:700">[Nazwa studia]</span></div>` +
+      nav.innerHTML = `<div class="pn-logo" style="display:flex;gap:10px;align-items:center;padding:0 8px 12px"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">${esc(inicjaly(nazwa()))}</div><span style="font-weight:700">${esc(nazwa())}</span></div>` +
         NAV.map(([g, items0], i) => { const items = items0.filter(it => !roleOf((studioUser() || {}).rola).hide.includes(it[1])); return (g ? `<div class="pn-g">${g}</div>` : '<div style="flex:1 1 auto"></div><hr class="p-sep" style="margin:8px 0">') +
           items.map(([l, h, b]) => `<a class="pn-a" href="${h}"${h === cur ? ' aria-current="page"' : ''}>${l}${b ? '<span class="pn-n" id="pn-quotes"></span>' : ''}</a>`).join(''); }).join('');
     }
@@ -204,7 +208,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       const bar = document.createElement('div');
       bar.className = 'pn-bar';
       const u = studioUser() || {};
-      bar.innerHTML = `<details class="pn-user"><summary aria-label="Konto: ${esc(u.imie || '[Właścicielka]')}, ${esc(roleOf(u.rola).n)}"><b>${esc(u.imie || '[Właścicielka]')}</b><small>${esc(roleOf(u.rola).n)}</small></summary><div class="pn-menu"><button type="button" id="pn-out">Wyloguj</button></div></details>` +
+      bar.innerHTML = `<details class="pn-user"><summary aria-label="Konto: ${esc(u.imie || 'Joanna Malec')}, ${esc(roleOf(u.rola).n)}"><b>${esc(u.imie || 'Joanna Malec')}</b><small>${esc(roleOf(u.rola).n)}</small></summary><div class="pn-menu"><button type="button" id="pn-out">Wyloguj</button></div></details>` +
         `<button type="button" class="pn-bell" id="pn-bell" aria-label="Powiadomienia"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i></i></button>`;
       const L = lokalizacje(), wyb = Mock.get('lokalizacja', 0) || 0;
       if (L.length > 1) bar.insertAdjacentHTML('afterbegin', `<label class="pn-lok" style="display:flex;align-items:center;gap:6px;margin-right:auto;font-size:13px;color:#625860">Lokalizacja<select id="pn-lok" class="p-in s" style="max-width:220px">${L.map((l, i) => `<option value="${i}"${i === wyb ? ' selected' : ''}>${esc(l.n)}</option>`).join('')}</select></label>`);
@@ -225,7 +229,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
   // Płatne dodatki abonamentu: Mock "dodatki" = { podpisy: bool }, domyślnie wyłączone.
   const addon = k => !!(Mock.get('dodatki', {}) || {})[k];
   const setAddon = (k, v) => Mock.set('dodatki', { ...(Mock.get('dodatki', {}) || {}), [k]: v });
-  const signUpsell = () => `<div class="p-row" style="flex-direction:column;align-items:flex-start"><b>Podpisy elektroniczne to dodatek</b><span style="line-height:1.45">Klientki podpiszą zgody na telefonie przed wizytą. [cena] zł / mies.</span><a class="p-btn sm dark" href="ustawienia.html#dodatki">Włącz dodatek</a></div>`;
+  const signUpsell = () => `<div class="p-row" style="flex-direction:column;align-items:flex-start"><b>Podpisy elektroniczne to dodatek</b><span style="line-height:1.45">Klientki podpiszą zgody na telefonie przed wizytą. 29 zł / mies.</span><a class="p-btn sm dark" href="ustawienia.html#dodatki">Włącz dodatek</a></div>`;
 
   // Import kalendarza (Google/Apple) do elementu el: wybór kalendarza, plik .ics liczony lokalnie albo przykład. Wynik: Mock "kalendarz.import" = { zrodlo, n }.
   const wizyt = n => `${n} ${n === 1 ? 'wizytę' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'wizyty' : 'wizyt'}`;
@@ -255,8 +259,9 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
   }
 
   // locations: shortcut: only a label in the header, the mock does not split data per location; real data would be filtered by the chosen one
-  const LOK0 = [{ n: '[Studio 1] – Centrum', adres: '[ulica, numer], [miasto]' }, { n: '[Studio 1] – Mokotów', adres: '[ulica, numer], [miasto]' }];
+  const LOK0 = [{ n: 'Studio Malwa – Centrum', adres: 'ul. Puławska 24, Warszawa' }, { n: 'Studio Malwa – Mokotów', adres: 'ul. Puławska 24, Warszawa' }];
   const lokalizacje = () => Mock.get('lokalizacje', null) || LOK0;
-  window.PS = { lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, zl: n => `${Math.round(n)} zł`, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
+  const STYL = [{ n: 'Magda', rola: 'paznokcie', c: '#9E1F50', t: '#F8EAF0' }, { n: 'Ewelina', rola: 'rzęsy, brwi, paznokcie', c: '#2F7A8C', t: '#E7F2F4' }];
+  window.PS = { STYL, lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, zl: n => `${Math.round(n)} zł`, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
   init();
 })();

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Scenariusze testów</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<style>
+body{margin:0;background:#FBF8F9;color:#1E1A1D;font:15px/1.5 'DM Sans',sans-serif}
+main{max-width:880px;margin:0 auto;padding:24px 20px 48px;display:flex;flex-direction:column;gap:20px}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif;margin:0}
+h1{font-size:28px}h2{font-size:20px}
+.box{background:#FFFFFF;border-radius:16px;padding:16px 18px;box-shadow:0 1px 2px rgba(30,10,18,.06),0 8px 24px rgba(30,10,18,.06)}
+ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.z{display:grid;grid-template-columns:36px minmax(0,1fr);gap:4px 12px;align-items:start}
+.z>.nr{grid-row:1/4;width:36px;height:36px;border-radius:50%;background:#F6EDF1;color:#9E1F50;font-weight:700;display:flex;align-items:center;justify-content:center}
+.z .tresc{font-size:16px;font-weight:500}
+.z .mut{color:#625860;font-size:14px}
+.z .akcje{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.btn{min-height:44px;padding:0 16px;border-radius:12px;border:0;background:#9E1F50;color:#FFFFFF;font:inherit;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;cursor:pointer}
+.btn:hover{background:#7A173D;color:#FFFFFF}
+.btn-o{min-height:44px;padding:0 14px;border-radius:12px;border:1px solid #E4D9DE;background:#FFFFFF;color:#1E1A1D;font:inherit;cursor:pointer}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:700;margin-right:6px}
+.k{background:#F6EDF1;color:#9E1F50}.s{background:#E7F2F4;color:#2F5A86}
+:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="panel.html">Panel studia</a></div>
+<main>
+  <div>
+    <h1>Scenariusze testów</h1>
+    <p style="margin:6px 0 0;color:#625860">Strona dla osoby prowadzącej test. Uczestniczki i uczestnicy jej nie widzą.</p>
+  </div>
+
+  <section class="box" aria-labelledby="jak-h">
+    <h2 id="jak-h">Jak prowadzić test</h2>
+    <ol style="margin-top:10px">
+      <li>Przed każdą osobą otwórz link zadania (albo wyślij go na jej telefon). Link czyści dane makiety i włącza tryb testowy: bez czarnego paska i narzędzi, z przyciskiem <b>Uwagi</b> w rogu.</li>
+      <li>Przeczytaj treść zadania na głos. Nie podpowiadaj, notuj, gdzie osoba się zatrzymuje.</li>
+      <li>Po zadaniu poproś o wpisanie wrażeń przez przycisk <b>Uwagi</b> (można dodać zrzut ekranu).</li>
+      <li>Uwagi zapisują się na urządzeniu, na którym był test. Odczytasz je tak: <a href="start.html?test=0">wyłącz tryb testowy</a>, potem <b>Narzędzia</b> → <b>Uwagi z testów</b> → <b>Pobierz (JSON)</b>.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="kl-h" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="kl-h">Klientki</h2>
+    <div id="lista-k" style="display:flex;flex-direction:column;gap:12px"></div>
+  </section>
+  <section aria-labelledby="sa-h" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="sa-h">Salony</h2>
+    <div id="lista-s" style="display:flex;flex-direction:column;gap:12px"></div>
+  </section>
+</main>
+<script>
+// [kto, zadanie (czytane uczestnikowi), na co patrzeć (dla prowadzącego), link: strona + ?scen=N z Narzędzi makiety]
+const ZADANIA = [
+  ['k', 'Chcesz zrobić manicure hybrydowy jutro po 16:00 i wydać najwyżej 200 zł. Znajdź salon i zarezerwuj wizytę.', 'Czy znajduje pole „Kiedy” i filtry? Czy rozumie zaliczkę przed rezerwacją?', 'start.html'],
+  ['k', 'Zaprojektuj paznokcie, które Ci się podobają, sprawdź cenę i zarezerwuj termin.', 'Kreator: czy wie, że cena liczy się na bieżąco? Gdzie się zatrzymuje?', 'start.html'],
+  ['k', 'Masz kupiony karnet na 5 manicure. Umów kolejną wizytę z karnetu.', 'Czy zauważa „Rozlicz z karnetu” i że nie płaci zaliczki?', 'start.html?scen=7&na=start.html'],
+  ['k', 'Coś Ci wypadło. Odwołaj swoją wizytę i sprawdź, czy dostaniesz zwrot zaliczki.', 'Czy znajduje „Moje wizyty”? Czy komunikat o zwrocie jest jasny?', 'start.html?scen=9&na=start.html'],
+  ['k', 'Po ostatniej wizycie jeden paznokieć odkleił się po tygodniu. Zgłoś to studiu.', 'Czy znajduje „Zgłoś reklamację” w historii wizyt?', 'start.html?scen=8&na=start.html'],
+  ['s', 'Prowadzisz salon. Załóż konto studia w aplikacji.', 'Gdzie szuka rejestracji dla salonów? Czy kroki są zrozumiałe?', 'start.html'],
+  ['s', 'Dziś przyszły dwie rezerwacje online. Sprawdź je w kalendarzu i przenieś wizytę Ewy z 13:05 na inną wolną godzinę.', 'Czy rozumie statusy wizyt? Czy znajduje przeciąganie albo „Przenieś”?', 'panel.html?scen=11'],
+  ['s', 'Klientka zgłosiła reklamację. Odpowiedz jej i zaproponuj bezpłatną poprawkę.', 'Czy znajduje reklamację (dzwonek, Opinie)? Czy decyzje są jasne?', 'opinie-studio.html'],
+  ['s', 'Sprawdź, ile salon zarobił w tym miesiącu po odjęciu kosztów.', 'Czy kafle i „Koszty i zysk” są czytelne?', 'raporty.html'],
+  ['s', 'Przygotuj kod rabatowy −20% na jesienną promocję.', 'Czy znajduje Promocje → Kody rabatowe?', 'promocje.html'],
+];
+const link = s => s + (s.includes('?') ? '&' : '?') + 'test=1&reset=1';
+console.assert(link('start.html') === 'start.html?test=1&reset=1' && link('start.html?scen=7') === 'start.html?scen=7&test=1&reset=1', 'testy link');
+const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let nr = 0;
+for (const [kto, zad, uwaga, url] of ZADANIA) {
+  nr++;
+  const el = document.createElement('div'); el.className = 'box z';
+  el.innerHTML = `<span class="nr" aria-hidden="true">${nr}</span><span class="tresc"><span class="tag ${kto}">${kto === 'k' ? 'Klientka' : 'Salon'}</span>${esc(zad)}</span>
+    <span class="mut">Obserwuj: ${esc(uwaga)}</span>
+    <span class="akcje"><a class="btn" href="${link(url)}" aria-label="Otwórz zadanie ${nr}">Otwórz</a><button type="button" class="btn-o" data-url="${link(url)}" aria-label="Kopiuj link do zadania ${nr}">Kopiuj link</button></span>`;
+  document.getElementById(kto === 'k' ? 'lista-k' : 'lista-s').append(el);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-url]'); if (!b) return;
+  const u = new URL(b.dataset.url, location.href).href;
+  (navigator.clipboard?.writeText(u) || Promise.reject()).then(() => Mock.toast('Skopiowano link'), () => prompt('Skopiuj link:', u));
+});
+</script>
+</body>
+</html>

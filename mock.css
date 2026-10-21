@@ -15,7 +15,7 @@ a { color:#9E1F50; } a:hover { color:#7A173D; }
 @media (min-width:1024px) {
   .nav.d-tabbar { margin-top:0; grid-template-columns:none; grid-auto-flow:column; justify-content:start; align-items:center; gap:8px; border-top:0; border-bottom:1px solid #F0E8EC; padding:6px 20px; }
   /* the desktop top bar carries the brand, like a normal site header */
-  .nav.d-tabbar::before { content:'[Nazwa aplikacji]'; margin-right:24px; font:700 20px 'Bricolage Grotesque', 'DM Sans', sans-serif; color:#9E1F50; }
+  .nav.d-tabbar::before { content:url('znak.svg') '\00a0odcień'; display:flex; align-items:center; gap:4px; margin-right:24px; font:700 24px 'Bricolage Grotesque', 'DM Sans', sans-serif; color:#1E1A1D; letter-spacing:-0.3px; }
   .nav.d-tabbar a { flex-direction:row; gap:8px; padding:0 16px; font-size:14px; min-height:48px; }
 }
 @media (max-width:1023px) {

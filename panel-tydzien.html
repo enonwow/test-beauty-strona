@@ -10,7 +10,9 @@
 <script src="mock.js" defer></script>
 <script src="panel-shell.js" defer></script>
 <script src="panel-drag.js" defer></script>
-<style>@media (max-width:1023px){[data-day]>[data-s]{min-height:44px}}</style>
+<style>/* stylist colour stripe, same as the day view (PS.STYL) */
+[data-day] a[data-s="1"]{border-left:4px solid #9E1F50 !important}[data-day] a[data-s="2"]{border-left:4px solid #2F7A8C !important}
+@media (max-width:1023px){[data-day]>[data-s]{min-height:44px}}</style>
 </head>
 <body>
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
@@ -27,10 +29,10 @@
       </div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
         <label for="who" style="font-size: 13px; color: #625860">Stylistka</label>
-        <select id="who" style="min-height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; font: inherit"><option value="0">Wszystkie</option><option value="1">[Stylistka 1]</option><option value="2">[Stylistka 2]</option></select>
+        <select id="who" style="min-height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; font: inherit"><option value="0">Wszystkie</option><option value="1">Magda</option><option value="2">Ewelina</option></select>
         <div role="group" aria-label="Widok" style="display: flex; border: 1px solid #E4D9DE; border-radius: 10px; overflow: hidden; background: #FFFFFF">
           <a href="panel.html" style="min-height: 40px; padding: 0 14px; background: #FFFFFF; color: #1E1A1D; text-decoration: none; display: flex; align-items: center">Dzień</a>
-          <a href="panel-tydzien.html" aria-current="page" style="min-height: 40px; padding: 0 14px; background: #1E1A1D; color: #FFFFFF; text-decoration: none; display: flex; align-items: center">Tydzień</a>
+          <a href="panel-tydzien.html" aria-current="page" style="min-height: 40px; padding: 0 14px; background: #FFFFFF; color: #9E1F50; font-weight: 700; box-shadow: inset 0 0 0 2px #9E1F50; text-decoration: none; display: flex; align-items: center">Tydzień</a>
         </div>
         <button type="button" id="add-visit" class="p-btn pri">+ Wizyta</button>
       </div>
@@ -77,7 +79,7 @@
           <a href="panel.html" data-s="1" style="position: absolute; top: 288px; left: 4px; right: 4px; height: 94px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #F6EDF1; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>15:00</b> Żel · french</a>
         </div>
         <div data-day="22" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC; background: #FAF6F8">
-          <div data-s="1" style="position: absolute; top: 8px; left: 4px; right: 4px; padding: 6px 8px; border-radius: 8px; background: #FFFFFF; border: 1px solid #E4D9DE; color: #625860; font-size: 12px">Urlop · [Stylistka 1]</div>
+          <div data-s="1" style="position: absolute; top: 8px; left: 4px; right: 4px; padding: 6px 8px; border-radius: 8px; background: #FFFFFF; border: 1px solid #E4D9DE; color: #625860; font-size: 12px">Urlop · Magda</div>
         </div>
         <div data-day="23" style="position: relative; height: 432px; border-left: 1px solid #F0E8EC">
           <a href="panel.html" data-s="2" style="position: absolute; top: 48px; left: 4px; right: 4px; height: 118px; box-sizing: border-box; padding: 6px 8px; border-radius: 8px; background: #EAF0F7; color: #1E1A1D; text-decoration: none; font-size: 12px; overflow: hidden"><b>10:00</b> Rzęsy 4D–6D</a>
@@ -128,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let i = 0; i < 6; i++) {
         const d = day(i); if (d.getDate() !== +m[1] || d.getMonth() + 1 !== +m[2]) continue;
         const col = document.querySelector(`[data-day="${19 + i}"]`), el = document.createElement('a');
-        el.className = 'dyn kal-item'; el.href = 'panel.html'; el.dataset.s = v.stylistka === '[Stylistka 2]' ? '2' : '1'; el.dataset.k = 'v' + v.id; el.dataset.dur = Math.max(30, v.czas || 60);
+        el.className = 'dyn kal-item'; el.href = 'panel.html'; el.dataset.s = v.stylistka === 'Ewelina' ? '2' : '1'; el.dataset.k = 'v' + v.id; el.dataset.dur = Math.max(30, v.czas || 60);
         el.style.cssText = `position:absolute;top:${(toMin(v.godzina) - 540) * 0.8}px;left:4px;right:4px;height:${Math.max(30, (v.czas || 60) * 0.8 - 2)}px;box-sizing:border-box;padding:6px 8px;border-radius:8px;background:${KC[v.kategoria] || '#F6EDF1'};color:#1E1A1D;text-decoration:none;font-size:12px;overflow:hidden;outline:2px solid #9E1F50`;
         el.innerHTML = `<b>${v.godzina}</b> ${PS.esc(v.klientka || 'Klientka online')}`;
         col.append(el);

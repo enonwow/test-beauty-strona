@@ -71,7 +71,7 @@ function wynik() {
 function render() {
   const r = wynik();
   const toggle = (q, val, label) => { const on = odp[q.id] === (val === 'tak'); // odp holds booleans
-    return `<button type="button" data-q="${q.id}" data-val="${val}" aria-pressed="${on}" ${zgoda ? '' : 'disabled'} style="min-height: 44px; padding: 0 14px; border: 0; background: ${on ? '#1E1A1D' : '#FFFFFF'}; color: ${on ? '#FFFFFF' : '#1E1A1D'}; font: inherit; font-size: 13px; cursor: ${zgoda ? 'pointer' : 'not-allowed'}; opacity: ${zgoda ? 1 : 0.5}">${label}</button>`; };
+    return `<button type="button" data-q="${q.id}" data-val="${val}" aria-pressed="${on}" ${zgoda ? '' : 'disabled'} style="min-height: 44px; padding: 0 14px; border: 0; background: #FFFFFF; color: ${on ? '#9E1F50' : '#1E1A1D'};${on ? ' font-weight: 700; box-shadow: inset 0 0 0 2px #9E1F50;' : ''} font: inherit; font-size: 13px; cursor: ${zgoda ? 'pointer' : 'not-allowed'}; opacity: ${zgoda ? 1 : 0.5}">${label}</button>`; };
   let html = '';
   if (booking.sciezka === 'konsultacja') html += `<p style="margin: 16px 0 0; padding: 10px 12px; border-radius: 10px; background: #FFF1E0; color: #8A3B12; font-size: 13px; line-height: 1.45">Kreator skierował Cię na konsultację (${esc(booking.usluga)}). Pytania pomogą przygotować rozmowę.</p>`;
   if (pyt.length) {
@@ -98,9 +98,11 @@ function render() {
       + (r.sciezka === 'blokada' ? `<button type="button" data-przypomnij style="align-self: flex-start; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #1E1A1D; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Przypomnij mi</button>` : '')
       + '</section>';
   }
+  // same 30% rule as termin.html; a free consultation has no deposit
+  const zal = Math.ceil((r.sciezka === 'konsultacja' ? c.konsultacja.cena : booking.seria?.zaZabieg || booking.cenaMax || booking.cena || 0) * 0.3);
   html += `<section style="margin-top: 20px; padding: 14px; border-radius: 14px; background: #FAF6F8; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.45">
       <b style="font-size: 14px">Zanim zapłacisz</b>
-      <span>Wpłata to <b>zaliczka [x] zł</b>. Zwracamy ją, gdy odwołasz do 24 h przed wizytą.</span>
+      <span>${zal ? `Wpłata to <b>zaliczka ${zal} zł</b>. Zwracamy ją, gdy odwołasz do 24 h przed wizytą.` : 'Bez zaliczki.'}</span>
       <span>Rezerwujesz online, więc masz 14 dni na odstąpienie od umowy.</span>
       <span>Cena brutto z kreatora jest ostateczna${booking.cenaMax > booking.cenaMin ? ', poza widełkami opisanymi w kreatorze' : ''}.</span></section>`;
   const blocked = !r.komplet || r.sciezka === 'blokada';

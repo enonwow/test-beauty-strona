@@ -20,8 +20,7 @@ nav[aria-label="Sekcje"] a { display: inline-flex; align-items: center; min-heig
 
     <header style="padding-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
       <div style="display: flex; gap: 10px; align-items: center">
-        <div style="width: 40px; height: 40px; border-radius: 12px; background: #9E1F50; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700">NA</div>
-        <span style="font-weight: 700">[Nazwa aplikacji] <span style="color: #625860; font-weight: 400">dla studiów</span></span>
+        <span style="display: inline-flex; align-items: baseline; gap: 6px"><span class="logo" style="display:inline-flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px"><img src="znak.svg" alt="" width="26" height="18">odcień</span><span style="color: #625860; font-weight: 400">dla studiów</span></span>
       </div>
       <nav aria-label="Sekcje" style="display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px">
         <a href="#funkcje">Funkcje</a><a href="#porownanie">Porównanie</a><a href="#plany">Plany</a><a href="#faq">Pytania</a>
@@ -49,11 +48,11 @@ nav[aria-label="Sekcje"] a { display: inline-flex; align-items: center; min-heig
         <table style="width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px">
           <thead><tr style="background: #FAF6F8; text-align: left">
             <th scope="col" style="padding: 12px 14px; font-weight: 700"></th>
-            <th scope="col" style="padding: 12px 14px; font-weight: 700; color: #9E1F50">[Nazwa aplikacji]</th>
+            <th scope="col" style="padding: 12px 14px; font-weight: 700; color: #9E1F50">Odcień</th>
             <th scope="col" style="padding: 12px 14px; font-weight: 700; color: #625860">Typowy system z prowizją</th>
           </tr></thead>
           <tbody>
-            <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Prowizja od nowych klientek</th><td style="padding: 12px 14px">0%</td><td style="padding: 12px 14px; color: #625860">[x]% od każdej pierwszej wizyty</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Prowizja od nowych klientek</th><td style="padding: 12px 14px">0%</td><td style="padding: 12px 14px; color: #625860">30% od każdej pierwszej wizyty</td></tr>
             <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Cena dla klientki</th><td style="padding: 12px 14px">dokładna kwota brutto z kreatora</td><td style="padding: 12px 14px; color: #625860">„od … zł”, dopłaty ustalane na wizycie</td></tr>
             <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Długość wizyty w kalendarzu</th><td style="padding: 12px 14px">liczona z wybranych opcji</td><td style="padding: 12px 14px; color: #625860">stała dla usługi</td></tr>
             <tr style="border-top: 1px solid #F0E8EC"><th scope="row" style="padding: 12px 14px; text-align: left; font-weight: 500">Inspiracja ze zdjęcia</th><td style="padding: 12px 14px">prośba o wycenę wpada do panelu</td><td style="padding: 12px 14px; color: #625860">wiadomości w komunikatorach</td></tr>
@@ -89,7 +88,7 @@ nav[aria-label="Sekcje"] a { display: inline-flex; align-items: center; min-heig
       <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
         <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700">Plany</h2>
         <div id="okres" data-choice role="group" aria-label="Okres rozliczenia" style="display: flex; border: 1px solid #E4D9DE; border-radius: 12px; overflow: hidden">
-          <button type="button" data-value="m" aria-pressed="true" style="min-height: 44px; padding: 0 16px; border: 0; background: #1E1A1D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Miesięcznie</button>
+          <button type="button" data-value="m" aria-pressed="true" style="min-height: 44px; padding: 0 16px; border: 0; background: #FFFFFF; color: #9E1F50; font-weight: 700; box-shadow: inset 0 0 0 2px #9E1F50; font: inherit; font-size: 14px; cursor: pointer">Miesięcznie</button>
           <button type="button" data-value="y" aria-pressed="false" style="min-height: 44px; padding: 0 16px; border: 0; background: #FFFFFF; color: #1E1A1D; font: inherit; font-size: 14px; cursor: pointer">Rocznie</button>
         </div>
       </div>
@@ -98,27 +97,27 @@ nav[aria-label="Sekcje"] a { display: inline-flex; align-items: center; min-heig
         <article style="padding: 18px; border: 1px solid #E4D9DE; border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
           <h3 style="margin: 0; font-size: 18px">Solo</h3>
           <span style="color: #625860; font-size: 13px">1 stylistka, 1 stanowisko</span>
-          <b data-price style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[cena] zł / mies.</b>
+          <b data-price="79" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">79 zł / mies.</b>
           <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 14px"><li>kreator i strona studia</li><li>kalendarz i przypomnienia SMS</li><li>wyceny ze zdjęcia</li></ul>
           <a href="onboarding.html" style="margin-top: auto; min-height: 44px; border-radius: 10px; border: 1px solid #1E1A1D; color: #1E1A1D; text-decoration: none; font-weight: 500; display: flex; align-items: center; justify-content: center">Wybierz Solo</a>
         </article>
         <article style="padding: 18px; border: 2px solid #9E1F50; border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
           <h3 style="margin: 0; font-size: 18px">Studio <span style="font-size: 12px; color: #9E1F50; font-weight: 700">najczęściej wybierany</span></h3>
           <span style="color: #625860; font-size: 13px">do 5 osób w zespole</span>
-          <b data-price style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[cena] zł / mies.</b>
+          <b data-price="149" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">149 zł / mies.</b>
           <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 14px"><li>wszystko z Solo</li><li>grafik zespołu, kasa, magazyn</li><li>karnety, promocje, raporty</li></ul>
           <a href="onboarding.html" style="margin-top: auto; min-height: 44px; border-radius: 10px; background: #9E1F50; color: #FFFFFF; text-decoration: none; font-weight: 700; display: flex; align-items: center; justify-content: center">Wybierz Studio</a>
         </article>
         <article style="padding: 18px; border: 1px solid #E4D9DE; border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
           <h3 style="margin: 0; font-size: 18px">Sieć</h3>
           <span style="color: #625860; font-size: 13px">kilka lokali, wspólne klientki</span>
-          <b data-price style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">[cena] zł / mies.</b>
+          <b data-price="299" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">299 zł / mies.</b>
           <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 14px"><li>wszystko ze Studio</li><li>wiele lokali i magazynów</li><li>raporty dla całej sieci</li></ul>
           <a href="onboarding.html" style="margin-top: auto; min-height: 44px; border-radius: 10px; border: 1px solid #1E1A1D; color: #1E1A1D; text-decoration: none; font-weight: 500; display: flex; align-items: center; justify-content: center">Wybierz Sieć</a>
         </article>
       </div>
       <div style="padding: 14px 18px; border-radius: 14px; background: #FAF6F8; display: flex; flex-direction: column; gap: 4px">
-        <span><b>Dodatki:</b> Podpisy elektroniczne · <b>[cena] zł / mies.</b></span>
+        <span><b>Dodatki:</b> Podpisy elektroniczne · <b>29 zł / mies.</b></span>
         <span style="color: #625860; font-size: 13px">Zwykły podpis elektroniczny (forma dokumentowa) pod zgodami RODO, wywiadami przed zabiegiem i zgodami na zdjęcia.</span>
       </div>
     </section>
@@ -139,11 +138,11 @@ nav[aria-label="Sekcje"] a { display: inline-flex; align-items: center; min-heig
   </div>
 </div>
 <script>
-// Billing toggle: mock.js switches the buttons, this swaps the price labels and the note.
+// Billing toggle: mock.js switches the buttons, this swaps the price labels (a year costs 10 months) and the note.
 document.getElementById('okres').addEventListener('mock:choice', e => {
   const yearly = e.detail.value === 'y';
-  document.querySelectorAll('[data-price]').forEach(el => { el.textContent = yearly ? '[cena] zł / rok' : '[cena] zł / mies.'; });
-  document.getElementById('okresNote').textContent = yearly ? 'Płacisz raz w roku, [x] miesiące taniej niż miesięcznie.' : 'Płacisz co miesiąc, rezygnujesz w dowolnej chwili.';
+  document.querySelectorAll('[data-price]').forEach(el => { el.textContent = yearly ? el.dataset.price * 10 + ' zł / rok' : el.dataset.price + ' zł / mies.'; });
+  document.getElementById('okresNote').textContent = yearly ? 'Płacisz raz w roku, 2 miesiące taniej niż miesięcznie.' : 'Płacisz co miesiąc, rezygnujesz w dowolnej chwili.';
 });
 </script>
 </body>

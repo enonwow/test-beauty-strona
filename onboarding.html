@@ -28,9 +28,13 @@
 
   <section id="krok1" data-krok="1" style="display: flex; flex-direction: column; gap: 14px">
     <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Dane studia</h2>
-    <div style="display: flex; flex-direction: column; gap: 6px"><label for="nazwa" style="font-size: 13px; color: #625860">Nazwa studia</label><input id="nazwa" type="text" autocomplete="organization" placeholder="[Nazwa studia]" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
-    <div style="display: flex; flex-direction: column; gap: 6px"><label for="adres" style="font-size: 13px; color: #625860">Adres</label><input id="adres" type="text" autocomplete="street-address" placeholder="[ulica, numer lokalu], [miasto]" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
-    <div style="display: flex; flex-direction: column; gap: 6px"><label for="telefon" style="font-size: 13px; color: #625860">Telefon studia</label><input id="telefon" type="tel" autocomplete="tel" placeholder="[telefon]" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="nazwa" style="font-size: 13px; color: #625860">Nazwa studia</label><input id="nazwa" type="text" autocomplete="organization" placeholder="Studio Malwa" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="adres" style="font-size: 13px; color: #625860">Adres</label><input id="adres" type="text" autocomplete="street-address" placeholder="ul. Puławska 24, lok. 3, Warszawa" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="telefon" style="font-size: 13px; color: #625860">Telefon studia</label><input id="telefon" type="tel" autocomplete="tel" placeholder="600 123 456" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <h3 style="margin: 6px 0 0; font-size: 16px">Konto właścicielki</h3>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="imie" style="font-size: 13px; color: #625860">Twoje imię</label><input id="imie" type="text" autocomplete="given-name" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="email" style="font-size: 13px; color: #625860">E-mail do logowania</label><input id="email" type="email" autocomplete="email" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="haslo" style="font-size: 13px; color: #625860">Hasło (co najmniej 8 znaków)</label><input id="haslo" type="password" autocomplete="new-password" style="min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #C9B6BF; font: inherit"></div>
     <div style="display: flex; justify-content: flex-end"><button type="button" data-hide="#krok1" data-show="#krok2" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Dalej</button></div>
   </section>
 
@@ -83,7 +87,7 @@
     <p style="margin: 0; color: #625860; font-size: 14px; line-height: 1.45">Następny krok w panelu: uzupełnij cennik, żeby kreatory pokazywały Twoje ceny i czasy.</p>
     <div style="display: flex; justify-content: space-between; gap: 10px">
       <button type="button" data-hide="#krok5" data-show="#krok4" style="min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; cursor: pointer">Wstecz</button>
-      <button type="button" data-toast="Studio założone" data-go="panel.html" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Przejdź do panelu</button>
+      <button type="button" id="zaloz" style="min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Przejdź do panelu</button>
     </div>
   </section>
 </div>
@@ -124,7 +128,7 @@ function syncStep() {
   if (n === 5) {
     const cats = [...document.querySelectorAll('#kategorie [aria-pressed="true"]')].map(b => b.dataset.value);
     const open = [...document.querySelectorAll('[data-day]')].filter(r => r.querySelector('input[type=checkbox]').checked).length;
-    const rows = [['Studio', document.getElementById('nazwa').value.trim() || '[Nazwa studia]'], ['Adres', document.getElementById('adres').value.trim() || '[adres]'],
+    const rows = [['Studio', document.getElementById('nazwa').value.trim() || 'nie podano'], ['Adres', document.getElementById('adres').value.trim() || 'nie podano'],
       ['Usługi', cats.join(', ') || 'nie wybrano'], ['Klientki z importu', String(imported)], ['Dni otwarte', `${open} w tygodniu`]];
     const dl = document.getElementById('podsumowanie'); dl.replaceChildren();
     for (const [k, v] of rows) dl.append(Object.assign(document.createElement('dt'), { textContent:k, style:'color: #625860' }), Object.assign(document.createElement('dd'), { textContent:v, style:'margin: 0' }));
@@ -132,6 +136,37 @@ function syncStep() {
   window.scrollTo({ top: 0 });
 }
 document.addEventListener('click', e => { if (e.target.closest('[data-show]')) setTimeout(syncStep); }); // after mock.js toggled the sections
+
+// "Dalej" leaves a step only when its fields are filled; capture runs before mock.js switches the sections.
+const err = (el, msg) => { let p = document.getElementById(el.id + '-err'); p?.remove(); el.removeAttribute('aria-invalid');
+  if (!msg) return false;
+  p = Object.assign(document.createElement('p'), { id: el.id + '-err', textContent: msg, style: 'margin: 0; color: #A3262A; font-size: 13px' }); p.setAttribute('role', 'alert');
+  el.after(p); el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', p.id); return true; };
+const $ = id => document.getElementById(id);
+function bledy(krok) {
+  if (krok === '1') return [[$('nazwa'), !$('nazwa').value.trim() && 'Wpisz nazwę studia'], [$('adres'), !$('adres').value.trim() && 'Wpisz adres studia'],
+    [$('telefon'), $('telefon').value.replace(/\D/g, '').length < 9 && 'Wpisz 9-cyfrowy numer telefonu'], [$('imie'), !$('imie').value.trim() && 'Wpisz swoje imię'],
+    [$('email'), !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim()) && 'Wpisz adres e-mail, np. ola@studio.pl'], [$('haslo'), $('haslo').value.length < 8 && 'Hasło musi mieć co najmniej 8 znaków']]
+    .filter(([el, m]) => err(el, m)).map(([el]) => el);
+  if (krok === '2') return err($('kategorie'), !document.querySelector('#kategorie [aria-pressed="true"]') && 'Wybierz co najmniej jedną kategorię') ? [$('kategorie')] : [];
+  return [];
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-show]'), s = b?.closest('[data-krok]');
+  if (!s || Number(b.dataset.show.slice(5)) < Number(s.dataset.krok)) return; // "Wstecz" always works
+  const zle = bledy(s.dataset.krok);
+  if (zle.length) { e.stopImmediatePropagation(); e.preventDefault(); (zle[0].querySelector?.('button') || zle[0]).focus(); }
+}, true);
+
+// Save the studio (profile shown in the panel and on profil-studia.html) and log the owner in.
+$('zaloz').addEventListener('click', () => {
+  const godz = [...document.querySelectorAll('[data-day]')].map(r => { const [od, doo] = r.querySelectorAll('input[type=time]'); return [od.value, doo.value, !r.querySelector('input[type=checkbox]').checked]; });
+  Mock.set('profil', { ...Mock.get('profil', {}), nm: $('nazwa').value.trim(), ad: $('adres').value.trim(), tel: $('telefon').value.trim(), h: godz,
+    kat: [...document.querySelectorAll('#kategorie [aria-pressed="true"]')].map(b => b.dataset.value) });
+  Mock.set('studioUser', { imie: $('imie').value.trim(), email: $('email').value.trim(), rola: 'właścicielka' });
+  Mock.toast('Studio założone. Zalogowano');
+  setTimeout(() => { location.href = 'panel.html'; }, 600);
+});
 </script>
 </body>
 </html>

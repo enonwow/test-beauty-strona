@@ -33,7 +33,7 @@
         <section class="p-card">
           <div style="display: flex; gap: 12px; align-items: center">
             <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 50%; background: #9E1F50"></span>
-            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">[Stylistka 1]</b><span style="color: #625860">Właścicielka · paznokcie</span></div>
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">Magda</b><span style="color: #625860">Właścicielka · paznokcie</span></div>
           </div>
           <div style="display: flex; gap: 6px; flex-wrap: wrap">
             <span class="p-chip">Hybryda</span><span class="p-chip">Żel</span><span class="p-chip">Przedłużanie</span><span class="p-chip">Zdobienia</span>
@@ -47,14 +47,14 @@
         <section class="p-card">
           <div style="display: flex; gap: 12px; align-items: center">
             <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 50%; background: #2F5A86"></span>
-            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">[Stylistka 2]</b><span style="color: #625860">Stylistka · rzęsy, brwi, paznokcie</span></div>
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">Ewelina</b><span style="color: #625860">Stylistka · rzęsy, brwi, paznokcie</span></div>
           </div>
           <div style="display: flex; gap: 6px; flex-wrap: wrap">
             <span class="p-chip" style="background: #EAF0F7">Rzęsy 1:1–mega</span><span class="p-chip" style="background: #EEF3EA">Brwi</span><span class="p-chip">Hybryda</span>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px">
             <label class="p-lab">Uprawnienia<select class="p-in" data-rl="2" data-toast-change="Zapisano uprawnienia"></select></label>
-            <label class="p-lab">Prowizja od usług<input class="p-in" value="[x] %" style="width: 100px" data-toast-change="Zapisano prowizję"></label>
+            <label class="p-lab">Prowizja od usług<input class="p-in" value="40 %" style="width: 100px" data-toast-change="Zapisano prowizję"></label>
           </div>
         </section>
         <div id="invited" style="display: contents"></div>
@@ -111,11 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const zakres = (a, b) => (a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${Mock.MIESD[b.getMonth()]}` : `${a.getDate()} ${Mock.MIESD[a.getMonth()]} – ${b.getDate()} ${Mock.MIESD[b.getMonth()]}`);
   document.getElementById('gr-h').textContent = 'Grafik: ' + zakres(dt(0), dt(6));
   const P = { 1: '#F6EDF1', 2: '#EAF0F7' };
-  const DEF = { '[Stylistka 1]': ['9–18', '9–18', '9–18', 'urlop', '10–18', '9–14', '—'], '[Stylistka 2]': ['12–20', '9–17', '9–17', '9–17', '9–17', '—', '—'] };
+  const DEF = { 'Magda': ['9–18', '9–18', '9–18', 'urlop', '10–18', '9–14', '—'], 'Ewelina': ['12–20', '9–17', '9–17', '9–17', '9–17', '—', '—'] };
   let G = Mock.get('zespol.grafik', DEF);
   let STAN = Mock.get('zespol.stan', [
-    { n: 'Stanowisko 1', o: 'Paznokcie · [Stylistka 1]', sp: 'Lampa UV/LED, frezarka, odciąg pyłu', us: ['Hybryda', 'Żel', 'Przedłużanie'] },
-    { n: 'Stanowisko 2', o: 'Rzęsy i brwi · [Stylistka 2]', sp: 'Leżanka, lampa z lupą, stolik na kleje', us: ['Rzęsy 1:1–mega', 'Brwi'] },
+    { n: 'Stanowisko 1', o: 'Paznokcie · Magda', sp: 'Lampa UV/LED, frezarka, odciąg pyłu', us: ['Hybryda', 'Żel', 'Przedłużanie'] },
+    { n: 'Stanowisko 2', o: 'Rzęsy i brwi · Ewelina', sp: 'Leżanka, lampa z lupą, stolik na kleje', us: ['Rzęsy 1:1–mega', 'Brwi'] },
     { n: 'Gabinet kosmetyczny', o: 'Kosmetyka (przykład)', sp: 'Leżanka, lampa, zestaw do peelingów', us: ['Oczyszczanie', 'Peeling kwasowy'] }]);
   const saveG = () => Mock.set('zespol.grafik', G);
   const cls = v => (v === 'urlop' ? 'background:#FFF1E0;color:#8A3B12' : v === '—' ? 'color:#625860' : '');
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- pay from commission: base + turnover × rate ---
   const doWyplaty = o => Math.round(o.podstawa + o.utarg * o.proc / 100);
   console.assert(doWyplaty({ podstawa: 3000, utarg: 10000, proc: 10 }) === 4000 && doWyplaty({ podstawa: 0, utarg: 9000, proc: 40 }) === 3600, 'zespol doWyplaty');
-  let WY = Mock.get('zespol.wyn', [{ k: '[Stylistka 1]', utarg: 9800, proc: 40, podstawa: 0 }, { k: '[Stylistka 2]', utarg: 7200, proc: 10, podstawa: 3000 }]);
+  let WY = Mock.get('zespol.wyn', [{ k: 'Magda', utarg: 9800, proc: 40, podstawa: 0 }, { k: 'Ewelina', utarg: 7200, proc: 10, podstawa: 3000 }]);
   const renderWy = () => { document.getElementById('wy').innerHTML = WY.map((o, i) => `<tr><td><b>${E(o.k)}</b></td><td style="text-align:right">${o.utarg.toLocaleString('pl-PL')} zł</td>
       <td style="text-align:right"><input class="p-in s" type="number" min="0" max="100" data-wy="${i}" data-f="proc" value="${o.proc}" aria-label="Prowizja ${E(o.k)} (%)" style="width:70px"> %</td>
       <td style="text-align:right"><input class="p-in s" type="number" min="0" step="100" data-wy="${i}" data-f="podstawa" value="${o.podstawa}" aria-label="Podstawa ${E(o.k)} (zł)" style="width:90px"> zł</td>

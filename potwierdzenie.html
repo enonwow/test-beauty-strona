@@ -20,7 +20,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .btn-r{background:#9E1F50}.btn-r:hover{background:#7A173D}
 .row{display:flex;justify-content:space-between;gap:12px}
 .chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
-.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 .cell{min-height:52px;text-align:center;border-radius:10px;border:1px solid #C9B6BF;font:inherit;font-size:20px;min-width:0;width:100%;box-sizing:border-box;padding:0}
 .cell.f{border:2px solid #9E1F50;font-weight:700}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -37,6 +37,13 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   #akcje{padding-left:0 !important;padding-right:0 !important;padding-top:32px !important}
   #po-odw{padding-left:0 !important;padding-right:0 !important;padding-top:32px !important}
 }
+/* success moment: the style's photo with the check, the date large, how long until the visit */
+.hero-ok{position:relative;width:100%;height:180px;border-radius:20px;overflow:hidden;margin-bottom:6px;background:#3A1020}
+.hero-ok img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-ok::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,10,18,0) 30%,rgba(30,10,18,.7))}
+.hero-ok>span{position:absolute;left:16px;right:16px;bottom:14px;z-index:1;display:flex;align-items:center;gap:10px;color:#FFFFFF}
+.hero-ok #ikona{width:36px;height:36px;border-radius:50%;background:#FFFFFF;display:flex;align-items:center;justify-content:center;flex:none}
+.odlicz{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#F6EDF1;color:#9E1F50;font-size:13px;font-weight:700}
 </style>
 </head>
 <body>
@@ -47,18 +54,21 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <!-- phone: wrappers vanish and "order" keeps the old sequence; desktop: card left, actions and notes right -->
   <div class="d-main">
   <section class="o1" style="padding:32px 20px 0;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
-    <div id="ikona" aria-hidden="true" style="width:52px;height:52px;border-radius:50%;background:#E6F2EC;display:flex;align-items:center;justify-content:center">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F6B47" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+    <div class="hero-ok">
+      <img id="hero-foto" src="zdjecia/k-paznokcie.jpg" alt="" width="480" height="360">
+      <span><span id="ikona" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F6B47" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+      <h1 id="tytul" style="margin:0;font-size:24px;font-weight:700;color:#FFFFFF">Zarezerwowane</h1></span>
     </div>
-    <h1 id="tytul" style="margin:4px 0 0;font-size:26px;font-weight:700">Zarezerwowane</h1>
-    <p id="kiedy" style="margin:0;font-size:16px">Wtorek, 20 października · 11:15–13:05</p>
-    <p id="gdzie" style="margin:0;color:#625860;font-size:14px">[Studio 1] · Dowolna stylistka · [adres]</p>
+    <p id="kiedy" style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700">Wtorek, 20 października</p>
+    <p id="kiedy-g" style="margin:0;font-size:17px;font-weight:500">11:15–13:05</p>
+    <span id="odlicz" class="odlicz" hidden></span>
+    <p id="gdzie" style="margin:0;color:#625860;font-size:14px">Studio Malwa · Dowolna stylistka · ul. Puławska 24, Warszawa</p>
   </section>
 
-  <section aria-label="Karta stylizacji" class="o4" style="margin:22px 20px 0;border:1px solid #E4D9DE;border-radius:16px;overflow:hidden">
-    <div style="padding:14px 16px;background:#F6EDF1;display:flex;justify-content:space-between;align-items:center">
+  <section aria-label="Karta stylizacji" class="o4" style="margin:22px 20px 0;border-radius:16px;overflow:hidden;background:#FFFFFF;box-shadow:0 1px 2px rgba(30,10,18,.06),0 8px 24px rgba(30,10,18,.07)">
+    <div style="padding:14px 16px;background:#FFFFFF;border-bottom:1px solid #F0E8EC;display:flex;justify-content:space-between;align-items:center">
       <h2 style="margin:0;font-size:18px;font-weight:700">Karta stylizacji</h2>
-      <span style="font-size:12px;color:#625860">Kod: [KOD-PROJEKTU]</span>
+      <span style="font-size:12px;color:#625860">Kod: HYB-4821</span>
     </div>
     <div style="padding:16px;display:flex;gap:14px">
       <img id="kat-foto" src="zdjecia/k-paznokcie.jpg" alt="" width="88" height="88" style="width:88px;height:88px;object-fit:cover;border-radius:14px;flex:none;background:#E4D9DE">
@@ -75,7 +85,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <div id="seria-row" hidden class="row" style="color:#1F6B47"><span id="seria-txt">Seria</span><b id="seria-kw"></b></div>
       <div id="zad-row" hidden class="row" style="color:#1F6B47"><span>Zaliczka wpłacona</span><span>−<span id="zad">60</span> zł</span></div>
       <div style="height:1px;background:#F0E8EC;margin:4px 0"></div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:700">Uzgodniona cena brutto</span><span id="total" style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700"><span data-bind="booking.cena">200</span> zł</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:700">Uzgodniona cena brutto</span><span id="total" style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;color:#9E1F50"><span data-bind="booking.cena">200</span> zł</span></div>
       <span id="powod-p" hidden style="color:#625860;font-size:13px;line-height:1.4"></span>
       <span id="omnibus-p" hidden style="color:#625860;font-size:12px;line-height:1.4"></span>
       <div id="reszta-row" hidden class="row"><span>Do zapłaty w studiu</span><b><span id="reszta">140</span> zł</b></div>
@@ -168,7 +178,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <input class="cell" aria-label="Cyfra 5" inputmode="numeric" maxlength="1">
       <input class="cell" aria-label="Cyfra 6" inputmode="numeric" maxlength="1">
     </div>
-    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Tworząc konto, akceptujesz [regulamin] i [politykę prywatności]. Nie wysyłamy reklam bez osobnej zgody.</p>
+    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Tworząc konto, akceptujesz regulamin i politykę prywatności. Nie wysyłamy reklam bez osobnej zgody.</p>
     <div style="display:flex;gap:8px">
       <button type="button" class="b2" data-close style="flex:1">Anuluj</button>
       <button type="submit" class="btn" style="flex:1">Potwierdź</button>
@@ -199,9 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const dm = (B.dzien || Mock.krotko(Mock.dzien(1))).match(/^(\S+)\s+(\d{1,2})\.(\d{2})/);
 
   if (dm) {
-    $('#kiedy').textContent = `${DN[dm[1]] || dm[1]}, ${+dm[2]} ${MIES[dm[3] - 1]}` + (B.godzina ? ` · ${B.godzina}${B.koniec ? '–' + B.koniec : ''}` : '');
+    $('#kiedy').textContent = `${DN[dm[1]] || dm[1]}, ${+dm[2]} ${MIES[dm[3] - 1]}`;
+    const n = Mock.odDzis(Mock.zKrotko(B.dzien || Mock.krotko(Mock.dzien(1))));
+    if (n >= 0) { $('#odlicz').hidden = false; $('#odlicz').textContent = n === 0 ? 'Dziś' + (B.godzina ? ` o ${B.godzina}` : '') : `${n === 1 ? 'Jutro' : 'Za ' + Mock.plural(n, ['dzień', 'dni', 'dni'])} · przypomnimy SMS-em 24 h przed`; }
   }
-  $('#gdzie').textContent = `${B.studio || '[Studio 1]'} · ${B.stylistka && B.stylistka !== 'Dowolna' ? B.stylistka : 'dowolna stylistka'} · [adres]`;
+  $('#kiedy-g').textContent = B.godzina ? `${B.godzina}${B.koniec ? '–' + B.koniec : ''}` : '';
+  $('#kiedy-g').hidden = !B.godzina;
+  $('#gdzie').textContent = `${B.studio || 'Studio Malwa'} · ${B.stylistka && B.stylistka !== 'Dowolna' ? B.stylistka : 'dowolna stylistka'} · ul. Puławska 24, Warszawa`;
   if (B.kategoria) $('#kat').textContent = B.kategoria;
   if (B.usluga) $('#usl').textContent = B.usluga;
   if (B.czasTekst) $('#czas').textContent = B.czasTekst;
@@ -211,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dopisz = (k, v) => { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.style.color = '#625860'; dd.style.margin = '0'; dt.textContent = k; dd.textContent = v; $('#dla').parentElement.append(dt, dd); };
   if (B.dojazd) dopisz('Adres', B.dojazd.adres);
   if (osoby > 1) dopisz('Osoby', String(osoby));
-  $('#kat-foto').src = Mock.fotoKat(B.kategoria);
+  $('#kat-foto').src = $('#hero-foto').src = Mock.fotoKat(B.kategoria);
   // v2 creator fields (all optional): price range with reason, line items, test, series, notes
   const cenaMax = B.cenaMax != null ? Number(B.cenaMax) : cena, cenaMin = B.cenaMin != null ? Number(B.cenaMin) : cenaMax;
   const zakres = (a, b) => (a === b ? `${a} zł` : `${a}–${b} zł`);
@@ -254,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!maUslugi && !(Array.isArray(B.pozycje) && B.pozycje.length)) $('#pozycje .row span:last-child').textContent = przed;
   }
   if (B.karnet) { const r = document.createElement('div'); r.className = 'row'; r.style.color = '#1F6B47';
-    const a = document.createElement('span'); a.textContent = `Z karnetu: ${B.karnet.n}${B.karnet.zostalo != null ? ` (zostało ${Mock.plural(B.karnet.zostalo, ['wizyta', 'wizyty', 'wizyt'])})` : ''}`;
+    const a = document.createElement('span'); a.textContent = `Z karnetu: ${B.karnet.n}${B.karnet.zostalo != null ? ` (${Mock.zostalo(B.karnet.zostalo)})` : ''}`;
     const c = document.createElement('span'); c.textContent = `−${B.karnet.wartosc} zł`; c.style.whiteSpace = 'nowrap'; r.append(a, c); $('#promo-row').after(r);
     if (!(Array.isArray(B.pozycje) && B.pozycje.length) && !maUslugi) $('#pozycje .row span:last-child').textContent = `${B.karnet.wartosc} zł`; }
   if (B.kod) { const r = document.createElement('div'); r.className = 'row'; r.style.color = '#1F6B47';
@@ -262,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     r.append(a, c); $('#promo-row').after(r);
     if (!(Array.isArray(B.pozycje) && B.pozycje.length) && !maUslugi) $('#pozycje .row span:last-child').textContent = `${B.bazaCena ? B.bazaCena.max : cenaMax + B.kod.rabat} zł`; }
   if (B.seria && !(Array.isArray(B.pozycje) && B.pozycje.length)) { $('#seria-row').hidden = false; $('#seria-txt').textContent = `Seria ${B.seria.ile} zabiegów, rabat wliczony`; $('#seria-kw').textContent = `${B.seria.suma} zł`; }
-  if (B.testDzien) { $('#test-box').hidden = false; $('#test-txt').textContent = `${B.testDzien}, ${B.testGodzina}–${B.testKoniec} (${B.testMin || 10} min), ${B.studio || '[Studio 1]'}.`; }
+  if (B.testDzien) { $('#test-box').hidden = false; $('#test-txt').textContent = `${B.testDzien}, ${B.testGodzina}–${B.testKoniec} (${B.testMin || 10} min), ${B.studio || 'Studio Malwa'}.`; }
   if (Array.isArray(B.uwagi) && B.uwagi.length) {
     $('#uwagi-box').hidden = false;
     B.uwagi.forEach(u => { const li = document.createElement('li'); li.textContent = u; $('#uwagi').appendChild(li); });
@@ -328,10 +342,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const testVisit = visits.find(v => v.id === B.testVisitId);
   function odwolana() {
     $('#tytul').textContent = 'Wizyta odwołana';
-    $('#ikona').style.background = '#FFF1E0';
+    $('#ikona').style.background = '#FFF1E0'; $('#odlicz').hidden = true;
     $('#ikona').innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8A3B12" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>';
     $('#akcje').hidden = true; $('#po-odw').hidden = false; $('#zgody').hidden = true;
-    $('#po-odw .btn-r').href = 'salon.html?s=' + encodeURIComponent(B.studio || '[Studio 1]');
+    $('#po-odw .btn-r').href = 'salon.html?s=' + encodeURIComponent(B.studio || 'Studio Malwa');
   }
   if (visit && visit.status === 'odwołana') odwolana();
 
@@ -364,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // referral: the link carries a code; the friend sees the discount on the studio page
-  $('#polec-btn').addEventListener('click', () => Mock.polec(B.studio || '[Studio 1]', (Mock.get('user', {}) || {}).imie || (B.kontakt && B.kontakt.imie)));
+  $('#polec-btn').addEventListener('click', () => Mock.polec(B.studio || 'Studio Malwa', (Mock.get('user', {}) || {}).imie || (B.kontakt && B.kontakt.imie)));
 
   // dialog text depends on the 24 h rule against the mocked "now"
   document.querySelector('[data-open="#odw"]').addEventListener('click', () => {

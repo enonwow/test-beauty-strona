@@ -26,19 +26,19 @@
       <div style="flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
         <section class="p-card">
           <h2>Podstawowe dane</h2>
-          <label class="p-lab">Nazwa studia<input class="p-in" id="nm" value="[Nazwa studia]"></label>
-          <label class="p-lab">Opis<textarea class="p-in" id="ds" rows="4">[Krótki opis: czym się zajmujecie, co Was wyróżnia, dla kogo jest studio]</textarea></label>
-          <label class="p-lab">Adres<input class="p-in" id="ad" value="[ulica numer, miasto]"></label>
+          <label class="p-lab">Nazwa studia<input class="p-in" id="nm" value="Studio Malwa"></label>
+          <label class="p-lab">Opis<textarea class="p-in" id="ds" rows="4">Manicure, rzęsy i brwi na Mokotowie. Stawiamy na naturalny efekt i trwałość, a cenę znasz przed wizytą.</textarea></label>
+          <label class="p-lab"><span id="ad-l">Adres</span><input class="p-in" id="ad" value="ul. Puławska 24, Warszawa"></label>
         </section>
 
         <section class="p-card" aria-labelledby="lok-h">
           <div class="p-top"><h2 id="lok-h" class="p-h2">Lokalizacje</h2><button type="button" class="p-btn sm" id="lok-add">+ Dodaj lokalizację</button></div>
           <div id="lok" style="display: flex; flex-direction: column; gap: 8px"></div>
-          <span class="p-mut">Każda lokalizacja ma swój adres, godziny i zespół. Klientki widzą je na stronie studia, a panel przełączasz w nagłówku.</span>
+          <span class="p-mut">Każda lokalizacja ma swój adres i godziny otwarcia. „Edytuj” przełącza formularz poniżej (i panel) na tę lokalizację.</span>
         </section>
 
         <section class="p-card">
-          <h2>Godziny otwarcia</h2>
+          <h2 id="godz-h">Godziny otwarcia</h2>
           <div class="p-tw"><table class="p-tbl" style="min-width: 380px"><thead><tr><th>Dzień</th><th>Od</th><th>Do</th><th>Zamknięte</th></tr></thead><tbody id="godz"></tbody></table></div>
         </section>
 
@@ -97,7 +97,7 @@
           <span class="p-mut">Podgląd strony studia</span>
           <div role="img" aria-label="Zdjęcie główne studia" id="pv-cover" style="height: 110px; border-radius: 14px; background: #E4D9DE"></div>
           <b id="pv-nm" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px"></b>
-          <span class="p-mut">★ [ocena] · <span id="pv-ad"></span></span>
+          <span class="p-mut">★ 4,9 · <span id="pv-ad"></span></span>
           <span id="pv-h" style="font-size: 13px"></span>
           <p id="pv-ds" style="margin: 0; line-height: 1.45; white-space: pre-wrap"></p>
           <div id="pv-ud" style="display: flex; gap: 6px; flex-wrap: wrap"></div>
@@ -113,35 +113,64 @@
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, DN = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'], UD = ['Wi-Fi', 'Parking', 'Klimatyzacja', 'Dostęp dla wózków', 'Płatność kartą', 'Kawa i herbata'], COL = ['#5B1630', '#3E2A4A', '#C98C8C', '#2F5A86', '#F3E3DA', '#EEF3EA'];
   const DEF = {
-    nm: '[Nazwa studia]', ds: '[Krótki opis: czym się zajmujecie, co Was wyróżnia, dla kogo jest studio]', ad: '[ulica numer, miasto]', zs: document.getElementById('zs').value,
+    nm: 'Studio Malwa', ds: 'Manicure, rzęsy i brwi na Mokotowie. Stawiamy na naturalny efekt i trwałość, a cenę znasz przed wizytą.', ad: 'ul. Puławska 24, Warszawa', zs: document.getElementById('zs').value,
     h: DN.map((d, i) => (i < 5 ? ['9:00', '18:00', false] : i === 5 ? ['9:00', '14:00', false] : ['9:00', '14:00', true])),
     ud: ['Wi-Fi', 'Płatność kartą', 'Kawa i herbata'], ph: COL.slice(0, 4).map(c => ({ c }))
   };
   const S = { ...DEF, ...Mock.get('profil', {}) };
   const $ = id => document.getElementById(id);
+  // With several locations the address and hours belong to the location being edited (Mock "lokalizacje"); one location uses the profile's own.
+  const L = PS.lokalizacje().map(l => ({ ...l })), wiele = () => L.length > 1;
+  let wyb = Math.min(Mock.get('lokalizacja', 0) || 0, L.length - 1);
+  const godz = () => (wiele() ? (L[wyb].h ||= S.h.map(r => [...r])) : S.h);
+  const adres = () => (wiele() ? L[wyb].adres : S.ad);
 
   function renderStatic() {
-    $('godz').innerHTML = DN.map((d, i) => `<tr><td>${d}</td><td><input class="p-in s" type="time" data-h="${i}" data-k="0" value="${S.h[i][0].padStart(5, '0')}" aria-label="${d}: otwarcie"></td><td><input class="p-in s" type="time" data-h="${i}" data-k="1" value="${S.h[i][1].padStart(5, '0')}" aria-label="${d}: zamknięcie"></td><td><input type="checkbox" data-h="${i}" data-k="2" ${S.h[i][2] ? 'checked' : ''} aria-label="${d}: zamknięte" style="width:20px;height:20px;accent-color:#9E1F50"></td></tr>`).join('');
+    $('godz').innerHTML = DN.map((d, i) => `<tr><td>${d}</td><td><input class="p-in s" type="time" data-h="${i}" data-k="0" value="${godz()[i][0].padStart(5, '0')}" aria-label="${d}: otwarcie"></td><td><input class="p-in s" type="time" data-h="${i}" data-k="1" value="${godz()[i][1].padStart(5, '0')}" aria-label="${d}: zamknięcie"></td><td><input type="checkbox" data-h="${i}" data-k="2" ${godz()[i][2] ? 'checked' : ''} aria-label="${d}: zamknięte" style="width:20px;height:20px;accent-color:#9E1F50"></td></tr>`).join('');
     $('udog').innerHTML = UD.map(u => `<label class="p-chk"><input type="checkbox" data-u="${E(u)}" ${S.ud.includes(u) ? 'checked' : ''}>${u}</label>`).join('');
-    $('nm').value = S.nm; $('ds').value = S.ds; $('ad').value = S.ad; $('zs').value = S.zs;
+    $('nm').value = S.nm; $('ds').value = S.ds; $('ad').value = adres();
+    $('ad-l').textContent = wiele() ? 'Adres: ' + L[wyb].n : 'Adres'; $('godz-h').textContent = wiele() ? 'Godziny otwarcia: ' + L[wyb].n : 'Godziny otwarcia'; $('zs').value = S.zs;
   }
   function tile(p, i) { return p.src ? `<img src="${p.src}" alt="Zdjęcie portfolio ${i + 1}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">` : ''; }
   function renderPortfolio() {
     $('portfolio').innerHTML = S.ph.map((p, i) => `<div data-tile style="position:relative;aspect-ratio:1;border-radius:10px;background:${p.c || '#E4D9DE'}">${tile(p, i)}<button type="button" data-rm="${i}" aria-label="Usuń zdjęcie ${i + 1}" style="position:absolute;top:4px;right:4px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#1E1A1D;font:700 18px 'DM Sans',sans-serif;cursor:pointer">×</button></div>`).join('') || '<span class="p-mut">Brak zdjęć. Dodaj pierwsze.</span>';
   }
   function preview() {
-    $('pv-nm').textContent = S.nm || 'Nazwa studia'; $('pv-ds').textContent = S.ds; $('pv-ad').textContent = S.ad;
-    const t = S.h[1]; // makieta: "dziś" to wtorek
+    $('pv-nm').textContent = S.nm || 'Nazwa studia'; $('pv-ds').textContent = S.ds; $('pv-ad').textContent = adres();
+    const t = godz()[1]; // makieta: "dziś" to wtorek
     $('pv-h').textContent = t[2] ? 'Dziś zamknięte' : `Dziś otwarte ${t[0]}–${t[1]}`;
     $('pv-ud').innerHTML = S.ud.map(u => `<span class="p-chip">${E(u)}</span>`).join('');
     $('pv-ph').innerHTML = S.ph.slice(0, 3).map(p => `<div style="flex:1;aspect-ratio:1;border-radius:8px;background:${p.c || '#E4D9DE'};overflow:hidden">${p.src ? `<img alt="" src="${p.src}" style="width:100%;height:100%;object-fit:cover">` : ''}</div>`).join('');
     if (S.ph[0]) $('pv-cover').style.background = S.ph[0].c || '#E4D9DE';
   }
-  renderStatic(); renderPortfolio(); preview();
+  function rLok() {
+    $('lok').innerHTML = L.map((l, i) => `<div class="p-row"><span><b>${E(l.n)}</b><br><span class="p-mut">${E(l.adres)}</span></span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${i === 0 ? '<span class="p-badge">główna</span>' : ''}`
+      + (wiele() ? (i === wyb ? '<span class="p-badge" style="background:#F6EDF1;color:#9E1F50">edytujesz</span>' : `<button type="button" class="p-btn sm" data-lok="${i}" aria-label="Edytuj lokalizację ${E(l.n)}">Edytuj</button>`)
+        + (i ? `<button type="button" class="p-btn sm" data-lok-rm="${i}" aria-label="Usuń lokalizację ${E(l.n)}">Usuń</button>` : '') : '') + '</span></div>').join('');
+  }
+  function syncHeader() { // the location switch in the panel header follows this list
+    const hs = $('pn-lok'); if (!hs) return;
+    hs.innerHTML = L.map((l, i) => `<option value="${i}"${i === wyb ? ' selected' : ''}>${E(l.n)}</option>`).join('');
+  }
+  function pick(i) { wyb = i; Mock.set('lokalizacja', i); syncHeader(); renderStatic(); preview(); rLok(); }
+  document.addEventListener('change', e => { if (e.target.id === 'pn-lok') pick(+e.target.value); });
+  $('lok').addEventListener('click', e => {
+    const ed = e.target.closest('[data-lok]'), rm = e.target.closest('[data-lok-rm]');
+    if (ed) { pick(+ed.dataset.lok); Mock.toast('Edytujesz: ' + L[wyb].n); $('ad').focus(); }
+    if (rm) { const i = +rm.dataset.lokRm, n = L[i].n;
+      PS.modal({ title: 'Usunąć lokalizację?', ok: 'Usuń', body: `<p style="margin:0">${E(n)}: adres i godziny tej lokalizacji znikną z profilu i strony studia.</p>`,
+        onOk: () => { L.splice(i, 1); Mock.set('lokalizacje', L); pick(wyb === i ? 0 : wyb > i ? wyb - 1 : wyb); }, toast: () => 'Usunięto lokalizację: ' + n }); }
+  });
+  $('lok-add').addEventListener('click', () => PS.modal({ title: 'Nowa lokalizacja', ok: 'Dodaj',
+    body: '<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. Studio Malwa – Mokotów"></label><label class="p-lab">Adres<input class="p-in" name="a" required placeholder="ul. Puławska 24, Warszawa"></label>',
+    onOk: f => { if (!f.n.value.trim() || !f.a.value.trim()) return false; L.push({ n: f.n.value.trim(), adres: f.a.value.trim(), h: S.h.map(r => [...r]) }); Mock.set('lokalizacje', L); pick(L.length - 1); PS.refresh(); },
+    toast: f => 'Dodano lokalizację: ' + f.n.value.trim() + '. Uzupełnij jej godziny poniżej.' }));
+  renderStatic(); renderPortfolio(); preview(); rLok();
 
   const on = (id, k) => $(id).addEventListener('input', e => { S[k] = e.target.value; preview(); });
-  on('nm', 'nm'); on('ds', 'ds'); on('ad', 'ad'); on('zs', 'zs');
-  $('godz').addEventListener('input', e => { const t = e.target, i = +t.dataset.h, k = +t.dataset.k; S.h[i][k] = k === 2 ? t.checked : t.value; preview(); });
+  on('nm', 'nm'); on('ds', 'ds'); on('zs', 'zs');
+  $('ad').addEventListener('input', e => { if (wiele()) L[wyb].adres = e.target.value; else S.ad = e.target.value; preview(); rLok(); });
+  $('godz').addEventListener('input', e => { const t = e.target, i = +t.dataset.h, k = +t.dataset.k; godz()[i][k] = k === 2 ? t.checked : t.value; preview(); });
   $('udog').addEventListener('change', e => { const u = e.target.dataset.u; S.ud = e.target.checked ? S.ud.concat(u) : S.ud.filter(x => x !== u); preview(); });
   $('portfolio').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; S.ph.splice(+b.dataset.rm, 1); renderPortfolio(); preview(); Mock.toast('Usunięto zdjęcie'); });
   $('foto').addEventListener('change', e => {
@@ -150,8 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Kanały rezerwacji
-  const LINK = '[adres]/[nazwa-studia]';
-  const kod = () => '<script src="[adres]/widget.js" data-studio="[nazwa-studia]" data-tekst="' + $('wg-tekst').value.replace(/"/g, '&quot;') + '" data-styl="' + $('wg-styl').value + '" async><' + '/script>';
+  const LINK = 'https://odcien.pl/studio-malwa';
+  const kod = () => '<script src="https://odcien.pl/widget.js" data-studio="studio-malwa" data-tekst="' + $('wg-tekst').value.replace(/"/g, '&quot;') + '" data-styl="' + $('wg-styl').value + '" async><' + '/script>';
   function widget() {
     const txt = $('wg-tekst').value.trim() || 'Zarezerwuj wizytę', b = $('wg-btn'), fl = $('wg-styl').value === 'plywajacy';
     b.textContent = txt;
@@ -193,20 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
   ggShow();
   $('gg-btn').addEventListener('click', () => {
     if (gg()) return PS.modal({ title: 'Rozłączyć Google?', ok: 'Rozłącz', cls: 'dark', body: '<p style="margin:0">Przycisk „Zarezerwuj” zniknie z Profilu firmy w Google. Rezerwacje z Google, które już masz, zostają.</p>', onOk: () => { Mock.set('kanaly.google', false); ggShow(); }, toast: 'Rozłączono z Google' });
-    PS.modal({ title: 'Połącz z Profilem firmy w Google', ok: 'Połącz', body: '<label class="p-lab">Profil firmy<select class="p-in" name="p"><option>[Nazwa studia], [miasto]</option><option>Inny profil (przykład)</option></select></label><span class="p-mut">Makieta: nic nie jest wysyłane do Google. Prawdziwe połączenie wymaga zalogowania na konto właściciela profilu.</span>', onOk: () => { Mock.set('kanaly.google', true); ggShow(); }, toast: f => 'Połączono z Google: ' + f.p.value });
+    PS.modal({ title: 'Połącz z Profilem firmy w Google', ok: 'Połącz', body: '<label class="p-lab">Profil firmy<select class="p-in" name="p"><option>Studio Malwa, Warszawa</option><option>Inny profil (przykład)</option></select></label><span class="p-mut">Makieta: nic nie jest wysyłane do Google. Prawdziwe połączenie wymaga zalogowania na konto właściciela profilu.</span>', onOk: () => { Mock.set('kanaly.google', true); ggShow(); }, toast: f => 'Połączono z Google: ' + f.p.value });
   });
   if (location.hash === '#kanaly') $('kanaly').scrollIntoView();
-  $('save').addEventListener('click', () => { Mock.set('profil', { ...S, ph: S.ph.filter(p => !p.src) }); Mock.toast('Zapisano profil studia'); });
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const E = PS.esc, rLok = () => { document.getElementById('lok').innerHTML = PS.lokalizacje().map((l, i) => `<div class="p-row"><span><b>${E(l.n)}</b><br><span class="p-mut">${E(l.adres)}</span></span>${i === 0 ? '<span class="p-badge">główna</span>' : ''}</div>`).join(''); };
-  document.getElementById('lok-add').addEventListener('click', () => PS.modal({ title: 'Nowa lokalizacja', ok: 'Dodaj',
-    body: '<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. [Studio 1] – Mokotów"></label><label class="p-lab">Adres<input class="p-in" name="a" required placeholder="[ulica, numer], [miasto]"></label>',
-    onOk: f => { if (!f.n.value.trim() || !f.a.value.trim()) return false; Mock.set('lokalizacje', [...PS.lokalizacje(), { n: f.n.value.trim(), adres: f.a.value.trim() }]); rLok(); PS.refresh(); },
-    toast: f => 'Dodano lokalizację: ' + f.n.value.trim() }));
-  rLok();
+  $('save').addEventListener('click', () => { Mock.set('profil', { ...S, ph: S.ph.filter(p => !p.src) }); if (wiele()) Mock.set('lokalizacje', L); Mock.toast('Zapisano profil studia'); });
 });
 </script>
 </body>

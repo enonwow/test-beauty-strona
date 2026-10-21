@@ -34,7 +34,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
   </a>
 
   <div style="display:flex;flex-direction:column;gap:8px">
-    <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:700;color:#9E1F50">[Nazwa aplikacji]</span>
+    <span class="logo" style="display:inline-flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px"><img src="znak.svg" alt="" width="26" height="18">odcień</span>
     <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:700">Zaloguj się lub załóż konto</h1>
     <p style="margin:0;color:#625860;line-height:1.45">Wystarczy numer telefonu, bez hasła. Jeśli jesteś tu pierwszy raz, po kodzie z SMS założymy konto. Konto nie jest potrzebne do rezerwacji. Przyda się do historii stylizacji, ulubionych studiów i „Powtórz”.</p>
   </div>
@@ -65,12 +65,18 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
 
   <button type="submit" id="zaloguj" class="btn" hidden>Zaloguj</button>
 
-  <p style="margin:0;margin-top:auto;color:#625860;font-size:12px;line-height:1.5">Logując się lub zakładając konto, akceptujesz [regulamin] i [politykę prywatności]. Nie wysyłamy reklam bez Twojej osobnej zgody.</p>
+  <div style="margin-top:auto;padding:12px 14px;border-radius:12px;border:1px solid #E4D9DE;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:14px">
+    <b style="flex:1 1 100%">Prowadzisz salon?</b>
+    <a href="panel-logowanie.html" style="min-height:44px;display:flex;align-items:center;font-weight:500">Zaloguj się do panelu studia</a>
+    <a href="onboarding.html" style="min-height:44px;display:flex;align-items:center;font-weight:500">Załóż konto studia</a>
+  </div>
+
+  <p style="margin:0;color:#625860;font-size:12px;line-height:1.5">Logując się lub zakładając konto, akceptujesz regulamin i politykę prywatności. Nie wysyłamy reklam bez Twojej osobnej zgody.</p>
 </form>
 
 <form id="profil" class="app" novalidate hidden>
   <div style="display:flex;flex-direction:column;gap:8px">
-    <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:700;color:#9E1F50">[Nazwa aplikacji]</span>
+    <span class="logo" style="display:inline-flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px"><img src="znak.svg" alt="" width="26" height="18">odcień</span>
     <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:700">Uzupełnij profil</h1>
     <p style="margin:0;color:#625860;line-height:1.45">Numer telefonu masz już potwierdzony. Zostały dwa pola i zgoda na regulamin.</p>
   </div>
@@ -89,7 +95,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
     <select id="p-jezyk" class="inp"><option selected>Polski</option><option>Українська</option><option>Русский</option><option>English</option></select>
   </div>
   <div style="display:flex;flex-direction:column;gap:6px">
-    <label style="display:flex;gap:10px;align-items:flex-start;min-height:44px;font-size:14px;line-height:1.4"><input id="p-reg" type="checkbox" required style="width:22px;height:22px;margin:0;flex:none" aria-describedby="p-reg-err">Akceptuję [regulamin] i [politykę prywatności] (wymagane)</label>
+    <label style="display:flex;gap:10px;align-items:flex-start;min-height:44px;font-size:14px;line-height:1.4"><input id="p-reg" type="checkbox" required style="width:22px;height:22px;margin:0;flex:none" aria-describedby="p-reg-err">Akceptuję regulamin i politykę prywatności (wymagane)</label>
     <span id="p-reg-err" role="alert" style="color:#A3262A;font-size:13px" hidden>Bez zgody na regulamin nie utworzymy konta.</span>
   </div>
   <label style="display:flex;gap:10px;align-items:flex-start;min-height:44px;font-size:14px;line-height:1.4"><input id="p-mkt" type="checkbox" style="width:22px;height:22px;margin:0;flex:none">Chcę dostawać powiadomienia marketingowe: promocje i nowości od studiów (osobna zgoda, możesz ją cofnąć w każdej chwili)</label>
@@ -103,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const u = Mock.get('user', {}) || {};
   if (u.tel) $('#tel').value = u.tel;
   const digits = () => $('#tel').value.replace(/\D/g, '');
+  const ten = () => String(u.tel || '').replace(/\D/g, '').slice(-9) === digits().slice(-9); // the saved profile belongs to this number; another number is a new account
   let t = null, tel = '';
   // ?wroc=strona.html: where to go after logging in (only local pages)
   const w = new URLSearchParams(location.search).get('wroc');
@@ -150,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (digits().length < 9) { $('#tel').focus(); return Mock.toast('Wpisz 9-cyfrowy numer telefonu'); }
     if (cells.some(c => !c.value)) { (cells.find(c => !c.value)).focus(); return Mock.toast('Wpisz 6-cyfrowy kod z SMS-a'); }
     tel = $('#tel').value.trim();
-    if (u.imie) { Mock.set('user', { ...u, tel, zalogowana: true }); Mock.toast('Zalogowano'); setTimeout(() => (location.href = wroc), 600); return; }
+    if (u.imie && ten()) { Mock.set('user', { ...u, tel, zalogowana: true }); Mock.toast('Zalogowano'); setTimeout(() => (location.href = wroc), 600); return; }
     // first login (no name stored yet): ask for the profile before finishing
     $('#log').hidden = true; $('#profil').hidden = false; $('#p-imie').focus(); scrollTo(0, 0);
   });
@@ -162,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#p-imie').setAttribute('aria-invalid', String(!imie)); $('#p-reg').setAttribute('aria-invalid', String(!$('#p-reg').checked));
     if (!imie) return $('#p-imie').focus();
     if (!$('#p-reg').checked) return $('#p-reg').focus();
-    Mock.set('user', { ...u, imie, tel, email: $('#p-email').value.trim(), jezyk: $('#p-jezyk').value, zalogowana: true, zgody: { regulamin: true, marketing: $('#p-mkt').checked } });
+    Mock.set('user', { ...(ten() ? u : {}), imie, tel, email: $('#p-email').value.trim(), jezyk: $('#p-jezyk').value, zalogowana: true, zgody: { regulamin: true, marketing: $('#p-mkt').checked } });
     Mock.toast('Profil zapisany. Zalogowano');
     setTimeout(() => (location.href = wroc), 600);
   });

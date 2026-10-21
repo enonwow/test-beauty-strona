@@ -17,7 +17,7 @@
   <nav id="panel-nav"></nav>
 
   <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
-    <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Opinie</h1><span class="p-mut">Średnia ocena studia: ★ [ocena] · [liczba] opinii. Odpowiedz klientce albo zgłoś opinię, która nie dotyczy wizyty.</span></div>
+    <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Opinie</h1><span class="p-mut">Średnia ocena studia: ★ 4,9 · 128 opinii. Odpowiedz klientce albo zgłoś opinię, która nie dotyczy wizyty.</span></div>
 
     <section id="reklamacje" class="p-card" aria-labelledby="rk-h" style="scroll-margin-top: 16px">
       <div class="p-top"><h2 id="rk-h" class="p-h2">Reklamacje</h2><span class="p-mut">Na odpowiedź masz 14 dni. Klientka widzi ją w „Moich wizytach”.</span></div>
@@ -39,10 +39,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc;
   const SEED = [
-    { id: 's1', k: '[Klientka A]', o: 5, t: 'Hybryda trzyma się już trzeci tydzień, a termin był od ręki.', u: 'Hybryda jednolita' },
-    { id: 's2', k: '[Klientka C]', o: 3, t: 'Efekt ładny, ale wizyta zaczęła się 20 minut po czasie.', u: 'Przedłużanie L · french' },
-    { id: 's3', k: '[Klientka E]', o: 5, t: 'Cena z kreatora zgodziła się co do złotówki.', u: 'Żel · french' },
-    { id: 's4', k: '[Klientka M]', o: 1, t: 'Nie byłam w tym salonie, ktoś pomylił studia.', u: '—' }];
+    { id: 's1', k: 'Anna K.', o: 5, t: 'Hybryda trzyma się już trzeci tydzień, a termin był od ręki.', u: 'Hybryda jednolita' },
+    { id: 's2', k: 'Celina M.', o: 3, t: 'Efekt ładny, ale wizyta zaczęła się 20 minut po czasie.', u: 'Przedłużanie L · french' },
+    { id: 's3', k: 'Ewa P.', o: 5, t: 'Cena z kreatora zgodziła się co do złotówki.', u: 'Żel · french' },
+    { id: 's4', k: 'Marta G.', o: 1, t: 'Nie byłam w tym salonie, ktoś pomylił studia.', u: '—' }];
   let ST = Mock.get('opinie-studio', {}); // {id: {reply, photo, reported}}
   let filt = 'all';
   const all = () => Mock.get('reviews', []).map((r, i) => ({ id: 'r' + i, k: 'Klientka z kreatora', o: +r.ocena || 5, t: r.tekst || r.opis || '', u: r.opis && r.tekst ? r.opis : 'wizyta z rezerwacji online', nowa: true })).concat(SEED).map(r => ({ ...r, ...(ST[r.id] || {}) }));

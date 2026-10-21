@@ -10,8 +10,10 @@
   function set(key, value) {
     try { localStorage.setItem(PREFIX + key, JSON.stringify(value)); } catch { /* private mode: page still works */ }
   }
+  // feedback from tests and the test mode survive a data reset (feedback is deleted only on purpose, in Narzędzia makiety)
+  const ZOSTAJE = [PREFIX + 'zgloszenia', PREFIX + 'tryb.test'];
   function reset() {
-    try { Object.keys(localStorage).filter(k => k.startsWith(PREFIX)).forEach(k => localStorage.removeItem(k)); } catch {}
+    try { Object.keys(localStorage).filter(k => k.startsWith(PREFIX) && !ZOSTAJE.includes(k)).forEach(k => localStorage.removeItem(k)); } catch {}
   }
   // "booking.cena" -> get('booking').cena
   function lookup(path) {
@@ -157,7 +159,7 @@
     return i < 0 ? null : { i, s: lista[i] };
   }
   // Complaints after a visit (wizyty.html files them, opinie-studio.html answers). status: nowa | poprawka | zwrot | odrzucona
-  const REKL_SEED = () => [{ id: 'rk1', visitId: null, klientka: '[Klientka A]', usluga: 'Hybryda jednolita', cena: 140, opis: 'Po trzech dniach odprysk na dwóch paznokciach prawej dłoni.', oczekuje: 'poprawka', foto: 'dlon.jpg', data: iso(dzien(-1)), status: 'nowa', przyklad: true }];
+  const REKL_SEED = () => [{ id: 'rk1', visitId: null, klientka: 'Anna K.', usluga: 'Hybryda jednolita', cena: 140, opis: 'Po trzech dniach odprysk na dwóch paznokciach prawej dłoni.', oczekuje: 'poprawka', foto: 'dlon.jpg', data: iso(dzien(-1)), status: 'nowa', przyklad: true }];
   const reklamacje = () => get('reklamacje', null) || REKL_SEED();
   const setReklamacje = l => set('reklamacje', l);
   // Stock (magazyn.html, products used on a visit in panel.html) and aftercare texts per category (cennik.html, wizyty.html, marketing.html)
@@ -184,6 +186,8 @@
     const d = n % 10, t = n % 100;
     return `${n} ${n === 1 ? one : d >= 2 && d <= 4 && (t < 12 || t > 14) ? few : many}`;
   };
+  // visits left on a pass, with the verb agreeing: "została 1 wizyta", "zostały 3 wizyty", "zostało 5 wizyt"
+  const zostalo = n => { const w = plural(n, ['wizyta', 'wizyty', 'wizyt']); return (n === 1 ? 'została ' : w.endsWith('wizyty') ? 'zostały ' : 'zostało ') + w; };
 
   function act(el, e) {
     const d = el.dataset;
@@ -225,8 +229,12 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
 [hidden]{display:none !important}
 .mock-zglos{min-height:28px;padding:2px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.6);background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}
 .mock-zglos:hover{background:rgba(255,255,255,.12)}
+.mock-uwagi{position:fixed;right:12px;bottom:88px;z-index:50;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:#1E1A1D;color:#FFFFFF;font:700 14px 'DM Sans',sans-serif;box-shadow:0 6px 18px rgba(30,10,18,.25);cursor:pointer}
+.mock-uwagi:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+@media (min-width:1024px){.mock-uwagi{bottom:20px;right:20px}}
 .nav-x{display:none !important}
-@media (min-width:1024px){.nav-x{display:flex !important}.nav-firma{margin-left:auto;border:1px solid #9E1F50;border-radius:10px;color:#9E1F50 !important;font-weight:700;min-height:44px !important}.nav-firma:hover{background:#F6EDF1}.nav.d-tabbar{grid-auto-columns:max-content}}
+@media (min-width:1024px){.nav-x{display:flex !important}.nav-firma{margin-left:auto;border:1px solid #9E1F50;border-radius:10px;color:#9E1F50 !important;font-weight:700;min-height:44px !important}.nav-firma:hover{background:#F6EDF1}.nav.d-tabbar{display:flex;align-items:center}.nav.d-tabbar::before,.nav-firma{white-space:nowrap}.nav-firma{gap:0 !important}}
+@media (min-width:1024px) and (max-width:1199px){.nav-firma-x{display:none}}
 .mock-dzis{padding:2px 10px;border-radius:999px;background:#FFF1E0;color:#8A3B12;font-weight:700;white-space:nowrap}
 .mock-zglos:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
 @media (max-width:1023px){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:16px !important}}
@@ -248,6 +256,10 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
   (document.head || document.documentElement).appendChild(style);
 
   function init() {
+    // brand: the tab icon and name on every page
+    document.querySelectorAll('link[rel=icon]').forEach(l => l.remove());
+    document.head.insertAdjacentHTML('beforeend', '<link rel="icon" href="znak.svg" type="image/svg+xml">');
+    if (!document.title.includes('Odcień')) document.title = (document.title ? document.title + ' · ' : '') + 'Odcień';
     document.querySelectorAll('[data-choice]').forEach(g => choiceStyles(g, choiceItems(g)));
     document.addEventListener('click', e => {
       const item = e.target.closest(CHOICE_ITEM);
@@ -267,10 +279,27 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
     bindTexts(document);
     // news and the studio sign-up in the shared top menu (desktop only: the phone tab bar keeps its 4 tabs)
     const tab = document.querySelector('.nav.d-tabbar');
-    if (tab) tab.insertAdjacentHTML('beforeend', `<a href="aktualnosci.html" class="nav-x"${/aktualnosci\.html$/.test(location.pathname) ? ' aria-current="page"' : ''}><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 9h3v8a2 2 0 0 1-2 2"></path><path d="M8 9h5M8 13h5"></path></svg>Aktualności</a><a href="dla-studiow.html" class="nav-x nav-firma">Dla studiów: załóż konto salonu</a>`);
+    if (tab) tab.insertAdjacentHTML('beforeend', `<a href="aktualnosci.html" class="nav-x"${/aktualnosci\.html$/.test(location.pathname) ? ' aria-current="page"' : ''}><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 9h3v8a2 2 0 0 1-2 2"></path><path d="M8 9h5M8 13h5"></path></svg>Aktualności</a><a href="dla-studiow.html" class="nav-x nav-firma">Dla studiów<span class="nav-firma-x">: załóż konto salonu</span></a>`);
+    // test links: ?test=1 / ?test=0 switches the test mode, ?reset=1 clears the data, ?scen=N opens a ready scenario (Narzędzia makiety)
+    const P = new URLSearchParams(location.search);
+    if (P.has('test')) set('tryb.test', P.get('test') === '1');
+    if (P.has('reset') || P.has('scen')) {
+      const czysty = () => { const q = new URLSearchParams(location.search); ['reset', 'scen', 'test', 'na'].forEach(k => q.delete(k)); return location.pathname.split('/').pop() + (q.toString() ? '?' + q : ''); };
+      if (P.get('reset') === '1') reset();
+      const na = /^[a-z-]+\.html$/.test(P.get('na') || '') ? P.get('na') : null; // &na=start.html: prepare the scenario, start the test on another page
+      if (P.has('scen')) import('./narzedzia.js').then(m => { const u = m.scenariusz(+P.get('scen')); location.replace(na || u || czysty()); }).catch(() => location.replace(czysty()));
+      else location.replace(czysty());
+      return;
+    }
     // "Zgłoś problem" in the mock bar on every page; the dialog code loads only when someone clicks it
     const bar = document.querySelector('.mock-bar');
-    if (bar) {
+    if (bar && get('tryb.test', false)) { // test mode: no mock bar and tools, one "Uwagi" button for feedback
+      bar.hidden = true;
+      const u = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-uwagi', textContent: 'Uwagi' });
+      u.setAttribute('aria-label', 'Zgłoś uwagę albo problem');
+      u.addEventListener('click', () => import('./zgloszenie.js').then(m => m.otworz()).catch(() => toast('Nie udało się otworzyć formularza.')));
+      document.body.append(u);
+    } else if (bar) {
       const b = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-zglos', textContent: 'Zgłoś problem' });
       b.addEventListener('click', () => import('./zgloszenie.js').then(m => m.otworz()).catch(() => toast('Nie udało się otworzyć formularza.')));
       const n = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-zglos', textContent: 'Narzędzia' });
@@ -299,7 +328,7 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
     try { await navigator.clipboard.writeText(text + ' ' + url); toast('Skopiowano zaproszenie z linkiem'); } catch { toast('Link: ' + url); }
   }
 
-  window.Mock = { get, set, reset, lookup, toast, addVisit, bindTexts, zl, dur, plural,
+  window.Mock = { get, set, reset, lookup, toast, addVisit, bindTexts, zl, dur, plural, zostalo,
     happyHours, setHappyHours, promoFor, happyToday, priceAfter, weekday, fotoKat, nipOk, polec,
     teraz, dzien, SKR, MIES, MIESD, dm, krotko, dlugo, zKrotko, odDzis, ustawDzis, testowa, iso, kody, setKody, sprawdzKod, karnety, sprzedane, karnetDla, reklamacje, setReklamacje, magazyn, zalecenia };
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
@@ -319,7 +348,7 @@ dialog::backdrop{background:rgba(30,26,29,.45)}
       { k: 'Ewa', tel: '', us: 'Mani', t: 'czasowy', ile: 0, doIso: '2026-01-31' }];
     return karnetDla('Mani', '600100200', '', L, '2026-06-01').i === 1 && karnetDla('Mani', '', 'Ewa', L, '2026-06-01') === null && karnetDla('Mani', '', 'Ewa', L, '2026-01-15').i === 2 && karnetDla('Inna', '600100200', '', L, '2026-06-01') === null; })(), 'mock.js karnetDla');
   console.assert(nipOk('123-456-32-18') && !nipOk('1234563217') && !nipOk('12345') && !nipOk(''), 'mock.js nipOk');
-  console.assert(zl(-15) === '−15 zł' && dur(105) === '1 h 45 min' && dur(60) === '1 h' && plural(1, ['a', 'b', 'c']) === '1 a'
+  console.assert(zl(-15) === '−15 zł' && dur(105) === '1 h 45 min' && dur(60) === '1 h' && plural(1, ['a', 'b', 'c']) === '1 a' && zostalo(1) === 'została 1 wizyta' && zostalo(3) === 'zostały 3 wizyty' && zostalo(12) === 'zostało 12 wizyt' && zostalo(0) === 'zostało 0 wizyt'
     && plural(3, ['a', 'b', 'c']) === '3 b' && plural(12, ['a', 'b', 'c']) === '12 c' && plural(22, ['a', 'b', 'c']) === '22 b', 'mock.js formats');
   console.assert((() => {
     const saved = localStorage.getItem(PREFIX + 'happyHours');

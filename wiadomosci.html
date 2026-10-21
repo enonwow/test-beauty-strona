@@ -53,7 +53,7 @@
         <form id="odp" style="display:flex;flex-direction:column;gap:8px">
           <div class="p-pills" role="group" aria-label="Gotowe odpowiedzi">
             <button type="button" class="p-pill" data-wzor="Dzień dobry! Potwierdzam wizytę, do zobaczenia.">Potwierdzam wizytę</button>
-            <button type="button" class="p-pill" data-wzor="Proszę wybrać stylizację w kreatorze, od razu zobaczy Pani cenę i wolne terminy: [link do kreatora]">Link do kreatora</button>
+            <button type="button" class="p-pill" data-wzor="Proszę wybrać stylizację w kreatorze, od razu zobaczy Pani cenę i wolne terminy: odcien.pl/studio-malwa/kreator">Link do kreatora</button>
             <button type="button" class="p-pill" data-wzor="Czy może Pani przesłać zdjęcie paznokci? Wtedy dokładnie wycenię uzupełnienie.">Poproś o zdjęcie</button>
           </div>
           <label class="p-lab">Odpowiedź<textarea id="tresc" class="p-in" rows="3" required maxlength="1000"></textarea></label>
@@ -72,17 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, $ = s => document.querySelector(s), dd = n => Mock.dm(Mock.dzien(n)); // "20.10" for today + n days
   // seed threads; od: 'kl' klientka, 'st' studio, 'sys' an automatic event from the calendar
   const SEED = {
-    '[Klientka B]': { info: 'wizyta dziś 11:15 · hybryda M · velvet', msgs: [
+    'Basia W.': { info: 'wizyta dziś 11:15 · hybryda M · velvet', msgs: [
       { od: 'sys', t: `${dd(-2)}, 21:04`, txt: `Rezerwacja z linku na Instagramie: ${Mock.krotko(Mock.dzien(0))}, 11:15` },
       { od: 'kl', k: 'WhatsApp', t: `${dd(-1)}, 18:02`, txt: 'Dzień dobry, czy mogę jutro zmienić kolor na nude? Velvet zostaje na następny raz :)' }] },
-    '[Klientka F]': { info: 'prośba o wycenę ze zdjęcia', msgs: [
+    'Felicja R.': { info: 'prośba o wycenę ze zdjęcia', msgs: [
       { od: 'sys', t: `${dd(-1)}, 16:40`, txt: 'Prośba o wycenę: zdjęcie inspiracji z Instagrama' },
       { od: 'kl', k: 'SMS', t: `${dd(-1)}, 16:41`, txt: 'Takie jak na zdjęciu, ale krótsze. Ile to wyjdzie?' }] },
-    '[Klientka D]': { info: 'wizyta dziś 9:30 · rzęsy 1:1, uzupełnienie', msgs: [
+    'Dorota S.': { info: 'wizyta dziś 9:30 · rzęsy 1:1, uzupełnienie', msgs: [
       { od: 'sys', t: `${dd(-1)}, 9:30`, txt: 'SMS z prośbą o potwierdzenie doręczony' },
       { od: 'kl', k: 'SMS', t: `${dd(-1)}, 9:41`, txt: 'TAK' },
       { od: 'sys', t: `${dd(-1)}, 9:41`, txt: 'Wizyta potwierdzona: w kalendarzu ✓' }], czytane: true },
-    '[Klientka A]': { info: `ostatnia wizyta ${dd(0)} · hybryda jednolita`, msgs: [
+    'Anna K.': { info: `ostatnia wizyta ${dd(0)} · hybryda jednolita`, msgs: [
       { od: 'st', k: 'SMS', t: `${dd(-3)}, 19:00`, txt: 'Dziękujemy za wizytę! Zapraszamy ponownie.' },
       { od: 'kl', k: 'SMS', t: `${dd(-3)}, 19:12`, txt: 'Dziękuję, było super!' }], czytane: true }
   };

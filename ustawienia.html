@@ -36,7 +36,7 @@
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Odwołania i zaliczki</h2>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Bezpłatne odwołanie do<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>12 h przed</option><option selected>24 h przed</option><option>48 h przed</option></select></label>
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Zaliczka od nowych klientek</label>
-        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Kwota zaliczki<input data-toast-change="Zapisano" value="[x] zł" style="min-height: 38px; width: 100px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Kwota zaliczki<input data-toast-change="Zapisano" value="30% ceny" style="min-height: 38px; width: 100px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
         <span style="color: #625860; font-size: 12px; line-height: 1.45">Klientka widzi zasady przed płatnością, a nie dopiero przy odwołaniu. Zwrot zaliczki jest automatyczny, jeśli odwoła w terminie.</span>
       </section>
 
@@ -45,10 +45,10 @@
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Potwierdzenie rezerwacji</label>
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Przypomnienie 24 h przed</label>
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Proś o potwierdzenie przybycia (odpowiedź TAK albo NIE)</label>
-        <div style="display: flex; flex-direction: column; gap: 6px"><span class="p-mut">Podgląd SMS-a 24 h przed wizytą</span><div style="max-width: 300px; padding: 12px 14px; border-radius: 16px 16px 16px 4px; background: #F0E8EC; line-height: 1.4">[NazwaStudia]: jutro 11:15, hybryda. Odpisz TAK, jeśli będziesz, albo NIE, żeby odwołać. Zmiana terminu: [link]</div><span class="p-mut">TAK oznacza wizytę w kalendarzu znakiem ✓. NIE odwołuje ją i zwalnia termin dla listy oczekujących.</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><span class="p-mut">Podgląd SMS-a 24 h przed wizytą</span><div style="max-width: 300px; padding: 12px 14px; border-radius: 16px 16px 16px 4px; background: #F0E8EC; line-height: 1.4">Studio Malwa: jutro 11:15, hybryda. Odpisz TAK, jeśli będziesz, albo NIE, żeby odwołać. Zmiana terminu: odcien.pl/w/k7f2</div><span class="p-mut">TAK oznacza wizytę w kalendarzu znakiem ✓. NIE odwołuje ją i zwalnia termin dla listy oczekujących.</span></div>
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Przypomnienie o uzupełnieniu po <select data-toast-change="Zapisano" aria-label="Po ilu tygodniach" style="min-height: 34px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option selected>3 tyg.</option><option>4 tyg.</option></select></label>
-        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Nadawca SMS<input data-toast-change="Zapisano" value="[NazwaStudia]" style="min-height: 38px; width: 140px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
-        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>SMS w tym miesiącu</span><b>[x] z [y] w abonamencie</b></div>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Nadawca SMS<input data-toast-change="Zapisano" value="Studio Malwa" style="min-height: 38px; width: 140px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>SMS w tym miesiącu</span><b>184 z 300 w abonamencie</b></div>
         <span style="color: #625860; font-size: 12px">Gdy SMS nie dotrze, zobaczysz alarm przy wizycie w kalendarzu.</span>
       </section>
 
@@ -86,17 +86,17 @@
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Języki<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option selected>polski, ukraiński, rosyjski</option><option>tylko polski</option></select></label>
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Pokazuj studio w wyszukiwarce</label>
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Przyjmuj zdjęcia inspiracji do wyceny</label>
-        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between; gap: 10px"><span style="color: #625860">Twój link</span><b>[adres]/[nazwa-studia]</b></div>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between; gap: 10px"><span style="color: #625860">Twój link</span><b>odcien.pl/studio-malwa</b></div>
       </section>
 
       <section style="background: #FFFFFF; border: 2px solid #1E1A1D; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Abonament</h2>
         <div id="end-banner" class="p-banner" role="status" hidden></div>
-        <div style="display: flex; justify-content: space-between; align-items: baseline"><b style="font-size: 18px">[Nazwa planu]</b><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">[cena] zł / mies.</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><b style="font-size: 18px">Studio</b><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">149 zł / mies.</span></div>
         <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; line-height: 1.4">
           <li>0% prowizji od klientek, także z wyszukiwarki</li>
-          <li>[x] SMS miesięcznie w cenie</li>
-          <li>Opłacone do [data]</li>
+          <li>300 SMS miesięcznie w cenie</li>
+          <li>Opłacone do końca miesiąca</li>
         </ul>
         <div style="display: flex; gap: 8px; flex-wrap: wrap">
           <button type="button" id="card" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Zmień kartę</button>
@@ -109,7 +109,7 @@
       <section id="dodatki" aria-labelledby="dod-h" style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
         <h2 id="dod-h" style="margin: 0; font-size: 16px; font-weight: 700">Dodatki</h2>
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
-          <label for="dod-podpisy" style="display: flex; flex-direction: column; gap: 2px"><b>Podpisy elektroniczne · [cena] zł / mies.</b><span style="color: #625860; font-size: 12px; line-height: 1.4">Klientki podpisują zgody i wywiady w telefonie przed wizytą. Opcja płatna, poza abonamentem.</span></label>
+          <label for="dod-podpisy" style="display: flex; flex-direction: column; gap: 2px"><b>Podpisy elektroniczne · 29 zł / mies.</b><span style="color: #625860; font-size: 12px; line-height: 1.4">Klientki podpisują zgody i wywiady w telefonie przed wizytą. Opcja płatna, poza abonamentem.</span></label>
           <input type="checkbox" id="dod-podpisy" role="switch" style="width: 44px; height: 28px; flex: none; accent-color: #9E1F50">
         </div>
         <span id="dod-stan" class="p-mut" role="status"></span>
@@ -129,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dod.checked) { PS.setAddon('podpisy', false); showDod(); Mock.toast('Dodatek wyłączony: podpisy elektroniczne'); return; }
     dod.checked = false; // włącza dopiero potwierdzenie
     PS.modal({
-      title: 'Włączyć podpisy elektroniczne?', ok: 'Włączam za [cena] zł / mies.',
-      body: '<p style="margin:0;line-height:1.45">Dodatek kosztuje <b>[cena] zł miesięcznie</b> i jest doliczany do abonamentu od następnego okresu rozliczeniowego. Wyłączysz go w każdej chwili, bez okresu wypowiedzenia.</p>',
+      title: 'Włączyć podpisy elektroniczne?', ok: 'Włączam za 29 zł / mies.',
+      body: '<p style="margin:0;line-height:1.45">Dodatek kosztuje <b>29 zł miesięcznie</b> i jest doliczany do abonamentu od następnego okresu rozliczeniowego. Wyłączysz go w każdej chwili, bez okresu wypowiedzenia.</p>',
       onOk: () => { PS.setAddon('podpisy', true); showDod(); },
       toast: 'Dodatek włączony: podpisy elektroniczne'
     });
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toast: 'Karta zmieniona'
   }));
   document.getElementById('calimp').addEventListener('click', () => PS.modal({ title: 'Importuj z Kalendarza Google lub Apple', noOk: true, body: '<div id="cal-mount" style="display:flex;flex-direction:column;gap:12px"></div>', onOpen: f => PS.calImport(f.querySelector('#cal-mount')) }));
-  document.getElementById('copylink').addEventListener('click', () => { navigator.clipboard?.writeText('[adres]/[nazwa-studia]').catch(() => {}); Mock.toast('Skopiowano link do profilu'); });
+  document.getElementById('copylink').addEventListener('click', () => { navigator.clipboard?.writeText('https://odcien.pl/studio-malwa').catch(() => {}); Mock.toast('Skopiowano link do profilu'); });
   document.getElementById('fbhelp').addEventListener('click', () => PS.modal({
     title: 'Przycisk „Zarezerwuj” na Facebooku', noOk: true,
     body: '<ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;line-height:1.4"><li>Otwórz stronę firmową i wybierz „Dodaj przycisk”.</li><li>Wybierz „Zarezerwuj”.</li><li>Wklej link do profilu studia z sekcji „Strona dla klientek”.</li></ol>'

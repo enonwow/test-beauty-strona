@@ -16,7 +16,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .sec{padding:20px 20px 0;display:flex;flex-direction:column;gap:8px}
 .sec h2,.lab{margin:0;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif}
 .chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
-.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 .inp{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;box-sizing:border-box;width:100%}
 .zdj{min-height:140px;border:2px dashed #C9B6BF;border-radius:16px;background:#FAF6F8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:#1E1A1D;text-align:center;padding:12px;overflow:hidden}
 .zdj:focus-within{outline:2px solid #9E1F50;outline-offset:2px}
@@ -55,7 +55,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <form id="wf" style="display:flex;flex-direction:column;flex:1" novalidate>
     <div class="d-cols">
     <div class="d-aside">
-    <p style="margin:16px 20px 0;color:#625860;font-size:14px;line-height:1.45">Wyślij inspirację, np. zdjęcie z Instagrama. <b id="studio" style="color:#1E1A1D">[Studio 1]</b> odtworzy ją w kreatorze i odeśle Ci SMS-em cenę, czas i wolne terminy.</p>
+    <p style="margin:16px 20px 0;color:#625860;font-size:14px;line-height:1.45">Wyślij inspirację, np. zdjęcie z Instagrama. <b id="studio" style="color:#1E1A1D">Studio Malwa</b> odtworzy ją w kreatorze i odeśle Ci SMS-em cenę, czas i wolne terminy.</p>
     <ol class="d-only how">
       <li>Dodajesz zdjęcie i krótki opis.</li>
       <li>Stylistka odtwarza stylizację w kreatorze.</li>
@@ -111,7 +111,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F6B47" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
     </div>
     <h2 style="margin:0;font-size:24px">Wysłano</h2>
-    <p style="margin:0;line-height:1.5">Studio <b id="ok-studio">[Studio 1]</b> odeśle wycenę SMS-em na numer <b id="ok-tel"></b>.</p>
+    <p style="margin:0;line-height:1.5">Studio <b id="ok-studio">Studio Malwa</b> odeśle wycenę SMS-em na numer <b id="ok-tel"></b>.</p>
     <img id="ok-img" alt="Wysłane zdjęcie inspiracji" hidden style="max-width:160px;border-radius:12px;border:1px solid #E4D9DE">
     <p style="margin:0;color:#625860;font-size:13px;line-height:1.45">W wiadomości dostaniesz link z ceną, czasem i wolnymi terminami. Prośba jest widoczna w panelu studia w sekcji „Wyceny”.</p>
     <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:8px">
@@ -126,7 +126,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
   const u = Mock.get('user', {}) || {};
-  const studio = new URLSearchParams(location.search).get('s') || (Mock.get('booking', {}) || {}).studio || '[Studio 1]';
+  const studio = new URLSearchParams(location.search).get('s') || (Mock.get('booking', {}) || {}).studio || 'Studio Malwa';
   document.querySelectorAll('[data-studio]').forEach(a => (a.href = 'salon.html?s=' + encodeURIComponent(studio)));
   $('#studio').textContent = studio;
   if (u.imie) $('#imie').value = u.imie;

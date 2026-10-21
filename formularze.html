@@ -108,14 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- podpisy elektroniczne ---
   const DOCMAP = { f1: 'rodo', f2: 'wywiad-rzesy', f3: 'zdjecia' }; // tylko wzorcowe formularze mają dokument do podpisu w makiecie
   const SAMPLE_PODP = [
-    { doc: 'rodo', klientka: '[Klientka A]', data: '2026-10-18T14:20:00', sposob: 'odręczny', przyklad: true },
-    { doc: 'wywiad-rzesy', klientka: '[Klientka D]', data: '2026-10-17T10:05:00', sposob: 'wpisany', przyklad: true }];
+    { doc: 'rodo', klientka: 'Anna K.', data: '2026-10-18T14:20:00', sposob: 'odręczny', przyklad: true },
+    { doc: 'wywiad-rzesy', klientka: 'Dorota S.', data: '2026-10-17T10:05:00', sposob: 'wpisany', przyklad: true }];
   const DOCNAME = { rodo: 'Zgoda RODO', 'wywiad-rzesy': 'Wywiad przed przedłużaniem rzęs', zdjecia: 'Zgoda na zdjęcia' };
   const podp = () => SAMPLE_PODP.concat(Mock.get('podpisy', [])).sort((a, b) => (a.data < b.data ? 1 : -1));
   const nPodp = id => (DOCMAP[id] ? podp().filter(p => p.doc === DOCMAP[id]).length : 0);
   const pad2 = n => String(n).padStart(2, '0');
   const kiedy = iso => { const d = new Date(iso); return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}, ${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
-  const KL = ['[Klientka A]', '[Klientka B]', '[Klientka D]', '[Klientka E]', '[Klientka F]'];
+  const KL = ['Anna K.', 'Basia W.', 'Dorota S.', 'Ewa P.', 'Felicja R.'];
 
   function renderSign() {
     const x = f(), doc = x && DOCMAP[x.id];

@@ -4,6 +4,19 @@ const MAX = 8 * 1024 * 1024;
 const WORKER = '';
 const ADRES = location.hostname.endsWith('github.io') ? WORKER : '/api/zgloszenie';
 let dlg, plik = null;
+// no address to send to: keep the report on this device (Narzędzia makiety → Uwagi z testów), the screenshot scaled down to fit localStorage
+async function zapiszLokalnie(dane) {
+  let zrzut = null;
+  if (plik) try {
+    const img = await createImageBitmap(plik), k = Math.min(1, 900 / Math.max(img.width, img.height));
+    const c = Object.assign(document.createElement('canvas'), { width: Math.round(img.width * k), height: Math.round(img.height * k) });
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); zrzut = c.toDataURL('image/jpeg', 0.7);
+  } catch { /* unreadable image: keep the text */ }
+  const l = Mock.get('zgloszenia', []) || [];
+  l.push({ czas: new Date().toISOString(), ...dane, zrzut });
+  Mock.set('zgloszenia', l);
+  return (Mock.get('zgloszenia', []) || []).length === l.length; // false when localStorage is full or off
+}
 
 function zbuduj() {
   dlg = document.createElement('dialog');
@@ -30,7 +43,7 @@ function zbuduj() {
     <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500">Kontakt (opcjonalnie)
       <input name="kontakt" autocomplete="email" placeholder="e-mail, jeśli chcesz odpowiedź" style="min-height:44px;border-radius:12px;border:1px solid #C9B6BF;padding:0 12px;font:inherit"></label>
     <input name="pulapka" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
-    <span style="color:#625860;font-size:12px;line-height:1.45">Wyślemy opis, zrzut (jeśli go dodasz), adres tej strony, rozmiar ekranu i nazwę przeglądarki. Nie wysyłamy danych z Twojego konta. Zgłoszenie zobaczy zespół na naszym Discordzie.</span>
+    <span style="color:#625860;font-size:12px;line-height:1.45">${ADRES ? "Wyślemy" : "Zapiszemy na tym urządzeniu"} opis, zrzut (jeśli go dodasz), adres tej strony, rozmiar ekranu i nazwę przeglądarki. Nie bierzemy danych z Twojego konta. ${ADRES ? "Zgłoszenie zobaczy zespół na naszym Discordzie." : "Uwagi odczyta osoba prowadząca test."}</span>
     <p data-zg-stan role="status" hidden style="margin:0;padding:10px 12px;border-radius:10px;font-size:14px;line-height:1.45"></p>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button type="button" data-zg-zamknij style="min-height:44px;padding:0 16px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;font:inherit;cursor:pointer">Anuluj</button>
@@ -67,12 +80,14 @@ function zbuduj() {
     if (plik) fd.append('plik', plik, plik.name || 'zrzut.png');
     const btn = $('[data-zg-wyslij]'); btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Wysyłam…';
     try {
-      if (!ADRES) { stan('Zgłoszenia nie są jeszcze skonfigurowane.', 'info'); return; }
+      const dane = { kategoria: f.kategoria.value, opis, kontakt: f.kontakt.value.trim(), strona: location.pathname + location.search, ekran: `${innerWidth}x${innerHeight}`, przegladarka: navigator.userAgent.slice(0, 200) };
+      const lokalnie = async () => { if (await zapiszLokalnie(dane)) { stan('Dziękujemy! Uwaga została zapisana.', 'ok'); f.reset(); ustawPlik(null); setTimeout(() => dlg.close(), 1800); } else stan('Nie udało się zapisać uwagi. Spróbuj bez zrzutu ekranu.', 'err'); };
+      if (!ADRES) return await lokalnie();
       const r = await fetch(ADRES, { method: 'POST', body: fd, signal: AbortSignal.timeout(20000) });
       const ct = r.headers.get('content-type') || '', d = ct.includes('json') ? await r.json() : {};
       if (r.ok) { stan('Dziękujemy! Zgłoszenie trafiło do zespołu.', 'ok'); f.reset(); ustawPlik(null); setTimeout(() => dlg.close(), 1800); }
       else if (r.status === 422 && d.errors) { if (d.errors.opis) blad('zg-opis-err', d.errors.opis); if (d.errors.plik) blad('zg-plik-err', d.errors.plik); stan('Popraw zaznaczone pola.', 'err'); }
-      else if (r.status === 404 || !ct.includes('json')) stan('W makiecie uruchomionej lokalnie zgłoszenia nie są wysyłane. Na stronie publicznej trafią na Discorda.', 'info');
+      else if (r.status === 404 || !ct.includes('json')) await lokalnie(); // local server without the function
       else stan(d.error || 'Nie udało się wysłać zgłoszenia. Spróbuj ponownie.', 'err');
     } catch { stan('Brak połączenia. Spróbuj ponownie za chwilę.', 'err'); }
     finally { btn.disabled = false; btn.removeAttribute('aria-busy'); btn.textContent = 'Wyślij zgłoszenie'; }

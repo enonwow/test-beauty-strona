@@ -16,7 +16,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .star{width:52px;height:52px;border-radius:12px;border:1px solid #8A7F86;background:#fff;color:#625860;font-size:24px;cursor:pointer;padding:0}
 .star.on{border:2px solid #9E1F50;background:#F6EDF1;color:#9E1F50}
 .chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
-.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 .btn{min-height:52px;border-radius:12px;background:#9E1F50;color:#fff;border:0;font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .btn:hover{background:#7A173D}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -46,7 +46,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <div class="d-aside">
   <section style="margin:16px 20px 0;padding:14px;border-radius:14px;background:#F6EDF1;display:flex;gap:12px;align-items:center">
     <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#5B1630;flex:none"></span>
-    <span style="display:flex;flex-direction:column;gap:2px"><b id="studio">[Studio 1] · 29.09</b><span id="opis" style="color:#625860;font-size:13px">Hybryda M · velvet × 10 · [Stylistka 1]</span></span>
+    <span style="display:flex;flex-direction:column;gap:2px"><b id="studio">Studio Malwa · 29.09</b><span id="opis" style="color:#625860;font-size:13px">Hybryda M · velvet × 10 · Magda</span></span>
   </section>
   </div>
 
@@ -110,8 +110,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
   const p = new URLSearchParams(location.search);
-  const studio = p.get('s') || '[Studio 1]', opis = p.get('o') || 'Hybryda M · velvet × 10';
-  $('#studio').textContent = p.get('s') ? studio : '[Studio 1] · 29.09';
+  const studio = p.get('s') || 'Studio Malwa', opis = p.get('o') || 'Hybryda M · velvet × 10';
+  $('#studio').textContent = p.get('s') ? studio : 'Studio Malwa · 29.09';
   $('#opis').textContent = opis;
   const NAZWY = ['', 'Słabo', 'Takie sobie', 'W porządku', 'Dobrze', 'Świetnie'];
   let ocena = 0;

@@ -15,7 +15,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif;margin:0}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
 .chip{flex:none;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
-.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 .tr-lista{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px}
 .tr{flex:0 0 220px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D;scroll-snap-align:start;border:1px solid #E4D9DE;border-radius:16px;padding:10px}
 .tr img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:10px}
@@ -53,10 +53,10 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif;margin:0}
     <h2 id="tr-h" style="font-size:20px">Trendy z kreatorów</h2>
     <span style="color:#625860;font-size:13px">Najczęściej układane w tym tygodniu. Dane przykładowe.</span>
     <div class="tr-lista">
-      <a class="tr" href="paznokcie.html"><img src="zdjecia/k-paznokcie.jpg" alt="" width="480" height="360" loading="lazy"><b>Mleczny róż, krótki migdał</b><small>Paznokcie · [x]% stylizacji</small></a>
-      <a class="tr" href="rzesy.html"><img src="zdjecia/k-rzesy.jpg" alt="" width="480" height="360" loading="lazy"><b>Kocie oko 3D</b><small>Rzęsy · [x]% stylizacji</small></a>
-      <a class="tr" href="brwi.html"><img src="zdjecia/k-brwi.jpg" alt="" width="480" height="360" loading="lazy"><b>Laminacja „fluffy”</b><small>Brwi · [x]% stylizacji</small></a>
-      <a class="tr" href="fryzjer.html"><img src="zdjecia/k-fryzjer.jpg" alt="" width="480" height="360" loading="lazy"><b>Karmelowy balejaż</b><small>Włosy · [x]% stylizacji</small></a>
+      <a class="tr" href="paznokcie.html"><img src="zdjecia/k-paznokcie.jpg" alt="" width="480" height="360" loading="lazy"><b>Mleczny róż, krótki migdał</b><small>Paznokcie · 34% stylizacji</small></a>
+      <a class="tr" href="rzesy.html"><img src="zdjecia/k-rzesy.jpg" alt="" width="480" height="360" loading="lazy"><b>Kocie oko 3D</b><small>Rzęsy · 22% stylizacji</small></a>
+      <a class="tr" href="brwi.html"><img src="zdjecia/k-brwi.jpg" alt="" width="480" height="360" loading="lazy"><b>Laminacja „fluffy”</b><small>Brwi · 19% stylizacji</small></a>
+      <a class="tr" href="fryzjer.html"><img src="zdjecia/k-fryzjer.jpg" alt="" width="480" height="360" loading="lazy"><b>Karmelowy balejaż</b><small>Włosy · 15% stylizacji</small></a>
     </div>
   </section>
 
@@ -73,7 +73,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif;margin:0}
   <footer style="padding:24px 20px 24px;color:#625860;font-size:13px;line-height:1.5;display:flex;flex-direction:column;gap:6px">
     <span>Pokazujemy tylko tytuł, krótki opis i link do artykułu u wydawcy. Treść i zdjęcia należą do wydawców.</span>
     <span id="zrodla"></span>
-    <span>Jesteś wydawcą i chcesz zmienić sposób prezentacji albo wyłączyć swój kanał? Napisz: [adres e-mail].</span>
+    <span>Jesteś wydawcą i chcesz zmienić sposób prezentacji albo wyłączyć swój kanał? Napisz: wydawcy@odcien.pl.</span>
   </footer>
 
   <nav class="nav d-tabbar" aria-label="Menu główne" style="margin-top:auto">

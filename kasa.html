@@ -57,12 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, FUND = 200;
   document.getElementById('dzis').textContent = Mock.dlugo(Mock.dzien(0));
   const SEED = [
-    { t: '9:00', k: '[Klientka A]', o: 'Hybryda jednolita', m: 'gotówka', v: 140, dok: { typ: 'paragon', nr: 'paragon nr 0001' } },
-    { t: '9:30', k: '[Klientka D]', o: 'Rzęsy 1:1 · uzupełnienie (cena przykładowa)', m: 'karta', v: 150, dok: { typ: 'faktura', nr: 'FV/14/10/2026', nip: '1234563218', firma: '[Firma klientki D]' } }
+    { t: '9:00', k: 'Anna K.', o: 'Hybryda jednolita', m: 'gotówka', v: 140, dok: { typ: 'paragon', nr: 'paragon nr 0001' } },
+    { t: '9:30', k: 'Dorota S.', o: 'Rzęsy 1:1 · uzupełnienie (cena przykładowa)', m: 'karta', v: 150, dok: { typ: 'faktura', nr: 'FV/14/10/2026', nip: '1234563218', firma: 'Dorota Sowa Fotografia' } }
   ];
-  const CARDS = [{ code: 'KARTA-DEMO-1', v: 100, od: '[kupująca], na urodziny' }, { code: 'KARTA-DEMO-2', v: 200, od: '[kupująca], prezent' }];
+  const CARDS = [{ code: 'KARTA-DEMO-1', v: 100, od: 'Basia W., na urodziny' }, { code: 'KARTA-DEMO-2', v: 200, od: 'Iza N., prezent' }];
   const zl = n => n.toLocaleString('pl-PL') + ' zł';
-  const tx = () => SEED.concat(Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota, dok: x.dok })), Mock.get('kasa.gc', []).map(x => ({ t: x.t, k: '[klientka]', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })));
+  const tx = () => SEED.concat(Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota, dok: x.dok })), Mock.get('kasa.gc', []).map(x => ({ t: x.t, k: 'Klientka online', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })));
   const dokTxt = d => (!d ? '<span class="p-mut">–</span>' : d.typ === 'faktura' ? `<span class="p-badge blue" title="${E(d.firma)}, NIP ${E(d.nip)}">${E(d.nr)}</span><br><span class="p-mut" title="Numer nadany przez Krajowy System e-Faktur">KSeF: ${E(ksef(d))}</span>` : `<span class="p-mut">${E(d.nr)}</span>`);
   const ruch = () => Mock.get('kasa.ruch', []);
   // mock KSeF number: seller NIP-date-6 characters, as the real one looks

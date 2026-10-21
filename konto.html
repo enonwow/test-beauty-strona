@@ -58,6 +58,7 @@ h2{margin:0 0 6px;font-size:18px;font-weight:700}
     <button type="button" id="edytuj" class="btn-o" data-bind-if="user.zalogowana" data-open="#dlg-edycja" style="margin-left:auto">Edytuj dane</button>
   </header>
 
+  <img data-bind-unless="user.zalogowana" src="zdjecia/dlon-1.jpg" alt="" width="1600" height="1067" style="display:block;margin:12px 20px 0;width:calc(100% - 40px);max-width:560px;height:150px;object-fit:cover;object-position:30% 55%;border-radius:20px">
   <div data-bind-unless="user.zalogowana" style="margin:12px 20px 0;max-width:560px;box-sizing:border-box;padding:20px;border-radius:16px;background:#FAF6F8;font-size:15px;line-height:1.45;display:flex;flex-direction:column;gap:12px">
     <h2 style="margin:0;font-size:18px">Zaloguj się numerem telefonu</h2>
     <span style="color:#625860">Bez hasła: dostaniesz kod SMS. Masz już konto? Wpisz ten sam numer.</span>
@@ -82,7 +83,7 @@ h2{margin:0 0 6px;font-size:18px;font-weight:700}
     <h2 id="lojal">Karta lojalnościowa</h2>
     <div style="border:1px solid #E4D9DE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px">
       <div id="pieczatki" style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;justify-items:center"></div>
-      <span style="font-size:14px"><b id="pcz-n">3</b> z 8 pieczątek. Po 8. wizycie dostajesz [nagroda].</span>
+      <span style="font-size:14px"><b id="pcz-n">3</b> z 8 pieczątek. Po 8. wizycie dostajesz zdobienie gratis.</span>
       <span style="color:#625860;font-size:12px">Pieczątkę dostajesz za każdą odbytą wizytę w studiach z programem lojalnościowym. Wartości przykładowe.</span>
     </div>
   </section>
@@ -155,10 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = document.createElement('div'); el.style.cssText = 'border:1px solid #E4D9DE;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px';
     const b = document.createElement('b'); b.textContent = s.n;
     const o = document.createElement('span'); o.style.cssText = 'color:#625860;font-size:13px';
-    o.textContent = `${s.us} · ${s.t === 'pakiet' ? 'zostało ' + Mock.plural(Math.max(0, s.ile), ['wizyta', 'wizyty', 'wizyt']) : 'bez limitu wizyt'} · ważny do ${s.do}${koniec ? ' (wygasł)' : zuzyty ? ' (wykorzystany)' : ''}`;
+    o.textContent = `${s.us} · ${s.t === 'pakiet' ? Mock.zostalo(Math.max(0, s.ile)) : 'bez limitu wizyt'} · ważny do ${s.do}${koniec ? ' (wygasł)' : zuzyty ? ' (wykorzystany)' : ''}`;
     el.append(b, o); box.append(el);
   });
-  document.getElementById('polec-btn').addEventListener('click', () => Mock.polec(((Mock.get('favorites', []) || [])[0]) || '[Studio 1]', (Mock.get('user', {}) || {}).imie));
+  document.getElementById('polec-btn').addEventListener('click', () => Mock.polec(((Mock.get('favorites', []) || [])[0]) || 'Studio Malwa', (Mock.get('user', {}) || {}).imie));
 });
 </script>
 
@@ -232,8 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
-  const FOTO = { '[Studio 1]': 'k-paznokcie.jpg', '[Studio 2]': 'dlon-1-mini.jpg', '[Studio 3]': 'dlon-2-mini.jpg', '[Studio 4]': 'k-rzesy.jpg', '[Studio 5]': 'k-fryzjer.jpg' }; // same photos as the result cards
-  const WOLNE = { '[Studio 1]': 'wt 14:30', '[Studio 2]': 'śr 9:00', '[Studio 3]': 'pt 17:00', '[Studio 4]': 'wt 12:00', '[Studio 5]': 'wt 15:00' };
+  const FOTO = { 'Studio Malwa': 'k-paznokcie.jpg', 'Pracownia Lilia': 'dlon-1-mini.jpg', 'Atelier Nude': 'dlon-2-mini.jpg', 'Lash Room Iga': 'k-rzesy.jpg', 'Salon Loft': 'k-fryzjer.jpg' }; // same photos as the result cards
+  const WOLNE = { 'Studio Malwa': 'wt 14:30', 'Pracownia Lilia': 'śr 9:00', 'Atelier Nude': 'pt 17:00', 'Lash Room Iga': 'wt 12:00', 'Salon Loft': 'wt 15:00' };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const u = Mock.get('user', {}) || {};
   if (!u.imie || !u.zalogowana) $('#imie').textContent = 'Twój profil';

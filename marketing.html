@@ -36,10 +36,10 @@
         <div id="kanal" data-choice role="group" aria-label="Kanał kampanii" class="p-pills"><button type="button" class="p-pill" aria-pressed="true" data-value="sms">SMS</button><button type="button" class="p-pill" aria-pressed="false" data-value="email">E-mail</button></div>
         <label id="temat-w" hidden class="p-lab">Temat e-maila<input id="temat" class="p-in" value="Jesienna kolekcja już w kreatorze"></label>
         <label for="tresc" style="color: #625860; font-size: 13px">Treść</label>
-        <textarea id="tresc" rows="4" class="p-in">[NazwaStudia]: nowa kolekcja jesień 2026 już w kreatorze. Sprawdź cenę i wolne terminy: [link]</textarea>
+        <textarea id="tresc" rows="4" class="p-in">Studio Malwa: nowa kolekcja jesień 2026 już w kreatorze. Sprawdź cenę i wolne terminy: odcien.pl/studio-malwa</textarea>
         <div style="display: flex; justify-content: space-between; color: #625860; font-size: 12px"><span id="cnt" aria-live="polite">0 znaków · 1 SMS</span><span>stopka z wypisem dodawana automatycznie</span></div>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Odbiorczynie<select id="grupa" class="p-in" data-toast-change="Zmieniono grupę odbiorczyń"><option selected>Wszystkie ze zgodą</option><option>Paznokcie, ostatnie 3 miesiące</option><option>Rzęsy</option></select></label>
-        <div class="p-box"><span>Wyślemy do</span><b id="odb">[liczba] klientek ze zgodą</b></div>
+        <div class="p-box"><span>Wyślemy do</span><b id="odb">186 klientek ze zgodą</b></div>
         <div style="display: flex; flex-direction: column; gap: 6px"><span class="p-mut" id="prev-l">Podgląd na telefonie klientki</span><div id="prev-box" style="max-width: 280px; padding: 12px 14px; border-radius: 16px 16px 16px 4px; background: #F0E8EC"><b id="prev-temat" hidden style="display: block; margin-bottom: 6px"></b><span id="prev" style="white-space: pre-wrap; word-break: break-word; line-height: 1.4"></span><br><span class="p-mut" id="prev-stop">Wypis: odpowiedz STOP</span></div></div>
         <button type="button" id="plan" class="p-btn pri">Zaplanuj wysyłkę</button>
       </section>
@@ -59,7 +59,7 @@
           <label class="p-lab" style="flex: 1 1 140px">Zniżka dla nowej klientki (zł)<input class="p-in" type="number" min="0" step="5" value="20" data-toast-change="Zapisano"></label>
           <label class="p-lab" style="flex: 1 1 140px">Nagroda dla polecającej (zł)<input class="p-in" type="number" min="0" step="5" value="20" data-toast-change="Zapisano"></label>
         </div>
-        <div class="p-box"><span>W październiku z polecenia</span><b>[liczba] nowych klientek · [kwota] zniżek</b></div>
+        <div class="p-box"><span>W październiku z polecenia</span><b>6 nowych klientek · 180 zł zniżek</b></div>
         <span class="p-mut">Nagroda dla polecającej nalicza się dopiero po odbytej wizycie nowej klientki. Wizyta z polecenia ma w kalendarzu dopisek „z polecenia”.</span>
       </section>
 
@@ -84,14 +84,14 @@
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Karty podarunkowe</h2>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
           <div data-choice="multi" role="group" aria-label="Kwoty kart" style="display: flex; gap: 8px; flex-wrap: wrap">
-            <button type="button" aria-pressed="true" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #1E1A1D; background: #1E1A1D; color: #FFFFFF; font: inherit">100 zł</button>
-            <button type="button" aria-pressed="true" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #1E1A1D; background: #1E1A1D; color: #FFFFFF; font: inherit">200 zł</button>
+            <button type="button" aria-pressed="true" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #9E1F50; background: #FFFFFF; color: #9E1F50; font-weight: 700; box-shadow: inset 0 0 0 1px #9E1F50; font: inherit">100 zł</button>
+            <button type="button" aria-pressed="true" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #9E1F50; background: #FFFFFF; color: #9E1F50; font-weight: 700; box-shadow: inset 0 0 0 1px #9E1F50; font: inherit">200 zł</button>
             <button type="button" aria-pressed="false" style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit">Na konkretną stylizację</button>
           </div>
           <button type="button" id="kwota" class="p-btn dash">+ Kwota</button>
         </div>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Ważność<select data-toast-change="Zapisano ważność kart" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>6 miesięcy</option><option selected>12 miesięcy</option></select></label>
-        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>Sprzedane w październiku</span><b>[liczba] · [kwota]</b></div>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>Sprzedane w październiku</span><b>4 · 2400 zł</b></div>
         <span style="color: #625860; font-size: 12px">Karta działa tylko w Twoim studiu. Klientka widzi saldo i datę ważności w swoim profilu.</span>
       </section>
     </div>
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Mock.toast(c.checked ? 'Automat włączony' : 'Automat wyłączony');
   }));
   document.getElementById('zal-pv').addEventListener('click', () => PS.modal({ title: 'Podgląd e-maila', noOk: true,
-    body: `<div style="border:1px solid #E4D9DE;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;line-height:1.5"><span class="p-mut">Od: [Nazwa studia] · Temat: Jak dbać o paznokcie po wizycie</span><b>Dzień dobry, [Imię]!</b><span>Dziękujemy za wizytę. Kilka rad na najbliższe dni:</span><span>${PS.esc(Mock.zalecenia().Paznokcie)}</span><span class="p-mut">Coś nie tak? Zgłoś reklamację w „Moich wizytach”. Wypis z e-maili: [link]</span></div>` }));
+    body: `<div style="border:1px solid #E4D9DE;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;line-height:1.5"><span class="p-mut">Od: Studio Malwa · Temat: Jak dbać o paznokcie po wizycie</span><b>Dzień dobry, Anno!</b><span>Dziękujemy za wizytę. Kilka rad na najbliższe dni:</span><span>${PS.esc(Mock.zalecenia().Paznokcie)}</span><span class="p-mut">Coś nie tak? Zgłoś reklamację w „Moich wizytach”. Wypis z e-maili: odcien.pl/wypis</span></div>` }));
   const t = document.getElementById('tresc'), cnt = document.getElementById('cnt'), prev = document.getElementById('prev');
   // shortcut: polskie litery wymuszają kodowanie Unicode (70 znaków w SMS, 67 w wielu); bez nich 160/153, nie liczymy znaków rozszerzonych GSM.
   function upd() {
@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
     kanal = e.detail.value; const em = kanal === 'email', $ = id => document.getElementById(id);
     $('kamp-h').textContent = em ? 'Nowa kampania e-mail' : 'Nowa kampania SMS'; $('temat-w').hidden = !em; $('cnt').hidden = em;
     $('prev-l').textContent = em ? 'Podgląd e-maila' : 'Podgląd na telefonie klientki'; $('prev-box').style.maxWidth = em ? '420px' : '280px'; $('prev-box').style.borderRadius = em ? '12px' : '16px 16px 16px 4px';
-    $('prev-stop').textContent = em ? 'Wypis z e-maili: [link] · wysyłamy tylko do klientek ze zgodą e-mail' : 'Wypis: odpowiedz STOP';
-    $('odb').textContent = em ? '[liczba] klientek ze zgodą e-mail' : '[liczba] klientek ze zgodą';
+    $('prev-stop').textContent = em ? 'Wypis z e-maili: odcien.pl/wypis · wysyłamy tylko do klientek ze zgodą e-mail' : 'Wypis: odpowiedz STOP';
+    $('odb').textContent = em ? '142 klientki ze zgodą e-mail' : '186 klientek ze zgodą';
     upd();
   });
   document.getElementById('temat').addEventListener('input', upd);
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('wyr-on').addEventListener('change', e => { W.on = e.target.checked; Mock.set('wyroznienie', W); wyr(); Mock.toast(W.on ? 'Wyróżnienie włączone od jutra' : 'Wyróżnienie wyłączone'); });
   document.getElementById('wyr-st').addEventListener('change', e => { W.st = +e.target.value; Mock.set('wyroznienie', W); wyr(); Mock.toast('Zapisano stawkę'); });
   wyr();
-  document.getElementById('grupa').addEventListener('change', e => { document.getElementById('odb').textContent = '[liczba] klientek: ' + e.target.selectedOptions[0].text.toLowerCase(); });
+  document.getElementById('grupa').addEventListener('change', e => { document.getElementById('odb').textContent = Mock.plural([186, 94, 52][e.target.selectedIndex], ['klientka', 'klientki', 'klientek']) + ': ' + e.target.selectedOptions[0].text.toLowerCase(); });
   const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   document.getElementById('plan').addEventListener('click', () => PS.modal({
     onOpen: f => { f.d.min = iso(Mock.dzien(0)); f.d.value = iso(Mock.dzien(2)); }, // a campaign cannot be planned in the past

@@ -18,7 +18,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .btn:disabled{background:#C9B6BF;color:#fff;cursor:not-allowed}
 .btn.out{background:#fff;color:#1E1A1D;border:1px solid #1E1A1D}.btn.out:hover{background:#FAF6F8;color:#1E1A1D}
 .tab{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer}
-.tab[aria-pressed=true]{background:#1E1A1D;border-color:#1E1A1D;color:#fff}
+.tab[aria-pressed=true]{background:#fff;border-color:#9E1F50;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 .inp{min-height:52px;padding:0 14px;border-radius:12px;border:1px solid #C9B6BF;font:inherit;font-size:16px;box-sizing:border-box;width:100%}
 .doc{max-height:260px;overflow:auto;padding:14px;border:1px solid #E4D9DE;border-radius:14px;background:#FAF6F8;font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:8px}
 .doc p{margin:0}
@@ -45,7 +45,7 @@ body.studio .doc{max-height:32vh;font-size:16px}
     <a href="wizyty.html" id="wstecz" data-back aria-label="Wróć" class="back">
       <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
     </a>
-    <div style="display:flex;flex-direction:column"><h1 id="tytul" style="margin:0;font-size:20px;font-weight:700">Podpisz przed wizytą</h1><span id="studio" style="color:#625860;font-size:13px">[Nazwa studia]</span></div>
+    <div style="display:flex;flex-direction:column"><h1 id="tytul" style="margin:0;font-size:20px;font-weight:700">Podpisz przed wizytą</h1><span id="studio" style="color:#625860;font-size:13px">Studio Malwa</span></div>
   </header>
 
   <div class="d-cols"><div class="d-main">
@@ -119,9 +119,9 @@ import { createPad } from './podpis-pad.js';
   // Treści to wzory do sprawdzenia z prawnikiem, nazwy w nawiasach to miejsca na dane studia.
   const DOCS = {
     rodo: ['Zgoda na przetwarzanie danych osobowych (RODO)', [
-      'Administratorem Twoich danych jest [Nazwa studia], [adres]. Kontakt w sprawach danych: [e-mail].',
+      'Administratorem Twoich danych jest Studio Malwa, ul. Puławska 24, 02-512 Warszawa. Kontakt w sprawach danych: kontakt@studiomalwa.pl.',
       'Dane (imię, telefon, e-mail, historia wizyt i notatki do zabiegów) przetwarzamy, żeby umówić i przeprowadzić wizytę oraz wysyłać przypomnienia SMS.',
-      'Podstawą jest wykonanie umowy oraz Twoja zgoda. Dane przechowujemy do [okres] od ostatniej wizyty.',
+      'Podstawą jest wykonanie umowy oraz Twoja zgoda. Dane przechowujemy do 3 lat od ostatniej wizyty.',
       'Masz prawo wglądu, poprawienia, przeniesienia i usunięcia danych oraz wycofania zgody w dowolnym momencie, bez wpływu na wcześniejsze wizyty.',
       'Zgoda na wiadomości marketingowe jest osobna i dobrowolna.']],
     'wywiad-rzesy': ['Wywiad przed przedłużaniem rzęs', [
@@ -129,11 +129,11 @@ import { createPad } from './podpis-pad.js';
       'Oświadczam, że poinformowałam stylistkę o alergiach na kleje, kosmetyki i lateks, o noszeniu soczewek kontaktowych oraz o chorobach oczu i skóry powiek.',
       'Oświadczam, że poinformowałam o ciąży lub karmieniu piersią, jeśli dotyczy.',
       'Rozumiem, że przy podrażnieniu, łzawieniu lub zaczerwienieniu powinnam zgłosić się do studia lub lekarza, a stylistka może odmówić wykonania zabiegu.',
-      'Zalecenia po zabiegu (unikanie wody i pary przez [x] godzin, nieolejowe kosmetyki) otrzymałam i rozumiem.']],
+      'Zalecenia po zabiegu (unikanie wody i pary przez 24 godziny, nieolejowe kosmetyki) otrzymałam i rozumiem.']],
     zdjecia: ['Zgoda na wykorzystanie zdjęć', [
-      'Wyrażam zgodę, aby [Nazwa studia] robiło zdjęcia efektów zabiegu (paznokci, rzęs, brwi) i publikowało je w portfolio na stronie studia i w mediach społecznościowych.',
+      'Wyrażam zgodę, aby Studio Malwa robiło zdjęcia efektów zabiegu (paznokci, rzęs, brwi) i publikowało je w portfolio na stronie studia i w mediach społecznościowych.',
       'Na zdjęciach nie będzie widać mojej twarzy ani danych, które pozwalają mnie zidentyfikować, chyba że zgodzę się na to osobno.',
-      'Zgodę mogę wycofać w każdej chwili, a studio usunie zdjęcia w ciągu [x] dni.',
+      'Zgodę mogę wycofać w każdej chwili, a studio usunie zdjęcia w ciągu 30 dni.',
       'Brak zgody nie wpływa na możliwość skorzystania z usług.']]
   };
   const qp = new URLSearchParams(location.search), q = qp.get('doc');
@@ -142,11 +142,11 @@ import { createPad } from './podpis-pad.js';
   const wroc = { klientki: 'klientki.html', formularze: 'formularze.html' }[qp.get('wroc')] || 'panel.html';
   const doc = DOCS[q] ? q : 'rodo';
   const B = Mock.get('booking', {}) || {};
-  $('#studio').textContent = B.studio || '[Nazwa studia]';
+  $('#studio').textContent = B.studio || 'Studio Malwa';
   if (studio) {
     document.body.classList.add('studio');
     $('#tytul').textContent = 'Podpis w studiu';
-    $('#studio').textContent = `Dla: ${kl || '[Klientka]'} · tablet studia`;
+    $('#studio').textContent = `Dla: ${kl || 'Klientka'} · tablet studia`;
     $('#pad-t').textContent = 'Podpis klientki (rysikiem albo palcem)';
     const w = $('#wstecz'); w.removeAttribute('data-back'); w.href = '#'; w.dataset.open = '#pin'; w.setAttribute('aria-label', 'Zakończ (PIN stylistki)');
     $('#d-wroc').hidden = true; $('#d-panel').hidden = false; $('#oddaj').hidden = false;
@@ -191,7 +191,7 @@ import { createPad } from './podpis-pad.js';
     e.preventDefault();
     if ($('#go').disabled) return;
     const user = Mock.get('user', null) || {};
-    const klientka = studio ? kl || '[Klientka]' : mode === 'wpisany' ? $('#typed').value.trim() : (user.imie || '[Klientka]');
+    const klientka = studio ? kl || 'Klientka' : mode === 'wpisany' ? $('#typed').value.trim() : (user.imie || 'Klientka');
     const sposob = mode === 'wpisany' ? 'wpisany' + (studio ? ' na tablecie w studiu' : '') : studio ? (pad.penSeen ? 'odręczny rysikiem w studiu' : 'odręczny na tablecie w studiu') : mode;
     const now = Mock.teraz();
     // zapisujemy tylko dane o podpisie, nigdy obrazka z pola podpisu (obrazek widać raz na ekranie potwierdzenia)

@@ -13,7 +13,7 @@
 .app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
 h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .tab{flex:1;min-height:44px;border:0;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
-.tab[aria-selected=true]{background:#1E1A1D;color:#fff;font-weight:700}
+.tab[aria-selected=true]{background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 2px #9E1F50}
 .nv{width:44px;height:44px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .cd{height:44px;min-width:44px;border-radius:10px;border:2px solid transparent;background:transparent;color:#1E1A1D;font:inherit;font-size:14px;padding:0;cursor:pointer}
 .cd.t{border-color:#1E1A1D;font-weight:700}
@@ -32,7 +32,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .vb .rd{color:#A3262A}
 .vb a:hover{color:#1E1A1D}.vb a.dk:hover{color:#fff}
 .pot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:#FFF1E0;color:#8A3B12;font-size:14px}
-.pot button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#1E1A1D;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.pot button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .pot.ok{background:#E6F2EC;color:#1F6B47;font-weight:700}
 .dok{display:flex;flex-direction:column;gap:6px;font-size:14px}
 .dok .r{display:flex;justify-content:space-between;gap:12px}
@@ -110,7 +110,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
         <img src="zdjecia/styl-velvet-burgund.jpg" alt="" width="52" height="52" loading="lazy" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
           <span style="font-weight:500">Velvet burgund · 29 września</span>
-          <span style="color:#625860;font-size:13px">[Studio 1] · 200 zł · <a href="ocena.html?s=%5BStudio%201%5D&amp;o=Hybryda%20M%20%C2%B7%20velvet%20%C3%97%2010">Oceń</a></span>
+          <span style="color:#625860;font-size:13px">Studio Malwa · 200 zł · <a href="ocena.html?s=Studio%20Malwa&amp;o=Hybryda%20M%20%C2%B7%20velvet%20%C3%97%2010">Oceń</a></span>
         </span>
         <a href="paznokcie.html" class="btn" style="min-height:44px;padding:0 12px;font-size:14px;font-weight:500">Powtórz</a>
       </div>
@@ -118,7 +118,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
         <img src="zdjecia/k-rzesy.jpg" alt="" width="52" height="52" loading="lazy" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
           <span style="font-weight:500">Rzęsy 2D–3D, 11–12 mm, CC · 6 października</span>
-          <span style="color:#625860;font-size:13px">[Studio 2] · uzupełnienie za ok. 3 tyg.</span>
+          <span style="color:#625860;font-size:13px">Pracownia Lilia · uzupełnienie za ok. 3 tyg.</span>
         </span>
         <a href="rzesy.html" style="min-height:44px;padding:0 12px;border-radius:10px;border:1px solid #1E1A1D;color:#1E1A1D;text-decoration:none;font-size:14px;font-weight:500;display:flex;align-items:center">Umów</a>
       </div>
@@ -187,10 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const NOW = Mock.teraz(); // device date (or the day pinned with ?dzis=)
   const pozniej = n => { let d = Mock.dzien(n); while (d.getDay() === 0) d = Mock.dzien(++n); return d; }; // n days ahead, skipping Sunday (closed)
   const SUG = Mock.dzien(7); // suggested refill in the calendar
-  const SAMPLE = { id: 'przyklad', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: '[Studio 1]', stylistka: '[Stylistka 1]', dzien: Mock.krotko(pozniej(1)), godzina: '11:15', koniec: '13:05', klientka: '', status: 'nadchodząca' };
+  const SAMPLE = { id: 'przyklad', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: 'Studio Malwa', stylistka: 'Magda', dzien: Mock.krotko(pozniej(1)), godzina: '11:15', koniec: '13:05', klientka: '', status: 'nadchodząca' };
   let pending = null;
   // a finished sample visit, so the history shows how a receipt or invoice is downloaded
-  const HIST = [{ id: 'hist1', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czasTekst: '1 h 50 min', studio: '[Studio 1]', stylistka: '[Stylistka 1]', dzien: Mock.krotko(pozniej(-21)), godzina: '11:15', koniec: '13:05', status: 'odbyta', dokNr: `FV/31/${String(pozniej(-21).getMonth() + 1).padStart(2, '0')}/${pozniej(-21).getFullYear()}`, faktura: { nip: '1234563218', firma: '[Twoja firma]' } }];
+  const HIST = [{ id: 'hist1', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czasTekst: '1 h 50 min', studio: 'Studio Malwa', stylistka: 'Magda', dzien: Mock.krotko(pozniej(-21)), godzina: '11:15', koniec: '13:05', status: 'odbyta', dokNr: `FV/31/${String(pozniej(-21).getMonth() + 1).padStart(2, '0')}/${pozniej(-21).getFullYear()}`, faktura: { nip: '1234563218', firma: 'Pracownia Graficzna Anna Kowalczyk' } }];
 
   const all = () => {
     const v = Mock.get('visits', []);
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const find = id => all().concat(HIST).find(v => String(v.id) === String(id));
 
   const KREATORY = { paznokcie: 'paznokcie.html', 'rzęsy': 'rzesy.html', brwi: 'brwi.html', fryzjer: 'fryzjer.html', kosmetologia: 'kosmetyka.html', kosmetyka: 'kosmetyka.html' };
-  const doStudia = v => 'salon.html?s=' + encodeURIComponent(v.studio || '[Studio 1]');
+  const doStudia = v => 'salon.html?s=' + encodeURIComponent(v.studio || 'Studio Malwa');
   function card(v) {
     const sty = v.stylistka && v.stylistka !== 'Dowolna' ? v.stylistka : 'Dowolna stylistka';
     const id = esc(v.id);
@@ -307,9 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (a.dataset.a === 'dok') {
       const fv = !!v.faktura;
       $('#dok-t').textContent = fv ? `Faktura ${v.dokNr || ''}`.trim() : 'Paragon fiskalny';
-      $('#dok-tresc').innerHTML = `<div class="r"><span>Sprzedawca</span><b>${esc(v.studio)}, NIP [NIP studia]</b></div>${fv ? `<div class="r"><span>Nabywca</span><b>${esc(v.faktura.firma)}, NIP ${esc(v.faktura.nip)}</b></div>` : ''}
+      $('#dok-tresc').innerHTML = `<div class="r"><span>Sprzedawca</span><b>${esc(v.studio)}, NIP 123-456-32-18</b></div>${fv ? `<div class="r"><span>Nabywca</span><b>${esc(v.faktura.firma)}, NIP ${esc(v.faktura.nip)}</b></div>` : ''}
         <div class="r"><span>Data</span><b>${esc(v.dzien)}</b></div><div class="r"><span>${esc(v.opis)}</span><b>${esc(cenaTxt(v))} zł</b></div>
-        <div class="r"><span>Stawka VAT</span><b>[stawka studia]</b></div><div class="r" style="border-top:1px solid #F0E8EC;padding-top:6px"><span>Razem brutto</span><b>${esc(cenaTxt(v))} zł</b></div>`;
+        <div class="r"><span>Stawka VAT</span><b>23%</b></div><div class="r" style="border-top:1px solid #F0E8EC;padding-top:6px"><span>Razem brutto</span><b>${esc(cenaTxt(v))} zł</b></div>`;
       $('#dok').showModal(); return;
     }
     if (a.dataset.a === 'karta' || a.dataset.a === 'przeloz') {

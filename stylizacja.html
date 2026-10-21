@@ -14,7 +14,7 @@
 h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
 .chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:13px;cursor:pointer}
-.chip[aria-pressed=true]{border-color:#9E1F50;background:#F6EDF1;color:#1E1A1D;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 .seg{flex:1;min-height:44px;border:0;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
 .seg+.seg{border-left:1px solid #E4D9DE}
 .seg[aria-pressed=true]{background:#F6EDF1;font-weight:700}
@@ -66,7 +66,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <div id="kiedy" data-choice role="group" aria-label="Kiedy" style="display:flex;gap:6px;flex-wrap:wrap">
       <button type="button" class="chip" aria-pressed="false" data-value="dzis">Dziś</button>
       <button type="button" class="chip" aria-pressed="true" data-value="tydzien">Ten tydzień</button>
-      <button type="button" class="chip" aria-pressed="false" data-value="miasto" id="chip-miasto">[miasto]</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="miasto" id="chip-miasto">Warszawa</button>
     </div>
     <div id="sort" data-choice role="group" aria-label="Sortuj" style="display:flex;border:1px solid #E4D9DE;border-radius:12px;overflow:hidden">
       <button type="button" class="seg" aria-pressed="true" data-value="cena">Najtaniej</button>
@@ -80,11 +80,11 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 
   <div class="d-main">
   <section id="lista" style="padding:12px 20px 0;display:flex;flex-direction:column;gap:10px">
-    <article class="st" data-n="[Studio 1]" data-cena="200" data-slot="2115" data-km="3" data-dzis="0" data-miasto="1">
+    <article class="st" data-n="Studio Malwa" data-cena="200" data-slot="2115" data-km="3" data-dzis="0" data-miasto="1">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-        <a href="salon.html?s=%5BStudio%201%5D" class="nm">
-          <span style="font-weight:700;font-size:16px">[Studio 1]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · ★ [ocena]</span>
+        <a href="salon.html?s=Studio%20Malwa" class="nm">
+          <span style="font-weight:700;font-size:16px">Studio Malwa</span>
+          <span style="color:#625860;font-size:13px">Mokotów · 3 km · ★ 4,9</span>
         </a>
         <span style="display:flex;flex-direction:column;align-items:flex-end">
           <span class="pr"><span data-bind="booking.cena">200</span> zł</span>
@@ -94,29 +94,29 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <div class="sl"><span style="font-size:13px;color:#625860">Najbliżej:</span><a href="termin.html">wt 11:15</a><a href="termin.html">wt 14:30</a></div>
     </article>
 
-    <article class="st" data-n="[Studio 2]" data-cena="210" data-slot="1110" data-km="1" data-dzis="1" data-miasto="1">
+    <article class="st" data-n="Pracownia Lilia" data-cena="210" data-slot="1110" data-km="1" data-dzis="1" data-miasto="1">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-        <a href="salon.html?s=%5BStudio%202%5D" class="nm">
-          <span style="font-weight:700;font-size:16px">[Studio 2]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · ★ [ocena]</span>
+        <a href="salon.html?s=Pracownia%20Lilia" class="nm">
+          <span style="font-weight:700;font-size:16px">Pracownia Lilia</span>
+          <span style="color:#625860;font-size:13px">Żoliborz · 1 km · ★ 4,8</span>
         </a>
         <span style="display:flex;flex-direction:column;align-items:flex-end">
-          <span class="pr">[cena]</span>
-          <span style="color:#625860;font-size:12px">[czas]</span>
+          <span class="pr">210 zł</span>
+          <span style="color:#625860;font-size:12px">ok. 1 h 50 min</span>
         </span>
       </div>
       <div class="sl"><span style="font-size:13px;color:#625860">Najbliżej:</span><a href="termin.html">dziś 18:30</a><a href="termin.html">śr 9:00</a></div>
     </article>
 
-    <article class="st" data-n="[Studio 3]" data-cena="225" data-slot="6780" data-km="2" data-dzis="0" data-miasto="1">
+    <article class="st" data-n="Atelier Nude" data-cena="225" data-slot="6780" data-km="2" data-dzis="0" data-miasto="1">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-        <a href="salon.html?s=%5BStudio%203%5D" class="nm">
-          <span style="font-weight:700;font-size:16px">[Studio 3]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · ★ [ocena]</span>
+        <a href="salon.html?s=Atelier%20Nude" class="nm">
+          <span style="font-weight:700;font-size:16px">Atelier Nude</span>
+          <span style="color:#625860;font-size:13px">Śródmieście · 2 km · ★ 4,7</span>
         </a>
         <span style="display:flex;flex-direction:column;align-items:flex-end">
-          <span class="pr">[cena]</span>
-          <span style="color:#625860;font-size:12px">[czas]</span>
+          <span class="pr">225 zł</span>
+          <span style="color:#625860;font-size:12px">ok. 1 h 50 min</span>
         </span>
       </div>
       <div class="sl"><span style="font-size:13px;color:#625860">Najbliżej:</span><a href="termin.html">pt 17:00</a></div>

@@ -9,20 +9,25 @@
 <link rel="stylesheet" href="mock.css">
 <link rel="stylesheet" href="desktop.css">
 <script src="mock.js" defer></script>
+<script src="szukaj.js" defer></script>
 <style>
 .app{width:100%;min-height:100vh;box-sizing:border-box;background:#FFFFFF;color:#1E1A1D;font-family:'DM Sans',sans-serif;font-size:15px;display:flex;flex-direction:column}
 h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .back{width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D;flex:none;background:#fff}
 .chip{min-height:44px;padding:0 12px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:13px;cursor:pointer}
-.chip[aria-pressed=true]{border-color:#9E1F50;background:#F6EDF1;color:#1E1A1D;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
 /* phone: quick filters in one swipeable row instead of three wrapped rows */
 #filtry{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
 #filtry .chip{flex:none;white-space:nowrap}
-.chip[aria-pressed=true]:not(#chip-kiedy):not(#mapa-btn)::before{content:"\2713\00a0";content:"\2713\00a0" / ""}
-.card{position:relative;border:1px solid #E4D9DE;border-radius:16px;overflow:hidden}
-.card>a.main{display:flex;gap:12px;padding:14px 56px 14px 14px;text-decoration:none;color:#1E1A1D}
+.chip[aria-pressed=true]:not(#mapa-btn)::before{content:"\2713\00a0";content:"\2713\00a0" / ""}
+.card{position:relative;border-radius:16px;overflow:hidden;background:#FFFFFF;box-shadow:0 1px 2px rgba(30,10,18,.06),0 8px 24px rgba(30,10,18,.07)}
+/* photo on top like the happy hours cards on the start page, heart on the photo */
+.card>a.main{display:flex;flex-direction:column;text-decoration:none;color:#1E1A1D}
+.card>a.main>img{width:100% !important;height:150px !important;border-radius:0 !important}
+.card>a.main>span{padding:12px 14px 4px}
+.cena-b{color:#9E1F50;font-weight:700}
 .card>a.main:hover{color:#1E1A1D}
-.heart{position:absolute;top:6px;right:6px;width:44px;height:44px;border:0;background:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9E1F50}
+.heart{position:absolute;top:10px;right:10px;width:44px;height:44px;border:0;background:#FFFFFF;box-shadow:0 2px 8px rgba(30,10,18,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9E1F50}
 .heart path{fill:none;stroke:#9E1F50;stroke-width:2;stroke-linejoin:round}
 .heart[aria-pressed=true] path{fill:#9E1F50}
 .slots{padding:0 14px 14px;display:flex;gap:6px;flex-wrap:wrap}
@@ -43,7 +48,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .zoom{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.28);background:#fff}
 .zoom button{width:44px;height:44px;border:0;background:#fff;color:#1E1A1D;font:inherit;font-size:22px;cursor:pointer}
 .zoom button+button{border-top:1px solid #E4D9DE}
-.card.sel{border-color:#9E1F50;box-shadow:0 0 0 1px #9E1F50}
+.card.sel{box-shadow:0 0 0 2px #9E1F50,0 8px 24px rgba(30,10,18,.07)}
 .sel{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;font:inherit;font-size:13px}
 .fl{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px}
 .fl input{width:22px;height:22px;margin:0}
@@ -69,10 +74,15 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   #mapa[hidden]{display:flex !important}
   #mapa{margin:12px 0 0 !important}
   #lista{padding-top:4px !important}
-  #filtry{flex-direction:column;align-items:flex-start;flex-wrap:wrap;overflow:visible}
-  .d-aside-left .o2{flex-direction:column;align-items:flex-start}
-  #filtry .chip,#wiecej,.d-aside-left .sel{min-height:44px}
-  .d-aside-left .sel{width:100%}
+  /* filters: one row above the list and the map instead of a narrow column */
+  .d-cols{flex-wrap:wrap;row-gap:0}
+  .d-aside-left{flex:1 1 100% !important;position:static !important;display:flex !important;flex-wrap:wrap;align-items:center;gap:8px;padding:4px 0 8px;border-bottom:1px solid #F0E8EC}
+  #filtry{flex-wrap:wrap;overflow:visible;padding:0 !important}
+  .d-aside-left .o2{align-items:center;padding:0 !important;margin-left:auto;gap:8px}
+  #filtry .chip,.d-aside-left .sel{min-height:44px}
+  /* two cards side by side next to the map */
+  #lista{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px !important;padding-left:0 !important;padding-right:0 !important}
+  #lista>:not(.card){grid-column:1/-1}
 }
 </style>
 </head>
@@ -80,22 +90,18 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
 <div class="app d-page">
 
-  <header style="padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F0E8EC">
+  <header style="padding:14px 20px;display:flex;align-items:flex-start;gap:10px">
     <a href="start.html" aria-label="Wróć" class="back">
       <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
     </a>
-    <a href="start.html" aria-label="Zmień wyszukiwanie" style="flex:1;min-width:0;min-height:44px;padding:0 14px;border-radius:12px;background:#F6EDF1;color:#1E1A1D;text-decoration:none;display:flex;flex-direction:column;justify-content:center">
-      <h1 id="h1" style="margin:0;font-family:inherit;font-weight:700;font-size:14px">Paznokcie · Dziś</h1>
-      <span id="h2" style="color:#625860;font-size:12px">[miasto, dzielnica]</span>
-    </a>
+    <form id="szukaj" role="search" aria-label="Zmień wyszukiwanie" style="flex:1;min-width:0"></form>
   </header>
 
   <div class="d-cols">
   <!-- on the phone the wrappers vanish (display:contents) and "order" restores the original sequence -->
   <div class="d-aside d-aside-left">
-  <div id="filtry" class="o1" data-choice="multi" role="group" aria-label="Filtry" style="padding:12px 20px 0;display:flex;gap:6px">
-    <button type="button" class="chip" aria-pressed="true" data-f="kiedy" id="chip-kiedy">Dziś ✕</button>
-    <button type="button" class="chip" aria-pressed="false" data-f="teraz" id="chip-teraz">Wolne w ciągu 2 h</button>
+  <div id="filtry" class="o1" role="group" aria-label="Filtry" style="padding:12px 20px 0;display:flex;gap:6px">
+    <button type="button" class="flt" id="filtry-btn" style="min-height:44px;flex:none">Filtry<i hidden></i></button>
     <button type="button" class="chip" aria-pressed="false" data-f="po16">Po 16:00</button>
     <button type="button" class="chip" aria-pressed="false" data-f="do200">Do 200 zł</button>
     <button type="button" class="chip" aria-pressed="false" data-f="blik">BLIK / karta</button>
@@ -103,7 +109,6 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <button type="button" class="chip" aria-pressed="false" data-f="hh" id="chip-hh">Happy hours</button>
   </div>
   <div class="o2" style="padding:8px 20px 0;display:flex;justify-content:space-between;align-items:center;gap:10px">
-    <button type="button" id="wiecej" class="chip" data-open="#dlg-filtry" style="flex:none">Więcej filtrów</button>
     <span id="szukano" hidden style="color:#625860;font-size:12px"></span>
     <label for="sort" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Sortuj</label>
     <select id="sort" class="sel" style="margin-left:auto"><option value="slot">Najbliższy termin</option><option value="km">Najbliżej</option><option value="cena">Najtaniej</option></select>
@@ -118,69 +123,69 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 
   <section id="lista" class="o6" style="padding:12px 20px 0;display:flex;flex-direction:column;gap:12px">
 
-    <article class="card" data-n="[Studio 1]" data-kat="paznokcie rzęsy" data-cena="140" data-km="1.2" data-slot="870" data-po16="1" data-pay="blik karta gotówka" data-udog="parking klimatyzacja" data-px="24" data-py="34">
-      <a class="main" href="salon.html?s=%5BStudio%201%5D">
-        <img src="zdjecia/k-paznokcie.jpg" alt="Stylizacja paznokci w [Studio 1]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+    <article class="card" data-n="Studio Malwa" data-kat="paznokcie rzęsy" data-cena="140" data-km="1.2" data-slot="870" data-po16="1" data-pay="blik karta gotówka" data-udog="parking klimatyzacja" data-px="24" data-py="34">
+      <a class="main" href="salon.html?s=Studio%20Malwa">
+        <img src="zdjecia/k-paznokcie.jpg" alt="Stylizacja paznokci w Studio Malwa" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
         <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <span style="font-weight:700;font-size:16px">[Studio 1]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,9</b> · 128 opinii</span></span>
-          <span style="font-size:13px">Manicure hybrydowy od 140 zł · od 1 h 15</span>
+          <span style="font-weight:700;font-size:16px">Studio Malwa</span>
+          <span style="color:#625860;font-size:13px">Mokotów · 1,2 km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,9</b> · 128 opinii</span></span>
+          <span style="font-size:13px">Manicure hybrydowy <b class="cena-b">od 140 zł</b> · od 1 h 15</span>
         </span>
       </a>
-      <button type="button" class="heart" aria-label="Dodaj [Studio 1] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <button type="button" class="heart" aria-label="Dodaj Studio Malwa do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
       <div class="slots"><a href="termin.html">14:30</a><a href="termin.html">16:40</a><a href="termin.html" class="o">Inne dni</a></div>
     </article>
 
-    <article class="card" data-n="[Studio 3]" data-kat="paznokcie kosmetyka" data-cena="230" data-km="2.4" data-slot="1080" data-po16="1" data-pay="blik karta" data-udog="klimatyzacja bez-schodow" data-px="68" data-py="78">
+    <article class="card" data-n="Atelier Nude" data-kat="paznokcie kosmetyka" data-cena="230" data-km="2.4" data-slot="1080" data-po16="1" data-pay="blik karta" data-udog="klimatyzacja bez-schodow" data-px="68" data-py="78">
       <div style="padding:8px 14px;background:#FAF6F8;font-size:12px;color:#625860;display:flex;justify-content:space-between;gap:8px;align-items:center"><span><b style="color:#1E1A1D">Reklama</b> · studio płaci za wyróżnienie</span><a href="#dlaczego" data-open="#dlg-reklama" style="font-size:12px;min-height:44px;display:flex;align-items:center">Dlaczego to widzę?</a></div>
-      <a class="main" href="salon.html?s=%5BStudio%203%5D">
-        <img src="zdjecia/dlon-2-mini.jpg" alt="Dłoń z manicure w [Studio 3]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+      <a class="main" href="salon.html?s=Atelier%20Nude">
+        <img src="zdjecia/dlon-2.jpg" alt="Dłoń z manicure w Atelier Nude" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
         <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <span style="font-weight:700;font-size:16px">[Studio 3]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,7</b> · 86 opinii</span></span>
-          <span style="font-size:13px">Manicure hybrydowy od [cena]</span>
+          <span style="font-weight:700;font-size:16px">Atelier Nude</span>
+          <span style="color:#625860;font-size:13px">Śródmieście · 2,4 km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,7</b> · 86 opinii</span></span>
+          <span style="font-size:13px">Manicure hybrydowy <b class="cena-b">od 230 zł</b></span>
         </span>
       </a>
-      <button type="button" class="heart" aria-label="Dodaj [Studio 3] do ulubionych" aria-pressed="false" style="top:44px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <button type="button" class="heart" aria-label="Dodaj Atelier Nude do ulubionych" aria-pressed="false" style="top:44px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
       <div class="slots"><a href="termin.html">18:00</a><a href="termin.html" class="o">Inne dni</a></div>
     </article>
 
-    <article class="card" data-n="[Studio 2]" data-kat="paznokcie rzęsy brwi" data-cena="170" data-km="1.9" data-slot="1155" data-po16="1" data-pay="karta gotówka" data-udog="parking" data-px="84" data-py="34">
-      <a class="main" href="salon.html?s=%5BStudio%202%5D">
-        <img src="zdjecia/dlon-1-mini.jpg" alt="Dłoń z żelowym manicure w [Studio 2]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+    <article class="card" data-n="Pracownia Lilia" data-kat="paznokcie rzęsy brwi" data-cena="170" data-km="1.9" data-slot="1155" data-po16="1" data-pay="karta gotówka" data-udog="parking" data-px="84" data-py="34">
+      <a class="main" href="salon.html?s=Pracownia%20Lilia">
+        <img src="zdjecia/dlon-1.jpg" alt="Dłoń z żelowym manicure w Pracownia Lilia" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
         <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <span style="font-weight:700;font-size:16px">[Studio 2]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,8</b> · 64 opinii</span></span>
-          <span style="font-size:13px">Żel na naturalnej płytce od [cena]</span>
+          <span style="font-weight:700;font-size:16px">Pracownia Lilia</span>
+          <span style="color:#625860;font-size:13px">Żoliborz · 1,9 km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,8</b> · 64 opinii</span></span>
+          <span style="font-size:13px">Żel na naturalnej płytce <b class="cena-b">od 170 zł</b></span>
         </span>
       </a>
-      <button type="button" class="heart" aria-label="Dodaj [Studio 2] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <button type="button" class="heart" aria-label="Dodaj Pracownia Lilia do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
       <div class="slots"><a href="termin.html">19:15</a><a href="termin.html" class="o">Inne dni</a></div>
     </article>
 
-    <article class="card" data-n="[Studio 4]" data-kat="rzęsy brwi" data-cena="160" data-km="3.1" data-slot="720" data-po16="1" data-pay="blik karta gotówka" data-udog="bez-schodow wifi" data-px="16" data-py="72">
-      <a class="main" href="salon.html?s=%5BStudio%204%5D">
-        <img src="zdjecia/k-rzesy.jpg" alt="Rzęsy po przedłużaniu w [Studio 4]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+    <article class="card" data-n="Lash Room Iga" data-kat="rzęsy brwi" data-cena="160" data-km="3.1" data-slot="720" data-po16="1" data-pay="blik karta gotówka" data-udog="bez-schodow wifi" data-px="16" data-py="72">
+      <a class="main" href="salon.html?s=Lash%20Room%20Iga">
+        <img src="zdjecia/k-rzesy.jpg" alt="Rzęsy po przedłużaniu w Lash Room Iga" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
         <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <span style="font-weight:700;font-size:16px">[Studio 4]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,6</b> · 203 opinii</span></span>
-          <span style="font-size:13px">Rzęsy 2D–3D od [cena]</span>
+          <span style="font-weight:700;font-size:16px">Lash Room Iga</span>
+          <span style="color:#625860;font-size:13px">Wola · 3,1 km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,6</b> · 203 opinii</span></span>
+          <span style="font-size:13px">Rzęsy 2D–3D <b class="cena-b">od 160 zł</b></span>
         </span>
       </a>
-      <button type="button" class="heart" aria-label="Dodaj [Studio 4] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <button type="button" class="heart" aria-label="Dodaj Lash Room Iga do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
       <div class="slots"><a href="termin.html">12:00</a><a href="termin.html">17:30</a><a href="termin.html" class="o">Inne dni</a></div>
     </article>
 
-    <article class="card" data-n="[Studio 5]" data-kat="fryzjer" data-cena="120" data-km="4.2" data-slot="900" data-po16="0" data-pay="gotówka" data-udog="" data-px="38" data-py="19">
-      <a class="main" href="salon.html?s=%5BStudio%205%5D">
-        <img src="zdjecia/k-fryzjer.jpg" alt="Fryzura po koloryzacji w [Studio 5]" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
+    <article class="card" data-n="Salon Loft" data-kat="fryzjer" data-cena="120" data-km="4.2" data-slot="900" data-po16="0" data-pay="gotówka" data-udog="" data-px="38" data-py="19">
+      <a class="main" href="salon.html?s=Salon%20Loft">
+        <img src="zdjecia/k-fryzjer.jpg" alt="Fryzura po koloryzacji w Salon Loft" width="88" height="88" loading="lazy" style="width:88px;height:88px;object-fit:cover;border-radius:12px;background:#EDE6E2;flex:none">
         <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <span style="font-weight:700;font-size:16px">[Studio 5]</span>
-          <span style="color:#625860;font-size:13px">[dzielnica] · [x] km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,9</b> · 41 opinii</span></span>
-          <span style="font-size:13px">Strzyżenie od [cena]</span>
+          <span style="font-weight:700;font-size:16px">Salon Loft</span>
+          <span style="color:#625860;font-size:13px">Praga-Południe · 4,2 km · <span style="white-space:nowrap"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" style="vertical-align:-1px"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z" fill="#9E1F50"/></svg> <b style="color:#1E1A1D">4,9</b> · 41 opinii</span></span>
+          <span style="font-size:13px">Strzyżenie <b class="cena-b">od 120 zł</b></span>
         </span>
       </a>
-      <button type="button" class="heart" aria-label="Dodaj [Studio 5] do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
+      <button type="button" class="heart" aria-label="Dodaj Salon Loft do ulubionych" aria-pressed="false"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg></button>
       <div class="slots"><a href="termin.html">15:00</a><a href="termin.html" class="o">Inne dni</a></div>
     </article>
 
@@ -202,9 +207,9 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
           <rect x="278" y="196" width="60" height="30" rx="4"/><rect x="284" y="262" width="56" height="34" rx="4"/><rect x="20" y="276" width="86" height="30" rx="4"/>
         </g>
         <path d="M-10 346 C70 312 150 372 236 330 S350 292 380 306 L380 340 C350 330 280 360 236 366 C150 410 70 352 -10 380Z" fill="#BFD9EA"/>
-        <text x="30" y="368" font-size="10" font-style="italic" fill="#5C8BAA" transform="rotate(-9 30 368)">[rzeka]</text>
+        <text x="30" y="368" font-size="10" font-style="italic" fill="#5C8BAA" transform="rotate(-9 30 368)">Wisła</text>
         <rect x="206" y="44" width="124" height="70" rx="18" fill="#CDE3C2"/>
-        <text x="236" y="84" font-size="10" fill="#4F7A45">[park]</text>
+        <text x="236" y="84" font-size="10" fill="#4F7A45">Pole Mokotowskie</text>
         <g fill="none" stroke-linecap="round">
           <path d="M-10 176 L370 164" stroke="#DCD5C6" stroke-width="16"/><path d="M-10 176 L370 164" stroke="#FFFFFF" stroke-width="12"/>
           <path d="M136 -10 L152 410" stroke="#DCD5C6" stroke-width="14"/><path d="M136 -10 L152 410" stroke="#FFFFFF" stroke-width="10"/>
@@ -213,10 +218,10 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
           <path d="M-10 258 L370 236" stroke="#DCD5C6" stroke-width="10"/><path d="M-10 258 L370 236" stroke="#FFFFFF" stroke-width="7"/>
         </g>
         <g font-size="9" fill="#625860">
-          <text x="16" y="170" transform="rotate(-1.8 16 170)">[ulica]</text>
-          <text x="156" y="128" transform="rotate(87 156 128)">[ulica]</text>
-          <text x="290" y="96" transform="rotate(2.2 290 96)">[ulica]</text>
-          <text x="30" y="252" transform="rotate(-3.4 30 252)">[ulica]</text>
+          <text x="16" y="170" transform="rotate(-1.8 16 170)">Puławska</text>
+          <text x="156" y="128" transform="rotate(87 156 128)">Rakowiecka</text>
+          <text x="290" y="96" transform="rotate(2.2 290 96)">Madalińskiego</text>
+          <text x="30" y="252" transform="rotate(-3.4 30 252)">Odyńca</text>
         </g>
         <circle cx="190" cy="212" r="18" fill="#2F5A86" fill-opacity=".18"/>
         <circle cx="190" cy="212" r="7" fill="#2F5A86" stroke="#FFFFFF" stroke-width="2.5"/>
@@ -245,36 +250,6 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   </nav>
 </div>
 
-<dialog id="dlg-filtry" aria-labelledby="dlg-f-t">
-  <form id="f-form" style="display:flex;flex-direction:column;gap:14px">
-    <h2 id="dlg-f-t" style="margin:0;font-size:18px">Więcej filtrów</h2>
-    <fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:6px">
-      <legend style="font-weight:700;font-size:14px;padding:0;margin-bottom:6px">Cena usługi od–do (zł)</legend>
-      <div style="display:flex;gap:10px;align-items:center">
-        <input class="inp" id="cena-od" type="number" min="0" inputmode="numeric" placeholder="od" aria-label="Cena od">
-        <span aria-hidden="true">–</span>
-        <input class="inp" id="cena-do" type="number" min="0" inputmode="numeric" placeholder="do" aria-label="Cena do">
-      </div>
-    </fieldset>
-    <fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column">
-      <legend style="font-weight:700;font-size:14px;padding:0;margin-bottom:4px">Płatność</legend>
-      <label class="fl"><input type="checkbox" name="pay" value="blik">BLIK</label>
-      <label class="fl"><input type="checkbox" name="pay" value="karta">Karta</label>
-      <label class="fl"><input type="checkbox" name="pay" value="gotówka">Gotówka</label>
-    </fieldset>
-    <fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column">
-      <legend style="font-weight:700;font-size:14px;padding:0;margin-bottom:4px">Udogodnienia</legend>
-      <label class="fl"><input type="checkbox" name="udog" value="parking">Parking</label>
-      <label class="fl"><input type="checkbox" name="udog" value="klimatyzacja">Klimatyzacja</label>
-      <label class="fl"><input type="checkbox" name="udog" value="bez-schodow">Wejście bez schodów</label>
-      <label class="fl"><input type="checkbox" name="udog" value="wifi">Wi‑Fi</label>
-    </fieldset>
-    <div style="display:flex;gap:8px">
-      <button type="button" class="btn-o" id="f-reset" style="flex:1">Wyczyść</button>
-      <button type="submit" class="btn" style="flex:1">Pokaż wyniki</button>
-    </div>
-  </form>
-</dialog>
 
 <dialog id="dlg-reklama" aria-labelledby="dlg-r-t">
   <div style="display:flex;flex-direction:column;gap:12px">
@@ -288,45 +263,49 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
   const cards = [...document.querySelectorAll('article.card')];
-  const search = Mock.get('search', {}) || {};
   const CATS = ['paznokcie', 'rzęsy', 'brwi', 'fryzjer', 'kosmetyka'];
-  const kiedy = search.kiedy || 'Dziś';
-  const q = (search.q || '').trim();
-  const kat = CATS.find(c => c === q.toLowerCase());
-  // studios with a happy-hours offer today (mock today = Monday 19.10.2026): [Studio 1] from the studio's offers, [Studio 2] is a fixed example
-  const HH_STUDIA = Mock.happyToday().length ? ['[Studio 1]', '[Studio 2]'] : [];
-  const F = { teraz: false, po16: false, do200: false, blik: false, km2: false, hh: false, od: null, do: null, pay: [], udog: [] };
-  let favs = Mock.get('favorites', []);
-
-  $('#h1').textContent = `${q || 'Wszystkie usługi'} · ${kiedy}`;
-  $('#h2').textContent = search.miasto || '[miasto, dzielnica]';
-  $('#chip-kiedy').textContent = `${kiedy} ✕`;
-  $('#kiedy-t').textContent = kiedy === 'Teraz' ? 'w ciągu 2 godzin' : kiedy === 'Dziś' ? 'dziś' : kiedy === 'Jutro' ? 'jutro' : kiedy === 'Ten tydzień' ? 'w tym tygodniu' : `(${kiedy})`;
-  const kt0 = $('#kiedy-t').textContent;
-  if (q && !kat) { $('#szukano').hidden = false; $('#szukano').textContent = `Szukano: „${q}”. Pokazujemy wszystkie studia.`; }
-
+  // studios with a happy-hours offer today: Studio Malwa from the studio's offers, Pracownia Lilia is a fixed example
+  const HH_STUDIA = Mock.happyToday().length ? ['Studio Malwa', 'Pracownia Lilia'] : [];
+  let favs = Mock.get('favorites', []), search, kat, f;
   const T0 = Mock.teraz(), terazMin = T0.getHours() * 60 + T0.getMinutes();
-  if (kiedy === 'Teraz') { F.teraz = true; $('#chip-teraz').setAttribute('aria-pressed', 'true'); }
-  if (kiedy !== 'Dziś' && kiedy !== 'Teraz') $('#chip-teraz').hidden = true; // "now" only makes sense for today
   const plural = n => (n === 1 ? 'studio' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'studia' : 'studiów');
   const fmt = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
-
-  function ok(c) {
-    const d = c.dataset;
+  const KT = { Teraz: 'w ciągu 2 godzin', 'Dziś': 'dziś', Jutro: 'jutro', 'Ten tydzień': 'w tym tygodniu', Weekend: 'w weekend' };
+  // search from the card (usługa, gdzie, kiedy); filters from the shared sheet and the quick chips
+  function ustaw() {
+    search = Mock.get('search', {}) || {};
+    const q = (search.q || '').trim(), kiedy = search.kiedy || 'Dziś';
+    kat = CATS.find(c => c === q.toLowerCase());
+    $('#kiedy-t').textContent = KT[kiedy] || kiedy;
+    $('#szukano').hidden = !q || !!kat;
+    $('#szukano').textContent = `Szukano: „${q}”. Pokazujemy wszystkie studia.`;
+    linki();
+  }
+  // quick chips are shortcuts to fields of the filters sheet
+  const SKROT = {
+    po16: [x => x.godz === 'po16', (x, on) => ({ ...x, godz: on ? 'po16' : '' })],
+    do200: [x => x.do === 200, (x, on) => ({ ...x, do: on ? 200 : null })],
+    blik: [x => x.pay.includes('blik') || x.pay.includes('karta'), (x, on) => ({ ...x, pay: on ? ['blik', 'karta'] : [] })],
+    km2: [x => x.km === 2, (x, on) => ({ ...x, km: on ? 2 : 0 })],
+    hh: [x => x.hh, (x, on) => ({ ...x, hh: on })],
+  };
+  function ok(c, F = f) {
+    const d = c.dataset, slot = +d.slot;
     if (kat && !d.kat.split(' ').includes(kat)) return false;
-    if (F.teraz && !(+d.slot >= terazMin && +d.slot <= terazMin + 120)) return false; // first free hour within 2 h from now
-    if (F.po16 && d.po16 !== '1') return false;
-    if (F.do200 && +d.cena > 200) return false;
-    if (F.blik && !/blik|karta/.test(d.pay)) return false;
-    if (F.km2 && +d.km > 2) return false;
-    if (F.hh && !HH_STUDIA.includes(d.n)) return false;
+    if (search.kiedy === 'Teraz' && !(slot >= terazMin && slot <= terazMin + 120)) return false; // first free hour within 2 h from now
+    if (F.godz === 'rano' && slot >= 720) return false;
+    if (F.godz === 'pol' && (slot < 720 || slot >= 960)) return false;
+    if (F.godz === 'po16' && d.po16 !== '1') return false;
     if (F.od !== null && +d.cena < F.od) return false;
     if (F.do !== null && +d.cena > F.do) return false;
+    if (F.km && +d.km > F.km) return false;
+    if (F.hh && !HH_STUDIA.includes(d.n)) return false;
     if (F.pay.length && !F.pay.some(p => d.pay.split(' ').includes(p))) return false;
     if (F.udog.length && !F.udog.every(u => d.udog.split(' ').includes(u))) return false;
     return true;
   }
   function apply() {
+    f = Szukaj.filtry();
     const key = $('#sort').value;
     const sorted = [...cards].sort((a, b) => key === 'slot' ? a.dataset.slot - b.dataset.slot : key === 'km' ? a.dataset.km - b.dataset.km : a.dataset.cena - b.dataset.cena);
     const anchor = $('#pusto');
@@ -335,39 +314,29 @@ document.addEventListener('DOMContentLoaded', () => {
     cards.forEach(c => { const v = ok(c); c.hidden = !v; if (v) n++; });
     $('#n').textContent = n; $('#n-s').textContent = plural(n);
     $('#pusto').hidden = n > 0;
-    const extra = (F.od !== null) + (F.do !== null) + F.pay.length + F.udog.length;
-    $('#wiecej').textContent = extra ? `Więcej filtrów (${extra})` : 'Więcej filtrów';
+    document.querySelectorAll('#filtry [data-f]').forEach(b => b.setAttribute('aria-pressed', String(SKROT[b.dataset.f][0](f))));
+    const ile = Szukaj.ile(f), fb = $('#filtry-btn');
+    fb.classList.toggle('on', ile > 0); fb.querySelector('i').hidden = !ile; fb.querySelector('i').textContent = ile;
+    fb.setAttribute('aria-label', ile ? `Filtry, włączone: ${ile}` : 'Filtry');
+    history.replaceState(null, '', Szukaj.url('wyniki.html')); // the address always shows the current search
     drawPins();
     return n;
   }
+  const policz = F => cards.filter(c => ok(c, F)).length;
+  console.assert(SKROT.blik[0]({ ...Szukaj.F0, pay: ['karta'] }) && !SKROT.do200[0](Szukaj.F0), 'wyniki skróty');
 
-  // chips
-  $('#filtry').addEventListener('mock:choice', e => {
-    const b = e.detail.button, on = b.getAttribute('aria-pressed') === 'true', f = b.dataset.f;
-    if (f !== 'kiedy') F[f] = on;
-    else $('#kiedy-t').textContent = on ? kt0 : 'w dowolnym dniu';
+  $('#filtry-btn').insertAdjacentHTML('afterbegin', '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>');
+  $('#filtry-btn').addEventListener('click', () => Szukaj.arkusz({ licz: policz, zastosuj: () => { const n = apply(); Mock.toast(`Zastosowano filtry · ${n} ${plural(n)}`); } }));
+  $('#filtry').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]'); if (!b) return;
+    const [jest, ustawF] = SKROT[b.dataset.f];
+    Mock.set('filtry', ustawF(Szukaj.filtry(), !jest(Szukaj.filtry())));
     apply();
   });
   $('#sort').addEventListener('change', apply);
-
-  // more filters dialog
-  $('#f-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const num = id => (document.getElementById(id).value === '' ? null : +document.getElementById(id).value);
-    F.od = num('cena-od'); F.do = num('cena-do');
-    F.pay = [...document.querySelectorAll('[name=pay]:checked')].map(i => i.value);
-    F.udog = [...document.querySelectorAll('[name=udog]:checked')].map(i => i.value);
-    $('#dlg-filtry').close();
-    const n = apply();
-    Mock.toast(`Zastosowano filtry · ${n} ${plural(n)}`);
-  });
-  const clearDialog = () => { document.querySelectorAll('#f-form input').forEach(i => (i.type === 'checkbox' ? (i.checked = false) : (i.value = ''))); F.od = F.do = null; F.pay = []; F.udog = []; };
-  $('#f-reset').addEventListener('click', () => { clearDialog(); apply(); Mock.toast('Wyczyszczono dodatkowe filtry'); });
-  $('#wyczysc').addEventListener('click', () => {
-    clearDialog(); ['teraz', 'po16', 'do200', 'blik', 'km2', 'hh'].forEach(k => (F[k] = false));
-    document.querySelectorAll('#filtry [data-f]').forEach(b => { if (b.dataset.f !== 'kiedy') b.setAttribute('aria-pressed', 'false'); });
-    apply();
-  });
+  $('#wyczysc').addEventListener('click', () => { Mock.set('filtry', { ...Szukaj.F0 }); apply(); });
+  Szukaj.zUrl(); // a link with ?q=…&kiedy=…&do=… sets the search and the filters
+  Szukaj.karta($('#szukaj'), { zwijana: true, onSzukaj: () => { ustaw(); apply(); Mock.toast('Zaktualizowano wyszukiwanie'); } });
 
   // favourites
   const paintHearts = () => cards.forEach(c => c.querySelector('.heart').setAttribute('aria-pressed', String(favs.includes(c.dataset.n))));
@@ -380,17 +349,19 @@ document.addEventListener('DOMContentLoaded', () => {
     Mock.toast(favs.includes(n) ? `Dodano ${n} do ulubionych` : `Usunięto ${n} z ulubionych`);
   });
 
-  // slot links carry studio, day and hour: termin.html?s=[Studio 1]&t=14:30&d=19 (mock "today" = Monday 19.10, "Jutro" = 20.10)
-  const dzienSzukania = search.kiedy === 'Jutro' ? 1 : 0, /* "Teraz" and "Dziś" are today */ DNI = { 0: Mock.krotko(Mock.dzien(0)), 1: Mock.krotko(Mock.dzien(1)) }; // d = days from today
-  document.querySelectorAll('.slots a').forEach(a => {
-    const studio = a.closest('.card').dataset.n, godzina = a.classList.contains('o') ? '' : a.textContent.trim();
-    a.href = `termin.html?s=${encodeURIComponent(studio)}` + (godzina ? `&t=${godzina}&d=${dzienSzukania}` : '');
-    a.addEventListener('click', () => {
-      let b = Mock.get('booking', {}) || {};
-      if (b.uslugi && b.studio !== studio) b = {}; // a cart belongs to one studio
-      Mock.set('booking', { ...b, studio, ...(godzina ? { dzien: DNI[dzienSzukania], godzina } : {}) });
+  // slot links carry studio, day and hour: termin.html?s=Studio Malwa&t=14:30&d=1 (d = days from today, from "Kiedy")
+  function linki() {
+    const dni = search.dni ?? (search.kiedy === 'Jutro' ? 1 : 0), dzien = Mock.krotko(Mock.dzien(dni));
+    document.querySelectorAll('.slots a').forEach(a => {
+      const studio = a.closest('.card').dataset.n, godzina = a.classList.contains('o') ? '' : a.textContent.trim();
+      a.href = `termin.html?s=${encodeURIComponent(studio)}` + (godzina ? `&t=${godzina}&d=${dni}` : '');
+      a.onclick = () => {
+        let b = Mock.get('booking', {}) || {};
+        if (b.uslugi && b.studio !== studio) b = {}; // a cart belongs to one studio
+        Mock.set('booking', { ...b, studio, ...(godzina ? { dzien, godzina } : {}) });
+      };
     });
-  });
+  }
 
   // map
   let mapOn = false, pinned = null;
@@ -420,8 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#mapa-btn').textContent = mapOn ? 'Pokaż listę' : 'Pokaż mapę';
     $('#mapa-btn').setAttribute('aria-pressed', String(mapOn));
   });
-  if (search.hh) { F.hh = true; $('#chip-hh').setAttribute('aria-pressed', 'true'); Mock.set('search', { ...search, hh: false }); } // arrived from "Happy hours dziś" on the start page
-  apply();
+  ustaw(); apply();
 });
 </script>
 </body>

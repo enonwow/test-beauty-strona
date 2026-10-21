@@ -16,7 +16,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .sec{padding:22px 20px 0;display:flex;flex-direction:column;gap:10px}
 .sec h2{margin:0;font-size:14px;font-weight:700;font-family:inherit}
 .chip{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer}
-.chip[aria-pressed=true]{border:2px solid #9E1F50;background:#F6EDF1;font-weight:700}
+.chip[aria-pressed=true]{border-color:#9E1F50;background:#FFFFFF;color:#9E1F50;font-weight:700;box-shadow:inset 0 0 0 1px #9E1F50}
+#cena-txt s{color:#625860;font-weight:400}
 .chip[aria-pressed=true]::before,.slot[aria-pressed=true] b::before{content:"\2713\00a0";content:"\2713\00a0" / ""}
 .day[aria-pressed=true]::before{content:"\2713";content:"\2713" / "";position:absolute;top:3px;right:5px;font-size:11px}
 .day{position:relative;min-height:60px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:0}
@@ -79,12 +80,12 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <div class="d-cols">
   <!-- phone: wrappers vanish and "order" keeps the old sequence; desktop: summary + button stick on the right -->
   <div class="d-aside">
-  <div class="o1" style="margin:16px 20px 0;padding:14px;border-radius:14px;background:#F6EDF1;display:flex;flex-direction:column;gap:10px">
+  <div class="o1" style="margin:16px 20px 0;padding:14px;border-radius:14px;background:#FFFFFF;box-shadow:0 1px 2px rgba(30,10,18,.06),0 8px 24px rgba(30,10,18,.07);display:flex;flex-direction:column;gap:10px">
     <div style="display:flex;gap:12px;align-items:center">
       <img id="sum-foto" src="zdjecia/k-paznokcie.jpg" alt="" width="52" height="52" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
       <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
         <span id="opis-sum" style="font-weight:500" data-bind="booking.opis">Manicure hybrydowy · M · velvet × 10</span>
-        <span style="color:#625860;font-size:13px"><span id="cena-txt">200 zł</span> · <span id="czas-txt">1 h 50 min</span> · <span data-bind="booking.studio">[Studio 1]</span></span>
+        <span style="color:#625860;font-size:13px"><span id="cena-txt" style="color:#9E1F50;font-weight:700">200 zł</span> · <span id="czas-txt">1 h 50 min</span> · <span data-bind="booking.studio">Studio Malwa</span></span>
       </div>
       <a id="zmien" href="paznokcie.html" style="font-size:14px;font-weight:500;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center">Zmień</a>
     </div>
@@ -111,7 +112,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <input id="zad" type="checkbox" checked style="width:22px;height:22px;margin:0;flex:none">
       <span>Makieta: studio wymaga zaliczki (<b id="zad-kw">60</b> zł, przykładowo 30% ceny)</span>
     </label>
-    <span style="color:#625860;font-size:12px;line-height:1.4">Bez konta i bez aplikacji. Zasady odwołania: [zasady studia]. Reszta płatna w studiu. Gdy studio wymaga zaliczki, następny krok to <a href="zadatek.html">płatność BLIK</a>.</span>
+    <span style="color:#625860;font-size:12px;line-height:1.4">Bez konta i bez aplikacji. Zasady odwołania: bezpłatnie do 24 h przed wizytą. Reszta płatna w studiu. Gdy studio wymaga zaliczki, następny krok to <a href="zadatek.html">płatność BLIK</a>.</span>
     <button id="rez-btn" type="submit" form="rez" class="btn"><span id="btn-txt">Rezerwuję · 200 zł</span></button>
   </div>
   </div>
@@ -140,7 +141,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <button type="button" class="chip" aria-pressed="false" data-value="dojazd">Dojazd do mnie</button>
     </div>
     <div id="dojazd-box" hidden style="display:flex;flex-direction:column;gap:10px">
-      <div class="fld"><label for="d-adres">Adres wizyty</label><input id="d-adres" class="inp" type="text" autocomplete="street-address" placeholder="[ulica, numer, miasto]" aria-describedby="d-adres-err">
+      <div class="fld"><label for="d-adres">Adres wizyty</label><input id="d-adres" class="inp" type="text" autocomplete="street-address" placeholder="ul. Puławska 24, Warszawa" aria-describedby="d-adres-err">
         <span id="d-adres-err" class="err" hidden></span></div>
       <div class="fld"><label for="d-strefa">Strefa dojazdu (opłata za dojazd, przykładowo)</label>
         <select id="d-strefa" class="inp"><option value="0">do 10 km · 30 zł</option><option value="1">do 20 km · 50 zł</option></select></div>
@@ -152,8 +153,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <h2>Stylistka</h2>
     <div id="styl" data-choice role="group" aria-label="Stylistka" style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="chip" aria-pressed="true" data-value="Dowolna">Dowolna</button>
-      <button type="button" class="chip" aria-pressed="false" data-value="[Stylistka 1]">[Stylistka 1]</button>
-      <button type="button" class="chip" aria-pressed="false" data-value="[Stylistka 2]">[Stylistka 2]</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="Magda">Magda</button>
+      <button type="button" class="chip" aria-pressed="false" data-value="Ewelina">Ewelina</button>
     </div>
   </section>
 
@@ -191,7 +192,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <span id="tel-err" class="err" hidden></span>
     </div>
     <label id="karn-w" hidden style="display:flex;gap:10px;align-items:center;min-height:44px;padding:8px 12px;border-radius:12px;background:#E6F2EC;color:#1F6B47;font-size:14px;line-height:1.35"><input id="karn" type="checkbox" checked style="width:22px;height:22px;margin:0;flex:none"><span id="karn-txt"></span></label>
-    <div class="fld">
+    <div class="fld" id="kod-fld">
       <label for="kod">Kod rabatowy (opcjonalnie)</label>
       <div style="display:flex;gap:8px"><input id="kod" class="inp" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="kod-info" style="text-transform:uppercase"><button type="button" id="kod-ok" class="btn-o" style="flex:none">Zastosuj</button></div>
       <span id="kod-info" role="status" style="font-size:13px;line-height:1.4"></span>
@@ -247,7 +248,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
-  const DEF = { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy · M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: '[Studio 1]' };
+  const DEF = { kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Manicure hybrydowy · M · velvet × 10', cena: 200, czas: 110, czasTekst: '1 h 50 min', studio: 'Studio Malwa' };
   const qp = new URLSearchParams(location.search);
   const B0 = Mock.get('booking', {}) || {}, qs = qp.get('s');
   const B = qs && qs !== B0.studio ? { ...(B0.uslugi ? {} : B0), studio: qs } : B0; // another studio than the cart: start without the cart
@@ -412,16 +413,20 @@ document.addEventListener('DOMContentLoaded', () => {
   function setBtn() {
     if (przeloz) return;
     const pr = pricing();
-    $('#btn-txt').textContent = konsult ? 'Rezerwuję konsultację · 0 zł' : test48 && step === 1 ? 'Dalej: termin zabiegu' : `Rezerwuję · ${rng(pr.min, pr.max)}`;
+    // paid with a pass: say so instead of "0 zł", which reads like a price error
+    const kt = karnet(), po = pr.karnet && kt.s.t === 'pakiet' ? kt.s.ile - 1 : null;
+    const zost = po === null ? '' : !po ? ', ostatnia wizyta z karnetu' : ', po wizycie ' + Mock.zostalo(po);
+    const dop = pr.D ? ` + ${pr.D} zł dojazdu` : '';
+    $('#btn-txt').textContent = konsult ? 'Rezerwuję konsultację · 0 zł' : test48 && step === 1 ? 'Dalej: termin zabiegu' : pr.karnet ? `Rezerwuję z karnetu${dop}` : `Rezerwuję · ${rng(pr.min, pr.max)}`;
     $('#zad-kw').textContent = Math.ceil((B.seria && B.seria.zaZabieg || pr.max) * 0.3);
     if (!konsult) { $('#zad-lab').hidden = cenaMax === 0 || !!pr.karnet; krokZal(); } // a visit paid with a pass needs no deposit
     // price line + discount box in the summary
-    if (!konsult) $('#cena-txt').innerHTML = pr.p ? `<s>${rng(pr.rMin + pr.D, pr.rMax + pr.D)}</s> <b>${rng(pr.min, pr.max)}</b>` : rng(pr.min, pr.max);
+    if (!konsult) $('#cena-txt').innerHTML = pr.karnet ? `z karnetu${dop}${zost}` : pr.p ? `<s>${rng(pr.rMin + pr.D, pr.rMax + pr.D)}</s> <b>${rng(pr.min, pr.max)}</b>` : rng(pr.min, pr.max);
     const L = [];
     if (pr.o > 1) L.push(['Liczba osób', `× ${pr.o}`]);
     if (pr.D) L.push([`Dojazd do klientki (${STREFY[sel.strefa].strefa})`, `+${pr.D} zł`]);
-    const kt = karnet(); $('#karn-w').hidden = !kt;
-    if (kt) $('#karn-txt').textContent = `Rozlicz z karnetu „${kt.s.n}” (${kt.s.t === 'pakiet' ? 'zostało ' + Mock.plural(kt.s.ile, ['wizyta', 'wizyty', 'wizyt']) : 'ważny do ' + kt.s.do})`;
+    $('#karn-w').hidden = !kt; $('#kod-fld').hidden = !!pr.karnet; // a code changes nothing on a visit paid with a pass
+    if (kt) $('#karn-txt').textContent = `Rozlicz z karnetu „${kt.s.n}” (${kt.s.t === 'pakiet' ? Mock.zostalo(kt.s.ile) : 'ważny do ' + kt.s.do})`;
     if (pr.karnet) L.push([`Z karnetu: ${pr.karnet.n}`, `−${pr.rMax} zł`]);
     if (pr.k) L.push([`Kod ${pr.k.kod} (${pr.k.opis})`, pr.k.min === pr.k.max ? `−${pr.k.max} zł` : `−${pr.k.min}–${pr.k.max} zł`]);
     const ki = $('#kod-info');
@@ -593,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (base.polecenie) Mock.set('polecenie', null); // the referral discount is for the first visit only
     if (kt && kt.s.t === 'pakiet') { const l = Mock.sprzedane(); l[kt.i] = { ...l[kt.i], ile: l[kt.i].ile - 1 }; Mock.set('karnety.sprzedane', l); } // one visit used
     if (kod) Mock.setKody(Mock.kody().map(x => (x.kod === kod.kod ? { ...x, uzyto: x.uzyto + 1 } : x))); // one more use of the code
-    const needZad = !przeloz && !konsult && pr.max > 0 && $('#zad').checked && !B.zadatek;
+    const needZad = !przeloz && !konsult && pr.max > 0 && !pr.karnet && $('#zad').checked && !B.zadatek; // a visit paid with a pass needs no deposit
     Mock.toast(przeloz ? 'Wizyta przełożona' : konsult ? 'Konsultacja zarezerwowana' : 'Termin zarezerwowany');
     setTimeout(() => (location.href = needZad ? 'zadatek.html' : 'potwierdzenie.html'), 600);
   });
