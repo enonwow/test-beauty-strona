@@ -73,3 +73,26 @@ Obrysy obszarów (`OBSZAR` w `kosmetyka.html`) zaznaczone ręcznie na tych plika
 |---|---|---|---|
 | kosmetologia-1.jpg | https://unsplash.com/photos/a-woman-with-her-eyes-closed-standing-in-front-of-a-building-hzQ1VAEJoW4 | Ann Danilina (@annhwa) | Unsplash License, https://unsplash.com/license |
 | plecy-1.jpg | https://unsplash.com/photos/the-back-of-a-woman-wearing-a-white-dress-p5JqZjuC0Zk | Kateryna Hliznitsova (@kate_gliz) | Unsplash License, https://unsplash.com/license |
+
+## Zdjęcia kategorii, studiów i happy hours (`kat-*.jpg`, `studio-*.jpg`, `hh-*.jpg`, `salon-wnetrze.jpg`)
+
+Pobrane 2026-10-21 z Unsplash (darmowa licencja, nie Unsplash+), w szerokości 1200 px (studio-lilia 900 px) przez serwis obrazków Unsplash, poza tym bez zmian.
+
+| Plik | Gdzie | Źródło | Autor | Licencja |
+|---|---|---|---|---|
+| kat-paznokcie.jpg | start, kafel Paznokcie | https://unsplash.com/photos/hand-with-mauve-and-glitter-nails-Y14F-1vzVds | @newleonin | Unsplash License, https://unsplash.com/license |
+| kat-rzesy.jpg | start, kafel Rzęsy | https://unsplash.com/photos/woman-left-eye-Wude2F3CMss | @aaaarupar | Unsplash License |
+| kat-brwi.jpg | start, kafel Brwi | https://unsplash.com/photos/a-close-up-of-a-womans-eye-with-makeup-nt6KRD9im7A | @lintin9095 | Unsplash License |
+| kat-fryzjer.jpg | start, kafel Fryzjer | https://unsplash.com/photos/person-holding-gray-hair-curler-MMz03PyCOZg | @bayleejadegramling | Unsplash License |
+| kat-kosmetyka.jpg | start, kafel Kosmetyka | https://unsplash.com/photos/woman-receiving-facial-skincare-treatment-PqyzuzFiQfY | @karelysruiz | Unsplash License |
+| studio-malwa.jpg | Studio Malwa: wyniki, start, profil, galeria studia | https://unsplash.com/photos/a-woman-getting-her-nails-done-at-a-nail-salon-gb6gtiTZKB8 | @giorgiotrovato | Unsplash License |
+| studio-iga.jpg | Lash Room Iga | https://unsplash.com/photos/eyelash-extensions-application-in-salon-sRSRuxkOuzI | @hayleykimstudios | Unsplash License |
+| studio-nude.jpg | Atelier Nude | https://unsplash.com/photos/hand-with-light-pink-manicured-nails-vtQHwU4F13s | @jd_chon | Unsplash License |
+| studio-lilia.jpg | Pracownia Lilia | https://unsplash.com/photos/a-potted-plant-sitting-next-to-a-white-vase-qtoMPyiIBPA | @alonagrrr | Unsplash License |
+| studio-loft.jpg | Salon Loft | https://unsplash.com/photos/hairstylist-blow-drying-client-hair-FkAZqQJTbXM | @awcreativeut | Unsplash License |
+| hh-manicure.jpg | start, happy hours (paznokcie) | https://unsplash.com/photos/womans-hand-with-ornate-nails-holding-a-delicate-plant-mciNDxIq4J0 | @julia_2501 | Unsplash License |
+| hh-brwi.jpg | start, happy hours (brwi) | https://unsplash.com/photos/a-woman-getting-her-eyebrows-done-by-a-professional-hair-stylist-CqEGy4zAmbI | @bermixstudio | Unsplash License |
+| salon-wnetrze.jpg | galeria strony studia | https://unsplash.com/photos/a-room-with-a-chair-sink-and-a-plant-in-it-Ui6DZ9A1eXU | @unsplashbydan | Unsplash License |
+
+Na kat-kosmetyka, studio-iga, hh-brwi i studio-malwa widać część twarzy albo osoby w salonie: Unsplash License pozwala na użycie, ale nie wolno sugerować, że te osoby polecają aplikację albo studio. Przed wersją produkcyjną sprawdź licencję ponownie.
+

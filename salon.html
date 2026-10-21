@@ -508,14 +508,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // portfolio and the gallery above the name: sample photos from zdjecia/ (sources in zdjecia/ZRODLA.md)
   const PORT = [ // [thumbnail, large photo, caption, category]
-    ['dlon-2-mini.jpg', 'dlon-2.jpg', 'Manicure hybrydowy, nude', 'Paznokcie'], ['k-paznokcie.jpg', 'dlon-1.jpg', 'Naturalny beż', 'Paznokcie'],
+    ['studio-malwa.jpg', 'studio-malwa.jpg', 'Manicure w studiu', 'Paznokcie'], ['salon-wnetrze.jpg', 'salon-wnetrze.jpg', 'Wnętrze studia', 'Studio'], ['dlon-2-mini.jpg', 'dlon-2.jpg', 'Manicure hybrydowy, nude', 'Paznokcie'], ['k-paznokcie.jpg', 'dlon-1.jpg', 'Naturalny beż', 'Paznokcie'],
     ['k-rzesy.jpg', 'k-rzesy.jpg', 'Rzęsy 3D, kocie oko', 'Rzęsy'], ['brwi-1.jpg', 'brwi-1.jpg', 'Regulacja i henna brwi', 'Brwi'],
     ['wlosy-1-mini.jpg', 'wlosy-1.jpg', 'Fale na długich włosach', 'Fryzjer'], ['dlon-4-mini.jpg', 'dlon-4.jpg', 'Róż na krótkich paznokciach', 'Paznokcie'],
     ['k-kosmetyka.jpg', 'k-kosmetyka.jpg', 'Oczyszczanie i maska', 'Kosmetyka'], ['dlon-3-mini.jpg', 'dlon-3.jpg', 'Naturalny manicure', 'Paznokcie'],
     ['wlosy-3-mini.jpg', 'wlosy-3.jpg', 'Jasny blond, proste', 'Fryzjer']];
   const foto = (f, lazy) => `<img src="zdjecia/${f}" alt=""${lazy ? ' loading="lazy"' : ''}>`;
   $('#siatka').innerHTML = PORT.map((p, i) => `<button type="button" class="tile" data-i="${i}" aria-label="Powiększ zdjęcie: ${p[2]}">${foto(p[0], true)}</button>`).join('');
-  const GAL = [0, 2, 4, 6], ileWiecej = PORT.length - GAL.length;
+  const GAL = [0, 1, 4, 8], ileWiecej = PORT.length - GAL.length;
   $('#galeria').innerHTML = GAL.map((i, k) => k === GAL.length - 1
     ? `<button type="button" data-wiecej aria-label="Wszystkie zdjęcia (${PORT.length})">${foto(PORT[i][0])}<span class="wiecej" aria-hidden="true">+${ileWiecej}</span></button>`
     : `<button type="button" data-i="${i}" aria-label="Powiększ zdjęcie: ${PORT[i][2]}">${foto(k ? PORT[i][0] : PORT[i][1])}</button>`).join('');
