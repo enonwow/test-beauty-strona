@@ -9,6 +9,30 @@
 <link rel="stylesheet" href="mock.css">
 <script src="mock.js" defer></script>
 <script src="panel-shell.js" defer></script>
+<style>
+/* delivery scanner */
+.sk-d{width:min(820px,calc(100% - 24px))}
+.sk-cam{position:relative;border-radius:14px;overflow:hidden;background:#1E1A1D;min-height:64px;display:flex;align-items:center;justify-content:center}
+.sk-cam video{display:none;width:100%;height:220px;object-fit:cover}
+.sk-cam.on video,.sk-cam.on .sk-ramka{display:block}
+.sk-cam.on #sk-aparat{display:none}
+.sk-ramka{display:none;position:absolute;left:50%;top:54%;width:min(260px,80%);height:96px;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:12px;pointer-events:none}
+.sk-ramka::after{content:'';position:absolute;left:10px;right:10px;top:50%;height:2px;background:#E5484D}
+.sk-ok{position:absolute;left:50%;top:8px;transform:translateX(-50%);background:#1F6B47;color:#fff;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+.sk-ok.nowy{background:#8A3B12}
+.sk-st{margin:0;min-height:20px;font-size:13px;font-weight:700;color:#1F6B47}
+.sk-st.nowy{color:#8A3B12}
+.sk-tbl td,.sk-tbl th{padding:8px 6px;vertical-align:middle}
+.sk-q{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.sk-new td{background:#FFF6E5}
+@media (max-width:600px){.sk-tbl{width:100%;min-width:0 !important}.sk-tbl thead{display:none}.sk-tbl,.sk-tbl tbody{display:block}
+  .sk-tbl tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px;padding:10px 0;border-bottom:1px solid #F0E8EC}
+  .sk-tbl td{display:block;padding:0 !important;border:0 !important;background:none !important}.sk-tbl td:nth-child(5){grid-column:2;grid-row:1;justify-self:end}
+  .sk-tbl td:nth-child(2){grid-column:1/3}.sk-tbl td input{width:100% !important;min-width:0;box-sizing:border-box}}
+/* stock rows: none left, just received */
+.zero td{background:#FDECEC}
+.plus td{background:#E6F2EC}
+</style>
 </head>
 <body>
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
@@ -20,7 +44,8 @@
     <div class="p-top">
       <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Magazyn</h1><span class="p-mut">Produkty zużywane na zabiegach. Stany i progi są przykładowe.</span></div>
       <div class="p-acts">
-        <button type="button" class="p-btn pri" id="deliv">Przyjmij dostawę</button>
+        <button type="button" class="p-btn pri" id="skan"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-4px;margin-right:6px"><path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>Skanuj dostawę</button>
+        <button type="button" class="p-btn" id="deliv">Przyjmij ręcznie</button>
         <button type="button" class="p-btn" id="newp">+ Produkt</button>
       </div>
     </div>
@@ -47,7 +72,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc;
-  let P = Mock.magazyn(), filt = 'all', q = ''; // shared with the visit details in panel.html
+  let P = Mock.magazyn(), filt = 'all', q = '', swieze = {}; // swieze: product index -> amount just received (green for a moment) // shared with the visit details in panel.html
   const save = () => Mock.set('magazyn', P);
   const low = x => x.s <= x.p;
   // Etap A: batches and expiry dates; the table shows the batch that ends first
@@ -61,13 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lowc').textContent = '(' + P.filter(low).length + ')';
     document.getElementById('expc').textContent = '(' + P.filter(exp).length + ')';
     document.getElementById('przet').innerHTML = P.flatMap((x, i) => partie(x).filter(b => Mock.waznosc(b) === 'przeterminowane').map(b => `<div class="p-row" role="status" style="background:#FDECEC;color:#A3262A"><span><b>${E(x.n)}, partia ${E(b.nr)}, jest przeterminowana (${dz(b.wazne).slice(0, 5)}).</b> Nie pojawi się w „Użytych preparatach”. Zutylizuj albo zwróć do hurtowni.</span><button type="button" class="p-btn sm" data-utyl="${i}" data-nr="${E(b.nr)}">Oznacz jako zutylizowaną</button></div>`)).join('');
-    const v = P.map((x, i) => ({ ...x, i })).filter(x => (filt === 'all' || (filt === 'low' ? low(x) : exp(x))) && x.n.toLowerCase().includes(q));
-    document.getElementById('rows').innerHTML = v.map(x => `<tr>
+    const v = P.map((x, i) => ({ ...x, i })).filter(x => (filt === 'all' || (filt === 'low' ? low(x) : exp(x))) && (x.n.toLowerCase().includes(q) || (q && (x.ean || '').includes(q))));
+    document.getElementById('rows').innerHTML = v.map(x => `<tr class="${x.s <= 0 ? 'zero' : ''}${swieze[x.i] ? ' plus' : ''}">
       <td><b>${E(x.n)}</b></td><td>${E(x.k)}</td>
-      <td><span style="display:inline-flex;gap:6px;align-items:center"><span id="st-${x.i}" data-min="0" style="min-width:28px;text-align:center;font-weight:700">${x.s}</span> <span class="p-mut">${E(x.u)}</span></span></td>
+      <td><span style="display:inline-flex;gap:6px;align-items:center"><span id="st-${x.i}" data-min="0" style="min-width:28px;text-align:center;font-weight:700">${x.s}</span> <span class="p-mut">${E(x.u)}</span>${swieze[x.i] ? ` <span class="p-badge ok">+${swieze[x.i]}</span>` : ''}</span></td>
       <td><input class="p-in s" type="number" min="0" value="${x.p}" style="width:72px" data-p="${x.i}" aria-label="Próg alertu: ${E(x.n)}"></td>
       <td>${partiaTd(x)}</td>
-      <td>${poTerminie(x).length ? '<span class="p-badge" style="background:#FDECEC;color:#A3262A">partia po terminie</span> ' : ''}${low(x) ? '<span class="p-badge warn">do zamówienia</span>' : poTerminie(x).length ? '' : '<span class="p-badge ok">w normie</span>'}</td>
+      <td>${poTerminie(x).length ? '<span class="p-badge" style="background:#FDECEC;color:#A3262A">partia po terminie</span> ' : ''}${x.s <= 0 ? '<span class="p-badge" style="background:#A3262A;color:#FFFFFF">brak na stanie</span>' : low(x) ? '<span class="p-badge warn">do zamówienia</span>' : poTerminie(x).length ? '' : '<span class="p-badge ok">w normie</span>'}</td>
       <td style="white-space:nowrap"><button type="button" class="p-btn sm" data-use="${x.i}" aria-label="Zużyj 1: ${E(x.n)}" ${x.s <= 0 ? 'disabled' : ''}>Zużyj −1</button> ${low(x) ? `<button type="button" class="p-btn sm dark" data-order="${x.i}">Zamów</button>` : ''}</td></tr>`).join('');
     document.getElementById('pusto').hidden = v.length > 0;
     document.getElementById('pusto').textContent = filt === 'exp' ? 'Żadna partia nie kończy się w ciągu 30 dni.' : filt === 'low' ? 'Brak produktów do zamówienia.' : 'Brak produktów.';
@@ -110,12 +135,114 @@ document.addEventListener('DOMContentLoaded', () => {
       const x = P[+f.p.value]; x.s += +f.n.value; x.partie = [...(x.partie || []), { nr: f.nr.value.trim(), wazne: f.w.value, ile: +f.n.value }]; save(); render(); PS.refresh(); },
     toast: f => `Przyjęto dostawę: +${f.n.value} ${P[+f.p.value].u}`
   }));
-  document.getElementById('newp').addEventListener('click', () => PS.modal({
-    title: 'Nowy produkt', ok: 'Dodaj',
-    body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required></label><label class="p-lab">Kategoria<select class="p-in" name="k"><option>Paznokcie</option><option>Rzęsy</option><option>Brwi</option><option>Inne</option></select></label><div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Stan<input class="p-in" type="number" min="0" name="s" value="0"></label><label class="p-lab" style="flex:1">Próg alertu<input class="p-in" type="number" min="0" name="p" value="2"></label></div>`,
-    onOk: f => { P.push({ n: f.n.value.trim(), k: f.k.value, s: +f.s.value, p: +f.p.value, u: 'szt.', partie: [] }); save(); render(); },
-    toast: f => 'Dodano produkt: ' + f.n.value.trim()
-  }));
+  const kodBlad = (e, bez) => (!e ? '' : !/^\d{8,14}$/.test(e) ? 'Kod kreskowy to 8 do 14 cyfr.' : P.some((x, j) => j !== bez && kk.ten(x.ean, e)) ? 'Ten kod ma już inny produkt.' : '');
+  function nowyProdukt(ean = '', gotowe) {
+    PS.modal({
+      title: 'Nowy produkt', ok: 'Dodaj',
+      body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required></label><label class="p-lab">Kategoria<select class="p-in" name="k"><option>Paznokcie</option><option>Rzęsy</option><option>Brwi</option><option>Inne</option></select></label><div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Stan<input class="p-in" type="number" min="0" name="s" value="0"></label><label class="p-lab" style="flex:1">Próg alertu<input class="p-in" type="number" min="0" name="p" value="2"></label></div>
+        <label class="p-lab">Kod kreskowy (EAN, opcjonalnie)<input class="p-in" name="e" inputmode="numeric" autocomplete="off" value="${E(ean)}" aria-describedby="np-err"></label><p id="np-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p>`,
+      onOk: f => {
+        const e = f.e.value.replace(/\s/g, ''), err = f.querySelector('#np-err'), m = kodBlad(e);
+        if (m) { err.textContent = m; err.hidden = false; f.e.setAttribute('aria-invalid', 'true'); f.e.focus(); return false; }
+        P.push({ n: f.n.value.trim(), k: f.k.value, s: +f.s.value, p: +f.p.value, u: 'szt.', ean: e, partie: [] }); save(); render();
+        if (gotowe) gotowe(P.length - 1);
+      },
+      toast: f => 'Dodano produkt: ' + f.n.value.trim()
+    });
+  }
+  document.getElementById('newp').addEventListener('click', () => nowyProdukt());
+
+  // Delivery by barcode: the camera, a USB scanner (it types the code and Enter) or typing. Every read adds 1 to the list,
+  // "Przyjmij" adds the whole list to stock with its batches.
+  let kk = { ten: (a, b) => String(a || '').replace(/^0+/, '') === String(b || '').replace(/^0+/, '') && !!a }; // replaced by the module once loaded
+  const modul = import('./kod-kreskowy.js').then(m => (kk = m));
+  const pozycje = (n, biernik) => (n === 1 ? (biernik ? 'pozycję' : 'pozycja') : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'pozycje' : 'pozycji');
+  function skanuj() {
+    const L = []; // { i, ile, nr, w } for a known product, { ean, ile } for an unknown code
+    let stop = null, ostatni = '', kiedy = 0;
+    const d = PS.modal({
+      title: 'Skanuj dostawę', ok: 'Przyjmij',
+      body: `<div class="sk-cam" id="sk-cam"><video></video><div class="sk-ramka"></div><span class="sk-ok" id="sk-ok" hidden></span>
+          <button type="button" class="p-btn" id="sk-aparat">Włącz aparat</button></div>
+        <label class="p-lab" for="sk-kod">Kod kreskowy (czytnik USB albo wpisz ręcznie)</label>
+        <span style="display:flex;gap:8px;flex-wrap:wrap;margin-top:-6px"><input class="p-in" id="sk-kod" inputmode="numeric" autocomplete="off" placeholder="np. 2001000000012" style="flex:1 1 180px" aria-describedby="sk-st">
+          <button type="button" class="p-btn" id="sk-dodaj">Dodaj</button><button type="button" class="p-btn" id="sk-sym" title="W makiecie: skanuje losowy produkt z magazynu">Symuluj skan</button></span>
+        <p class="sk-st" id="sk-st" role="status"></p>
+        <div class="p-tw" id="sk-lista"></div>
+        <span class="p-mut">Każde zeskanowanie dodaje 1 sztukę. Partię i datę ważności wpisz z opakowania; kody GS1 z partią i datą wypełnią je same.</span>`,
+      onOk: f => {
+        const dzis = Mock.iso(Mock.teraz());
+        const zly = !L.length ? 'Zeskanuj albo wpisz kod produktu.' : L.some(x => x.ean) ? 'Dodaj nieznane kody jako nowe produkty albo usuń je z listy.'
+          : L.some(x => !x.nr !== !x.w) ? 'Wpisz partię i datę ważności razem albo zostaw oba pola puste.' : L.some(x => x.w && x.w <= dzis) ? 'Na liście jest partia po terminie. Nie przyjmuj jej na stan.' : '';
+        if (zly) { status(zly, true); return false; }
+        swieze = {};
+        L.forEach(x => { const p = P[x.i]; p.s += x.ile; if (x.nr) p.partie = [...(p.partie || []), { nr: x.nr, wazne: x.w, ile: x.ile }]; swieze[x.i] = (swieze[x.i] || 0) + x.ile; });
+        save(); render(); PS.refresh();
+        PS.log(`przyjęła dostawę ze skanera: ${L.map(x => `${P[x.i].n} +${x.ile}`).join(', ')}`);
+        setTimeout(() => { swieze = {}; render(); }, 6000);
+      },
+      toast: () => `Przyjęto dostawę: ${L.length} ${pozycje(L.length)}, +${L.reduce((a, x) => a + x.ile, 0)}`
+    });
+    d.classList.add('sk-d');
+    const $ = id => d.querySelector('#' + id), kod = $('sk-kod'), okBtn = d.querySelector('form > div:last-child button:last-child');
+    function status(t, nowy) {
+      $('sk-st').textContent = t; $('sk-st').classList.toggle('nowy', !!nowy);
+      $('sk-ok').textContent = t; $('sk-ok').classList.toggle('nowy', !!nowy); $('sk-ok').hidden = !t || !$('sk-cam').classList.contains('on');
+    }
+    function rysuj() {
+      const suma = L.reduce((a, x) => a + x.ile, 0);
+      okBtn.textContent = L.length ? `Przyjmij ${L.length} ${pozycje(L.length, true)} (+${suma})` : 'Przyjmij';
+      $('sk-lista').innerHTML = !L.length ? '<p class="p-mut" style="margin:0">Lista jest pusta. Zeskanuj pierwszy produkt.</p>'
+        : `<table class="p-tbl sk-tbl"><thead><tr><th>Produkt</th><th>Ilość</th><th>Partia</th><th>Ważne do</th><th><span class="p-sr">Usuń</span></th></tr></thead><tbody>${L.map((x, j) => {
+          const p = x.ean ? null : P[x.i], n = p ? p.n : 'Nieznany kod';
+          return `<tr class="${p ? '' : 'sk-new'}"><td><b>${E(n)}</b><span class="p-mut" style="display:block;font-size:12px">EAN ${E(p ? p.ean || '' : x.ean)}</span></td>
+            <td><span class="sk-q"><button type="button" class="p-btn sm" data-sk="-" data-j="${j}" aria-label="Mniej: ${E(n)}">−</button><b style="min-width:22px;text-align:center">${x.ile}</b><button type="button" class="p-btn sm" data-sk="+" data-j="${j}" aria-label="Więcej: ${E(n)}">+</button> <span class="p-mut">${E(p ? p.u : 'szt.')}</span></span></td>
+            ${p ? `<td><input class="p-in s" data-nr="${j}" value="${E(x.nr)}" placeholder="np. LOT 24A19" style="width:120px" aria-label="Partia: ${E(n)}"></td><td><input class="p-in s" type="date" data-w="${j}" value="${E(x.w)}" style="width:150px" aria-label="Ważne do: ${E(n)}"></td>`
+              : `<td colspan="2"><button type="button" class="p-btn sm dark" data-sk="nowy" data-j="${j}">Dodaj jako nowy produkt</button></td>`}
+            <td><button type="button" class="p-btn sm" data-sk="x" data-j="${j}" aria-label="Usuń z listy: ${E(n)}">✕</button></td></tr>`; }).join('')}</tbody></table>`;
+    }
+    async function dodaj(raw) {
+      await modul;
+      const g = kk.gs1(raw), k = String(g.kod || '').replace(/\s/g, '');
+      if (!/^\d{8,14}$/.test(k)) return status('To nie wygląda na kod kreskowy: 8 do 14 cyfr.', true);
+      const i = P.findIndex(x => kk.ten(x.ean, k));
+      let poz = L.find(x => (i >= 0 ? x.i === i && (!g.partia || x.nr === g.partia) : x.ean === k));
+      if (poz) poz.ile += 1;
+      else { poz = i >= 0 ? { i, ile: 1, nr: g.partia || '', w: g.wazne || '' } : { ean: k, ile: 1 }; L.push(poz); }
+      status(i >= 0 ? `✓ ${P[i].n} +1` : `Nieznany kod ${k}: dodaj go jako nowy produkt`, i < 0);
+      if (navigator.vibrate) navigator.vibrate(50);
+      rysuj();
+    }
+    const wpisany = () => { const v = kod.value.trim(); if (v) dodaj(v); kod.value = ''; kod.focus(); };
+    kod.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); wpisany(); } }); // a USB scanner ends with Enter: add, do not submit
+    $('sk-dodaj').addEventListener('click', wpisany);
+    $('sk-sym').addEventListener('click', () => { const z = P.filter(x => x.ean); if (z.length) dodaj(z[Math.floor(Math.random() * z.length)].ean); });
+    d.addEventListener('input', e => { const j = e.target.dataset.nr ?? e.target.dataset.w; if (j === undefined) return; L[+j][e.target.dataset.nr !== undefined ? 'nr' : 'w'] = e.target.value.trim(); });
+    d.addEventListener('click', e => {
+      const b = e.target.closest('[data-sk]'); if (!b) return;
+      const j = +b.dataset.j, x = L[j];
+      if (b.dataset.sk === '+') x.ile += 1;
+      if (b.dataset.sk === '-') x.ile -= 1;
+      if (b.dataset.sk === 'x' || x.ile <= 0) L.splice(j, 1);
+      if (b.dataset.sk === 'nowy') return nowyProdukt(x.ean, i => { L[j] = { i, ile: x.ile, nr: '', w: '' }; status(`✓ ${P[i].n} dodany do magazynu`); rysuj(); });
+      rysuj();
+    });
+    async function aparat() {
+      const v = d.querySelector('video');
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) throw new Error('Ta przeglądarka nie daje dostępu do aparatu. Wpisz kod albo użyj czytnika.');
+        await modul;
+        $('sk-cam').classList.add('on'); status('Skieruj aparat na kod kreskowy na opakowaniu'); // before start: the first code can arrive before it returns
+        stop = await kk.start(v, raw => { const t = Date.now(); if (raw === ostatni && t - kiedy < 1500) { kiedy = t; return; } ostatni = raw; kiedy = t; dodaj(raw); }); // the same code held in front of the camera counts once
+      } catch (err) {
+        $('sk-cam').classList.remove('on'); status(err.name === 'NotAllowedError' ? 'Brak zgody na aparat. Zezwól w ustawieniach przeglądarki albo wpisz kod.' : err.message || 'Aparat nie działa. Wpisz kod albo użyj czytnika.', true); }
+    }
+    $('sk-aparat').addEventListener('click', aparat);
+    d.addEventListener('close', () => { if (stop) stop(); });
+    rysuj();
+    if (matchMedia('(pointer: coarse)').matches) aparat(); else kod.focus(); // phone: camera at once; computer: ready for a USB scanner
+  }
+  document.getElementById('skan').addEventListener('click', skanuj);
   render();
 });
 </script>

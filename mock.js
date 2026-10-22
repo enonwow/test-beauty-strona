@@ -243,7 +243,10 @@
     { n: 'Baza hybrydowa', k: 'Paznokcie', s: 4, p: 2, u: 'szt.' }, { n: 'Top bez przemywania', k: 'Paznokcie', s: 3, p: 2, u: 'szt.' }, { n: 'Velvet, puder', k: 'Paznokcie', s: 5, p: 2, u: 'szt.' },
     { n: 'Klej do rzęs', k: 'Rzęsy', s: 3, p: 2, u: 'szt.' }, { n: 'Rzęsy 0,07 C 12 mm', k: 'Rzęsy', s: 8, p: 3, u: 'taśm' }, { n: 'Płatki hydrożelowe', k: 'Rzęsy', s: 10, p: 4, u: 'par' },
     { n: 'Henna do brwi, brąz', k: 'Brwi', s: 4, p: 2, u: 'szt.' }];
-  const magazyn = () => get('magazyn', null) || MAGAZYN_SEED.map(x => ({ ...x, partie: PARTIE_SEED()[x.n] || [] }));
+  // sample barcodes from the in-store range 200-299 (never a real product's code); stock saved before the scanner gets them by name
+  const EAN_SEED = { 'Lakier hybrydowy, burgund': '2001000000012', 'Żel budujący, przezroczysty': '2001000000029', 'Baza hybrydowa': '2001000000036', 'Top bez przemywania': '2001000000043',
+    'Velvet, puder': '2001000000050', 'Klej do rzęs': '2001000000067', 'Rzęsy 0,07 C 12 mm': '2001000000074', 'Płatki hydrożelowe': '2001000000081', 'Henna do brwi, brąz': '2001000000098' };
+  const magazyn = () => (get('magazyn', null) || MAGAZYN_SEED.map(x => ({ ...x, partie: PARTIE_SEED()[x.n] || [] }))).map(x => (x.ean === undefined && EAN_SEED[x.n] ? { ...x, ean: EAN_SEED[x.n] } : x));
   const ZAL_SEED = {
     Paznokcie: 'Przez 24 h unikaj gorącej wody i sauny. Do sprzątania zakładaj rękawiczki. Nie podważaj odprysków: przyjdź na bezpłatną poprawkę. Smaruj skórki oliwką raz dziennie.',
     'Rzęsy': 'Przez 24 h nie mocz rzęs i unikaj pary. Nie używaj tłustych kosmetyków do oczu. Czesz rzęsy szczoteczką rano. Nie śpij twarzą w poduszce przez pierwszą noc.',
