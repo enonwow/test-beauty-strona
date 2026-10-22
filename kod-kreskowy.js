@@ -1,8 +1,9 @@
 // Barcodes for the Magazyn delivery scanner: the back camera read by the browser's BarcodeDetector (Chrome on Android),
 // else ZXing from the CDN (iPhone, desktop), loaded only when the camera is switched on. The picture never leaves the device.
-const ZXING = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/zxing-browser.min.js';
+// pinned version with its hash (same as jsDelivr's sha256 listing): the browser refuses a changed file
+const ZXING = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/zxing-browser.min.js', ZXING_SRI = 'sha384-ylLhng89kD62+PVK1cjm4rAYg69zDlGrbbSfAE2Eb8Xqf8RoAQCMcRoUXZh7pAPC';
 const wczytaj = src => new Promise((ok, err) => {
-  const s = Object.assign(document.createElement('script'), { src, crossOrigin: 'anonymous' });
+  const s = Object.assign(document.createElement('script'), { src, crossOrigin: 'anonymous', integrity: ZXING_SRI });
   s.onload = ok; s.onerror = () => err(new Error('Nie udało się wczytać czytnika kodów.')); document.head.append(s);
 });
 
@@ -36,7 +37,9 @@ export function gs1(raw) {
     if (ai === '01') { const g = s.slice(2, 16); out.kod = g[0] === '0' ? g.slice(1) : g; s = s.slice(16); } // GTIN-14 with a leading 0 is the EAN-13
     else if (['11', '13', '15', '17'].includes(ai)) {
       const [r, m, d] = [s.slice(2, 4), s.slice(4, 6), s.slice(6, 8)];
-      if (ai === '17') out.wazne = `20${r}-${m}-${d === '00' ? String(new Date(2000 + +r, +m, 0).getDate()) : d}`;
+      if (!/^\d{6}$/.test(r + m + d)) break; // the code is printed data: only a real date gets through
+      const dd = d === '00' ? String(new Date(2000 + +r, +m, 0).getDate()) : d;
+      if (ai === '17' && +m >= 1 && +m <= 12 && +dd >= 1 && +dd <= new Date(2000 + +r, +m, 0).getDate()) out.wazne = `20${r}-${m}-${dd}`;
       s = s.slice(8);
     } else if (ai === '10' || ai === '21') {
       const k = s.indexOf(GS), v = k < 0 ? s.slice(2) : s.slice(2, k);
@@ -52,4 +55,5 @@ export const ten = (a, b) => String(a || '').replace(/^0+/, '') === String(b || 
 
 console.assert(JSON.stringify(gs1('01059012341234571727123110LOT26B')) === '{"kod":"5901234123457","wazne":"2027-12-31","partia":"LOT26B"}'
   && JSON.stringify(gs1('0105901234123457' + '10L1' + String.fromCharCode(29) + '17280200')) === '{"kod":"5901234123457","partia":"L1","wazne":"2028-02-29"}'
-  && gs1('2001000000012').kod === '2001000000012' && ten('0036000291452', '036000291452'), 'kod-kreskowy gs1');
+  && gs1('2001000000012').kod === '2001000000012' && ten('0036000291452', '036000291452')
+  && !gs1('010590123412345717<b-x>10L').wazne && !gs1('01059012341234571727133110L').wazne, 'kod-kreskowy gs1');

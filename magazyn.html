@@ -80,12 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const partie = x => (x.partie || []).filter(b => !b.utyl).sort((a, b) => (a.wazne < b.wazne ? -1 : 1));
   const exp = x => partie(x).some(b => Mock.waznosc(b));
   const poTerminie = x => partie(x).filter(b => Mock.waznosc(b) === 'przeterminowane');
-  const partiaTd = x => partie(x).map(b => { const w = Mock.waznosc(b); return `<span style="display:block">${E(b.nr)} · ${dz(b.wazne)}${w ? ` <span class="p-badge${BADGE[w] ? ' ' + BADGE[w] : ''}" style="${w === 'przeterminowane' ? 'background:#FDECEC;color:#A3262A' : ''}">${w}</span>` : ''}</span>`; }).join('') || '<span class="p-mut">—</span>';
+  const partiaTd = x => partie(x).map(b => { const w = Mock.waznosc(b); return `<span style="display:block">${E(b.nr)} · ${E(dz(b.wazne))}${w ? ` <span class="p-badge${BADGE[w] ? ' ' + BADGE[w] : ''}" style="${w === 'przeterminowane' ? 'background:#FDECEC;color:#A3262A' : ''}">${w}</span>` : ''}</span>`; }).join('') || '<span class="p-mut">—</span>';
 
   function render() {
     document.getElementById('lowc').textContent = '(' + P.filter(low).length + ')';
     document.getElementById('expc').textContent = '(' + P.filter(exp).length + ')';
-    document.getElementById('przet').innerHTML = P.flatMap((x, i) => partie(x).filter(b => Mock.waznosc(b) === 'przeterminowane').map(b => `<div class="p-row" role="status" style="background:#FDECEC;color:#A3262A"><span><b>${E(x.n)}, partia ${E(b.nr)}, jest przeterminowana (${dz(b.wazne).slice(0, 5)}).</b> Nie pojawi się w „Użytych preparatach”. Zutylizuj albo zwróć do hurtowni.</span><button type="button" class="p-btn sm" data-utyl="${i}" data-nr="${E(b.nr)}">Oznacz jako zutylizowaną</button></div>`)).join('');
+    document.getElementById('przet').innerHTML = P.flatMap((x, i) => partie(x).filter(b => Mock.waznosc(b) === 'przeterminowane').map(b => `<div class="p-row" role="status" style="background:#FDECEC;color:#A3262A"><span><b>${E(x.n)}, partia ${E(b.nr)}, jest przeterminowana (${E(dz(b.wazne).slice(0, 5))}).</b> Nie pojawi się w „Użytych preparatach”. Zutylizuj albo zwróć do hurtowni.</span><button type="button" class="p-btn sm" data-utyl="${i}" data-nr="${E(b.nr)}">Oznacz jako zutylizowaną</button></div>`)).join('');
     const v = P.map((x, i) => ({ ...x, i })).filter(x => (filt === 'all' || (filt === 'low' ? low(x) : exp(x))) && (x.n.toLowerCase().includes(q) || (q && (x.ean || '').includes(q))));
     document.getElementById('rows').innerHTML = v.map(x => `<tr class="${x.s <= 0 ? 'zero' : ''}${swieze[x.i] ? ' plus' : ''}">
       <td><b>${E(x.n)}</b></td><td>${E(x.k)}</td>
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
       onOk: f => {
         const dzis = Mock.iso(Mock.teraz());
         const zly = !L.length ? 'Zeskanuj albo wpisz kod produktu.' : L.some(x => x.ean) ? 'Dodaj nieznane kody jako nowe produkty albo usuń je z listy.'
-          : L.some(x => !x.nr !== !x.w) ? 'Wpisz partię i datę ważności razem albo zostaw oba pola puste.' : L.some(x => x.w && x.w <= dzis) ? 'Na liście jest partia po terminie. Nie przyjmuj jej na stan.' : '';
+          : L.some(x => x.w && !/^\d{4}-\d{2}-\d{2}$/.test(x.w)) ? 'Sprawdź datę ważności.' : L.some(x => !x.nr !== !x.w) ? 'Wpisz partię i datę ważności razem albo zostaw oba pola puste.' : L.some(x => x.w && x.w <= dzis) ? 'Na liście jest partia po terminie. Nie przyjmuj jej na stan.' : '';
         if (zly) { status(zly, true); return false; }
         swieze = {};
         L.forEach(x => { const p = P[x.i]; p.s += x.ile; if (x.nr) p.partie = [...(p.partie || []), { nr: x.nr, wazne: x.w, ile: x.ile }]; swieze[x.i] = (swieze[x.i] || 0) + x.ile; });
