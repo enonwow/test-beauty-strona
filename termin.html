@@ -141,7 +141,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <button type="button" class="chip" aria-pressed="false" data-value="dojazd">Dojazd do mnie</button>
     </div>
     <div id="dojazd-box" hidden style="display:flex;flex-direction:column;gap:10px">
-      <div class="fld"><label for="d-adres">Adres wizyty</label><input id="d-adres" class="inp" type="text" autocomplete="street-address" placeholder="ul. Puławska 24, Warszawa" aria-describedby="d-adres-err">
+      <div class="fld"><label for="d-adres">Adres wizyty</label><input id="d-adres" class="inp" type="text" autocomplete="address-line1" placeholder="ul. Puławska 24, Warszawa" aria-describedby="d-adres-err">
         <span id="d-adres-err" class="err" hidden></span></div>
       <div class="fld"><label for="d-strefa">Strefa dojazdu (opłata za dojazd, przykładowo)</label>
         <select id="d-strefa" class="inp"><option value="0">do 10 km · 30 zł</option><option value="1">do 20 km · 50 zł</option></select></div>
@@ -359,6 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#wstecz').href = 'potwierdzenie.html'; $('#wstecz').setAttribute('aria-label', 'Wróć do potwierdzenia');
     $('#btn-txt').textContent = 'Przełóż na ten termin'; // keep the span: the submit handler writes its busy text there
     $('#zad-lab').hidden = true;
+    // only the date changes: the studio already has her details, so the form does not ask again (WCAG 3.3.7)
+    const dane = $('#imie').closest('section'), nota = document.createElement('p');
+    nota.textContent = 'Zmieniasz tylko termin. Usługa, cena i dane kontaktowe zostają jak w rezerwacji.';
+    nota.style.cssText = 'margin:0;padding:12px 14px;border-radius:12px;background:#F6EDF1;font-size:14px;line-height:1.45';
+    dane.hidden = true; dane.before(nota);
   } else if (konsult) {
     $('#tytul').textContent = 'Umów konsultację';
     $('#opis-sum').textContent = 'Konsultacja przed zabiegiem · ' + b.opis;
@@ -544,8 +549,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const pola = [
       ['d-adres', !przeloz && sel.dojazd, () => ($('#d-adres').value.trim() ? '' : 'Wpisz adres, pod który mamy dojechać.')],
       ['slot', true, () => (sel.slot ? '' : 'Wybierz godzinę wizyty.')],
-      ['imie', true, () => ($('#imie').value.trim() ? '' : 'Wpisz imię.')],
-      ['tel', true, () => { const n = $('#tel').value.replace(/[^0-9]/g, '').length; return n >= 9 && n <= 12 ? '' : 'Wpisz numer telefonu, np. 600 100 200.'; }],
+      ['imie', !przeloz, () => ($('#imie').value.trim() ? '' : 'Wpisz imię.')],
+      ['tel', !przeloz, () => { const n = $('#tel').value.replace(/[^0-9]/g, '').length; return n >= 9 && n <= 12 ? '' : 'Wpisz numer telefonu, np. 600 100 200.'; }],
       ['innaimie', inna0, () => ($('#innaimie').value.trim() ? '' : 'Wpisz imię osoby, która przyjdzie.')],
       ['nip', !przeloz && $('#fv').checked, () => (Mock.nipOk($('#nip').value) ? '' : 'Sprawdź NIP: 10 cyfr, np. 123-456-32-18.')],
       ['firma', !przeloz && $('#fv').checked, () => ($('#firma').value.trim() ? '' : 'Wpisz nazwę firmy.')]
@@ -575,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (faktura && user.zalogowana) Mock.set('user', { ...user, faktura }); // next booking fills the invoice fields
     if (inna && $('#zapisz-b').checked && !$('#zapisz-bliska').hidden) Mock.set('bliscy', [...bliscy, { imie: klientka, tel: dlaKogo.tel }]);
     const visits = Mock.get('visits', []);
-    const kontakt = { imie, tel: $('#tel').value.trim() }; // who booked (not necessarily who comes): used to create an account from the confirmation
+    const kontakt = (przeloz && B.kontakt) || { imie, tel: $('#tel').value.trim() }; // who booked (not necessarily who comes): used to create an account from the confirmation
     const base = { kategoria: b.kategoria, studio: b.studio, stylistka: sel.styl, klientka, kontakt, dlaKogo, osoby, dojazd, faktura, polecenie: (Mock.get('polecenie', null) || {}).studio === b.studio ? Mock.get('polecenie') : null, status: 'nadchodząca' };
     const pr = pricing();
     const promo = pr.p ? { id: pr.p.id, nazwa: pr.p.nazwa, rabat: pr.p.rabat, kwota: pr.rMax - (pr.max - pr.D), cenaMinPrzed: pr.rMin, cenaMaxPrzed: pr.rMax } : null;

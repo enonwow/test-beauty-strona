@@ -319,12 +319,6 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     { n: 'Natalia', rola: 'koloryzacja, keratyna', c: '#5B4BA5', t: '#EEEBF8', us: [['Koloryzacja', 150, 320], ['Balejaż', 180, 450], ['Keratyna', 120, 380]], grafik: ['10–18', '10–18', '10–18', '10–18', 'urlop', '9–14', '—'] }
   ]];
   const STYL = ZESPOLY[Mock.lok()] || ZESPOLY[0];
-  // arrow keys between tabs (a page with its own keyboard handling marks its tabs with data-kt)
-  document.addEventListener('keydown', e => {
-    const t = e.target.closest && e.target.closest('[role=tab]'); if (!t || t.dataset.kt !== undefined || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
-    const all = [...t.parentElement.querySelectorAll('[role=tab]')], i = all.indexOf(t), n = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
-    e.preventDefault(); all[n].focus(); all[n].click();
-  });
   window.PS = { dziennik, log, kiedy, urzadzenie, STYL, lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
   Object.defineProperty(window.PS, 'ROLES', { get: roles }); window.PS.setRoles = setRoles; // the edited roles, not the defaults
   init();

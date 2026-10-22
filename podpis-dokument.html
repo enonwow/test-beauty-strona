@@ -71,7 +71,7 @@ dialog.big{width:min(760px,calc(100% - 24px))}
     <button type="button" id="przyklad" class="tab" style="align-self:flex-start">Wypróbuj na przykładowym dokumencie</button>
     <p id="err" class="err" role="alert" hidden></p>
     <div id="info" hidden class="row" style="padding:12px 14px;border-radius:12px;background:#E6F2EC;color:#1F6B47;align-items:center"><span id="info-t"></span><button type="button" id="zmien" class="tab">Zmień plik</button></div>
-    <div id="podglad" class="pages" aria-label="Podgląd dokumentu"></div>
+    <div id="podglad" class="pages" role="region" aria-label="Podgląd dokumentu"></div>
     <button type="button" id="przekaz" class="btn" disabled>Przekaż tablet klientce</button>
     <span style="color:#625860;font-size:12px;line-height:1.4">Makieta: plik zostaje tylko w tej przeglądarce i znika po zamknięciu strony. Nigdzie go nie wysyłamy.</span>
   </section>
@@ -79,7 +79,7 @@ dialog.big{width:min(760px,calc(100% - 24px))}
   <!-- 2. klientka: podpisuje w wybranych miejscach -->
   <section id="s-klientka" class="sec" hidden>
     <p class="hint"><b>Przeczytaj dokument.</b> Stuknij w miejsce, w którym chcesz się podpisać, i złóż podpis rysikiem albo palcem. Podpis możesz dodać w kilku miejscach.</p>
-    <div id="strony" class="pages" aria-label="Dokument do podpisu"></div>
+    <div id="strony" class="pages" role="region" aria-label="Dokument do podpisu"></div>
   </section>
   <div id="bar" class="bar" hidden>
     <label style="display:flex;gap:10px;align-items:center;min-height:44px"><input type="checkbox" id="ok" style="width:22px;height:22px;flex:none;accent-color:#9E1F50">Zapoznałam się z dokumentem</label>

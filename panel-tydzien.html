@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const v = widok();
     renderChips(v.mies);
     (v.mies ? renderMiesiac : renderTydzien)(v.n);
-    document.getElementById('v-t').toggleAttribute('aria-current', !v.mies); document.getElementById('v-m').toggleAttribute('aria-current', v.mies);
+    [['v-t', !v.mies], ['v-m', v.mies]].forEach(([id, on]) => { const a = document.getElementById(id); on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'); });
     document.getElementById('prev').setAttribute('aria-label', v.mies ? 'Poprzedni miesiąc' : 'Poprzedni tydzień');
     document.getElementById('next').setAttribute('aria-label', v.mies ? 'Następny miesiąc' : 'Następny tydzień');
   }

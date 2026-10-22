@@ -31,7 +31,7 @@
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
-      <div id="sections" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px"></div>
+      <div id="sections" role="tabpanel" aria-label="Usługi wybranej kategorii" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px"></div>
 
       <aside aria-label="Podgląd dla klientki" style="flex: 1 1 280px; min-width: 0; background: #1E1A1D; color: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Tak zobaczy to klientka</h2>
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const inp = (a, i, j, v, lab) => `<input class="p-in s" inputmode="numeric" style="width:84px" data-a="${a}" data-i="${i}" data-j="${j}" value="${v}" aria-label="${E(lab)}">`;
 
   function renderTabs() {
-    document.getElementById('tabs').innerHTML = Object.keys(D).map(k => `<button type="button" role="tab" class="p-pill" aria-selected="${k === cur}">${E(k)}</button>`).join('');
+    document.getElementById('tabs').innerHTML = Object.keys(D).map(k => `<button type="button" role="tab" class="p-pill" aria-controls="sections" aria-selected="${k === cur}">${E(k)}</button>`).join('');
   }
   function renderSections() {
     const c = D[cur], box = document.getElementById('sections');
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTabs(); renderSections();
 
   document.getElementById('sections').addEventListener('change', e => { if (e.target.id !== 'zal') return; Mock.set('zalecenia', { ...(Mock.get('zalecenia', {}) || {}), [cur]: e.target.value.trim() }); Mock.toast('Zapisano zalecenia: ' + cur); });
-  document.getElementById('tabs').addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { cur = t.textContent; renderTabs(); renderSections(); } });
+  document.getElementById('tabs').addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { cur = t.textContent; renderTabs(); renderSections(); document.querySelector('#tabs [aria-selected=true]').focus(); } }); // the tabs are redrawn: keep the focus on the chosen one
   const sec = document.getElementById('sections');
   function edit(e) {
     const t = e.target, a = t.dataset.a; if (!a) return;

@@ -32,11 +32,11 @@
     <h1 id="lg-h" style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:26px">Zaloguj się do panelu</h1>
 
     <div role="tablist" aria-label="Sposób logowania" style="display:flex;gap:4px;padding:4px;border-radius:14px;background:#F0E8EC">
-      <button type="button" role="tab" class="lg-tab" id="tab-pw" aria-selected="true" aria-controls="p-pw">Hasło</button>
-      <button type="button" role="tab" class="lg-tab" id="tab-sms" aria-selected="false" aria-controls="p-sms">Kod SMS</button>
+      <button type="button" role="tab" class="lg-tab" id="tab-pw" aria-selected="true" aria-controls="tp-pw">Hasło</button>
+      <button type="button" role="tab" class="lg-tab" id="tab-sms" aria-selected="false" aria-controls="tp-sms">Kod SMS</button>
     </div>
 
-    <form id="p-pw" role="tabpanel" aria-labelledby="tab-pw" novalidate style="display:flex;flex-direction:column;gap:14px">
+    <div role="tabpanel" id="tp-pw" aria-labelledby="tab-pw"><form id="p-pw" novalidate style="display:flex;flex-direction:column;gap:14px">
       <label class="lg-lab" for="email">E-mail lub telefon<input id="email" class="lg-in" type="text" autocomplete="username" inputmode="email" placeholder="np. imie@studio.pl"></label>
       <div class="lg-lab"><label for="pw">Hasło</label>
         <input id="pw" class="lg-in" type="password" autocomplete="current-password">
@@ -44,9 +44,9 @@
       <button type="button" class="lg-link" id="forgot">Nie pamiętasz hasła?</button>
       <button type="submit" class="lg-btn">Zaloguj</button>
       <span class="mock-only" style="color:#625860;font-size:12px">Makieta: konta testowe z hasłami są w Narzędziach makiety (pasek u góry).</span>
-    </form>
+    </form></div>
 
-    <form id="p-sms" role="tabpanel" aria-labelledby="tab-sms" novalidate hidden style="display:flex;flex-direction:column;gap:14px">
+    <div role="tabpanel" id="tp-sms" aria-labelledby="tab-sms" hidden><form id="p-sms" novalidate style="display:flex;flex-direction:column;gap:14px">
       <label class="lg-lab" for="tel">Numer telefonu<input id="tel" class="lg-in" type="tel" autocomplete="tel" inputmode="tel" placeholder="+48 …"></label>
       <button type="button" class="lg-btn" id="send" style="background:#1E1A1D">Wyślij kod</button>
       <div id="code-box" hidden style="display:flex;flex-direction:column;gap:14px">
@@ -55,7 +55,7 @@
         <button type="submit" class="lg-btn">Zaloguj</button>
       </div>
       <span style="color:#625860;font-size:12px">Makieta: kod SMS nie jest wysyłany, wpisz dowolne 6 cyfr. Numer musi należeć do konta studia.</span>
-    </form>
+    </form></div>
 
     <form id="p-2fa" novalidate hidden style="display:flex;flex-direction:column;gap:14px">
       <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:20px">Potwierdź, że to Ty</h2>
@@ -96,11 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function enter(a) { Mock.zaloguj(a); Mock.toast('Zalogowano'); setTimeout(() => { location.href = 'panel.html'; }, 500); }
 
   // zakładki
-  const tabs = { pw: ['#tab-pw', '#p-pw'], sms: ['#tab-sms', '#p-sms'] };
+  const tabs = { pw: ['#tab-pw', '#tp-pw'], sms: ['#tab-sms', '#tp-sms'] };
   function show(k) { Object.entries(tabs).forEach(([n, [t, p]]) => { $(t).setAttribute('aria-selected', String(n === k)); $(p).hidden = n !== k; }); }
   $('#tab-pw').addEventListener('click', () => show('pw'));
   $('#tab-sms').addEventListener('click', () => show('sms'));
-  [$('#tab-pw'), $('#tab-sms')].forEach(t => t.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const k = t.id === 'tab-pw' ? 'sms' : 'pw'; show(k); $(tabs[k][0]).focus(); } }));
 
   // e-mail i hasło
   $('#p-pw').addEventListener('submit', e => {
@@ -122,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tick = () => { $('#resend2').textContent = s > 0 ? `Nowy kod wyślesz za ${s} s` : 'Nie dostałaś kodu? Wyślij ponownie'; if (s-- <= 0) { clearInterval(t2); $('#resend2').disabled = false; } };
     tick(); t2 = setInterval(tick, 1000); };
   function krok2(on) { // the SMS step replaces the whole login form, header and sign-up link included
-    ['[role=tablist]', '#p-pw', '#lg-h', '#lg-nowe'].forEach(s => { $(s).hidden = on; }); $('#p-2fa').hidden = !on;
+    ['[role=tablist]', '#tp-pw', '#lg-h', '#lg-nowe'].forEach(s => { $(s).hidden = on; }); $('#p-2fa').hidden = !on;
     if (on) { $('#tel2').textContent = '·· ' + (czeka.tel || '456').replace(/\D/g, '').slice(-3); $('#urz2').textContent = PS.urzadzenie().replace(' · ', ', '); $('#code2').value = ''; odlicz(); $('#code2').focus(); } else { clearInterval(t2); $('#email').focus(); }
   }
   $('#resend2').addEventListener('click', () => { odlicz(); Mock.toast('Wysłaliśmy nowy kod SMS'); });

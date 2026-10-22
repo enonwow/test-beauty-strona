@@ -55,8 +55,8 @@ const dl = (id, big, label) => {
       + (big ? `<rect x="${960 - w}" y="${Y - 80}" width="${w}" height="68" rx="34" fill="#9E1F50"/><text x="940" y="${Y - 30}" text-anchor="end" font-size="50" font-weight="700" fill="#fff" font-family="DM Sans,sans-serif">${DL_N[k]}</text>` : '');
   }).join('');
   const top = big ? 0 : Math.max(-20, Math.min(0, 50 - DL_Y[id] * 0.12)); // tile: the chosen line near its middle
-  return `<div ${big ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'} style="position: relative; width: 100%; aspect-ratio: ${big ? '2 / 3' : '4 / 5'}; border-radius: ${big ? 14 : 8}px; overflow: hidden; background: #E4D9DE${big ? '' : '; margin-bottom: auto'}">`
-    + `<div style="position: absolute; left: 0; width: 100%; height: ${big ? 100 : 120}%; top: ${top}%"><img src="zdjecia/wlosy-dlugosc.jpg" alt="" ${big ? '' : 'loading="lazy" '}style="position: absolute; inset: 0; width: 100%; height: 100%"><svg viewBox="0 0 1000 1500" style="position: absolute; inset: 0; width: 100%; height: 100%">${linie}</svg></div></div>`; // thumbnails stay on top, labels at the bottom
+  return `<span ${big ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'} style="position: relative; display: block; width: 100%; aspect-ratio: ${big ? '2 / 3' : '4 / 5'}; border-radius: ${big ? 14 : 8}px; overflow: hidden; background: #E4D9DE${big ? '' : '; margin-bottom: auto'}">`
+    + `<span style="position: absolute; display: block; left: 0; width: 100%; height: ${big ? 100 : 120}%; top: ${top}%"><img src="zdjecia/wlosy-dlugosc.jpg" alt="" ${big ? '' : 'loading="lazy" '}style="position: absolute; inset: 0; width: 100%; height: 100%"><svg viewBox="0 0 1000 1500" style="position: absolute; inset: 0; width: 100%; height: 100%">${linie}</svg></span></span>`; // thumbnails stay on top, labels at the bottom
 };
 const by = (list, id) => list.find(x => x.id === id);
 const damskie = w => w.dla === 'damskie';
@@ -159,10 +159,10 @@ const { redraw, pad } = przymierzalnia(mount, {
       <span style="font-size: 14px; font-weight: 500; color: #1E1A1D">Odcień</span>
       <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">${ODCIENIE.map(o => `<button type="button" data-hex="${o.hex}" aria-pressed="${o === odcien}"><canvas width="160" height="100" aria-hidden="true" style="background: ${o.hex}"></canvas><span>${o.nazwa}</span></button>`).join('')}</div>
     </div>
-    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; color: #1E1A1D">
-      <label for="wlosy-sl">Intensywność: <output id="wlosy-int">80%</output></label>
+    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; color: #1E1A1D">
+      <span><label for="wlosy-sl">Intensywność:</label> <output id="wlosy-int" for="wlosy-sl">80%</output></span>
       <input id="wlosy-sl" type="range" min="0" max="100" value="80" style="width: 100%; min-height: 44px; accent-color: #9E1F50">
-    </label>
+    </div>
     <span id="wlosy-tech" style="font-size: 13px; color: #1E1A1D"></span>
     <p id="wlosy-jasniej" role="status" hidden style="margin: 0; padding: 10px 12px; border-radius: 10px; background: #FFF1E0; color: #8A3B12; font-size: 13px; line-height: 1.45"></p>`,
 });

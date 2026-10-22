@@ -43,11 +43,11 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
   </div>
 
   <div role="tablist" aria-label="Sposób logowania" style="display:flex;gap:4px;padding:4px;border-radius:14px;background:#F0E8EC">
-    <button type="button" role="tab" class="tab" id="tab-pw" aria-selected="true" aria-controls="f-pw">Hasło</button>
-    <button type="button" role="tab" class="tab" id="tab-sms" aria-selected="false" aria-controls="f-sms">Kod SMS</button>
+    <button type="button" role="tab" class="tab" id="tab-pw" aria-selected="true" aria-controls="tp-pw">Hasło</button>
+    <button type="button" role="tab" class="tab" id="tab-sms" aria-selected="false" aria-controls="tp-sms">Kod SMS</button>
   </div>
 
-  <form id="f-pw" role="tabpanel" aria-labelledby="tab-pw" novalidate class="col">
+  <div role="tabpanel" id="tp-pw" aria-labelledby="tab-pw"><form id="f-pw" novalidate class="col">
     <div class="pole"><label for="l-login" class="lab">E-mail lub telefon</label><input id="l-login" class="inp" type="text" inputmode="email" autocomplete="username" placeholder="np. kasia@example.com"></div>
     <div class="pole"><label for="l-pw" class="lab">Hasło</label>
       <input id="l-pw" class="inp" type="password" autocomplete="current-password">
@@ -55,14 +55,14 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
     <button type="button" class="lnk" id="zapomnialam" style="align-self:flex-start">Nie pamiętasz hasła?</button>
     <button type="submit" class="btn">Zaloguj</button>
     <span class="mock-only" style="color:#625860;font-size:12px">Makieta: konta testowe z hasłami są w Narzędziach makiety (pasek u góry).</span>
-  </form>
+  </form></div>
 
-  <form id="f-sms" role="tabpanel" aria-labelledby="tab-sms" novalidate hidden class="col">
+  <div role="tabpanel" id="tp-sms" aria-labelledby="tab-sms" hidden><form id="f-sms" novalidate class="col">
     <div class="pole">
       <label for="tel" class="lab">Numer telefonu</label>
       <div style="display:flex;gap:8px">
         <span style="min-height:52px;padding:0 12px;border-radius:12px;border:1px solid #C9B6BF;display:flex;align-items:center">+48</span>
-        <input id="tel" class="inp" style="flex:1" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="600 100 200">
+        <input id="tel" class="inp" style="flex:1" type="tel" inputmode="numeric" autocomplete="tel" placeholder="600 100 200">
       </div>
     </div>
 
@@ -83,7 +83,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
     </fieldset>
 
     <button type="submit" id="zaloguj" class="btn" hidden>Zaloguj</button>
-  </form>
+  </form></div>
 
   <p style="margin:0">Nie masz konta? <button type="button" class="lnk" data-widok="#rej">Załóż konto</button></p>
 
@@ -198,11 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#zapomnialam').addEventListener('click', () => { $('#n-login').value = $('#l-login').value.trim(); widok('#nowe'); });
 
   // tabs: password / SMS code
-  const tabs = [['#tab-pw', '#f-pw'], ['#tab-sms', '#f-sms']];
+  const tabs = [['#tab-pw', '#tp-pw'], ['#tab-sms', '#tp-sms']];
   const zakladka = i => tabs.forEach(([tb, p], j) => { $(tb).setAttribute('aria-selected', String(i === j)); $(p).hidden = i !== j; });
   tabs.forEach(([tb], i) => {
     $(tb).addEventListener('click', () => zakladka(i));
-    $(tb).addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { zakladka(1 - i); $(tabs[1 - i][0]).focus(); } });
   });
 
   $('#f-pw').addEventListener('submit', e => {

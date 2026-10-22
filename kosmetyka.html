@@ -42,13 +42,15 @@ const OBSZAR = {
   oczy: ['oczy', 'okolice oczu', 'M30 700 A760 380 0 1 0 1550 700 A760 380 0 1 0 30 700 Z M180 760 A565 185 -6 1 0 1310 690 A565 185 -6 1 0 180 760 Z'],
   plecy: ['plecy', 'plecy', 'M330 0 L360 200 L420 390 L500 560 L570 720 L620 880 L610 960 L560 1060 L700 1120 L900 1200 L1100 1250 L1350 1290 L1600 1310 L1600 0 Z'],
 };
+let nFiltr = 0; // the area picture is drawn more than once per page: each blur filter needs its own id
 function areas(obszar) {
+  const fid = `miek-${++nFiltr}`;
   const [foto, label, d] = OBSZAR[obszar] || OBSZAR.T, [src, w, h] = FOTO[foto];
   // spotlight: the area keeps the photo's real colours, everything else is dimmed (evenodd cuts the area out of the frame)
   return `<span role="img" aria-label="Zaznaczony obszar: ${label}" style="position: relative; display: block; width: 100%; max-width: calc(34vh * ${w} / ${h}); margin: 0 auto; aspect-ratio: ${w} / ${h}; border-radius: 14px; overflow: hidden; background: #F6EDF1">`
     + `<img src="${src}" alt="" width="${w}" height="${h}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">`
-    + `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%"><defs><filter id="miek-${foto}" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur stdDeviation="${w / 160}"></feGaussianBlur></filter></defs>`
-    + `<path d="M0 0 H${w} V${h} H0 Z ${d}" fill="#1E1A1D" fill-opacity=".55" fill-rule="evenodd" filter="url(#miek-${foto})"></path>`
+    + `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%"><defs><filter id="${fid}" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur stdDeviation="${w / 160}"></feGaussianBlur></filter></defs>`
+    + `<path d="M0 0 H${w} V${h} H0 Z ${d}" fill="#1E1A1D" fill-opacity=".55" fill-rule="evenodd" filter="url(#${fid})"></path>`
     + `<path d="${d}" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="6 5" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path></svg>`
     + `<span style="position: absolute; left: 10px; bottom: 10px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #1E1A1D; font-size: 13px; font-weight: 700">${label[0].toUpperCase() + label.slice(1)}</span></span>`;
 }

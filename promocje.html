@@ -34,20 +34,20 @@
     </div>
 
     <div id="tabs" role="tablist" aria-label="Rodzaj promocji" class="p-pills">
-      <button type="button" role="tab" class="p-pill" data-tab="hh" aria-selected="true" id="tab-hh">Happy hours</button>
-      <button type="button" role="tab" class="p-pill" data-tab="flash" aria-selected="false">Flash sale</button>
-      <button type="button" role="tab" class="p-pill" data-tab="last" aria-selected="false">Last minute</button>
-      <button type="button" role="tab" class="p-pill" data-tab="kody" aria-selected="false">Kody rabatowe</button>
+      <button type="button" role="tab" class="p-pill" data-tab="hh" aria-controls="t-hh" aria-selected="true" id="tab-hh">Happy hours</button>
+      <button type="button" role="tab" class="p-pill" data-tab="flash" aria-controls="t-hh" aria-selected="false">Flash sale</button>
+      <button type="button" role="tab" class="p-pill" data-tab="last" aria-controls="t-hh" aria-selected="false">Last minute</button>
+      <button type="button" role="tab" class="p-pill" data-tab="kody" aria-controls="t-kody" aria-selected="false">Kody rabatowe</button>
     </div>
 
     <!-- Happy hours: lista ofert + edycja -->
-    <div id="t-hh" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+    <div id="t-hh" role="tabpanel" aria-label="Oferty i edycja" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
       <section aria-label="Lista happy hours" id="hh-list" style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 10px"></section>
       <form id="hh-form" novalidate aria-label="Edycja happy hours" class="p-card" style="flex: 1 1 400px; padding: 18px; gap: 14px"></form>
     </div>
 
     <!-- Kody rabatowe: klientka wpisuje kod przy wyborze terminu -->
-    <section id="t-kody" hidden class="p-card" aria-labelledby="kody-h">
+    <section id="t-kody" hidden class="p-card" role="tabpanel" aria-labelledby="kody-h">
       <div class="p-top"><h2 id="kody-h" class="p-h2">Kody rabatowe</h2><button type="button" class="p-btn pri sm" id="kod-add">+ Nowy kod</button></div>
       <div class="p-tw"><table class="p-tbl"><thead><tr><th>Kod</th><th>Rabat</th><th>Ważny</th><th>Usługi</th><th>Użycia</th><th>Stan</th><th><span class="p-sr">Akcje</span></th></tr></thead><tbody id="kody"></tbody></table></div>
       <span class="p-mut">Klientka wpisuje kod przy wyborze terminu. Kod nie łączy się z happy hours: liczymy większy rabat. Kody na influencerki i kampanie na Instagramie warto robić osobne, żeby widzieć, który działa.</span>

@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function render() {
     const v = all().filter(r => filt === 'all' || (filt === 'open' && !r.reply) || (filt === 'low' && r.o <= 3));
     document.getElementById('lista').innerHTML = v.map(r => `<article class="p-card" data-id="${E(r.id)}">
-      <div class="p-top"><span><b>${E(r.k)}</b> <span class="p-mut">· ${E(r.u)}</span> ${r.nowa ? '<span class="p-badge">nowa</span>' : ''} ${r.reported ? '<span class="p-badge warn">zgłoszona do moderacji</span>' : ''}</span><b aria-label="Ocena ${r.o} na 5">★ ${r.o}/5</b></div>
+      <div class="p-top"><span><b>${E(r.k)}</b> <span class="p-mut">· ${E(r.u)}</span> ${r.nowa ? '<span class="p-badge">nowa</span>' : ''} ${r.reported ? '<span class="p-badge warn">zgłoszona do moderacji</span>' : ''}</span><b role="img" aria-label="Ocena ${r.o} na 5">★ ${r.o}/5</b></div>
       <p style="margin:0;line-height:1.5">${E(r.t)}</p>
       ${r.reply ? `<div style="padding:10px 12px;border-radius:10px;background:#F6EDF1"><b>Odpowiedź studia</b><p style="margin:4px 0 0;line-height:1.45">${E(r.reply)}</p>${r.photo ? '<span class="p-badge ok" style="margin-top:6px">dołączono zdjęcie pracy</span>' : ''}</div>` : ''}
       <div class="p-acts"><button type="button" class="p-btn sm pri" data-a="reply">${r.reply ? 'Edytuj odpowiedź' : 'Odpowiedz'}</button>${r.reported ? '' : '<button type="button" class="p-btn sm" data-a="report">Zgłoś opinię</button>'}</div></article>`).join('');

@@ -417,6 +417,40 @@ dialog,dialog *,.kpanel{overscroll-behavior:contain}
     });
   }
 
+  // tabs (W3C APG): arrows, Home and End move and select; only the selected tab is in the Tab order (roving tabindex).
+  // A page with its own keyboard handling marks its tabs with data-kt.
+  document.addEventListener('keydown', e => {
+    const t = e.target.closest && e.target.closest('[role=tab]'); if (!t || t.dataset.kt !== undefined || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+    const all = [...(t.closest('[role=tablist]') || t.parentElement).querySelectorAll('[role=tab]')], i = all.indexOf(t), n = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+    e.preventDefault(); all[n].focus(); all[n].click();
+  });
+  function roving() {
+    document.querySelectorAll('[role=tablist]').forEach(l => {
+      const t = [...l.querySelectorAll('[role=tab]')], on = t.find(x => x.getAttribute('aria-selected') === 'true') || t[0];
+      t.forEach(x => { x.tabIndex = x === on ? 0 : -1; });
+    });
+  }
+  // a scrolling table or row without anything focusable must still be reachable by keyboard (WCAG 2.1.1)
+  function przewijane() {
+    document.querySelectorAll('.p-tw, [style*="overflow-x"]').forEach(e => {
+      if (!/auto|scroll/.test(getComputedStyle(e).overflowX) || e.scrollWidth <= e.clientWidth + 1 || e.hasAttribute('tabindex') || e.querySelector('a[href],button,input,select,textarea,[tabindex]')) return;
+      const h = e.closest('section, .p-card, dialog')?.querySelector('h1, h2, h3, caption');
+      e.tabIndex = 0; e.setAttribute('role', 'region'); e.setAttribute('aria-label', (h ? h.textContent.trim() : 'Tabela') + ', przewijane w bok');
+    });
+  }
+  // bars stuck to the top or bottom (tab bar, creator summary and progress bar, studio cart) must not hide the focused
+  // element (WCAG 2.4.11): the page scrolls focus clear of them
+  function dol() {
+    const pas = [...document.querySelectorAll('.nav, .d-aside, .koszyk, #pbar, #side')].map(e => ({ s: getComputedStyle(e), r: e.getBoundingClientRect() }))
+      .filter(({ s, r }) => /fixed|sticky/.test(s.position) && r.height && r.height < innerHeight / 2);
+    const h = (f) => Math.max(0, ...pas.filter(f).map(p => p.r.height));
+    const d = h(p => p.r.bottom >= innerHeight - 2), g = h(p => p.r.top <= 2);
+    document.documentElement.style.scrollPaddingBottom = d ? Math.ceil(d) + 12 + 'px' : '';
+    document.documentElement.style.scrollPaddingTop = g ? Math.ceil(g) + 12 + 'px' : '';
+  }
+  let porzadek = 0;
+  const porzadki = () => { clearTimeout(porzadek); porzadek = setTimeout(() => { roving(); przewijane(); dol(); }, 120); };
+
   function init() {
     // brand: the tab icon and name on every page
     document.querySelectorAll('link[rel=icon]').forEach(l => l.remove());
@@ -426,6 +460,8 @@ dialog,dialog *,.kpanel{overscroll-behavior:contain}
     // participants type passwords by habit: every password field (not the 4-digit PINs) says it is a mock
     document.querySelectorAll('input[type=password][autocomplete$=password]').forEach(i => { const n = document.createElement('span'); n.textContent = 'To makieta: nie wpisuj hasła, którego używasz gdzie indziej.'; n.style.cssText = 'color:#8A3B12;font-size:12px'; (i.parentElement.tagName === 'DIV' && i.parentElement.children.length > 1 && !i.parentElement.querySelector('label') ? i.parentElement : i).insertAdjacentElement('afterend', n); });
     oko(document);
+    porzadki(); new MutationObserver(porzadki).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-selected'] });
+    addEventListener('resize', porzadki);
     document.querySelectorAll('[data-zal-proc]').forEach(el => { el.textContent = zalProc(); }); // the studio's deposit %
     if (odwH() !== 24) document.querySelectorAll('[data-odw]').forEach(el => { el.innerHTML = el.innerHTML.replace(/24 h/g, odwH() + ' h'); }); // the studio's free-cancellation window
     document.addEventListener('click', e => {
