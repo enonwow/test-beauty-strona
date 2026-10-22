@@ -23,7 +23,6 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
 .lab{font-size:13px;color:#625860}
 .err{margin:0;color:#A3262A;font-size:13px}
 .inp[aria-invalid="true"]{border-color:#A3262A}
-.pokaz{min-height:52px;padding:0 14px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer}
 .tab{flex:1;min-height:44px;border:0;border-radius:10px;background:transparent;color:#1E1A1D;font:inherit;cursor:pointer}
 .tab[aria-selected="true"]{background:#fff;font-weight:700;box-shadow:0 1px 3px rgba(30,26,29,.15)}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -37,12 +36,8 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
 <div id="log" class="app">
 
-  <a href="start.html" aria-label="Zamknij" style="align-self:flex-start;width:44px;height:44px;border-radius:12px;border:1px solid #E4D9DE;display:flex;align-items:center;justify-content:center;color:#1E1A1D">
-    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-  </a>
-
   <div style="display:flex;flex-direction:column;gap:8px">
-    <span class="logo" style="display:inline-flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px"><img src="znak.svg" alt="" width="26" height="18">odcień</span>
+    <a href="start.html" class="logo" aria-label="odcień, strona główna" style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px;text-decoration:none"><img src="znak.svg" alt="" width="26" height="18">odcień</a>
     <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:700">Zaloguj się</h1>
     <p style="margin:0;color:#625860;line-height:1.45">Konto nie jest potrzebne do rezerwacji. Przyda się do historii stylizacji, ulubionych studiów i „Powtórz”.</p>
   </div>
@@ -55,7 +50,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
   <form id="f-pw" role="tabpanel" aria-labelledby="tab-pw" novalidate class="col">
     <div class="pole"><label for="l-login" class="lab">E-mail lub telefon</label><input id="l-login" class="inp" type="text" inputmode="email" autocomplete="username" placeholder="np. kasia@example.com"></div>
     <div class="pole"><label for="l-pw" class="lab">Hasło</label>
-      <div style="display:flex;gap:8px"><input id="l-pw" class="inp" style="flex:1" type="password" autocomplete="current-password"><button type="button" class="pokaz" data-pokaz="l-pw" aria-pressed="false">Pokaż</button></div>
+      <input id="l-pw" class="inp" type="password" autocomplete="current-password">
     </div>
     <button type="button" class="lnk" id="zapomnialam" style="align-self:flex-start">Nie pamiętasz hasła?</button>
     <button type="submit" class="btn">Zaloguj</button>
@@ -103,14 +98,14 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
 
 <form id="rej" class="app" novalidate hidden>
   <div style="display:flex;flex-direction:column;gap:8px">
-    <span class="logo" style="display:inline-flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px"><img src="znak.svg" alt="" width="26" height="18">odcień</span>
+    <a href="start.html" class="logo" aria-label="odcień, strona główna" style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px;text-decoration:none"><img src="znak.svg" alt="" width="26" height="18">odcień</a>
     <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:700">Załóż konto</h1>
     <p style="margin:0;color:#625860;line-height:1.45">Zapiszemy historię wizyt i stylizacji, a kolejna rezerwacja zajmie chwilę.</p>
   </div>
   <div class="pole"><label for="r-imie" class="lab">Imię</label><input id="r-imie" class="inp" type="text" autocomplete="given-name"></div>
   <div class="pole"><label for="r-login" class="lab">E-mail lub numer telefonu</label><input id="r-login" class="inp" type="text" inputmode="email" autocomplete="username" aria-describedby="r-login-h"><span id="r-login-h" style="color:#625860;font-size:12px">Nim się zalogujesz. Przyjdą na niego potwierdzenia wizyt.</span></div>
   <div class="pole"><label for="r-pw" class="lab">Hasło (co najmniej 8 znaków)</label>
-    <div style="display:flex;gap:8px"><input id="r-pw" class="inp" style="flex:1" type="password" autocomplete="new-password"><button type="button" class="pokaz" data-pokaz="r-pw" aria-pressed="false">Pokaż</button></div>
+    <input id="r-pw" class="inp" type="password" autocomplete="new-password">
   </div>
   <div class="pole"><label style="display:flex;gap:10px;align-items:flex-start;min-height:44px;font-size:14px;line-height:1.4"><input id="r-reg" type="checkbox" style="width:22px;height:22px;margin:0;flex:none">Akceptuję regulamin i politykę prywatności (wymagane)</label></div>
   <label style="display:flex;gap:10px;align-items:flex-start;min-height:44px;font-size:14px;line-height:1.4"><input id="r-mkt" type="checkbox" style="width:22px;height:22px;margin:0;flex:none">Chcę dostawać powiadomienia marketingowe: promocje i nowości od studiów (osobna zgoda, możesz ją cofnąć w każdej chwili)</label>
@@ -120,7 +115,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
 
 <form id="nowe" class="app" novalidate hidden>
   <div style="display:flex;flex-direction:column;gap:8px">
-    <span class="logo" style="display:inline-flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px"><img src="znak.svg" alt="" width="26" height="18">odcień</span>
+    <a href="start.html" class="logo" aria-label="odcień, strona główna" style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px;text-decoration:none"><img src="znak.svg" alt="" width="26" height="18">odcień</a>
     <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:700">Ustaw nowe hasło</h1>
     <p style="margin:0;color:#625860;line-height:1.45">Podaj e-mail lub telefon konta. Wyślemy kod, a potem ustawisz nowe hasło.</p>
   </div>
@@ -129,7 +124,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
   <div id="n-box" hidden class="col">
     <div class="pole"><label for="n-kod" class="lab">Kod (6 cyfr)</label><input id="n-kod" class="inp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" style="letter-spacing:.2em;text-align:center"></div>
     <div class="pole"><label for="n-pw" class="lab">Nowe hasło (co najmniej 8 znaków)</label>
-      <div style="display:flex;gap:8px"><input id="n-pw" class="inp" style="flex:1" type="password" autocomplete="new-password"><button type="button" class="pokaz" data-pokaz="n-pw" aria-pressed="false">Pokaż</button></div>
+      <input id="n-pw" class="inp" type="password" autocomplete="new-password">
     </div>
     <button type="submit" class="btn">Zapisz i zaloguj</button>
     <span style="color:#625860;font-size:12px">W makiecie działa każdy 6-cyfrowy kod.</span>
@@ -139,7 +134,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif}
 
 <form id="profil" class="app" novalidate hidden>
   <div style="display:flex;flex-direction:column;gap:8px">
-    <span class="logo" style="display:inline-flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px"><img src="znak.svg" alt="" width="26" height="18">odcień</span>
+    <a href="start.html" class="logo" aria-label="odcień, strona główna" style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:#1E1A1D;letter-spacing:-0.3px;text-decoration:none"><img src="znak.svg" alt="" width="26" height="18">odcień</a>
     <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:700">Uzupełnij profil</h1>
     <p style="margin:0;color:#625860;line-height:1.45">Numer telefonu masz już potwierdzony. Zostały dwa pola i zgoda na regulamin.</p>
   </div>
@@ -201,10 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function widok(id) { ['#log', '#rej', '#nowe', '#profil'].forEach(s => { $(s).hidden = s !== id; }); scrollTo(0, 0); $(id).querySelector('input:not([type=checkbox])').focus(); }
   document.addEventListener('click', e => { const b = e.target.closest('[data-widok]'); if (b) widok(b.dataset.widok); });
   $('#zapomnialam').addEventListener('click', () => { $('#n-login').value = $('#l-login').value.trim(); widok('#nowe'); });
-  document.querySelectorAll('[data-pokaz]').forEach(b => b.addEventListener('click', () => {
-    const i = document.getElementById(b.dataset.pokaz), on = i.type === 'password';
-    i.type = on ? 'text' : 'password'; b.textContent = on ? 'Ukryj' : 'Pokaż'; b.setAttribute('aria-pressed', String(on));
-  }));
 
   // tabs: password / SMS code
   const tabs = [['#tab-pw', '#f-pw'], ['#tab-sms', '#f-sms']];

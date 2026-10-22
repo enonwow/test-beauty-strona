@@ -51,13 +51,22 @@ h2{margin:0;font-size:18px;font-weight:700}
 .hh-b{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px}
 .hh-badge{position:absolute;top:10px;left:10px;padding:3px 9px;border-radius:999px;background:#9E1F50;color:#FFFFFF;font-weight:700;font-size:13px}
 .hh-t{padding:6px 10px;border-radius:10px;background:#F6EDF1;font-weight:700;font-size:13px}
-.kr-lista{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px}
-.kr-card{flex:0 0 200px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D;scroll-snap-align:start}
-.kr-card img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:14px;background:#FAF6F8}
-.kr-card:hover b{color:#9E1F50}
 .nw{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid #E4D9DE;border-radius:14px;text-decoration:none;color:#1E1A1D}
 .nw:hover{background:#FAF6F8;color:#1E1A1D}
 .nw-m{color:#625860;font-size:13px}.nw-t{font-size:15px;line-height:1.35}.nw-go{color:#9E1F50;font-size:13px;font-weight:700}
+/* news carousel (W3C APG carousel, NN/g, Baymard): no autoplay, swipe or arrows, the next card peeks out */
+#nw-lista{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:2px 0;overscroll-behavior-x:contain}
+#nw-lista::-webkit-scrollbar{display:none}
+#nw-lista>div{flex:0 0 84%;display:flex;scroll-snap-align:start;min-height:132px}
+#nw-lista>div>a{flex:1}
+@media (min-width:1024px){#nw-lista>div{flex-basis:calc((100% - 30px)/3.15)}}
+@media (prefers-reduced-motion:reduce){#nw-lista{scroll-behavior:auto}}
+.nw-all{display:flex;align-items:center;justify-content:center;border:1px dashed #C9B6BF;border-radius:14px;color:#9E1F50;font-weight:700;text-decoration:none}
+.kr-nav{display:flex;align-items:center;gap:8px}
+.kr-poz{font-size:13px;color:#625860;min-width:40px;text-align:right}
+.kr-b{width:44px;height:44px;border-radius:999px;border:1px solid #C9B6BF;background:#fff;color:#1E1A1D;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.kr-b:disabled{opacity:.35;cursor:default}
+.kr-b:not(:disabled):hover{background:#FAF6F8}
 /* phone and tablet: photo with the headline, the search card overlapping its bottom, the rest on white */
 @media (max-width:1023px){
   .hero-a{position:relative;margin:4px 16px 0;background:#FFFFFF;color:#1E1A1D;overflow:visible;border-radius:0}
@@ -73,8 +82,6 @@ h2{margin:0;font-size:18px;font-weight:700}
 @media (min-width:1024px){
   .hh-lista{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;overflow:visible}
   .hh-card{max-width:none}
-  .kr-lista{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;overflow:visible}
-  #nw-lista{grid-template-columns:repeat(3,minmax(0,1fr))}
   .nav{margin-top:0 !important;grid-template-columns:repeat(4,auto);justify-content:start;gap:8px;border-top:0;border-bottom:1px solid #F0E8EC;padding:6px 20px}
   .nav a{flex-direction:row;gap:8px;padding:0 16px;font-size:14px;min-height:48px}
   .hero-a{margin:16px 20px 0;border-radius:24px;min-height:420px}
@@ -111,7 +118,7 @@ h2{margin:0;font-size:18px;font-weight:700}
     <h1 style="margin:0;font-size:32px;line-height:1.1;font-weight:700">Znajdź termin i poznaj cenę od razu</h1>
     <p>Zaprojektuj stylizację, zobacz cenę i wolne godziny. Bez dzwonienia.</p>
     <form id="szukaj" role="search" class="sf" aria-label="Szukaj terminu"></form>
-    <div class="hero-stat"><span><b>214</b>studiów w Warszawie</span><span><b>4,8 ★</b>średnia ocen</span><span><b>0 zł</b>za rezerwację</span></div>
+    <div class="hero-stat"><span><b>5</b>studiów na Mokotowie</span><span><b>4,8 ★</b>średnia ocen</span><span><b>0 zł</b>za rezerwację</span></div>
     </div>
   </section>
 
@@ -126,6 +133,31 @@ h2{margin:0;font-size:18px;font-weight:700}
     </nav>
   </section>
 
+  <section style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h2>Wolne dziś w pobliżu</h2>
+      <a href="wyniki.html" style="font-size:14px;font-weight:500;min-height:44px;display:flex;align-items:center">Wszystkie</a>
+    </div>
+    <div class="d-grid">
+    <a href="salon.html?s=Studio%20Malwa" class="salonk">
+      <img src="zdjecia/studio-malwa.jpg" alt="" width="56" height="56" loading="lazy" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none">
+      <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+        <span style="font-weight:700">Studio Malwa</span>
+        <span style="color:#625860;font-size:13px">Paznokcie, rzęsy · 1,2 km</span>
+        <span style="font-size:13px">Dziś: 14:30, 16:40</span>
+      </span>
+    </a>
+    <a href="salon.html?s=Pracownia%20Lilia" class="salonk">
+      <img src="zdjecia/studio-lilia.jpg" alt="" width="56" height="56" loading="lazy" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none">
+      <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+        <span style="font-weight:700">Pracownia Lilia</span>
+        <span style="color:#625860;font-size:13px">Rzęsy, brwi · 1,9 km</span>
+        <span style="font-size:13px">Dziś: 18:00</span>
+      </span>
+    </a>
+    </div>
+  </section>
+
   <section id="hh" hidden aria-labelledby="hh-h" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
     <div style="display:flex;justify-content:space-between;align-items:baseline">
       <h2 id="hh-h" style="font-size:20px">Happy hours dziś</h2>
@@ -136,42 +168,47 @@ h2{margin:0;font-size:18px;font-weight:700}
   </section>
 
 
-  <section aria-labelledby="kr-h" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
-    <h2 id="kr-h" style="font-size:20px">Zaprojektuj i poznaj cenę</h2>
-    <span style="color:#625860;font-size:14px;line-height:1.45">Kreator liczy cenę i czas wizyty, zanim zarezerwujesz. Ceny przykładowego studia.</span>
-    <div class="kr-lista">
-      <a class="kr-card" href="paznokcie.html"><img src="zdjecia/k-paznokcie.jpg" alt="" width="480" height="360" loading="lazy"><b>Paznokcie</b><span style="color:#625860;font-size:13px;line-height:1.4">Kształt, kolor i zdobienia na prawdziwej dłoni</span></a>
-      <a class="kr-card" href="rzesy.html"><img src="zdjecia/k-rzesy.jpg" alt="" width="480" height="360" loading="lazy"><b>Rzęsy</b><span style="color:#625860;font-size:13px;line-height:1.4">Styl, gęstość i skręt, przymierz na selfie</span></a>
-      <a class="kr-card" href="brwi.html"><img src="zdjecia/k-brwi.jpg" alt="" width="480" height="360" loading="lazy"><b>Brwi</b><span style="color:#625860;font-size:13px;line-height:1.4">Kształt i odcień, pakiety z rzęsami</span></a>
-      <a class="kr-card" href="fryzjer.html"><img src="zdjecia/k-fryzjer.jpg" alt="" width="480" height="360" loading="lazy"><b>Fryzjer</b><span style="color:#625860;font-size:13px;line-height:1.4">Długość i kolor, zobacz kolor na swoim zdjęciu</span></a>
-      <a class="kr-card" href="kosmetyka.html"><img src="zdjecia/k-kosmetyka.jpg" alt="" width="480" height="360" loading="lazy"><b>Kosmetologia</b><span style="color:#625860;font-size:13px;line-height:1.4">Zabieg, obszar i seria z rabatem</span></a>
-    </div>
-  </section>
 
-  <section id="nw" hidden aria-labelledby="nw-h" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
-    <div style="display:flex;justify-content:space-between;align-items:baseline">
-      <h2 id="nw-h" style="font-size:20px">Aktualności ze świata beauty</h2>
-      <a href="aktualnosci.html" style="font-size:14px;font-weight:500;min-height:44px;display:flex;align-items:center">Wszystkie</a>
+  <section id="nw" hidden aria-labelledby="nw-h" aria-roledescription="karuzela" style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px">
+      <h2 id="nw-h" style="font-size:20px">Aktualności</h2>
+      <div class="kr-nav">
+        <a href="aktualnosci.html" style="font-size:14px;font-weight:500;min-height:44px;display:flex;align-items:center">Wszystkie</a>
+        <span id="kr-poz" class="kr-poz" aria-hidden="true"></span>
+        <button type="button" id="kr-prev" class="kr-b" aria-label="Poprzednie" aria-controls="nw-lista"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button type="button" id="kr-next" class="kr-b" aria-label="Następne" aria-controls="nw-lista"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
     </div>
-    <div id="nw-lista" style="display:grid;gap:10px"></div>
+    <div id="nw-lista" aria-live="polite"></div>
   </section>
   <script type="module">
     import { wczytajNewsy, karta } from './aktualnosci.js';
     // the block only shows up when there are headlines; no spinner on the start page
+    // NN/g: about five items is what people browse, so 6 headlines and a card to all news at the end
     wczytajNewsy().then(d => {
-      const k = d.items.slice(0, 3).map(i => karta(i, { lead: false })).filter(Boolean);
+      const k = d.items.slice(0, 6).map(i => karta(i, { lead: false })).filter(Boolean);
       if (!k.length) return;
-      document.getElementById('nw-lista').replaceChildren(...k);
+      const all = Object.assign(document.createElement('a'), { className: 'nw-all', href: 'aktualnosci.html', textContent: 'Wszystkie aktualności →' });
+      const l = document.getElementById('nw-lista'), n = k.length + 1;
+      l.replaceChildren(...[...k, all].map((a, i) => { const g = document.createElement('div'); g.setAttribute('role', 'group'); g.setAttribute('aria-roledescription', 'slajd'); g.setAttribute('aria-label', `${i + 1} z ${n}`); g.append(a); return g; }));
       document.getElementById('nw').hidden = false;
+      const prev = document.getElementById('kr-prev'), next = document.getElementById('kr-next'), poz = document.getElementById('kr-poz');
+      const krok = () => l.firstElementChild.offsetWidth + 10, naRaz = () => Math.max(1, Math.floor(l.clientWidth / krok()));
+      prev.onclick = () => l.scrollBy({ left: -krok() * naRaz() });
+      next.onclick = () => l.scrollBy({ left: krok() * naRaz() });
+      const stan = () => {
+        prev.disabled = l.scrollLeft < 4; next.disabled = l.scrollLeft + l.clientWidth >= l.scrollWidth - 4;
+        poz.textContent = `${Math.min(Math.round(l.scrollLeft / krok()) + naRaz(), k.length)} / ${k.length}`; // the card to all news is not counted
+      };
+      l.addEventListener('scroll', stan, { passive: true }); addEventListener('resize', stan); stan();
     }).catch(() => {});
   </script>
 
   <div class="st-row">
   <section class="nov" style="margin:24px 20px 0;padding:16px;border-radius:18px;background:#1E1A1D;color:#FFFFFF;display:flex;flex-direction:column;gap:10px">
-    <span style="font-size:12px;color:#E9DEE3;letter-spacing:.04em">NOWOŚĆ</span>
-    <h2 style="font-size:20px">Szukaj po stylizacji</h2>
-    <p style="margin:0;color:#E9DEE3;font-size:14px;line-height:1.45">Ułóż paznokcie w kreatorze, a pokażemy studia z ceną i najbliższym terminem właśnie na tę stylizację.</p>
-    <a href="paznokcie.html" style="align-self:flex-start;min-height:44px;padding:0 16px;border-radius:10px;background:#FFFFFF;color:#1E1A1D;text-decoration:none;font-weight:700;display:flex;align-items:center">Ułóż stylizację</a>
+    <h2 style="font-size:20px">Zaprojektuj i poznaj cenę</h2>
+    <p style="margin:0;color:#E9DEE3;font-size:14px;line-height:1.45">Ułóż stylizację w kreatorze: od razu zobaczysz cenę, czas i studia z wolnym terminem na tę stylizację.</p>
+    <nav aria-label="Kreatory" style="display:flex;gap:8px;flex-wrap:wrap"><a href="paznokcie.html" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.5);color:#FFFFFF;text-decoration:none;font-weight:600">Paznokcie</a><a href="rzesy.html" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.5);color:#FFFFFF;text-decoration:none;font-weight:600">Rzęsy</a><a href="brwi.html" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.5);color:#FFFFFF;text-decoration:none;font-weight:600">Brwi</a><a href="fryzjer.html" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.5);color:#FFFFFF;text-decoration:none;font-weight:600">Fryzjer</a><a href="kosmetyka.html" style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.5);color:#FFFFFF;text-decoration:none;font-weight:600">Kosmetologia</a></nav>
   </section>
 
   <section style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
@@ -193,39 +230,7 @@ h2{margin:0;font-size:18px;font-weight:700}
   </section>
   </div>
 
-  <section style="padding:24px 20px 0;display:flex;flex-direction:column;gap:10px">
-    <div style="display:flex;justify-content:space-between;align-items:baseline">
-      <h2>Wolne dziś w pobliżu</h2>
-      <a href="wyniki.html" style="font-size:14px;font-weight:500;min-height:44px;display:flex;align-items:center">Wszystkie</a>
-    </div>
-    <div class="d-grid">
-    <a href="salon.html?s=Studio%20Malwa" class="salonk">
-      <img src="zdjecia/studio-malwa.jpg" alt="" width="56" height="56" loading="lazy" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none">
-      <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
-        <span style="font-weight:700">Studio Malwa</span>
-        <span style="color:#625860;font-size:13px">Paznokcie, rzęsy · 0,8 km</span>
-        <span style="font-size:13px">Dziś: 14:30, 16:40</span>
-      </span>
-    </a>
-    <a href="salon.html?s=Pracownia%20Lilia" class="salonk">
-      <img src="zdjecia/studio-lilia.jpg" alt="" width="56" height="56" loading="lazy" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none">
-      <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
-        <span style="font-weight:700">Pracownia Lilia</span>
-        <span style="color:#625860;font-size:13px">Rzęsy, brwi · 1,4 km</span>
-        <span style="font-size:13px">Dziś: 18:00</span>
-      </span>
-    </a>
-    </div>
-  </section>
 
-  <section aria-labelledby="firma-h" style="margin:28px 20px 0;padding:20px;border-radius:18px;background:#F6EDF1;display:flex;flex-direction:column;gap:10px">
-    <h2 id="firma-h" style="margin:0">Prowadzisz salon beauty?</h2>
-    <p style="margin:0;color:#625860;line-height:1.5">Załóż konto studia w kilka minut: kalendarz, rezerwacje online i kreator ceny. Bez prowizji od rezerwacji.</p>
-    <span style="display:flex;gap:8px;flex-wrap:wrap">
-      <a href="onboarding.html" class="btn" style="padding:0 20px">Załóż konto studia</a>
-      <a href="dla-studiow.html" style="min-height:50px;padding:0 16px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;text-decoration:none;display:flex;align-items:center;font-weight:500">Jak to działa</a>
-    </span>
-  </section>
 
   <footer style="margin-top:24px;padding:16px 20px;border-top:1px solid #F0E8EC;display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
     <a href="dla-studiow.html" style="min-height:44px;display:flex;align-items:center;font-weight:500">Dla studiów</a>

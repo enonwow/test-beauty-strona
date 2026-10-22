@@ -107,6 +107,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       if (t) Mock.toast(t);
     });
     d.addEventListener('close', () => d.remove());
+    Mock.oko(d);
     d.showModal();
     if (o.onOpen) o.onOpen(f, d);
     return d;
@@ -126,7 +127,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     modal({
       title: 'Nowa wizyta', ok: 'Dodaj',
       body: `<label class="p-lab">Klientka<input class="p-in" name="kl" required placeholder="Imię i nazwisko"></label>
-        <label class="p-lab">Usługa<select class="p-in" name="us">${SVC.map((s, i) => `<option value="${i}">${esc(s[0])} · ${s[2]} zł</option>`).join('')}</select></label>
+        <label class="p-lab">Usługa<select class="p-in" name="us">${SVC.map((s, i) => `<option value="${i}"${i === Math.max(0, SVC.findIndex(x => !o.miejsce || x[3] <= o.miejsce)) ? ' selected' : ''}>${esc(s[0])} · ${s[2]} zł · ${s[3]} min</option>`).join('')}</select></label>
         <label class="p-lab">Stylistka<select class="p-in" name="st">${STYL.map(s => `<option${s.n === o.stylistka ? ' selected' : ''}>${esc(s.n)}</option>`).join('')}</select></label>
         <label class="p-lab"${o.days ? '' : ' hidden'}>Dzień<select class="p-in" name="dz">${days.map(d => `<option value="${esc(d[1])}"${d[1] === o.dzien ? ' selected' : ''}>${esc(d[0])}</option>`).join('')}</select></label>
         <label class="p-lab">Godzina<select class="p-in" name="t">${SLOTS.map(x => `<option${x === (o.godz || '10:00') ? ' selected' : ''}>${x}</option>`).join('')}</select></label>

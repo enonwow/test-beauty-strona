@@ -347,8 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#zad-rodz').textContent = trybOn === 'calosc' && !B.seria ? 'płatności całości z góry' : 'zaliczki'; $('#zad-proc').hidden = trybOn === 'calosc' && !B.seria;
   const krokZal = () => { $('#krok-zal').hidden = $('#zad-lab').hidden || !$('#zad').checked; $('#reszta-txt').hidden = !$('#zad-lab').hidden && $('#zad').checked && trybOn === 'calosc' && !B.seria; };
   $('#zad').addEventListener('change', krokZal); // the mock switch changes only this booking; the studio's choice lives in ustawienia.html
-  if (user.imie) $('#imie').value = user.imie;
-  if (user.tel) $('#tel').value = user.tel;
+  const kt0 = B.kontakt || {}; // rescheduling or rebooking: the contact of the visit, else the logged-in client
+  if (kt0.imie || user.imie) $('#imie').value = kt0.imie || user.imie;
+  if (kt0.tel || user.tel) $('#tel').value = kt0.tel || user.tel;
   if (cenaMax > cenaMin && !konsult && B.powodPrzedzialu && !przeloz) { $('#powod').hidden = false; $('#powod').textContent = `Dlaczego widełki: ${String(B.powodPrzedzialu).replace(/[.\s]+$/, '')}.`; }
   // back/"Zmień" return to the creator of this category (it remembers the choice); old bookings go to the nails creator
   const KREATOR = { rzesy: 'rzesy.html', brwi: 'brwi.html', fryzjer: 'fryzjer.html', kosmetologia: 'kosmetyka.html' }[B.kat];
@@ -356,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (przeloz) {
     $('#tytul').textContent = 'Przełóż wizytę';
     $('#wstecz').href = 'potwierdzenie.html'; $('#wstecz').setAttribute('aria-label', 'Wróć do potwierdzenia');
-    $('#rez-btn').textContent = 'Przełóż na ten termin';
+    $('#btn-txt').textContent = 'Przełóż na ten termin'; // keep the span: the submit handler writes its busy text there
     $('#zad-lab').hidden = true;
   } else if (konsult) {
     $('#tytul').textContent = 'Umów konsultację';

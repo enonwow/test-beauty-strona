@@ -21,12 +21,13 @@ paznokcia (współrzędne w pikselach zapisanego pliku), a dla dlon-4 dodatkowo 
 
 ## Miniatury kreatorów na stronie głównej (`k-*.jpg`, 480×360)
 
-Pobrane 2026-10-19. `k-paznokcie.jpg` to kadr z dlon-1.jpg, `k-brwi.jpg` kadr z oczy-1.jpg, `k-rzesy.jpg` to oczy-1.jpg z rzęsami narysowanymi przez kreator (styl kocie oko, 3D). Dwa nowe zdjęcia, na których nie widać twarzy w całości:
+Pobrane 2026-10-19. `k-paznokcie.jpg` to kadr z dlon-1.jpg, `k-brwi.jpg` kadr z oczy-1.jpg, `k-rzesy.jpg` od 2026-10-22 to prawdziwe zdjęcie (tabela niżej), nie render kreatora. Dwa nowe zdjęcia, na których nie widać twarzy w całości:
 
 | Plik | Źródło | Autor | Licencja |
 |---|---|---|---|
 | k-fryzjer.jpg | https://unsplash.com/photos/two-women-with-long-wavy-blonde-and-brunette-hair-RpFQdgJ9gQw | Yovanka Loria Salon (@yovankaloriasalon) | Unsplash License, https://unsplash.com/license |
 | k-kosmetyka.jpg | https://unsplash.com/photos/facial-treatment-with-brush-applying-white-cream-to-face-Xxs9WvkUPLo | kimia kazemi (@kimick) | Unsplash License, https://unsplash.com/license |
+| k-rzesy.jpg (pobrane 2026-10-22, 480×360) | https://unsplash.com/photos/a-close-up-of-a-persons-eye-with-long-lashes-GEct9d7zgos | Milky Way Lashes (@milkywaylashes) | Unsplash License, https://unsplash.com/license |
 
 ## Przykładowe włosy w kreatorze fryzjera (`wlosy-*.jpg`, `wlosy-*-mini.jpg`, `wlosy-*-maska.png`)
 
@@ -61,8 +62,13 @@ Poziomy długości (ucho, ramiona, łopatki, pas, poniżej pasa) są wyskalowane
 
 ## Miniatury gotowych stylizacji (`styl-*.jpg`, 600×450)
 
-`styl-micro-french.jpg`, `styl-velvet-burgund.jpg` i `styl-glazed-pearl.jpg` to rendery kreatora paznokci (silnik lakieru z `paznokcie.html`) na zdjęciach
-dlon-1.jpg (micro french i glazed pearl) oraz dlon-3.jpg (velvet burgund), z kadrem na paznokcie i kompresją JPEG. Licencje i autorzy jak dla tych zdjęć wyżej.
+Pobrane 2026-10-22 z Unsplash (darmowa licencja, nie Unsplash+), kadr 600×450 z serwera Unsplash, JPEG. Zastąpiły dawne rendery kreatora: w makiecie nie używamy zrzutów ani renderów z naszych kreatorów jako zdjęć.
+
+| Plik | Źródło | Autor | Licencja |
+|---|---|---|---|
+| styl-micro-french.jpg | https://unsplash.com/photos/womans-hand-with-french-manicure-holds-small-flower-3AQ_VHXfjEg | Anna Meshkov (@anna_meshkov) | Unsplash License, https://unsplash.com/license |
+| styl-velvet-burgund.jpg | https://unsplash.com/photos/a-woman-holding-a-cup-of-coffee-in-her-hands-yE5h2O5bAY4 | Arsalan Farzi (@afarzi) | Unsplash License, https://unsplash.com/license |
+| styl-glazed-pearl.jpg | https://unsplash.com/photos/person-wearing-silver-ring-and-black-long-sleeve-shirt-vPrqHSLdF28 | allison christine (@happpyal) | Unsplash License, https://unsplash.com/license |
 
 ## Kosmetologia (krok „Obszar”)
 

@@ -207,9 +207,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function wolne(V) {
     const teraz = Mock.teraz(), nowM = Mock.odDzis(teraz) === 0 ? teraz.getHours() * 60 + teraz.getMinutes() : DAY0, out = [];
     [1, 2].forEach(c => {
-      const zaj = Object.values(V).filter(v => v.col === c).map(v => [toMin(v.t), toMin(v.t) + v.dur + techMin()]).concat(LOCK.filter(l => l.col === c).map(l => [l.a, l.b])).sort((a, b) => a[0] - b[0]);
+      const zaj = Object.values(V).filter(v => v.col === c).map(v => [toMin(v.t), toMin(v.t) + v.dur + techMin()]).concat(LOCK.filter(l => l.col === c).map(l => [l.a, l.b + techMin()])).sort((a, b) => a[0] - b[0]); // the break applies after a manual block too
       let od = Math.max(DAY0, Math.ceil(nowM / 15) * 15);
-      zaj.concat([[DAY1, DAY1]]).forEach(([a, b]) => { if (a - od >= 30) out.push([c, od, a]); od = Math.max(od, Math.ceil(b / 5) * 5); });
+      zaj.concat([[DAY1, DAY1]]).forEach(([a, b]) => { if (a - od >= 30) out.push([c, od, a]); od = Math.max(od, Math.ceil(b / 15) * 15); }); // quarter hours, like the hour list of "Nowa wizyta"
     });
     return out;
   }
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'kal-wolne';
       b.style.cssText = `position:absolute;z-index:1;left:6px;right:6px;top:${(od - DAY0) * PPM + 4}px;height:${Math.min(48, (doo - od) * PPM - 8)}px;box-sizing:border-box;border:1.5px dashed #C9B6BF;border-radius:10px;background:#FFFFFF;color:#9E1F50;font:inherit;font-size:12px;font-weight:700;cursor:pointer`;
       b.textContent = `Wolne ${fmt(od)}–${fmt(doo)} · Dodaj wizytę`;
-      b.addEventListener('click', () => PS.visitModal({ done: renderAll, check: wolny, godz: fmt(od), stylistka: PS.STYL[c - 1].n }));
+      b.addEventListener('click', () => PS.visitModal({ done: renderAll, check: wolny, godz: fmt(od), stylistka: PS.STYL[c - 1].n, miejsce: doo - od }));
       colEl(c).append(b);
     });
     const ile = Object.keys(V).length, utarg = Object.entries(V).reduce((a, [id, v]) => a + total(id, v), 0), czeka = Object.values(V).filter(v => v.potw === false).length, min = W.reduce((a, w) => a + w[2] - w[1], 0);

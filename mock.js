@@ -369,12 +369,20 @@ html:has(dialog[open]),html:has(.kdim){overflow:hidden}
 dialog,dialog *,.kpanel{overscroll-behavior:contain}
 .mock-zglos{min-height:28px;padding:2px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.6);background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}
 .mock-zglos:hover{background:rgba(255,255,255,.12)}
-.mock-uwagi{position:fixed;right:12px;bottom:88px;z-index:50;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:#1E1A1D;color:#FFFFFF;font:700 14px 'DM Sans',sans-serif;box-shadow:0 6px 18px rgba(30,10,18,.25);cursor:pointer}
+.pw-w{position:relative;display:flex;flex:1;min-width:0}
+.pw-w>input{flex:1;width:100%;padding-right:52px !important}
+.pw-oko{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:44px;padding:0;border:0;border-radius:10px;background:none;color:#625860;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pw-oko:hover{color:#1E1A1D;background:#FAF6F8}
+.pw-oko:focus-visible{outline:2px solid #9E1F50;outline-offset:-2px}
+/* testers' feedback: a slim tab on the right edge, it covers nothing */
+.mock-uwagi{position:fixed;right:0;top:50%;transform:rotate(-90deg) translateY(-100%);transform-origin:top right;z-index:50;min-height:36px;padding:0 14px;border-radius:10px 10px 0 0;border:0;background:#1E1A1D;color:#FFFFFF;font:700 13px 'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(30,10,18,.2);cursor:pointer}
 .mock-uwagi:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
-@media (min-width:1024px){.mock-uwagi{bottom:20px;right:20px}}
 .nav-x{display:none !important}
 @media (min-width:1024px){.nav-x{display:flex !important}.nav-firma{margin-left:auto;border:1px solid #9E1F50;border-radius:10px;color:#9E1F50 !important;font-weight:700;min-height:44px !important}.nav-firma:hover{background:#F6EDF1}.nav.d-tabbar{display:flex;align-items:center}.nav.d-tabbar::before,.nav-firma{white-space:nowrap}.nav-firma{gap:0 !important}}
 @media (min-width:1024px) and (max-width:1199px){.nav-firma-x{display:none}}
+.nav-login{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:10px;color:#1E1A1D !important;font-weight:700;white-space:nowrap;text-decoration:none}.nav-login:hover{background:#F6EDF1}
+.nav-login .av{width:30px;height:30px;border-radius:50%;background:#9E1F50;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:13px}
+@media (min-width:1024px){.nav-login{margin-left:auto}.nav-login~.nav-firma{margin-left:12px}.nav-login~.nav-firma .nav-firma-x{display:none}.nav.d-tabbar a.nav-prof{display:none !important}}
 .mock-dzis{padding:2px 10px;border-radius:999px;background:#FFF1E0;color:#8A3B12;font-weight:700;white-space:nowrap}
 .mock-zglos:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px}
 @media (max-width:1023px){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:16px !important}}
@@ -395,6 +403,20 @@ dialog,dialog *,.kpanel{overscroll-behavior:contain}
   style.textContent = CSS;
   (document.head || document.documentElement).appendChild(style);
 
+  // eye toggle inside every password field (not the 4-digit PINs); a fixed label with aria-pressed, as a toggle button should have
+  const OKO = '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const OKO_X = '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.7 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.2M6.6 6.6C3.6 8.6 2 12 2 12s3.5 7 10 7c1.8 0 3.4-.5 4.7-1.3M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18"/></svg>';
+  function oko(root) {
+    root.querySelectorAll('input[type=password][autocomplete$=password]:not([data-oko])').forEach(i => {
+      i.dataset.oko = '1';
+      const w = document.createElement('span'); w.className = 'pw-w'; i.replaceWith(w);
+      const b = Object.assign(document.createElement('button'), { type: 'button', className: 'pw-oko', innerHTML: OKO });
+      b.setAttribute('aria-label', 'Pokaż hasło'); b.setAttribute('aria-pressed', 'false'); if (i.id) b.setAttribute('aria-controls', i.id);
+      b.addEventListener('click', () => { const on = i.type === 'password'; i.type = on ? 'text' : 'password'; b.innerHTML = on ? OKO_X : OKO; b.setAttribute('aria-pressed', String(on)); });
+      w.append(i, b);
+    });
+  }
+
   function init() {
     // brand: the tab icon and name on every page
     document.querySelectorAll('link[rel=icon]').forEach(l => l.remove());
@@ -403,6 +425,7 @@ dialog,dialog *,.kpanel{overscroll-behavior:contain}
     document.querySelectorAll('[data-choice]').forEach(g => choiceStyles(g, choiceItems(g)));
     // participants type passwords by habit: every password field (not the 4-digit PINs) says it is a mock
     document.querySelectorAll('input[type=password][autocomplete$=password]').forEach(i => { const n = document.createElement('span'); n.textContent = 'To makieta: nie wpisuj hasła, którego używasz gdzie indziej.'; n.style.cssText = 'color:#8A3B12;font-size:12px'; (i.parentElement.tagName === 'DIV' && i.parentElement.children.length > 1 && !i.parentElement.querySelector('label') ? i.parentElement : i).insertAdjacentElement('afterend', n); });
+    oko(document);
     document.querySelectorAll('[data-zal-proc]').forEach(el => { el.textContent = zalProc(); }); // the studio's deposit %
     if (odwH() !== 24) document.querySelectorAll('[data-odw]').forEach(el => { el.innerHTML = el.innerHTML.replace(/24 h/g, odwH() + ' h'); }); // the studio's free-cancellation window
     document.addEventListener('click', e => {
@@ -423,7 +446,13 @@ dialog,dialog *,.kpanel{overscroll-behavior:contain}
     bindTexts(document);
     // news and the studio sign-up in the shared top menu (desktop only: the phone tab bar keeps its 4 tabs)
     const tab = document.querySelector('.nav.d-tabbar');
-    if (tab) tab.insertAdjacentHTML('beforeend', `<a href="aktualnosci.html" class="nav-x"${/aktualnosci\.html$/.test(location.pathname) ? ' aria-current="page"' : ''}><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 9h3v8a2 2 0 0 1-2 2"></path><path d="M8 9h5M8 13h5"></path></svg>Aktualności</a><a href="dla-studiow.html" class="nav-x nav-firma">Dla studiów<span class="nav-firma-x">: załóż konto salonu</span></a>`);
+    // log in / sign up (or the client's name) next to the studio link; on the phone the Profil tab says "Zaloguj się" until she logs in
+    const ja = get('user', {}) || {}, wroc = encodeURIComponent(location.pathname.split('/').pop() + location.search);
+    const prof = tab && [...tab.querySelectorAll('a')].find(a => /^konto\.html/.test(a.getAttribute('href') || ''));
+    if (prof) { prof.classList.add('nav-prof'); if (!ja.zalogowana) { prof.href = 'logowanie.html?wroc=' + wroc; [...prof.childNodes].reverse().find(n => n.nodeType === 3 && n.textContent.trim()).textContent = 'Zaloguj się'; } }
+    const konto = ja.zalogowana ? `<a href="konto.html" class="nav-x nav-login"><span class="av" aria-hidden="true">${esc((ja.imie || 'K').trim().charAt(0).toUpperCase())}</span>${esc(ja.imie || 'Moje konto')}</a>`
+      : `<a href="logowanie.html?wroc=${wroc}" class="nav-x nav-login"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>Zaloguj się / Załóż konto</a>`;
+    if (tab) tab.insertAdjacentHTML('beforeend', `<a href="aktualnosci.html" class="nav-x"${/aktualnosci\.html$/.test(location.pathname) ? ' aria-current="page"' : ''}><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 9h3v8a2 2 0 0 1-2 2"></path><path d="M8 9h5M8 13h5"></path></svg>Aktualności</a>${konto}<a href="dla-studiow.html" class="nav-x nav-firma">Dla studiów<span class="nav-firma-x">: załóż konto salonu</span></a>`);
     // test links: ?test=1 / ?test=0 switches the test mode, ?reset=1 clears the data, ?scen=N opens a ready scenario (Narzędzia makiety)
     const P = new URLSearchParams(location.search);
     if (P.has('test')) set('tryb.test', P.get('test') === '1');
@@ -494,7 +523,7 @@ dialog,dialog *,.kpanel{overscroll-behavior:contain}
 
   window.Mock = { lok, lokOf, get, set, reset, lookup, toast, addVisit, bindTexts, zl, dur, plural, zostalo,
     happyHours, setHappyHours, promoFor, happyToday, priceAfter, weekday, fotoKat, nipOk, polec,
-    teraz, dzien, SKR, MIES, MIESD, dm, krotko, dlugo, zKrotko, odDzis, ustawDzis, testowa, iso, kody, setKody, sprawdzKod, karnety, sprzedane, karnetDla, cennikPoz, godziny, studio, moja, mojPodpis, odwH, zalProc, esc, fvNr, wizyt, kropki, zostaloZ, zostanie, sprzedaj, odlicz, odliczModal, cofnijOdlicz, KLIENTKI, klientki, reklamacje, setReklamacje, ankiety, ankietyWynik, magazyn, zalecenia,
+    oko, teraz, dzien, SKR, MIES, MIESD, dm, krotko, dlugo, zKrotko, odDzis, ustawDzis, testowa, iso, kody, setKody, sprawdzKod, karnety, sprzedane, karnetDla, cennikPoz, godziny, studio, moja, mojPodpis, odwH, zalProc, esc, fvNr, wizyt, kropki, zostaloZ, zostanie, sprzedaj, odlicz, odliczModal, cofnijOdlicz, KLIENTKI, klientki, reklamacje, setReklamacje, ankiety, ankietyWynik, magazyn, zalecenia,
     platnoscTryb, setPlatnoscTryb, zaliczka, PLATNOSC, platnoscBadge, zwrotPrzyOdwolaniu, zwrotTekst, stanowiska, stanSprzet, stanowiskoDla, stanowiskaWizyty, kolizjaStan, waznosc, waznePartie, zadania, setZadania, odKogo };
   // Studio styles (marketing.html adds them, salon.html shows those with on). foto: zdjecia/ path or a small data URL; link: creator link with the settings.
   const KOLEKCJA_SEED = [

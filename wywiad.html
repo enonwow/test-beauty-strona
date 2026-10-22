@@ -70,7 +70,7 @@ async function start() {
 function pytanie() {
   const u = window.Mock?.get('user', {}) || {}, zdj = [], TEMATY = ['Paznokcie', 'Rzęsy', 'Brwi', 'Włosy', 'Kosmetologia', 'Inne'];
   const temat0 = { rzesy: 'Rzęsy', brwi: 'Brwi', fryzjer: 'Włosy', kosmetologia: 'Kosmetologia' }[kat];
-  const studia = (window.Mock?.get('lokalizacje', null) || [{ n: 'Studio Malwa – Mokotów' }, { n: 'Studio Malwa – Centrum' }]).map(l => l.n); // same list as the panel's locations
+  const studia = (window.Mock?.get('lokalizacje', null) || [{ n: 'Studio Malwa – Centrum' }, { n: 'Studio Malwa – Mokotów' }]).map(l => l.n); // same list as the panel's locations
   document.title = 'Zapytaj studio'; document.querySelector('h1').textContent = 'Zapytaj studio';
   root.innerHTML = `<form id="pyt" novalidate style="padding: 16px 0; max-width: 640px; display: flex; flex-direction: column; gap: 14px">
     <p style="margin: 0; color: #625860; line-height: 1.5">Masz pytanie przed wizytą? Napisz do studia, możesz dodać zdjęcie. Nie musisz niczego wybierać w kreatorze.</p>

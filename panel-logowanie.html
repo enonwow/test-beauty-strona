@@ -39,7 +39,7 @@
     <form id="p-pw" role="tabpanel" aria-labelledby="tab-pw" novalidate style="display:flex;flex-direction:column;gap:14px">
       <label class="lg-lab" for="email">E-mail lub telefon<input id="email" class="lg-in" type="text" autocomplete="username" inputmode="email" placeholder="np. imie@studio.pl"></label>
       <div class="lg-lab"><label for="pw">Hasło</label>
-        <div style="display:flex;gap:8px"><input id="pw" class="lg-in" type="password" autocomplete="current-password"><button type="button" id="show" class="lg-link" aria-pressed="false" aria-controls="pw" style="text-decoration:none;border:1px solid #E4D9DE;border-radius:12px;padding:0 14px;color:#1E1A1D;align-self:auto;white-space:nowrap">Pokaż</button></div>
+        <input id="pw" class="lg-in" type="password" autocomplete="current-password">
       </div>
       <button type="button" class="lg-link" id="forgot">Nie pamiętasz hasła?</button>
       <button type="submit" class="lg-btn">Zaloguj</button>
@@ -103,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
   [$('#tab-pw'), $('#tab-sms')].forEach(t => t.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const k = t.id === 'tab-pw' ? 'sms' : 'pw'; show(k); $(tabs[k][0]).focus(); } }));
 
   // e-mail i hasło
-  $('#show').addEventListener('click', () => { const on = $('#pw').type === 'password'; $('#pw').type = on ? 'text' : 'password'; $('#show').textContent = on ? 'Ukryj' : 'Pokaż'; $('#show').setAttribute('aria-pressed', String(on)); });
   $('#p-pw').addEventListener('submit', e => {
     e.preventDefault();
     const m = $('#email').value.trim(), p = $('#pw').value;
