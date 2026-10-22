@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('filtr').addEventListener('mock:choice', e => { filt = e.detail.button.dataset.value; render(); });
   document.getElementById('lista').addEventListener('click', e => {
     const b = e.target.closest('[data-a]'); if (!b) return;
-    const q = all().find(x => x.id === b.closest('[data-id]').dataset.id);
+    const q = all().find(x => String(x.id) === b.closest('[data-id]').dataset.id); // quotes from the studio page have numeric ids
     PS.modal({
       title: 'Wycena dla: ' + q.k, ok: 'Wyślij SMS',
       body: `<label class="p-lab">Kwota (zł)<input class="p-in" type="number" min="0" name="k" required value="${q.st ? E(q.st.kwota) : ''}"></label>

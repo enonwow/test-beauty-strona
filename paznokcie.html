@@ -792,7 +792,7 @@ const book = e => {
   e.preventDefault();
   const q = quote(state, P); // same numbers as the quote on screen
   window.Mock?.set('booking', { kategoria:'Paznokcie', usluga:P.services[state.service]?.label ?? opt(state, 'service'),
-    opis:spec(state).slice(1).map(([, v]) => v).join(' · '), cena:q.total, czas:q.minutes, czasTekst:hm(q.minutes), studio:'Studio Malwa', cenaMin:q.total, cenaMax:q.total, sciezka:'rezerwacja' });
+    opis:spec(state).slice(1).map(([, v]) => v).join(' · '), cena:q.total, czas:q.minutes, czasTekst:hm(q.minutes), studio:new URLSearchParams(location.search).get('s') || 'Studio Malwa', cenaMin:q.total, cenaMax:q.total, sciezka:'rezerwacja' });
   location.href = 'termin.html#' + toHash(state);
 };
 document.querySelectorAll('[data-book]').forEach(a => { a.onclick = book; });

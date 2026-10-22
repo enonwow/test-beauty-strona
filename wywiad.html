@@ -14,6 +14,10 @@
   #wywiad-side { max-height: calc(100vh - 128px); overflow-y: auto; } /* 128 = side's top before the page scrolls (~103) + gap */
   #wywiad-side [data-dalej] { position: sticky; bottom: 0; box-shadow: 0 0 0 12px #FFFFFF; }
 }
+.pl { display: flex; flex-direction: column; gap: 6px; font-weight: 500 }
+.pi { min-height: 48px; box-sizing: border-box; border-radius: 12px; border: 1px solid #C9B6BF; padding: 0 12px; font: inherit; font-weight: 400; color: #1E1A1D; background: #FFFFFF }
+.pc { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid #E4D9DE; background: #FFFFFF; color: #1E1A1D; font: inherit; cursor: pointer }
+.pc[aria-pressed=true] { border: 2px solid #9E1F50; color: #9E1F50; font-weight: 700 }
 </style>
 </head>
 <body>
@@ -53,13 +57,57 @@ async function start() {
   if (!KAT[kat]) { root.innerHTML = '<div style="margin-top: 24px; padding: 24px 20px; border-radius: 16px; background: #FAF6F8; display: flex; flex-direction: column; align-items: flex-start; gap: 10px"><h2 style="margin: 0; font-size: 18px">Najpierw wybierz zabieg</h2><p style="margin: 0; color: #625860; line-height: 1.5">Pytania zależą od zabiegu, a nie wiemy jeszcze, który wybierasz. Wybierz usługę w studiu albo ułóż ją w kreatorze.</p><a href="salon.html" style="margin-top: 4px; min-height: 48px; padding: 0 20px; border-radius: 12px; background: #9E1F50; color: #FFFFFF; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center">Wybierz usługę</a></div>'; return; }
   document.getElementById('wstecz').href = KAT[kat].plik;
   booking = window.Mock?.get('booking', null);
-  if (!booking || booking.kat !== kat) { root.innerHTML = `<p style="padding-top: 20px; line-height: 1.5">Najpierw skonfiguruj zabieg, żeby pytania dotyczyły tego, co wybierzesz. <a href="${KAT[kat].plik}">Przejdź do kreatora</a>.</p>`; return; }
+  if (!booking || booking.kat !== kat) return pytanie(); // nothing configured yet: a plain question to the studio instead
   try { c = await (await fetch(`cenniki/${kat}.json`)).json(); }
   catch (e) { root.innerHTML = `<p style="padding-top: 20px; color: #A3262A">Nie udało się wczytać pytań (${esc(e.message)}).</p>`; return; }
   pyt = Kreator.pytania(c, booking.zakres || []);
   zgoda = !pyt.length; // nothing to ask: no health data, no consent needed
   document.getElementById('podsumowanie').textContent = `${KAT[kat].nazwa} · ${booking.sciezka === 'konsultacja' ? 'konsultacja' : zlRange(booking.cenaMin ?? booking.cena, booking.cenaMax ?? booking.cena)} · ok. ${booking.czasTekst}`;
   render();
+}
+
+// "Zapytaj studio": question text, optional photos and a phone number; it lands in the panel's Wiadomości (Mock "wiadomosci"), where the studio answers.
+function pytanie() {
+  const u = window.Mock?.get('user', {}) || {}, zdj = [], TEMATY = ['Paznokcie', 'Rzęsy', 'Brwi', 'Włosy', 'Kosmetologia', 'Inne'];
+  const temat0 = { rzesy: 'Rzęsy', brwi: 'Brwi', fryzjer: 'Włosy', kosmetologia: 'Kosmetologia' }[kat];
+  const studia = (window.Mock?.get('lokalizacje', null) || [{ n: 'Studio Malwa – Mokotów' }, { n: 'Studio Malwa – Centrum' }]).map(l => l.n); // same list as the panel's locations
+  document.title = 'Zapytaj studio'; document.querySelector('h1').textContent = 'Zapytaj studio';
+  root.innerHTML = `<form id="pyt" novalidate style="padding: 16px 0; max-width: 640px; display: flex; flex-direction: column; gap: 14px">
+    <p style="margin: 0; color: #625860; line-height: 1.5">Masz pytanie przed wizytą? Napisz do studia, możesz dodać zdjęcie. Nie musisz niczego wybierać w kreatorze.</p>
+    <label class="pl">Studio<select id="p-studio" class="pi">${studia.map(n => `<option>${esc(n)}</option>`).join('')}</select></label>
+    <div style="display: flex; flex-direction: column; gap: 6px"><span id="p-t" style="font-weight: 500">Czego dotyczy pytanie?</span><div id="p-temat" data-choice role="group" aria-labelledby="p-t" style="display: flex; gap: 8px; flex-wrap: wrap">${TEMATY.map(t => `<button type="button" class="pc" aria-pressed="${t === temat0}">${t}</button>`).join('')}</div></div>
+    <label class="pl">Twoje pytanie<textarea id="p-txt" rows="4" maxlength="1000" required class="pi" style="padding: 10px 12px; resize: vertical"></textarea></label>
+    <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-weight: 500">Zdjęcie (opcjonalnie)</span><div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap"><span id="p-zdj" style="display: contents"></span><label id="p-dodaj" style="position: relative; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #9E1F50; color: #9E1F50; font-weight: 700; display: inline-flex; align-items: center; cursor: pointer">+ Dodaj zdjęcie<input id="p-plik" type="file" accept="image/*" style="position: absolute; width: 1px; height: 1px; opacity: 0"></label></div><span style="color: #625860; font-size: 13px">Zdjęcie zobaczy tylko studio. Kliknij zdjęcie, żeby je usunąć.</span></div>
+    <label class="pl">Odpowiedź wyślemy na<input id="p-tel" class="pi" type="tel" inputmode="tel" autocomplete="tel" placeholder="600 100 200"></label>
+    <label style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45"><input id="p-zgoda" type="checkbox" style="width: 22px; height: 22px; margin: 0; flex: none; accent-color: #9E1F50">Zgadzam się, żeby studio użyło informacji o zdrowiu tylko do odpowiedzi na to pytanie.</label>
+    <p id="p-err" role="alert" hidden style="margin: 0; color: #A3262A; font-size: 14px"></p>
+    <button style="min-height: 52px; border-radius: 12px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer">Wyślij pytanie</button>
+    <span style="color: #625860; font-size: 13px; line-height: 1.45">Studio zwykle odpowiada w ciągu kilku godzin. Odpowiedź przyjdzie SMS-em i będzie w zakładce Wiadomości. Wiesz już, czego chcesz? <a href="${KAT[kat].plik}">Ustaw zabieg w kreatorze</a>, wtedy pytania o zdrowie dobierzemy do zabiegu.</span></form>`;
+  const $ = id => document.getElementById(id);
+  $('p-tel').value = u.tel || '';
+  const pokaz = () => { $('p-zdj').innerHTML = zdj.map((z, i) => `<button type="button" data-usun="${i}" aria-label="Usuń zdjęcie ${i + 1}" style="padding: 0; border: 0; background: none; cursor: pointer"><img src="${z}" alt="" style="width: 72px; height: 72px; object-fit: cover; border-radius: 10px; display: block"></button>`).join(''); $('p-dodaj').hidden = zdj.length >= 3; };
+  $('p-zdj').addEventListener('click', e => { const b = e.target.closest('[data-usun]'); if (b) { zdj.splice(+b.dataset.usun, 1); pokaz(); } });
+  // a small JPEG made on a canvas, so the photo fits in localStorage (as on wycena.html)
+  $('p-plik').addEventListener('change', e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    const url = URL.createObjectURL(f), im = new Image();
+    im.onload = () => { const k = Math.min(1, 320 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url); zdj.push(c.toDataURL('image/jpeg', 0.7)); pokaz(); };
+    im.onerror = () => { URL.revokeObjectURL(url); window.Mock?.toast('Nie udało się wczytać zdjęcia'); };
+    im.src = url;
+  });
+  $('pyt').addEventListener('submit', e => {
+    e.preventDefault();
+    const txt = $('p-txt').value.trim(), tel = $('p-tel').value.trim(), n = tel.replace(/\D/g, '').length, temat = root.querySelector('.pc[aria-pressed=true]')?.textContent || 'Inne';
+    const blad = txt.length < 5 ? ['p-txt', 'Napisz pytanie.'] : n < 9 || n > 12 ? ['p-tel', 'Wpisz numer telefonu, np. 600 100 200.'] : !$('p-zgoda').checked ? ['p-zgoda', 'Zaznacz zgodę, żeby studio mogło odpowiedzieć.'] : null;
+    $('p-err').hidden = !blad; if (blad) { $('p-err').textContent = blad[1]; return $(blad[0]).focus(); }
+    const d = Mock.teraz(), t = `dziś, ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`, kto = u.imie || `Klientka ${tel}`, studio = $('p-studio').value;
+    const sent = Mock.get('wiadomosci', {}) || {};
+    (sent[kto] = sent[kto] || []).push({ od: 'sys', t, txt: `Pytanie ze strony studia · ${temat} · ${studio} · tel. ${tel}` }, { od: 'kl', k: 'SMS', t, txt, img: zdj });
+    Mock.set('wiadomosci', sent);
+    if (JSON.stringify(Mock.get('wiadomosci', {})) !== JSON.stringify(sent)) { $('p-err').hidden = false; $('p-err').textContent = 'Brak miejsca w przeglądarce. Usuń zdjęcie i spróbuj jeszcze raz.'; return; } // Mock.set ignores a full storage
+    root.innerHTML = `<section role="status" style="padding: 32px 0 24px; max-width: 640px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start"><h2 style="margin: 0; font-size: 22px">Wysłano pytanie</h2><p style="margin: 0; line-height: 1.5">${esc(studio)} odpowie SMS-em na numer <b>${esc(tel)}</b>.</p><a href="wiadomosci.html?k=${encodeURIComponent(kto)}" style="min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid #1E1A1D; color: #1E1A1D; display: inline-flex; align-items: center; text-decoration: none">Zobacz po stronie studia (panel)</a><a href="salon.html" style="min-height: 48px; padding: 0 18px; border-radius: 12px; background: #9E1F50; color: #FFFFFF; font-weight: 700; display: inline-flex; align-items: center; text-decoration: none">Wróć do studia</a></section>`;
+    Mock.toast('Wysłano pytanie do studia');
+  });
 }
 
 function wynik() {

@@ -83,7 +83,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <div id="pozycje" style="display:flex;flex-direction:column;gap:6px"><div class="row"><span id="opis" data-bind="booking.opis">Manicure hybrydowy · M · velvet × 10</span><span><span data-bind="booking.cena">200</span> zł</span></div></div>
       <div id="promo-row" hidden class="row" style="color:#1F6B47"><span id="promo-txt"></span><span id="promo-kw" style="white-space:nowrap"></span></div>
       <div id="seria-row" hidden class="row" style="color:#1F6B47"><span id="seria-txt">Seria</span><b id="seria-kw"></b></div>
-      <div id="zad-row" hidden class="row" style="color:#1F6B47"><span>Zaliczka wpłacona</span><span>−<span id="zad">60</span> zł</span></div>
+      <div id="zad-row" hidden class="row" style="color:#1F6B47"><span id="zad-lab">Zaliczka wpłacona</span><span>−<span id="zad">60</span> zł</span></div>
       <div style="height:1px;background:#F0E8EC;margin:4px 0"></div>
       <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:700">Uzgodniona cena brutto</span><span id="total" style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;color:#9E1F50"><span data-bind="booking.cena">200</span> zł</span></div>
       <span id="powod-p" hidden style="color:#625860;font-size:13px;line-height:1.4"></span>
@@ -190,7 +190,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   <div style="display:flex;flex-direction:column;gap:12px">
     <h2 id="odw-t" style="margin:0;font-size:18px">Odwołać wizytę?</h2>
     <p id="odw-txt" style="margin:0;font-size:14px;line-height:1.5">Odwołanie jest bezpłatne.</p>
-    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Zasady: odwołanie do 24 h przed wizytą zwraca zaliczkę; później zaliczki nie zwracamy. Gdy odwoła studio, zwrot jest zawsze pełny.</p>
+    <p data-odw style="margin:0;color:#625860;font-size:12px;line-height:1.45">Zasady: odwołanie do 24 h przed wizytą zwraca zaliczkę; później zaliczki nie zwracamy. Gdy odwoła studio, zwrot jest zawsze pełny.</p>
     <div style="display:flex;gap:8px">
       <button type="button" class="b2" data-close style="flex:1">Zostaw wizytę</button>
       <button type="button" id="odw-ok" class="btn" style="flex:1;background:#A3262A">Odwołaj wizytę</button>
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $('#kiedy-g').textContent = B.godzina ? `${B.godzina}${B.koniec ? '–' + B.koniec : ''}` : '';
   $('#kiedy-g').hidden = !B.godzina;
-  $('#gdzie').textContent = `${B.studio || 'Studio Malwa'} · ${B.stylistka && B.stylistka !== 'Dowolna' ? B.stylistka : 'dowolna stylistka'} · ul. Puławska 24, Warszawa`;
+  $('#gdzie').textContent = `${B.studio || 'Studio Malwa'} · ${B.stylistka && B.stylistka !== 'Dowolna' ? B.stylistka : 'dowolna stylistka'} · ${Mock.studio(B.studio).adres}`;
   if (B.kategoria) $('#kat').textContent = B.kategoria;
   if (B.usluga) $('#usl').textContent = B.usluga;
   if (B.czasTekst) $('#czas').textContent = B.czasTekst;
@@ -289,11 +289,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (B.sciezka === 'konsultacja') { document.querySelector('[aria-label="Karta stylizacji"] h2').textContent = 'Karta konsultacji'; document.querySelector('[aria-label="Karta stylizacji"] [data-toast^="Zapisano"]').hidden = true; }
   if (B.zadatek) {
     $('#zad-row').hidden = false; $('#reszta-row').hidden = false;
+    if (B.platnosc && B.platnosc.rodzaj === 'calosc') $('#zad-lab').textContent = 'Zapłacone online';
     $('#zad').textContent = B.zadatek; $('#reszta').textContent = cenaMax > cenaMin ? `${Math.max(0, cenaMin - B.zadatek)}–${Math.max(0, cenaMax - B.zadatek)}` : Math.max(0, cena - B.zadatek);
   }
 
   // consents signed on podpis.html are kept in Mock "podpisy" ([{ doc, nazwa, klientka, data, sposob }])
-  const podpisy = Mock.get('podpisy', []) || [];
+  const podpisy = (Mock.get('podpisy', []) || []).filter(Mock.mojPodpis);
   const dm2 = d => { const s = String(d || ''); const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if (iso) return `${iso[3]}.${iso[2]}`; const m = s.match(/(\d{1,2})\.(\d{1,2})/); return m ? `${m[1].padStart(2, '0')}.${m[2].padStart(2, '0')}` : s; };
   const DOKS = [['rodo', 'Zgoda RODO', '1 min'], ...(B.kat === 'rzesy' ? [['wywiad-rzesy', 'Wywiad przed przedłużaniem rzęs', '2 min']] : [])];
   DOKS.forEach(([doc, nazwa, czas]) => {
@@ -331,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const empty = cells.find(c => !c.value);
       if (empty) { empty.focus(); return Mock.toast('Wpisz 6-cyfrowy kod z SMS-a'); }
+      if (!Mock.konto('klientka', kontakt.tel)) Mock.zapiszKonto({ typ: 'klientka', imie: kontakt.imie, tel: kontakt.tel, zgody: { regulamin: true, marketing: false } }); // no password yet: SMS login or "Nie pamiętasz hasła?"
       Mock.set('user', { ...user, imie: kontakt.imie, tel: kontakt.tel, zalogowana: true, zgody: { regulamin: true, marketing: false } });
       $('#dlg-konto').close(); $('#konto-karta').hidden = true;
       Mock.toast('Konto utworzone, wizyta zapisana w Twoich wizytach');
@@ -386,14 +388,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dm && B.godzina) {
       const [h, m] = B.godzina.split(':');
       const d0 = Mock.zKrotko(B.dzien || Mock.krotko(Mock.dzien(1))), start = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate(), +h, +m);
-      const wczesnie = start - NOW >= 24 * 3600 * 1000;
-      if (B.zadatek) txt = wczesnie ? `Odwołujesz więcej niż 24 h przed wizytą: zaliczka ${B.zadatek} zł wróci na Twoje konto w ciągu 5 dni roboczych.` : `Do wizyty zostało mniej niż 24 h: zaliczki ${B.zadatek} zł nie zwracamy.`;
-      else txt = wczesnie ? 'Odwołujesz więcej niż 24 h przed wizytą. Nie wpłacałaś zaliczki, więc nic nie tracisz.' : 'Do wizyty zostało mniej niż 24 h, ale nie wpłacałaś zaliczki, więc nic nie tracisz.';
+      const wczesnie = start - NOW >= Mock.odwH() * 3600 * 1000;
+      if (B.zadatek) txt = (wczesnie ? `Odwołujesz więcej niż ${Mock.odwH()} h przed wizytą: ` : `Do wizyty zostało mniej niż ${Mock.odwH()} h: `) + Mock.zwrotTekst({ kwota: +B.zadatek, rodzaj: (B.platnosc || {}).rodzaj || 'zaliczka' }, cena, wczesnie) + '.';
+      else txt = wczesnie ? `Odwołujesz więcej niż ${Mock.odwH()} h przed wizytą. Nie wpłacałaś zaliczki, więc nic nie tracisz.` : `Do wizyty zostało mniej niż ${Mock.odwH()} h, ale nie wpłacałaś zaliczki, więc nic nie tracisz.`;
     }
     $('#odw-txt').textContent = txt;
   });
   $('#odw-ok').addEventListener('click', () => {
-    if (visit) { visit.status = 'odwołana'; if (B.zadatek && dm && B.godzina) { const [h, m] = B.godzina.split(':'), d0 = Mock.zKrotko(B.dzien); visit.zwrot = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate(), +h, +m) - NOW >= 24 * 3600 * 1000; } }
+    if (visit) { visit.status = 'odwołana'; if ((B.zadatek || visit.platnosc) && dm && B.godzina) { const [h, m] = B.godzina.split(':'), d0 = Mock.zKrotko(B.dzien); Object.assign(visit, Mock.zwrotPrzyOdwolaniu({ zadatek: B.zadatek, ...visit }, new Date(d0.getFullYear(), d0.getMonth(), d0.getDate(), +h, +m) - NOW >= 24 * 3600 * 1000)); } } // Etap A: also marks the online payment as refunded
     if (testVisit) testVisit.status = 'odwołana'; // the test only makes sense with its treatment
     if (visit || testVisit) Mock.set('visits', visits);
     $('#odw').close();

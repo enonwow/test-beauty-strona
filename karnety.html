@@ -27,13 +27,14 @@
     <section class="p-card" aria-labelledby="sp-h">
       <h2 id="sp-h" class="p-h2">Sprzedane klientkom</h2>
       <div id="sprzedane" style="display: flex; flex-direction: column; gap: 8px"></div>
+      <span class="p-mut">Imię prowadzi do karty klientki. Karnet szuka się po telefonie, więc rezerwacja online tej klientki też go widzi.</span>
     </section>
   </main>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const E = PS.esc, KL = ['Anna K.', 'Basia W.', 'Dorota S.', 'Ewa P.'];
+  const E = PS.esc, KL = Mock.klientki();
   let O = Mock.karnety(), SP = Mock.sprzedane(); // shared with the client page (salon.html sells online)
   const sv = () => { Mock.set('karnety.oferta', O); Mock.set('karnety.sprzedane', SP); };
 
@@ -42,20 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
       <span style="color:#625860">${E(o.us)} · ${o.t === 'pakiet' ? Mock.plural(o.ile, ['wizyta', 'wizyty', 'wizyt']) : 'bez limitu wizyt'} · ważny ${o.dni} dni</span>
       <b style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px">${o.cena} zł</b>
       <div class="p-acts"><button type="button" class="p-btn dark" data-sell="${o.id}">Sprzedaj klientce</button><button type="button" class="p-btn sm dng" data-del="${o.id}">Usuń</button></div></section>`).join('') || '<span class="p-mut">Brak karnetów. Dodaj pierwszy przyciskiem „+ Nowy”.</span>';
-    document.getElementById('sprzedane').innerHTML = SP.map((s, i) => `<div class="p-row"><span><b>${E(s.k)}</b> · ${E(s.n)}${s.online ? ' <span class="p-badge blue">kupiony online</span>' : ''}<br><span class="p-mut">sprzedano ${E(s.data)} · ${E(s.cena)} zł · ${s.t === 'pakiet' ? (s.ile > 0 ? Mock.zostalo(s.ile) : 'wykorzystany') : 'do ' + E(s.do)}</span></span>
-      ${s.t === 'pakiet' && s.ile > 0 ? `<button type="button" class="p-btn sm" data-use="${i}">Odlicz wizytę</button>` : s.t === 'pakiet' ? '<span class="p-badge ok">komplet</span>' : '<span class="p-badge ok">aktywny</span>'}</div>`).join('') || '<span class="p-mut">Jeszcze nic nie sprzedano.</span>';
+    document.getElementById('sprzedane').innerHTML = SP.map((s, i) => { const ost = (s.hist || [])[0];
+      return `<div class="p-row"><span><a href="klientki.html?k=${encodeURIComponent(s.k)}" style="font-weight:700;color:#9E1F50">${E(s.k)}</a> <span class="p-mut">${E(s.tel || '')}</span> · ${E(s.n)}${s.online ? ' <span class="p-badge blue">kupiony online</span>' : ''}<br><span class="p-mut">sprzedano ${E(s.data)} · ${E(s.cena)} zł · ${s.t === 'pakiet' ? 'ważny do ' : 'do '}${E(s.do)}${ost ? ` · ostatnio odliczono ${E(ost.d.split('-').reverse().slice(0, 2).join('.'))} ${ost.jak === 'odliczone ręcznie' ? 'ręcznie' : 'przy wizycie'}` : ''}</span></span>
+      <span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${s.t === 'pakiet' ? `<span style="display:flex;gap:3px">${Mock.kropki(s)}</span><b style="font-size:14px">${s.ile > 0 ? s.ile + ' z ' + Mock.wizyt(s) : 'wykorzystany'}</b>` : '<span class="p-badge ok">aktywny</span>'}${s.t === 'pakiet' && s.ile > 0 ? `<button type="button" class="p-btn sm" data-use="${i}">Odlicz wizytę</button>` : ''}</span></div>`; }).join('') || '<span class="p-mut">Jeszcze nic nie sprzedano.</span>';
   }
   document.getElementById('oferta').addEventListener('click', e => {
     const s = e.target.closest('[data-sell]'), d = e.target.closest('[data-del]');
     if (s) { const o = O.find(x => x.id === +s.dataset.sell); PS.modal({
       title: 'Sprzedaj: ' + o.n, ok: 'Sprzedaj za ' + o.cena + ' zł',
-      body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map(k => `<option>${E(k)}</option>`).join('')}</select></label><label class="p-lab">Płatność<select class="p-in" name="m"><option>gotówka</option><option>karta</option><option>BLIK</option></select></label>`,
-      onOk: f => { const end = Mock.dzien(o.dni); SP.unshift({ k: f.k.value, tel: '', n: o.n, t: o.t, us: o.us, cena: o.cena, ile: o.ile, data: Mock.dzien(0).toLocaleDateString('pl-PL'), do: end.toLocaleDateString('pl-PL'), doIso: Mock.iso(end) }); sv(); render(); },
-      toast: f => `Sprzedano karnet: ${f.k.value}, ${o.cena} zł`
+      body: `<label class="p-lab">Klientka<select class="p-in" name="k">${KL.map((k, i) => `<option value="${i}">${E(k.n)}${k.tel ? ' · ' + E(k.tel) : ''}</option>`).join('')}</select></label><span class="p-mut">Karnet przypisujemy do telefonu klientki. Nowej klientki dodasz w zakładce Klientki.</span><label class="p-lab">Płatność<select class="p-in" name="m"><option>gotówka</option><option>karta</option><option>BLIK</option></select></label>`,
+      onOk: f => { Mock.sprzedaj(o, KL[+f.k.value]); SP = Mock.sprzedane(); render(); },
+      toast: f => `Sprzedano karnet: ${KL[+f.k.value].n}, ${o.cena} zł`
     }); }
     if (d) { const o = O.find(x => x.id === +d.dataset.del); PS.modal({ title: 'Usunąć z oferty?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">${E(o.n)} zniknie z oferty. Karnety już sprzedane klientkom nadal działają.</p>`, onOk: () => { O = O.filter(x => x !== o); sv(); render(); }, toast: 'Usunięto z oferty' }); }
   });
-  document.getElementById('sprzedane').addEventListener('click', e => { const b = e.target.closest('[data-use]'); if (!b) return; const s = SP[+b.dataset.use]; s.ile -= 1; sv(); render(); Mock.toast(s.ile ? `Odliczono wizytę: ${s.k}, ${Mock.zostalo(s.ile)}` : `Pakiet wykorzystany: ${s.k}`); });
+  document.getElementById('sprzedane').addEventListener('click', e => { const b = e.target.closest('[data-use]'); if (!b) return; Mock.odliczModal(+b.dataset.use, () => { SP = Mock.sprzedane(); render(); }); });
   document.getElementById('new').addEventListener('click', () => PS.modal({
     title: 'Nowy karnet lub pakiet', ok: 'Dodaj',
     body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required placeholder="np. Pakiet 4× brwi"></label>

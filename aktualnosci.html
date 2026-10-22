@@ -23,6 +23,8 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif;margin:0}
 .tr:hover b{color:#9E1F50}
 .lista{display:flex;flex-direction:column;gap:10px}
 .nw{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid #E4D9DE;border-radius:16px;text-decoration:none;color:#1E1A1D}
+.nw.f{flex-direction:row;gap:14px;align-items:flex-start}.nw-f{flex:none;width:112px;height:112px;object-fit:cover;border-radius:12px;background:#F6EDF1}.nw-tx{display:flex;flex-direction:column;gap:6px;min-width:0}
+@media (max-width:600px){.nw.f{gap:10px}.nw-f{width:84px;height:84px}}
 .nw:hover{background:#FAF6F8;color:#1E1A1D}
 .nw-m{color:#625860;font-size:13px}
 .nw-t{font-size:16px;line-height:1.35}
@@ -90,7 +92,7 @@ let dane = null, temat = 'all';
 
 function pokaz() {
   const items = dane.items.filter(i => temat === 'all' || i.topics?.includes(temat));
-  $('lista').replaceChildren(...items.map(i => karta(i)).filter(Boolean));
+  $('lista').replaceChildren(...items.map(i => karta(i, { foto: true })).filter(Boolean));
   $('pusto').hidden = items.length > 0;
 }
 function chipy() {

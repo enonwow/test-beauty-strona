@@ -64,6 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const kal = () => Mock.get('kalendarz', { techMin: 10 }) || { techMin: 10 };
   let cur = 'Paznokcie';
   const num = v => Math.max(0, parseInt(String(v).replace(/\D/g, ''), 10) || 0);
+  // price changes between two price lists, for the change log: ["Manicure hybrydowy, 140 → 150 zł", ...]
+  const zmianyCen = (a, b) => Object.keys(b).flatMap(k => ['base', 'extra'].flatMap(t => (b[k][t] || []).map(r => {
+    const o = ((a[k] || {})[t] || []).find(x => x[0] === r[0]); return o && num(o[1]) !== num(r[1]) ? `${r[0]}, ${num(o[1])} → ${num(r[1])} zł` : ''; }).filter(Boolean)));
+  console.assert(zmianyCen({ P: { base: [['Hybryda', 140]], extra: [['French', 20]] } }, { P: { base: [['Hybryda', '150zł']], extra: [['French', 20]] } }).join() === 'Hybryda, 140 → 150 zł'
+    && zmianyCen({}, { P: { base: [['Nowa', 90]] } }).length === 0, 'cennik zmianyCen');
+  let zapisane = JSON.parse(JSON.stringify(D)); // D is edited in place, so keep the last saved copy to compare on "Zapisz"
   const inp = (a, i, j, v, lab) => `<input class="p-in s" inputmode="numeric" style="width:84px" data-a="${a}" data-i="${i}" data-j="${j}" value="${v}" aria-label="${E(lab)}">`;
 
   function renderTabs() {
@@ -75,11 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
       ? `<label style="display:inline-flex;width:44px;height:44px;align-items:center;justify-content:center;cursor:pointer"><input type="checkbox" data-a="on" data-i="${i}" ${r[3] ? 'checked' : ''} aria-label="Rezerwacja online: ${E(r[0])}" style="width:20px;height:20px;accent-color:#9E1F50" data-toast-change="Zapisano widoczność online"></label>`
       : `<select class="p-in s" data-a="per" data-i="${i}" aria-label="Sposób liczenia: ${E(r[0])}">${PER.map((p, k) => `<option value="${k}"${k === r[3] ? ' selected' : ''}>${p}</option>`).join('')}</select>`}</td></tr>`).join('')}</tbody></table></div>`;
     box.innerHTML = `<section class="p-card"><h2>Kalendarz</h2><label class="p-lab" style="max-width:320px">Przerwa po każdej wizycie<select class="p-in" id="tech">${[0, 5, 10, 15].map(m => `<option value="${m}"${m === (kal().techMin ?? 10) ? ' selected' : ''}>${m} min</option>`).join('')}</select></label><span class="p-mut">Czas na sprzątanie i przygotowanie stanowiska. Kalendarz nie pozwoli ustawić następnej wizyty bliżej niż tyle minut.</span></section>` +
-      `<section class="p-card"><h2>Usługi bazowe</h2>${c.base.length ? tbl(c.base, 'base', 'Online', 'Usługa') : '<span class="p-mut">Brak pozycji. Dodaj pierwszą przyciskiem poniżej.</span>'}${c.base.length ? '<span class="p-mut">Czas działania (np. farba, henna): minuty w środku usługi, w których stylistka może przyjąć kogoś innego. W kalendarzu pojawia się jako luka w wizycie.</span>' : ''}</section>` +
+      `<section class="p-card"><h2>Usługi bazowe</h2>${stanBlok(c)}${c.base.length ? tbl(c.base, 'base', 'Online', 'Usługa') : '<span class="p-mut">Brak pozycji. Dodaj pierwszą przyciskiem poniżej.</span>'}${c.base.length ? '<span class="p-mut">Czas działania (np. farba, henna): minuty w środku usługi, w których stylistka może przyjąć kogoś innego. W kalendarzu pojawia się jako luka w wizycie.</span>' : ''}</section>` +
       (c.base.length ? `<section class="p-card"><h2>Osoby naraz i dojazd</h2><div class="p-tw"><table class="p-tbl"><thead><tr><th>Usługa</th><th>Ile osób naraz</th><th>Dojazd do klientki</th></tr></thead><tbody>${c.base.map((r, i) => `<tr><td>${E(r[0])}</td><td><select class="p-in s" data-a="osoby" data-i="${i}" aria-label="Ile osób naraz: ${E(r[0])}">${[1, 2, 3, 4].map(n => `<option value="${n}"${n === (r[5] || 1) ? ' selected' : ''}>${n}</option>`).join('')}</select></td><td><label style="display:inline-flex;width:44px;height:44px;align-items:center;justify-content:center;cursor:pointer"><input type="checkbox" data-a="dojazd" data-i="${i}" ${r[6] ? 'checked' : ''} aria-label="Dojazd do klientki: ${E(r[0])}" style="width:20px;height:20px;accent-color:#9E1F50" data-toast-change="Zapisano dojazd"></label></td></tr>`).join('')}</tbody></table></div><span class="p-mut">„Ile osób naraz” to rezerwacja dla kilku osób w jednym terminie (np. dwie przyjaciółki), cena rośnie razy liczbę osób. Dojazd: usługa jest wykonywana u klientki, a opłata zależy od strefy.</span></section>` : '') +
       (c.len ? `<section class="p-card"><h2>${cur === 'Fryzjer' ? 'Długość włosów' : cur === 'Rzęsy' ? 'Długość rzęs' : 'Długość (z wymiarem dla klientki)'}</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">${c.len.map((l, i) => `<div style="padding:10px;border-radius:12px;border:1px solid #E4D9DE;display:flex;flex-direction:column;gap:6px"><b>${E(l[0])}</b><label class="p-lab">+ zł${inp('len', i, 1, l[1], 'Dopłata zł: ' + l[0])}</label><label class="p-lab">+ min${inp('len', i, 2, l[2], 'Dopłata min: ' + l[0])}</label></div>`).join('')}</div></section>` : '') +
       `<section class="p-card"><h2>Efekty, ozdoby i dopłaty</h2>${c.extra.length ? tbl(c.extra, 'extra', 'Liczona', 'Pozycja') : '<span class="p-mut">Brak pozycji.</span>'}<button type="button" class="p-btn sm dash" id="addrow" style="align-self:flex-start">+ Dodaj pozycję</button></section>` +
-      `<section class="p-card"><h2>Zalecenia po zabiegu</h2><label class="p-lab">Wysyłamy je e-mailem po wizycie i pokazujemy w „Moich wizytach”<textarea class="p-in" id="zal" rows="4">${E(Mock.zalecenia()[cur] || '')}</textarea></label><span class="p-mut">Krótko, w punktach. Automat włączysz w Marketingu.</span></section>` +
+      `<section class="p-card"><h2>Zalecenia po zabiegu</h2><label class="p-lab">Wysyłamy e-mailem po wizycie i pokazujemy w „Moich wizytach”<textarea class="p-in" id="zal" rows="4">${E(Mock.zalecenia()[cur] || '')}</textarea></label><span class="p-mut">Krótko, w punktach. Automat włączysz w Marketingu.</span></section>` +
       `<section class="p-card" id="strefy"><h2>Strefy dojazdu</h2><div class="p-tw"><table class="p-tbl" style="min-width:320px"><thead><tr><th>Strefa</th><th>Opłata (zł)</th><th></th></tr></thead><tbody>${Z.map((z, i) => `<tr><td>${E(z[0])}</td><td>${inp('strefa', i, 1, z[1], 'Opłata: ' + z[0])}</td><td><button type="button" class="p-btn sm dng" data-zdel="${i}" aria-label="Usuń strefę ${E(z[0])}">Usuń</button></td></tr>`).join('')}</tbody></table></div><button type="button" class="p-btn sm dash" id="addz" style="align-self:flex-start">+ Dodaj strefę</button><span class="p-mut">Opłaty są przykładowe. Klientka wybiera strefę przy rezerwacji usługi z dojazdem.</span></section>`;
     preview();
   }
@@ -95,6 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('pv-time').textContent = PS.min(m);
     document.getElementById('pv-note').textContent = [cur === 'Paznokcie' ? '' : 'Ceny tej kategorii są przykładowe.', bp ? `W trakcie usługi „${bp[0]}” jest ${bp[4]} min przerwy: stylistka może w tym czasie przyjąć kogoś innego.` : ''].filter(Boolean).join(' ');
   }
+  // Etap A: the station each service needs (Mock "cennik.stan" = { usługa: stanowisko, '' = any }); panel.html and termin.html keep two visits off one station
+  function stanBlok(c) {
+    if (!c.base.length) return '';
+    const L = Mock.stanowiska();
+    return `<div class="p-box" style="flex-direction:column;align-items:stretch;gap:8px"><b id="stu-h">Stanowisko dla usług</b><div style="display:flex;flex-direction:column;gap:8px">${c.base.map((r, i) => { const n = Mock.stanowiskoDla(r[0], cur);
+      return `<div style="display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:space-between"><span id="stu-${i}" style="flex:1 1 220px;min-width:0">${E(r[0])}</span><select class="p-in" style="flex:1 1 220px;max-width:280px" data-stan="${E(r[0])}" aria-labelledby="stu-h stu-${i}"><option value="">Dowolne stanowisko</option>${L.map(x => `<option value="${E(x.n)}"${x.n === n ? ' selected' : ''}>${E(x.n)} · ${E(Mock.stanSprzet(x))}</option>`).join('')}</select></div>`; }).join('')}</div>
+      <span class="p-mut">Dwie wizyty nie zajmą naraz tego samego stanowiska, nawet u różnych osób z zespołu. Stanowiska dodasz w Zespole (zakładka „Sprzęt i gabinety”).</span></div>`;
+  }
+  document.getElementById('sections').addEventListener('change', e => {
+    const sl = e.target.closest('[data-stan]'); if (!sl) return;
+    Mock.set('cennik.stan', { ...(Mock.get('cennik.stan', {}) || {}), [sl.dataset.stan]: sl.value });
+    Mock.toast(`${sl.dataset.stan}: ${sl.value || 'dowolne stanowisko'}`);
+  });
   renderTabs(); renderSections();
 
   document.getElementById('sections').addEventListener('change', e => { if (e.target.id !== 'zal') return; Mock.set('zalecenia', { ...(Mock.get('zalecenia', {}) || {}), [cur]: e.target.value.trim() }); Mock.toast('Zapisano zalecenia: ' + cur); });
@@ -140,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
       toast: f => 'Dodano pozycję: ' + f.n.value.trim()
     });
   });
-  document.getElementById('save').addEventListener('click', () => { Mock.set('cennik.data', D); Mock.set('cennik.strefy', Z); Mock.toast('Zapisano cennik. Nowe ceny widać od razu w kreatorze'); });
+  document.getElementById('save').addEventListener('click', () => { zmianyCen(zapisane, D).forEach(z => PS.log('zmieniła cenę: ' + z)); zapisane = JSON.parse(JSON.stringify(D)); Mock.set('cennik.data', D); Mock.set('cennik.strefy', Z); Mock.toast('Zapisano cennik. Nowe ceny widać na stronie studia i przy dodawaniu wizyty'); });
   document.getElementById('imp').addEventListener('click', () => PS.modal({
     title: 'Import cennika z Booksy', ok: 'Importuj',
     body: '<label class="p-lab">Plik CSV z usługami<input class="p-in" type="file" name="f" accept=".csv,text/csv" required></label><span class="p-mut">Kolumny: nazwa, cena, czas. Pozycje o tej samej nazwie zostaną zaktualizowane.</span>',

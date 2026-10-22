@@ -58,14 +58,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc;
+  const TEL = Object.fromEntries(Mock.KLIENTKI.map(k => [k.id, k.tel])); // one phone per client, the same in the calendar and on passes
   const C0 = [
-    { id: 'b', n: 'Basia W.', c: '#5B1630', sub: 'dziś 11:15 · velvet', tag: 'all', tel: '601 234 518', od: 'marca 2024', w: 4, nb: 0, skad: 'Instagram', zg: [true, false], tg: ['VIP'], zdj: true, fo: [[Mock.dm(Mock.dzien(-21)), 'Hybryda M · velvet × 10', '#E4D9DE', '#5B1630'], [Mock.dm(Mock.dzien(-49)), 'Hybryda S · micro french', '#F3E3DA', '#C98C8C']],
+    { id: 'b', n: 'Basia W.', c: '#5B1630', sub: 'dziś 11:15 · velvet', tag: 'all', tel: TEL.b, od: 'marca 2024', w: 4, nb: 0, skad: 'Instagram', zg: [true, false], tg: ['VIP'], zdj: true, fo: [[Mock.dm(Mock.dzien(-21)), 'Hybryda M · velvet × 10', '#E4D9DE', '#5B1630'], [Mock.dm(Mock.dzien(-49)), 'Hybryda S · micro french', '#F3E3DA', '#C98C8C']],
       h: [[`${Mock.dm(Mock.dzien(0))} (dziś)`, 'Hybryda M · velvet × 10 · Magda', '200 zł', '#5B1630'], [Mock.dm(Mock.dzien(-21)), 'Hybryda M · velvet × 10 · lakier nr 802, mleczny róż', '200 zł', '#5B1630'], [Mock.dm(Mock.dzien(-49)), 'Hybryda S · micro french · zmiana na wizycie: + zdjęcie hybrydy, powód: pęknięty paznokieć', '180 zł', '#F3E3DA']], note: 'Wrażliwe skórki, lubi krótki kształt migdała.' },
-    { id: 'd', n: 'Dorota S.', c: '#2F5A86', sub: 'rzęsy 2D–3D · czas na uzupełnienie', tag: 'uzup', badge: ['uzupełnienie', '#FFF1E0', '#8A3B12'], tel: '602 118 940', od: 'stycznia 2025', w: 3, nb: 0, skad: 'Instagram', zg: [true, true], tg: ['alergia'], zdj: true, fo: [[Mock.dm(Mock.dzien(-63)), 'Rzęsy 2D–3D · pełny komplet', '#E4D9DE', '#2F5A86']],
+    { id: 'd', n: 'Dorota S.', c: '#2F5A86', sub: 'rzęsy 2D–3D · czas na uzupełnienie', tag: 'uzup', badge: ['uzupełnienie', '#FFF1E0', '#8A3B12'], tel: TEL.d, od: 'stycznia 2025', w: 3, nb: 0, skad: 'Instagram', zg: [true, true], tg: ['alergia'], zdj: true, fo: [[Mock.dm(Mock.dzien(-63)), 'Rzęsy 2D–3D · pełny komplet', '#E4D9DE', '#2F5A86']],
       h: [['dziś 9:30', 'Rzęsy 1:1 · uzupełnienie · Ewelina', '150 zł (przykład)', '#2F5A86'], [Mock.dm(Mock.dzien(-63)), 'Rzęsy 2D–3D · pełny komplet', '230 zł', '#2F5A86']], note: 'Uczulenie na klej standardowy, używać sensitive. Ma pierwszeństwo na wolne terminy.' },
-    { id: 'f', n: 'Felicja R.', c: '#E4D9DE', sub: 'czeka na wycenę z Instagrama', tag: 'nowa', badge: ['nowa', '#EAF0F7', '#2F5A86'], tel: '604 772 315', od: 'dziś', w: 0, nb: 0, skad: 'Instagram', zg: [true, false], tg: ['nowa'], zdj: false, fo: [],
+    { id: 'f', n: 'Felicja R.', c: '#E4D9DE', sub: 'czeka na wycenę z Instagrama', tag: 'nowa', badge: ['nowa', '#EAF0F7', '#2F5A86'], tel: TEL.f, od: 'dziś', w: 0, nb: 0, skad: 'Instagram', zg: [true, false], tg: ['nowa'], zdj: false, fo: [],
       h: [], note: 'Wysłała zdjęcie inspiracji: „Takie jak na zdjęciu, ale krótsze”.' },
-    { id: 'a', n: 'Anna K.', c: '#C98C8C', sub: `ostatnio ${Mock.dm(Mock.dzien(-35))} · hybryda`, tag: 'nieob', badge: ['nieobecność', '#FFF1E0', '#8A3B12'], tel: '605 901 227', od: 'czerwca 2025', w: 2, nb: 1, skad: 'Wyszukiwarka', zg: [true, true], tg: ['ryzyko nieobecności'], zdj: false, fo: [],
+    { id: 'a', n: 'Anna K.', c: '#C98C8C', sub: `ostatnio ${Mock.dm(Mock.dzien(-35))} · hybryda`, tag: 'nieob', badge: ['nieobecność', '#FFF1E0', '#8A3B12'], tel: TEL.a, od: 'czerwca 2025', w: 2, nb: 1, skad: 'Wyszukiwarka', zg: [true, true], tg: ['ryzyko nieobecności'], zdj: false, fo: [],
       h: [['dziś 9:00', 'Hybryda jednolita · Magda', '140 zł', '#C98C8C'], [Mock.dm(Mock.dzien(-35)), 'Hybryda S · nie przyszła, bez odwołania', '0 zł', '#E4D9DE']], note: 'Przy następnej rezerwacji poprosić o zaliczkę.' }
   ];
   let S = Mock.get('klientki.state', { del: [], block: [], dep: [], notes: {}, extra: [], tags: {}, zdj: [], foto: {} });
@@ -73,7 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const all = () => C0.concat(S.extra).filter(c => !S.del.includes(c.id));
   let sel = 'b', filt = 'all', q = '', tagF = '', tabK = 0; // tabK: open tab of the card, kept while moving between clients
   const qk = new URLSearchParams(location.search).get('k'); // back from the studio tablet: open that client
-  if (qk) { const c = C0.concat(S.extra).find(x => x.n === qk); if (c) sel = c.id; }
+  let brak = ''; // ?k= with a name that has no card
+  if (qk) { const c = C0.concat(S.extra).find(x => x.n === qk); if (c) sel = c.id; else brak = qk.slice(0, 60); }
   S = { tags: {}, zdj: [], foto: {}, ...S };
   const TAGS = ['VIP', 'alergia', 'nowa', 'ryzyko nieobecności'];
   const tagsOf = c => S.tags[c.id] ?? c.tg ?? [];
@@ -117,6 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const sekcja = (t, body, btn) => `<div style="display:flex;flex-direction:column;gap:8px"><div class="p-top"><h3 style="margin:0;font-size:15px;font-weight:700">${t}</h3>${btn || ''}</div>${body}</div>`;
   const wiersz = (a, b) => `<div class="p-row"><span>${a}</span><span style="text-align:right">${b}</span></div>`;
   const platHtml = c => { const L = platnosci(c); return sekcja('Płatności', L.length ? L.map(p => wiersz(`<b>${E(p[1])}</b><br><span class="p-mut">${E(p[0])} · ${E(p[3])}${p[4] ? ' · ' + E(p[4]) : ''}</span>`, `<b style="color:${p[2] < 0 ? '#A3262A' : '#1E1A1D'}">${p[2]} zł</b>`)).join('') : '<span class="p-mut">Brak płatności.</span>'); };
+  const ankHtml = c => { const L = Mock.ankiety().filter(a => a.klientka === c.n);
+    return sekcja('Ankiety po wizycie (widzi tylko studio)', L.length ? L.map(a => wiersz(`<b>${E(a.uwagi || 'bez uwag')}</b><br><span class="p-mut">${E(a.data.split('-').reverse().join('.'))} · ${E(a.opis)}</span>`, a.wroci ? `wróci: ${E(a.wroci.toLowerCase())}` : '')).join('') : '<span class="p-mut">Klientka nie wypełniła jeszcze ankiety. Pytamy o nią razem z prośbą o opinię.</span>'); };
   const prepHtml = c => { const L = (Mock.get('preparaty', []) || []).filter(p => p.klientka === c.n);
     return sekcja('Użyte preparaty', L.length ? L.map(p => wiersz(`<b>${E(p.n)}</b><br><span class="p-mut">${E(p.data.split('-').reverse().join('.'))} · ${E(p.usluga)}${p.partia ? ' · partia ' + E(p.partia) : ''}</span>`, `${E(p.ilosc)} ${E(p.u)}`)).join('') : '<span class="p-mut">Preparaty dopisujesz w szczegółach wizyty w kalendarzu. Numer partii pomaga, gdy klientka zgłosi uczulenie.</span>'); };
   const ZDARZ0 = { a: [{ data: Mock.iso(Mock.dzien(-35)), typ: 'Nieobecność bez odwołania', opis: 'Nie przyszła na 14:00, nie odbierała telefonu.', kto: 'Magda' }] };
@@ -125,9 +129,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const plikHtml = c => { const P = (Mock.get('podpisy', []) || []).filter(p => p.klientka === c.n), F = S.pliki && S.pliki[c.id] || [];
     return sekcja('Załączniki', P.map(p => wiersz(`<b>${E(p.nazwa)}</b><br><span class="p-mut">podpisano ${E(p.data.slice(0, 10).split('-').reverse().join('.'))}${p.kod ? ' · kod ' + E(p.kod) : ''}</span>`, '<span class="p-badge ok">podpis</span>')).concat(F.map(f => wiersz(`<b>${E(f.n)}</b><br><span class="p-mut">dodano ${E(f.data.split('-').reverse().join('.'))} · ${E(f.kb)} kB</span>`, '<span class="p-badge blue">plik</span>'))).join('') || '<span class="p-mut">Brak załączników.</span>',
       '<label class="p-btn sm" style="cursor:pointer">+ Dodaj plik<input type="file" data-a="plik" accept="application/pdf,image/*" style="position:absolute;width:1px;height:1px;opacity:0"></label>'); };
+  // passes of this client (by phone, else by name): dots, deductions with undo of the newest, manual deduction and sale
+  const cy = t => String(t || '').replace(/\D/g, '').slice(-9);
+  const karnHtml = c => { const L = Mock.sprzedane().map((s, i) => ({ s, i })).filter(({ s }) => cy(c.tel) ? cy(s.tel) === cy(c.tel) : s.k === c.n);
+    return `<div style="display:flex;flex-direction:column;gap:8px"><div class="p-top"><h3 style="margin:0;font-size:15px;font-weight:700">Karnety i pakiety</h3><button type="button" class="p-btn sm" data-a="ksell">Sprzedaj karnet</button></div>
+      ${L.map(({ s, i }) => `<div style="display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #F0E8EC;border-radius:12px">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><span><b>${E(s.n)}</b> <span class="p-badge ${s.t === 'pakiet' ? 'blue' : ''}">${s.t === 'pakiet' ? 'pakiet' : 'karnet czasowy'}</span><br><span class="p-mut">${E(s.us)} · ważny do ${E(s.do)} · ${s.online ? 'kupiony online' : 'sprzedany'} ${E(s.data)}, ${E(s.cena)} zł</span></span>
+          ${s.t === 'pakiet' ? `<span style="display:flex;gap:10px;align-items:center"><span style="display:flex;gap:4px">${Mock.kropki(s, 14)}</span><b>${s.ile > 0 ? Mock.zostaloZ(s) : 'wykorzystany'}</b></span>` : ''}</div>
+        ${(s.hist || []).length ? `<ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#625860">${s.hist.map((h, j) => `<li style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span>${E(h.d.split('-').reverse().slice(0, 2).join('.'))} · ${E(h.opis)} · ${j ? E(h.jak) : `<b style="color:#1E1A1D">${E(h.jak)}</b>`}</span>${j ? '' : `<button type="button" class="p-btn sm" data-a="kundo" data-k="${i}">Cofnij</button>`}</li>`).join('')}</ol>` : ''}
+        ${s.t !== 'pakiet' || s.ile > 0 ? `<div class="p-acts"><button type="button" class="p-btn sm" data-a="kuse" data-k="${i}">Odlicz wizytę ręcznie</button></div>` : ''}</div>`).join('') || '<span class="p-mut">Brak karnetów.</span>'}
+      <span class="p-mut">Wizyta z usługą z karnetu odlicza się sama, gdy klikniesz „Rozlicz” w kalendarzu. Rezerwacja online tylko oznacza „płaci karnetem”, a odwołana wizyta niczego nie zabiera.</span></div>`; };
   function renderCard() {
-    const c = all().find(x => x.id === sel) || all()[0];
     const k = document.getElementById('karta');
+    if (brak) { k.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><h2 style="margin:0;font-size:20px">${E(brak)}</h2><span class="p-mut">Ta klientka nie ma jeszcze karty w studiu (np. kupiła karnet online).</span><button type="button" class="p-btn pri" data-a="brak-dodaj">Dodaj kartę klientki</button></div>`; return; }
+    const c = all().find(x => x.id === sel) || all()[0];
     if (!c) { k.innerHTML = '<span class="p-mut">Brak klientek. Dodaj pierwszą przyciskiem „+ Dodaj”.</span>'; return; }
     sel = c.id;
     const dep = S.dep.includes(c.id), blk = S.block.includes(c.id);
@@ -147,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Wydała łącznie</span><b style="font-size:20px">${platnosci(c).reduce((a, p) => a + p[2], 0)} zł</b></div>
         <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">Skąd przyszła</span><b style="font-size:16px">${E(c.skad)}</b></div>
       </div>
+      ${karnHtml(c)}
       <div class="kt-bar" role="tablist" aria-label="Sekcje karty klientki">${KT.map((t, i) => `<button type="button" role="tab" id="kt-${i}" aria-controls="kp-${i}" aria-selected="${i === tabK}" tabindex="${i === tabK ? 0 : -1}" data-kt="${i}">${t}</button>`).join('')}</div>
       <div class="kt-p" role="tabpanel" id="kp-0" aria-labelledby="kt-0"${tabK !== 0 ? ' hidden' : ''}>
       <div style="display:flex;flex-direction:column;gap:8px"><h3 style="margin:0;font-size:15px;font-weight:700">Historia stylizacji</h3>
@@ -169,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span style="display:flex;justify-content:space-between"><span>Marketing SMS</span><b style="color:${c.zg[1] ? '#1F6B47' : '#625860'}">${c.zg[1] ? 'tak' : 'nie'}</b></span>
           <span class="p-mut">Zgodę marketingową zmienia tylko klientka. Kampanie trafiają wyłącznie do osób ze zgodą.</span></div>
       </div>
+      ${ankHtml(c)}
       <div class="p-acts" style="padding-top:12px;border-top:1px solid #F0E8EC">
         <button type="button" class="p-btn sm" data-a="dep">${dep ? 'Nie wymagaj zaliczki' : 'Wymagaj zaliczki od tej klientki'}</button>
         <button type="button" class="p-btn sm" data-a="block">${blk ? 'Odblokuj rezerwacje online' : 'Zablokuj rezerwacje online'}</button>
@@ -189,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault(); pokazTab(e.key === 'Home' ? 0 : e.key === 'End' ? KT.length - 1 : +t.dataset.kt + (e.key === 'ArrowRight' ? 1 : -1), true);
   });
 
-  document.getElementById('lista').addEventListener('click', e => { const a = e.target.closest('[data-id]'); if (!a) return; e.preventDefault(); sel = a.dataset.id; render(); });
+  document.getElementById('lista').addEventListener('click', e => { const a = e.target.closest('[data-id]'); if (!a) return; e.preventDefault(); sel = a.dataset.id; brak = ''; render(); });
   document.getElementById('filtr').addEventListener('mock:choice', e => { filt = e.detail.button.dataset.value; renderList(); });
   document.getElementById('filtr-tag').addEventListener('mock:choice', e => { tagF = e.detail.button.dataset.value; renderList(); });
   document.getElementById('szukaj').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); renderList(); });
@@ -206,6 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const b = e.target.closest('[data-a]'); if (!b) return;
     const c = all().find(x => x.id === sel), a = b.dataset.a;
     if (a === 'visit') PS.visitModal({ done: () => {} });
+    if (a === 'kuse') Mock.odliczModal(+b.dataset.k, renderCard);
+    if (a === 'kundo') { const s = Mock.cofnijOdlicz(+b.dataset.k); renderCard(); if (s) Mock.toast(`Cofnięto odliczenie: ${s.t === 'pakiet' ? Mock.zostalo(s.ile) : s.n}`); }
+    if (a === 'ksell') { const O = Mock.karnety(); if (!O.length) { location.href = 'karnety.html'; return; } PS.modal({ title: 'Sprzedaj karnet: ' + c.n, ok: 'Sprzedaj',
+      body: `<label class="p-lab">Karnet lub pakiet<select class="p-in" name="o">${O.map((o, j) => `<option value="${j}">${E(o.n)} · ${o.cena} zł</option>`).join('')}</select></label><label class="p-lab">Płatność<select class="p-in" name="m"><option>gotówka</option><option>karta</option><option>BLIK</option></select></label><span class="p-mut">Karnet przypisujemy do telefonu ${E(c.tel)}.</span>`,
+      onOk: f => { Mock.sprzedaj(O[+f.o.value], c); renderCard(); }, toast: f => `Sprzedano: ${O[+f.o.value].n}, ${O[+f.o.value].cena} zł` }); }
     if (a === 'zdarz') PS.modal({ title: 'Nowe zdarzenie', ok: 'Zapisz',
       body: `<label class="p-lab">Rodzaj<select class="p-in" name="t"><option>Spóźnienie</option><option>Nieobecność bez odwołania</option><option>Konflikt lub nieprzyjemna sytuacja</option><option>Reakcja na preparat</option><option>Inne</option></select></label><label class="p-lab">Co się stało<textarea class="p-in" name="o" rows="3" required></textarea></label><span class="p-mut">Wpis widzi tylko zespół. Pisz fakty, bez ocen: klientka może poprosić o swoje dane (RODO).</span>`,
       onOk: f => { if (!f.o.value.trim()) return false; S.zdarz = S.zdarz || {}; (S.zdarz[c.id] = S.zdarz[c.id] || []).unshift({ data: Mock.iso(Mock.teraz()), typ: f.t.value, opis: f.o.value.trim(), kto: (Mock.get('studioUser', null) || {}).imie || 'Joanna Malec' }); save(); render(); },
@@ -222,10 +244,11 @@ document.addEventListener('DOMContentLoaded', () => {
       toast: fm => `Wysłano do podpisu: ${c.n} (${fm.c.value})`
     });
     if (a === 'zgfoto') PS.modal({ title: 'Prośba o zgodę na zdjęcia', ok: 'Wyślij prośbę', body: `<p style="margin:0;line-height:1.45">${E(c.n)} dostanie SMS z linkiem. Zdjęcia będzie można dodawać dopiero po jej zgodzie.</p><label class="p-chk"><input type="checkbox" name="sim" checked>Makieta: oznacz zgodę jako udzieloną od razu</label>`, onOk: f => { if (f.sim.checked) { S.zdj.push(c.id); save(); render(); } }, toast: f => f.sim.checked ? 'Zgoda na zdjęcia zapisana' : 'Wysłano prośbę o zgodę: ' + c.n });
-    if (a === 'foto') PS.modal({ title: 'Dodaj zdjęcia z wizyty', ok: 'Dodaj', body: `<label class="p-lab">Podpis<input class="p-in" name="p" required placeholder="np. Hybryda M · velvet"></label><label class="p-lab">Data<input class="p-in" type="date" name="d" value="2026-10-19" required></label><span class="p-mut">Makieta: zamiast prawdziwych zdjęć pokażemy zdjęcia przykładowe.</span>`, onOk: f => { const p = f.p.value.trim(), d = f.d.value.split('-').reverse().slice(0, 2).join('.'); (S.foto[c.id] = S.foto[c.id] || []).push([d, p, '#E4D9DE', c.c === '#E4D9DE' ? '#9E1F50' : c.c]); save(); render(); }, toast: 'Dodano zdjęcia przed i po' });
+    if (a === 'foto') PS.modal({ title: 'Dodaj zdjęcia z wizyty', ok: 'Dodaj', body: `<label class="p-lab">Podpis<input class="p-in" name="p" required placeholder="np. Hybryda M · velvet"></label><label class="p-lab">Data<input class="p-in" type="date" name="d" value="${Mock.iso(Mock.dzien(0))}" required></label><span class="p-mut">Makieta: zamiast prawdziwych zdjęć pokażemy zdjęcia przykładowe.</span>`, onOk: f => { const p = f.p.value.trim(), d = f.d.value.split('-').reverse().slice(0, 2).join('.'); (S.foto[c.id] = S.foto[c.id] || []).push([d, p, '#E4D9DE', c.c === '#E4D9DE' ? '#9E1F50' : c.c]); save(); render(); }, toast: 'Dodano zdjęcia przed i po' });
     if (a === 'rodo') Mock.toast('Przygotowano plik z danymi klientki (ZIP)');
-    if (a === 'del') PS.modal({ title: 'Usunąć dane klientki?', ok: 'Usuń dane', cls: 'dark', body: `<p style="margin:0">Dane ${E(c.n)} zostaną usunięte bezpowrotnie: historia, notatki i zgody. Tej operacji nie można cofnąć.</p>`, onOk: () => { S.del.push(c.id); save(); sel = ''; render(); }, toast: 'Dane klientki usunięte' });
+    if (a === 'del') PS.modal({ title: 'Usunąć dane klientki?', ok: 'Usuń dane', cls: 'dark', body: `<p style="margin:0">Dane ${E(c.n)} zostaną usunięte bezpowrotnie: historia, notatki, zgody i ankiety. Tej operacji nie można cofnąć.</p>`, onOk: () => { S.del.push(c.id); save(); Mock.set('ankiety', Mock.ankiety().filter(x => x.klientka !== c.n)); sel = ''; render(); }, toast: 'Dane klientki usunięte' });
   });
+  document.getElementById('karta').addEventListener('click', e => { if (e.target.closest('[data-a="brak-dodaj"]')) { const n = brak; brak = ''; document.getElementById('add').click(); setTimeout(() => { const i = document.querySelector('dialog[open] input'); if (i) i.value = n; }, 50); } });
   document.getElementById('add').addEventListener('click', () => PS.modal({
     title: 'Nowa klientka',
     body: '<label class="p-lab">Imię i nazwisko<input class="p-in" name="n" required></label><label class="p-lab">Telefon<input class="p-in" name="t" type="tel" required placeholder="+48 …"></label>',

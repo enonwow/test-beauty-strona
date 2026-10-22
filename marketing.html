@@ -9,6 +9,25 @@
 <link rel="stylesheet" href="mock.css">
 <script src="mock.js" defer></script>
 <script src="panel-shell.js" defer></script>
+<style>
+.kol-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.kol-c{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(30,10,18,.06),0 8px 24px rgba(30,10,18,.07);display:flex;flex-direction:column}
+.kol-c img{width:100%;height:130px;object-fit:cover;display:block}
+.kol-c img.off{opacity:.55}
+.kol-c .b{padding:10px 12px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.kol-c .r{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+.tgl{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:13px;color:#625860;min-height:44px;padding:0;border:0;background:none;cursor:pointer}
+.tgl i{width:40px;height:24px;border-radius:999px;background:#E4D9DE;position:relative;flex:none}.tgl i:after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff}
+.tgl[aria-pressed=true] i{background:#9E1F50}.tgl[aria-pressed=true] i:after{left:19px}
+.kol-add{border:1.5px dashed #C9B6BF;border-radius:14px;min-height:220px;background:none;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#9E1F50;font-weight:700;cursor:pointer}
+.kol-port{display:flex;gap:6px;flex-wrap:wrap}
+.kol-port button{padding:0;border:0;border-radius:8px;background:none;cursor:pointer;width:48px;height:48px}
+.kol-port img{width:48px;height:48px;object-fit:cover;border-radius:8px;display:block}
+.kol-port button[aria-pressed=true] img{box-shadow:0 0 0 2px #9E1F50}
+.kol-2{display:grid;grid-template-columns:160px 1fr;gap:12px;align-items:start}
+.kol-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:600px){.kol-2,.kol-3{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
@@ -59,7 +78,7 @@
           <label class="p-lab" style="flex: 1 1 140px">Zniżka dla nowej klientki (zł)<input class="p-in" type="number" min="0" step="5" value="20" data-toast-change="Zapisano"></label>
           <label class="p-lab" style="flex: 1 1 140px">Nagroda dla polecającej (zł)<input class="p-in" type="number" min="0" step="5" value="20" data-toast-change="Zapisano"></label>
         </div>
-        <div class="p-box"><span>W październiku z polecenia</span><b>6 nowych klientek · 180 zł zniżek</b></div>
+        <div class="p-box"><span>W październiku z polecenia</span><b>6 nowych klientek · 120 zł zniżek</b></div>
         <span class="p-mut">Nagroda dla polecającej nalicza się dopiero po odbytej wizycie nowej klientki. Wizyta z polecenia ma w kalendarzu dopisek „z polecenia”.</span>
       </section>
 
@@ -69,14 +88,10 @@
         <a class="p-btn" href="profil-studia.html#kanaly">Ustaw kanały rezerwacji</a>
       </section>
 
-      <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <section style="grid-column: 1 / -1; background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Kolekcje sezonowe</h2>
-        <p style="margin: 0; color: #625860; line-height: 1.45">Gotowe stylizacje z ceną, widoczne na Twoim profilu i w wyszukiwarce. Klientka wybiera i od razu rezerwuje.</p>
-        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
-          <div style="display: flex; flex-direction: column; gap: 4px"><span aria-hidden="true" style="height: 64px; border-radius: 10px; background: #5B1630"></span><span style="font-size: 13px">Velvet burgund · 190 zł</span></div>
-          <div style="display: flex; flex-direction: column; gap: 4px"><span aria-hidden="true" style="height: 64px; border-radius: 10px; background: #3E2A4A"></span><span style="font-size: 13px">Kocie oko śliwka · 180 zł</span></div>
-          <a href="paznokcie.html" style="display: flex; flex-direction: column; gap: 4px; color: #1E1A1D; text-decoration: none"><span aria-hidden="true" style="height: 64px; border-radius: 10px; border: 1px dashed #A99BA2; display: flex; align-items: center; justify-content: center; color: #625860; font-size: 20px">+</span><span style="font-size: 13px">Dodaj z kreatora</span></a>
-        </div>
+        <p class="p-mut" style="margin: 0">Gotowe stylizacje z ceną „od” i czasem. Te z przełącznikiem „Na profilu” klientki widzą na stronie studia.</p>
+        <div id="kol-g" class="kol-g"></div>
         <label class="p-chk"><input type="checkbox" checked id="kol" data-toast-change="Zapisano">Kolekcja „Jesień 2026” opublikowana</label>
       </section>
 
@@ -91,7 +106,7 @@
           <button type="button" id="kwota" class="p-btn dash">+ Kwota</button>
         </div>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Ważność<select data-toast-change="Zapisano ważność kart" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>6 miesięcy</option><option selected>12 miesięcy</option></select></label>
-        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>Sprzedane w październiku</span><b>4 · 2400 zł</b></div>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FAF6F8; display: flex; justify-content: space-between"><span>Sprzedane w październiku</span><b>4 · 700 zł</b></div>
         <span style="color: #625860; font-size: 12px">Karta działa tylko w Twoim studiu. Klientka widzi saldo i datę ważności w swoim profilu.</span>
       </section>
     </div>
@@ -143,6 +158,60 @@ document.addEventListener('DOMContentLoaded', () => {
     body: '<div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Data<input class="p-in" type="date" name="d" required></label><label class="p-lab" style="flex:1">Godzina<input class="p-in" type="time" name="g" value="11:00" required></label></div><span class="p-mut">SMS dostaną tylko klientki z aktywną zgodą marketingową. Wiadomość będzie można odwołać do chwili wysyłki.</span>',
     toast: f => 'Kampania zaplanowana na ' + f.d.value.split('-').reverse().join('.') + ', ' + f.g.value
   }));
+  // style collection: Mock.kolekcja(); salon.html shows the ones with on
+  const E = PS.esc, FOTO = /^(data:image\/(jpeg|png|webp);base64,[\w+/=]+|zdjecia\/[\w.-]+)$/, kolG = document.getElementById('kol-g');
+  const PORT = ['hh-manicure.jpg', 'studio-nude.jpg', 'dlon-1.jpg', 'kat-paznokcie.jpg']; // shortcut: fixed sample photos stand in for portfolio photos with the client's consent, until the portfolio stores consent per photo
+  const kolRender = () => {
+    kolG.innerHTML = Mock.kolekcja().map(s => `<div class="kol-c"><img src="${FOTO.test(s.foto) ? s.foto : ''}" alt="" class="${s.on ? '' : 'off'}"><div class="b"><b>${E(s.n)}</b><span style="color:#9E1F50;font-weight:700">od ${E(s.cena)} zł <span style="color:#625860;font-weight:400">· ${E(s.czas)}</span></span><span class="p-mut" style="font-size:12px">${E(s.src)}</span>
+      <div class="r"><button type="button" class="tgl" data-on="${E(s.id)}" aria-pressed="${!!s.on}" aria-label="Na profilu studia: ${E(s.n)}"><i></i>${s.on ? 'Na profilu' : 'Ukryta'}</button><button type="button" class="p-btn sm" data-ed="${E(s.id)}">Edytuj</button></div></div></div>`).join('')
+      + '<button type="button" class="kol-add" data-ed=""><span style="font-size:28px" aria-hidden="true">+</span>Dodaj stylizację</button>';
+  };
+  kolRender();
+  kolG.addEventListener('click', e => {
+    const L = Mock.kolekcja(), t = e.target.closest('[data-on]');
+    if (t) { const s = L.find(x => String(x.id) === t.dataset.on); s.on = !s.on; Mock.set('kolekcja', L); kolRender(); kolG.querySelector(`[data-on="${t.dataset.on}"]`).focus(); return Mock.toast(s.on ? 'Stylizacja jest na profilu studia' : 'Stylizacja ukryta na profilu'); }
+    const b = e.target.closest('[data-ed]'); if (!b) return;
+    const s = L.find(x => String(x.id) === b.dataset.ed) || { n: '', kat: 'Paznokcie', cena: '', czas: '', on: true, link: '' };
+    let foto = s.foto || '', src = s.src || '';
+    PS.modal({
+      title: s.id ? 'Edytuj stylizację' : 'Dodaj stylizację', ok: s.id ? 'Zapisz' : 'Dodaj stylizację',
+      body: `<div style="display:flex;flex-direction:column;gap:8px"><b style="font-size:14px">Zdjęcie</b>
+        <div class="kol-2"><div style="position:relative;border-radius:12px;overflow:hidden;height:120px;background:#F6EDF1"><img id="kol-pv" alt="Wybrane zdjęcie" hidden style="width:100%;height:100%;object-fit:cover;display:block"><span id="kol-pv-t" hidden style="position:absolute;left:6px;bottom:6px;background:#fff;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700">wybrane</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="p-btn sm" style="justify-content:flex-start;cursor:pointer">Zrób zdjęcie albo wybierz z telefonu<input type="file" accept="image/*" name="plik" class="p-sr"></label>
+        <span class="p-mut" style="font-size:12px">albo z portfolio studia (tylko zdjęcia ze zgodą klientki na portfolio):</span>
+        <div class="kol-port" role="group" aria-label="Zdjęcia z portfolio">${PORT.map((p, i) => `<button type="button" data-f="zdjecia/${p}" aria-pressed="false" aria-label="Zdjęcie z portfolio ${i + 1}"><img src="zdjecia/${p}" alt=""></button>`).join('')}</div></div></div></div>
+        <label class="p-lab">Nazwa<input class="p-in" name="n" required maxlength="60"></label>
+        <div class="kol-3"><label class="p-lab">Kategoria<select class="p-in" name="kat">${['Paznokcie', 'Rzęsy', 'Brwi', 'Fryzjer', 'Kosmetyka'].map(k => `<option>${k}</option>`).join('')}</select></label><label class="p-lab">Cena od (zł)<input class="p-in" type="number" min="0" step="5" name="cena" required></label><label class="p-lab">Czas<input class="p-in" name="czas" required maxlength="20" placeholder="1 h 45"></label></div>
+        <div class="p-box" style="flex-direction:column;align-items:stretch;gap:6px"><b style="font-size:14px">Ustawienia w kreatorze</b><label class="p-lab">Link z kreatora (przycisk „Kopiuj link”)<input class="p-in" name="link" maxlength="4000" placeholder="bez linku: pusty kreator tej kategorii"></label><span class="p-mut" style="font-size:12px">Klientka, która kliknie stylizację, zobaczy kreator z tymi ustawieniami i może je zmienić. Cena i czas policzą się same.</span><a class="p-btn sm" id="kol-kr" target="_blank" rel="noopener" style="align-self:flex-start">Ustaw w kreatorze</a></div>
+        <label class="p-chk"><input type="checkbox" name="on">Pokaż na profilu studia</label>`,
+      onOpen: f => {
+        const pv = f.querySelector('#kol-pv'), kr = f.querySelector('#kol-kr');
+        const pokaz = (u, z) => { foto = u; src = z; pv.src = u; pv.hidden = f.querySelector('#kol-pv-t').hidden = !u; f.querySelectorAll('[data-f]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.f === u))); };
+        const link = () => (kr.href = Mock.kolekcjaLink({ kat: f.kat.value, link: f.link.value }));
+        f.n.value = s.n; f.kat.value = s.kat; f.cena.value = s.cena; f.czas.value = s.czas; f.link.value = s.link || ''; f.on.checked = !!s.on;
+        if (FOTO.test(foto)) pokaz(foto, src); link();
+        f.kat.addEventListener('change', link); f.link.addEventListener('input', link);
+        f.querySelector('.kol-port').addEventListener('click', e => { const p = e.target.closest('[data-f]'); if (p) pokaz(p.dataset.f, 'z portfolio'); });
+        // a small JPEG made on a canvas, so the photo fits in localStorage
+        f.plik.addEventListener('change', () => {
+          const file = f.plik.files[0]; if (!file) return;
+          const url = URL.createObjectURL(file), im = new Image();
+          im.onload = () => { const k = Math.min(1, 480 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url); pokaz(c.toDataURL('image/jpeg', 0.7), 'zdjęcie z telefonu'); };
+          im.onerror = () => { URL.revokeObjectURL(url); Mock.toast('Nie udało się wczytać zdjęcia'); };
+          im.src = url;
+        });
+      },
+      onOk: f => {
+        if (!foto) { Mock.toast('Dodaj zdjęcie stylizacji'); return false; }
+        const next = { ...s, id: s.id || Date.now(), n: f.n.value.trim(), kat: f.kat.value, cena: +f.cena.value, czas: f.czas.value.trim(), link: f.link.value.trim(), on: f.on.checked, foto, src: src || 'z kreatora' };
+        const list = s.id ? L.map(x => x.id === s.id ? next : x) : [...L, next];
+        Mock.set('kolekcja', list);
+        if (JSON.stringify(Mock.get('kolekcja', null)) !== JSON.stringify(list)) { Mock.toast('Brak miejsca w przeglądarce. Wybierz mniejsze zdjęcie.'); return false; } // Mock.set ignores a full storage
+        kolRender();
+      },
+      toast: f => (s.id ? 'Zapisano stylizację' : 'Dodano stylizację') + (f.on.checked ? ', jest na profilu studia' : '')
+    });
+  });
   document.getElementById('kwota').addEventListener('click', () => PS.modal({
     title: 'Własna kwota karty', ok: 'Dodaj',
     body: '<label class="p-lab">Kwota (zł)<input class="p-in" type="number" min="10" step="10" name="k" required></label>',

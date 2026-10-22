@@ -50,14 +50,14 @@ Krawędzie brwi (`DEMO.top` i `DEMO.bottom` w `brwi.html`) zaznaczone ręcznie n
 |---|---|---|---|
 | brwi-1.jpg | https://unsplash.com/photos/close-up-of-a-persons-eye-YCMkMQevCIE | Gabrielle Wright (@gabrielle_wright) | Unsplash License, https://unsplash.com/license |
 
-## Zdjęcie do wyboru długości włosów (`wlosy-dlugosc.jpg`, `wlosy-dlugosc-maska.png`)
+## Zdjęcie do wyboru długości włosów (`wlosy-dlugosc.jpg`)
 
-Pobrane 2026-10-19 z Unsplash (darmowa licencja, nie Unsplash+). Wycięte w kwadrat 1200×1200 px i skompresowane (JPEG), poza tym bez zmian. Osoba jest od tyłu, bez twarzy.
-Poziomy długości (ucho, ramiona, łopatki, pas, poniżej pasa) są wyskalowane raz ręcznie na tym zdjęciu, w `fryzjer.html`.
+Pobrane 2026-10-22 z Unsplash (darmowa licencja, nie Unsplash+). Rozmiar 1000×1500 px (format 2:3, wycinek z serwera Unsplash), JPEG, poza tym bez zmian. Osoba jest od tyłu, w salonie, bez twarzy.
+Poziomy długości (ucho, ramiona, łopatki, pas, poniżej pasa) są wyskalowane raz ręcznie na tym zdjęciu, w `fryzjer.html` (`DL_Y`). Linie rysuje SVG na zdjęciu, maska włosów nie jest już potrzebna.
 
 | Plik | Źródło | Autor | Licencja |
 |---|---|---|---|
-| wlosy-dlugosc.jpg | https://unsplash.com/photos/woman-in-white-long-sleeved-shirt-standing-in-front-of-pink-wall-WCPg9ROZbM0 | Element5 Digital (@element5digital) | Unsplash License, https://unsplash.com/license |
+| wlosy-dlugosc.jpg | https://unsplash.com/photos/person-wearing-black-top-W6cwaL7PMSw | Jessie Dee Dabrowski (@jessiedeexx) | Unsplash License, https://unsplash.com/license |
 
 ## Miniatury gotowych stylizacji (`styl-*.jpg`, 600×450)
 

@@ -146,7 +146,7 @@ const $ = id => document.getElementById(id);
 function bledy(krok) {
   if (krok === '1') return [[$('nazwa'), !$('nazwa').value.trim() && 'Wpisz nazwę studia'], [$('adres'), !$('adres').value.trim() && 'Wpisz adres studia'],
     [$('telefon'), $('telefon').value.replace(/\D/g, '').length < 9 && 'Wpisz 9-cyfrowy numer telefonu'], [$('imie'), !$('imie').value.trim() && 'Wpisz swoje imię'],
-    [$('email'), !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim()) && 'Wpisz adres e-mail, np. ola@studio.pl'], [$('haslo'), $('haslo').value.length < 8 && 'Hasło musi mieć co najmniej 8 znaków']]
+    [$('email'), !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim()) ? 'Wpisz adres e-mail, np. ola@studio.pl' : Mock.konto('studio', $('email').value) && 'Konto z tym e-mailem już istnieje. Zaloguj się do panelu.'], [$('haslo'), $('haslo').value.length < 8 && 'Hasło musi mieć co najmniej 8 znaków']]
     .filter(([el, m]) => err(el, m)).map(([el]) => el);
   if (krok === '2') return err($('kategorie'), !document.querySelector('#kategorie [aria-pressed="true"]') && 'Wybierz co najmniej jedną kategorię') ? [$('kategorie')] : [];
   return [];
@@ -163,7 +163,8 @@ $('zaloz').addEventListener('click', () => {
   const godz = [...document.querySelectorAll('[data-day]')].map(r => { const [od, doo] = r.querySelectorAll('input[type=time]'); return [od.value, doo.value, !r.querySelector('input[type=checkbox]').checked]; });
   Mock.set('profil', { ...Mock.get('profil', {}), nm: $('nazwa').value.trim(), ad: $('adres').value.trim(), tel: $('telefon').value.trim(), h: godz,
     kat: [...document.querySelectorAll('#kategorie [aria-pressed="true"]')].map(b => b.dataset.value) });
-  Mock.set('studioUser', { imie: $('imie').value.trim(), email: $('email').value.trim(), rola: 'właścicielka' });
+  const a = { typ: 'studio', imie: $('imie').value.trim(), email: $('email').value.trim(), tel: $('telefon').value.trim(), haslo: $('haslo').value, rola: 'właścicielka' };
+  Mock.zapiszKonto(a); Mock.zaloguj(a); // the owner logs in later with this e-mail (or the studio phone) and password
   Mock.toast('Studio założone. Zalogowano');
   setTimeout(() => { location.href = 'panel.html'; }, 600);
 });

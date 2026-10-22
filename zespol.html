@@ -9,6 +9,18 @@
 <link rel="stylesheet" href="mock.css">
 <script src="mock.js" defer></script>
 <script src="panel-shell.js" defer></script>
+<style>
+/* payroll on a phone: one card per person, pay and bonus on top, commission and base below (.p-tbl.wy-t beats the .p-tbl rules panel-shell.js injects later) */
+@media (max-width: 767px) {
+  .p-tbl.wy-t { min-width: 0 } .p-tbl.wy-t thead { display: none }
+  .p-tbl.wy-t tbody { display: flex; flex-direction: column; gap: 8px }
+  .p-tbl.wy-t tr { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "k pay" "pr pr" "ut ut" "pc pd"; gap: 8px 12px; padding: 12px; border: 1px solid #F0E8EC; border-radius: 12px }
+  .p-tbl.wy-t td { padding: 0; border: 0; text-align: left !important }
+  .p-tbl.wy-t td[data-l]::before { content: attr(data-l); display: block; color: #625860; font-size: 12px }
+  .p-tbl.wy-t [data-c=k] { grid-area: k; font-size: 16px } .p-tbl.wy-t [data-c=pay] { grid-area: pay; text-align: right !important; font-size: 16px }
+  .p-tbl.wy-t [data-c=pr] { grid-area: pr } .p-tbl.wy-t [data-c=ut] { grid-area: ut } .p-tbl.wy-t [data-c=pc] { grid-area: pc } .p-tbl.wy-t [data-c=pd] { grid-area: pd }
+}
+</style>
 </head>
 <body>
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
@@ -26,6 +38,7 @@
       <button type="button" role="tab" class="p-pill" aria-selected="true" aria-controls="tab-zespol">Zespół i grafik</button>
       <button type="button" role="tab" class="p-pill" aria-selected="false" aria-controls="tab-sprzet">Sprzęt i gabinety</button>
       <button type="button" role="tab" class="p-pill" aria-selected="false" aria-controls="tab-wyn">Czas pracy i wynagrodzenia</button>
+      <button type="button" role="tab" class="p-pill" aria-selected="false" aria-controls="tab-zad" id="zad-tab">Zadania <span id="zad-n" class="pn-n" style="display:inline-flex;margin-left:6px;vertical-align:1px"></span></button>
     </div>
 
     <div id="tab-zespol" style="display: flex; flex-direction: column; gap: 16px">
@@ -33,7 +46,7 @@
         <section class="p-card">
           <div style="display: flex; gap: 12px; align-items: center">
             <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 50%; background: #9E1F50"></span>
-            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">Magda</b><span style="color: #625860">Właścicielka · paznokcie</span></div>
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><b style="font-size: 16px">Magda</b><span style="color: #625860">Stylistka · paznokcie</span></div>
           </div>
           <div style="display: flex; gap: 6px; flex-wrap: wrap">
             <span class="p-chip">Hybryda</span><span class="p-chip">Żel</span><span class="p-chip">Przedłużanie</span><span class="p-chip">Zdobienia</span>
@@ -54,7 +67,7 @@
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px">
             <label class="p-lab">Uprawnienia<select class="p-in" data-rl="2" data-toast-change="Zapisano uprawnienia"></select></label>
-            <label class="p-lab">Prowizja od usług<input class="p-in" value="40 %" style="width: 100px" data-toast-change="Zapisano prowizję"></label>
+            <label class="p-lab">Prowizja od usług<input class="p-in" value="10 %" style="width: 100px" data-toast-change="Zapisano prowizję"></label>
           </div>
         </section>
         <div id="invited" style="display: contents"></div>
@@ -76,9 +89,9 @@
       </section>
 
       <section class="p-card" aria-labelledby="kcw-h">
-        <h2 id="kcw-h">Kto co widzi</h2>
+        <div class="p-top"><h2 id="kcw-h" style="margin: 0">Role i uprawnienia</h2><button type="button" class="p-btn sm dark" id="rola-add">+ Nowa rola</button></div>
         <div class="p-tw"><table class="p-tbl" id="kcw" style="min-width: 640px"></table></div>
-        <span class="p-mut">Tabela pokazuje pozycje menu panelu dla każdej roli. W makiecie menu chowa pozycje, ale adresy stron nie są blokowane.</span>
+        <span class="p-mut">Zaznacz, co rola widzi w menu; zmiana działa od razu u wszystkich osób z tą rolą. Właścicielka ma zawsze pełny dostęp. Rolę, którą ktoś ma, usuniesz dopiero po przepisaniu tych osób do innej. W makiecie menu chowa pozycje, ale adresy stron nie są blokowane.</span>
       </section>
     </div>
 
@@ -90,8 +103,17 @@
       </section>
       <section class="p-card" aria-labelledby="wy-h">
         <div class="p-top"><h2 id="wy-h" class="p-h2">Rozliczenie miesiąca</h2><button type="button" class="p-btn sm" id="wy-exp">Eksport dla księgowej (CSV)</button></div>
-        <div class="p-tw"><table class="p-tbl"><thead><tr><th>Osoba</th><th style="text-align: right">Utarg z usług</th><th style="text-align: right">Prowizja</th><th style="text-align: right">Podstawa</th><th style="text-align: right">Do wypłaty</th></tr></thead><tbody id="wy"></tbody></table></div>
-        <span class="p-mut">Do wypłaty = podstawa + utarg × prowizja. Kwoty brutto, przykładowe. Prowizję i podstawę zmienisz w polach.</span>
+        <div class="p-box" style="flex-direction: column; align-items: flex-start; gap: 6px"><b>Premie w tym miesiącu</b><span id="pr-z"></span><button type="button" class="p-btn sm" id="pr-edit">Zmień zasady premii</button></div>
+        <div class="p-tw"><table class="p-tbl wy-t"><thead><tr><th>Osoba</th><th style="text-align: right">Utarg z usług</th><th style="text-align: right">Prowizja</th><th style="text-align: right">Podstawa</th><th style="text-align: right">Premia</th><th style="text-align: right">Do wypłaty</th></tr></thead><tbody id="wy"></tbody></table></div>
+        <span class="p-mut">Do wypłaty = podstawa + utarg × prowizja + premia. Kwoty brutto, przykładowe. Prowizję i podstawę zmienisz w polach.</span>
+      </section>
+    </div>
+
+    <div id="tab-zad" hidden style="display: flex; flex-direction: column; gap: 16px">
+      <section class="p-card" aria-labelledby="zad-h">
+        <div class="p-top"><h2 id="zad-h" class="p-h2">Zadania</h2><button type="button" class="p-btn pri sm" id="zad-add">+ Zadanie</button></div>
+        <div id="zad-l" style="display: flex; flex-direction: column; gap: 8px"></div>
+        <span class="p-mut">Zadania widzi osoba przypisana i właścicielka. Nowe zadanie i ogłoszenie pojawiają się w dzwonku.</span>
       </section>
     </div>
 
@@ -109,20 +131,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const PON = Mock.dzien(-Mock.weekday(Mock.dzien(0))), dt = i => new Date(PON.getFullYear(), PON.getMonth(), PON.getDate() + i); // Monday of this week + i
   const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const zakres = (a, b) => (a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${Mock.MIESD[b.getMonth()]}` : `${a.getDate()} ${Mock.MIESD[a.getMonth()]} – ${b.getDate()} ${Mock.MIESD[b.getMonth()]}`);
-  document.getElementById('gr-h').textContent = 'Grafik: ' + zakres(dt(0), dt(6));
+  // who works where: the team, schedule, stations and pay of the location picked in the header (Mock.lok)
+  const LK = PS.lokalizacje();
+  document.getElementById('gr-h').textContent = 'Grafik: ' + zakres(dt(0), dt(6)) + (LK.length > 1 ? ' · ' + (LK[Mock.lok()] || LK[0]).n : '');
+  if (Mock.lok()) document.querySelectorAll('#tab-zespol .p-grid > section.p-card').forEach((c, i) => {
+    const o = PS.STYL[i]; if (!o) return c.remove();
+    c.querySelector('[aria-hidden]').style.background = o.c; c.querySelector('b').textContent = o.n; c.querySelector('b + span').textContent = (i ? 'Stylistka · ' : 'Menedżerka · ') + o.rola;
+    c.querySelector('.p-chip').parentElement.innerHTML = o.us.map(u => `<span class="p-chip">${E(u[0])}</span>`).join('');
+  });
   const P = { 1: '#F6EDF1', 2: '#EAF0F7' };
-  const DEF = { 'Magda': ['9–18', '9–18', '9–18', 'urlop', '10–18', '9–14', '—'], 'Ewelina': ['12–20', '9–17', '9–17', '9–17', '9–17', '—', '—'] };
+  const DEF = Object.fromEntries(PS.STYL.map(o => [o.n, [...o.grafik]])); // panel-shell.js, per location
   let G = Mock.get('zespol.grafik', DEF);
-  let STAN = Mock.get('zespol.stan', [
-    { n: 'Stanowisko 1', o: 'Paznokcie · Magda', sp: 'Lampa UV/LED, frezarka, odciąg pyłu', us: ['Hybryda', 'Żel', 'Przedłużanie'] },
-    { n: 'Stanowisko 2', o: 'Rzęsy i brwi · Ewelina', sp: 'Leżanka, lampa z lupą, stolik na kleje', us: ['Rzęsy 1:1–mega', 'Brwi'] },
-    { n: 'Gabinet kosmetyczny', o: 'Kosmetyka (przykład)', sp: 'Leżanka, lampa, zestaw do peelingów', us: ['Oczyszczanie', 'Peeling kwasowy'] }]);
+  let STAN = Mock.stanowiska(); // shared with cennik.html, panel.html and termin.html
   const saveG = () => Mock.set('zespol.grafik', G);
   const cls = v => (v === 'urlop' ? 'background:#FFF1E0;color:#8A3B12' : v === '—' ? 'color:#625860' : '');
 
   function renderGrafik() {
     const rows = Object.keys(G);
-    document.getElementById('gr').innerHTML = `<thead><tr style="color:#625860;font-size:12px"><th style="padding:8px;text-align:left;font-weight:500">Osoba</th>${DAYS.map(d => `<th style="padding:8px;font-weight:500">${d}</th>`).join('')}</tr></thead><tbody>${rows.map((r, ri) => `<tr style="border-top:1px solid #F0E8EC"><td style="padding:10px 8px;text-align:left;font-weight:700">${E(r)}</td>${G[r].map((v, i) => `<td style="padding:4px"><button type="button" data-r="${E(r)}" data-i="${i}" aria-label="${E(r)}, ${DAYS[i]} ${19 + i}.10: ${E(v)}. Zmień godziny" style="display:block;width:100%;min-height:44px;padding:8px;border-radius:8px;border:0;font:inherit;cursor:pointer;background:${v === 'urlop' || v === '—' ? '#fff' : P[(ri % 2) + 1]};${cls(v)}">${E(v)}</button></td>`).join('')}</tr>`).join('')}</tbody>`;
+    document.getElementById('gr').innerHTML = `<thead><tr style="color:#625860;font-size:12px"><th style="padding:8px;text-align:left;font-weight:500">Osoba</th>${DAYS.map(d => `<th style="padding:8px;font-weight:500">${d}</th>`).join('')}</tr></thead><tbody>${rows.map((r, ri) => `<tr style="border-top:1px solid #F0E8EC"><td style="padding:10px 8px;text-align:left;font-weight:700">${E(r)}</td>${G[r].map((v, i) => `<td style="padding:4px"><button type="button" data-r="${E(r)}" data-i="${i}" aria-label="${E(r)}, ${DAYS[i]} ${Mock.dm(dt(i))}: ${E(v)}. Zmień godziny" style="display:block;width:100%;min-height:44px;padding:8px;border-radius:8px;border:0;font:inherit;cursor:pointer;background:${v === 'urlop' || v === '—' ? '#fff' : P[(ri % 2) + 1]};${cls(v)}">${E(v)}</button></td>`).join('')}</tr>`).join('')}</tbody>`;
   }
   const hrs = (sel) => Array.from({ length: 15 }, (_, i) => `<option${i + 7 === sel ? ' selected' : ''}>${i + 7}</option>`).join('');
   document.getElementById('gr').addEventListener('click', e => {
@@ -151,10 +177,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const ROLE = { 'Stylistka': 'stylistka', 'Recepcja': 'recepcja', stylistka: 'stylistka', recepcja: 'recepcja' }; // podgląd zaproszenia istnieje tylko dla tych dwóch
   const RN = k => (PS.ROLES.find(r => r.k === k) || { n: k }).n;
   const ROPT = sel => PS.ROLES.map(r => `<option value="${r.k}"${r.k === sel ? ' selected' : ''}>${E(r.n)}</option>`).join('');
-  const RS = Mock.get('zespol.role', { 1: 'właścicielka', 2: 'stylistka' });
-  document.querySelectorAll('[data-rl]').forEach(sl => { sl.innerHTML = ROPT(RS[sl.dataset.rl]); sl.addEventListener('change', () => { RS[sl.dataset.rl] = sl.value; Mock.set('zespol.role', RS); }); });
+  const RS = Mock.get('zespol.role', Mock.lok() ? { 1: 'menedzerka', 2: 'stylistka' } : { 1: 'stylistka-plus', 2: 'stylistka' });
+  document.querySelectorAll('[data-rl]').forEach(sl => sl.addEventListener('change', () => { RS[sl.dataset.rl] = sl.value; Mock.set('zespol.role', RS); renderRole(); }));
   const MENU = PS.NAV.flatMap(g => g[1]);
-  document.getElementById('kcw').innerHTML = `<thead><tr><th scope="col">Pozycja menu</th>${PS.ROLES.map(r => `<th scope="col">${E(r.n)}</th>`).join('')}</tr></thead><tbody>${MENU.map(it => `<tr><th scope="row" style="font-weight:500">${E(it[0])}</th>${PS.ROLES.map(r => { const ok = !r.hide.includes(it[1]); return `<td>${ok ? '<span class="p-badge ok">widzi</span>' : '<span class="p-mut">brak</span>'}</td>`; }).join('')}</tr>`).join('')}</tbody>`;
+  // people per role: the two team cards and pending invitations
+  const ile = k => Object.values(RS).concat(inv.map(c => c.r)).filter(r => r === k).length;
+  function renderRole() {
+    const R = PS.ROLES;
+    document.querySelectorAll('[data-rl]').forEach(sl => { sl.innerHTML = ROPT(RS[sl.dataset.rl]); });
+    document.getElementById('kcw').innerHTML = `<thead><tr><th scope="col">Pozycja menu</th>${R.map((r, i) => `<th scope="col" style="vertical-align:top"><span style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">${E(r.n)}${r.own ? '<span class="p-badge blue">własna</span>' : ''}<span class="p-mut" style="font-weight:400">${ile(r.k)} os.</span>${i ? `<span style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" class="p-btn sm" data-ren="${i}">${r.own ? 'Zmień' : 'Zmień nazwę'}</button>${r.own ? `<button type="button" class="p-btn sm dng" data-usun="${i}">Usuń</button>` : ''}</span>` : '<span class="p-mut" style="font-weight:400">🔒 pełny dostęp</span>'}</span></th>`).join('')}</tr></thead>
+      <tbody>${MENU.map(it => `<tr><th scope="row" style="font-weight:500">${E(it[0])}</th>${R.map((r, i) => `<td><label style="display:inline-flex;min-width:44px;min-height:44px;align-items:center;justify-content:center"><input type="checkbox" style="width:20px;height:20px;accent-color:#9E1F50" data-r="${i}" data-h="${it[1]}"${i && r.hide.includes(it[1]) ? '' : ' checked'}${i ? '' : ' disabled'} aria-label="${E(r.n)}: ${E(it[0])}"></label></td>`).join('')}</tr>`).join('')}</tbody>`;
+  }
+  const kcw = document.getElementById('kcw');
+  kcw.addEventListener('change', e => {
+    const c = e.target.closest('[data-r]'); if (!c) return;
+    const R = PS.ROLES, r = R[+c.dataset.r];
+    r.hide = c.checked ? r.hide.filter(h => h !== c.dataset.h) : r.hide.concat(c.dataset.h);
+    PS.setRoles(R); Mock.toast(`${r.n}: ${c.checked ? 'widzi' : 'nie widzi'} „${MENU.find(m => m[1] === c.dataset.h)[0]}”`);
+  });
+  const nazwaOk = (f, R, skip) => { const n = f.n.value.trim(); if (R.some((r, i) => i !== skip && r.n.toLowerCase() === n.toLowerCase())) { Mock.toast('Rola o tej nazwie już jest'); return ''; } return n; };
+  kcw.addEventListener('click', e => {
+    const ren = e.target.closest('[data-ren]'), del = e.target.closest('[data-usun]'), R = PS.ROLES;
+    if (ren) { const i = +ren.dataset.ren, r = R[i]; PS.modal({ title: 'Zmień nazwę roli', ok: 'Zapisz',
+      body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required maxlength="40" value="${E(r.n)}"></label>`,
+      onOk: f => { const n = nazwaOk(f, R, i); if (!n) return false; r.n = n; PS.setRoles(R); renderRole(); renderInv(); }, toast: f => 'Nowa nazwa: ' + f.n.value.trim() }); }
+    if (del) { const r = R[+del.dataset.usun];
+      if (ile(r.k)) { Mock.toast(`Rolę „${r.n}” ma ${ile(r.k)} os. Najpierw przypisz im inną rolę`); return; }
+      PS.modal({ title: 'Usunąć rolę?', ok: 'Usuń', cls: 'dark', body: `<p style="margin:0">Rola „${E(r.n)}” zniknie z listy ról. Nikt jej teraz nie ma.</p>`,
+        onOk: () => { PS.setRoles(R.filter(x => x.k !== r.k)); renderRole(); }, toast: 'Usunięto rolę: ' + r.n }); }
+  });
+  document.getElementById('rola-add').addEventListener('click', () => { const R = PS.ROLES; PS.modal({ title: 'Nowa rola', ok: 'Dodaj rolę',
+    body: `<label class="p-lab">Nazwa<input class="p-in" name="n" required maxlength="40" placeholder="np. Kosmetolożka"></label>
+      <label class="p-lab">Zacznij od uprawnień roli<select class="p-in" name="z">${R.map((r, i) => `<option value="${i}"${r.k === 'stylistka-plus' ? ' selected' : ''}>${E(r.n)}</option>`).join('')}</select></label>
+      <span class="p-mut" style="font-size:13px">Potem zaznaczysz szczegóły w tabeli. Nowa rola pojawi się w „Zaproś osobę” i przy każdej osobie.</span>`,
+    onOk: f => { const n = nazwaOk(f, R, -1); if (!n) return false; PS.setRoles(R.concat({ k: 'r' + Date.now(), n, hide: R[+f.z.value].hide.slice(), own: true })); renderRole(); },
+    toast: f => 'Dodano rolę: ' + f.n.value.trim() }); });
   function renderInv() {
     document.getElementById('invited').innerHTML = inv.map((c, i) => `<section class="p-card"><div style="display:flex;gap:12px;align-items:center"><span aria-hidden="true" style="width:48px;height:48px;border-radius:50%;background:#E4D9DE"></span><div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><b style="font-size:16px;overflow-wrap:anywhere">${E(c.k)}</b><span style="color:#625860">${E(RN(c.r))}</span></div><span class="p-badge warn">zaproszona</span></div>
       <span class="p-mut">Osoba pojawi się w grafiku po przyjęciu zaproszenia. Link działa 7 dni.</span>
@@ -163,13 +220,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('invited').addEventListener('click', e => {
     const r = e.target.closest('[data-resend]'), c = e.target.closest('[data-cancel]');
     if (r) Mock.toast('Zaproszenie wysłane ponownie: ' + inv[+r.dataset.resend].k);
-    if (c) { const x = inv[+c.dataset.cancel]; inv.splice(+c.dataset.cancel, 1); Mock.set('zespol.inv', inv); renderInv(); Mock.toast('Zaproszenie anulowane: ' + x.k); }
+    if (c) { const x = inv[+c.dataset.cancel]; inv.splice(+c.dataset.cancel, 1); Mock.set('zespol.inv', inv); renderInv(); renderRole(); Mock.toast('Zaproszenie anulowane: ' + x.k); }
   });
   document.getElementById('invite').addEventListener('click', () => PS.modal({
     title: 'Zaproś osobę', ok: 'Wyślij zaproszenie',
     body: `<label class="p-lab">E-mail lub telefon<input class="p-in" name="k" required placeholder="np. imie@example.com lub +48 …"></label>
       <label class="p-lab">Rola<select class="p-in" name="r">${ROPT('stylistka')}</select></label>`,
-    onOk: f => { inv.unshift({ k: f.k.value.trim(), r: f.r.value }); Mock.set('zespol.inv', inv); renderInv(); },
+    onOk: f => { inv.unshift({ k: f.k.value.trim(), r: f.r.value }); Mock.set('zespol.inv', inv); renderInv(); renderRole(); },
     toast: f => `Zaproszenie wysłane: ${f.k.value.trim()}. Podgląd zaproszenia znajdziesz na liście niżej`
   }));
 
@@ -190,16 +247,33 @@ document.addEventListener('DOMContentLoaded', () => {
     toast: f => `Dodano stanowisko: ${f.n.value.trim()}`
   }));
 
-  // --- pay from commission: base + turnover × rate ---
-  const doWyplaty = o => Math.round(o.podstawa + o.utarg * o.proc / 100);
-  console.assert(doWyplaty({ podstawa: 3000, utarg: 10000, proc: 10 }) === 4000 && doWyplaty({ podstawa: 0, utarg: 9000, proc: 40 }) === 3600, 'zespol doWyplaty');
-  let WY = Mock.get('zespol.wyn', [{ k: 'Magda', utarg: 9800, proc: 40, podstawa: 0 }, { k: 'Ewelina', utarg: 7200, proc: 10, podstawa: 3000 }]);
-  const renderWy = () => { document.getElementById('wy').innerHTML = WY.map((o, i) => `<tr><td><b>${E(o.k)}</b></td><td style="text-align:right">${o.utarg.toLocaleString('pl-PL')} zł</td>
-      <td style="text-align:right"><input class="p-in s" type="number" min="0" max="100" data-wy="${i}" data-f="proc" value="${o.proc}" aria-label="Prowizja ${E(o.k)} (%)" style="width:70px"> %</td>
-      <td style="text-align:right"><input class="p-in s" type="number" min="0" step="100" data-wy="${i}" data-f="podstawa" value="${o.podstawa}" aria-label="Podstawa ${E(o.k)} (zł)" style="width:90px"> zł</td>
-      <td style="text-align:right;font-weight:700">${doWyplaty(o).toLocaleString('pl-PL')} zł</td></tr>`).join(''); };
+  // --- pay from commission: base + turnover × rate + bonus (turnover over a threshold, % of product sales) ---
+  let PR = Mock.get('zespol.premie', { prog: 9000, kwota: 300, prod: 10 });
+  const premia = (o, r = PR) => (o.utarg > r.prog ? r.kwota : 0) + Math.round((o.produkty || 0) * r.prod / 100);
+  const doWyplaty = (o, r = PR) => Math.round(o.podstawa + o.utarg * o.proc / 100) + premia(o, r);
+  const R0 = { prog: 9000, kwota: 300, prod: 10 };
+  console.assert(doWyplaty({ podstawa: 3000, utarg: 10000, proc: 10 }, R0) === 4300 && doWyplaty({ podstawa: 0, utarg: 9000, proc: 40 }, R0) === 3600 && premia({ utarg: 7200, produkty: 600 }, R0) === 60, 'zespol doWyplaty + premia');
+  let WY = Mock.get('zespol.wyn', Mock.lok() === 1 ? [{ k: 'Ola', utarg: 5400, proc: 40, podstawa: 0 }, { k: 'Natalia', utarg: 8600, proc: 10, podstawa: 3000, produkty: 400 }]
+    : [{ k: 'Magda', utarg: 10260, proc: 40, podstawa: 0 }, { k: 'Ewelina', utarg: 8140, proc: 10, podstawa: 3000, produkty: 600 }]);
+  const zl = n => n.toLocaleString('pl-PL') + ' zł';
+  const prOpis = o => { const p = premia(o), za = [o.utarg > PR.prog ? `utarg ponad ${zl(PR.prog)}` : '', o.produkty && PR.prod ? `${PR.prod}% z ${zl(o.produkty)} produktów` : ''].filter(Boolean).join(' + ');
+    return (p ? `<b>+${zl(p)}</b>` : '<span class="p-mut">—</span>') + `<br><span class="p-mut" style="font-size:12px">${E(za)}${o.utarg > PR.prog ? '' : `${za ? '; ' : ''}do +${zl(PR.kwota)} brakuje ${zl(PR.prog - o.utarg)}`}</span>`; };
+  const renderWy = () => { document.getElementById('pr-z').innerHTML = `Utarg osoby ponad <b>${zl(PR.prog)}</b> → <b>+${zl(PR.kwota)}</b><br>Sprzedaż produktów: <b>${PR.prod}%</b> wartości`;
+    document.getElementById('wy').innerHTML = WY.map((o, i) => `<tr><td data-c="k"><b>${E(o.k)}</b></td><td data-c="ut" data-l="Utarg z usług" style="text-align:right">${zl(o.utarg)}</td>
+      <td data-c="pc" data-l="Prowizja" style="text-align:right"><input class="p-in s" type="number" min="0" max="100" data-wy="${i}" data-f="proc" value="${o.proc}" aria-label="Prowizja ${E(o.k)} (%)" style="width:70px"> %</td>
+      <td data-c="pd" data-l="Podstawa" style="text-align:right"><input class="p-in s" type="number" min="0" step="100" data-wy="${i}" data-f="podstawa" value="${o.podstawa}" aria-label="Podstawa ${E(o.k)} (zł)" style="width:90px"> zł</td>
+      <td data-c="pr" data-l="Premia" style="text-align:right">${prOpis(o)}</td>
+      <td data-c="pay" data-l="Do wypłaty" style="text-align:right;font-weight:700">${zl(doWyplaty(o))}</td></tr>`).join(''); };
   document.getElementById('wy').addEventListener('change', e => { const t = e.target.closest('[data-wy]'); if (!t) return; WY[+t.dataset.wy][t.dataset.f] = Math.max(0, +t.value || 0); Mock.set('zespol.wyn', WY); renderWy(); Mock.toast('Zapisano'); });
-  document.getElementById('wy-exp').addEventListener('click', () => Mock.toast('Pobrano rozliczenie: ' + WY.map(o => `${o.k} ${doWyplaty(o)} zł`).join(', ')));
+  document.getElementById('pr-edit').addEventListener('click', () => PS.modal({
+    title: 'Zasady premii',
+    body: `<label class="p-lab">Próg utargu osoby w miesiącu (zł)<input class="p-in" name="prog" type="number" min="0" step="100" required value="${PR.prog}"></label>
+      <label class="p-lab">Premia za przekroczenie progu (zł)<input class="p-in" name="kwota" type="number" min="0" step="50" required value="${PR.kwota}"></label>
+      <label class="p-lab">Premia od sprzedaży produktów (%)<input class="p-in" name="prod" type="number" min="0" max="100" required value="${PR.prod}"></label>`,
+    onOk: f => { PR = { prog: +f.prog.value, kwota: +f.kwota.value, prod: +f.prod.value }; Mock.set('zespol.premie', PR); renderWy(); },
+    toast: 'Zasady premii zapisane'
+  }));
+  document.getElementById('wy-exp').addEventListener('click', () => Mock.toast('Pobrano rozliczenie: ' + WY.map(o => `${o.k} ${doWyplaty(o)} zł (premia ${premia(o)} zł)`).join(', ')));
   // --- working time today: start / end, compared with today's schedule ---
   const dzisI = Mock.weekday(Mock.dzien(0)), dzisIso = Mock.iso(Mock.teraz()), hm = d => `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
   const renderCp = () => { const L = (Mock.get('czasPracy', []) || []).filter(x => x.data === dzisIso);
@@ -210,7 +284,53 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cp').addEventListener('click', e => { const b = e.target.closest('[data-cp]'); if (!b) return;
     const L = Mock.get('czasPracy', []) || [], k = b.dataset.cp, z = L.find(x => x.k === k && x.data === dzisIso), t = hm(Mock.teraz());
     if (z) z.koniec = t; else L.push({ k, data: dzisIso, start: t }); Mock.set('czasPracy', L); renderCp(); Mock.toast(z ? `${k}: koniec pracy ${t}` : `${k}: początek pracy ${t}`); });
-  renderGrafik(); renderInv(); renderStan(); renderWy(); renderCp();
+  renderGrafik(); renderInv(); renderRole(); renderStan(); renderWy(); renderCp();
+});
+</script>
+<script>
+// Etap A: team tasks and announcements (Mock "zadania"; magazyn.html adds "Zamów …", the bell in panel-shell.js shows new ones)
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, OSOBY = ['Joanna', ...PS.STYL.map(o => o.n)];
+  const dIso = s => { const [y, m, d] = s.slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); };
+  const dzien = s => { const n = Mock.odDzis(dIso(s)); return n === 0 ? 'dziś' : n === -1 ? 'wczoraj' : n === 1 ? 'jutro' : Mock.dm(dIso(s)); };
+  const zost = n => `${n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'zostały' : 'zostało'} ${n} dni`;
+  function terminTxt(z) {
+    if (z.done) return 'zrobione ' + dzien(z.doneDzien || Mock.iso(Mock.teraz()));
+    const n = Mock.odDzis(dIso(z.termin));
+    return n < 0 ? `po terminie (${Mock.dm(dIso(z.termin))})` : n === 0 ? 'dziś' + (z.godz ? ' do ' + z.godz : '') : n === 1 ? 'do jutra' : zost(n);
+  }
+  console.assert(terminTxt({ termin: Mock.iso(Mock.dzien(1)) }) === 'do jutra' && terminTxt({ termin: Mock.iso(Mock.dzien(0)), godz: '16:00' }) === 'dziś do 16:00' && terminTxt({ termin: Mock.iso(Mock.dzien(13)) }) === 'zostało 13 dni'
+    && terminTxt({ termin: Mock.iso(Mock.dzien(3)) }) === 'zostały 3 dni' && terminTxt({ done: true, doneDzien: Mock.iso(Mock.dzien(-1)) }) === 'zrobione wczoraj' && terminTxt({ termin: Mock.iso(Mock.dzien(-2)) }).startsWith('po terminie'), 'zespol zadania terminTxt');
+  function render() {
+    const Z = Mock.zadania(), L = [...Z.lista.filter(z => !z.done), ...Z.lista.filter(z => z.done)], n = L.filter(z => !z.done).length;
+    const b = document.getElementById('zad-n'); b.textContent = n; b.hidden = !n;
+    document.getElementById('zad-l').innerHTML = Z.ogl.map(o => `<div class="p-row" style="background:#F6EDF1"><span><b>Ogłoszenie ${E(Mock.odKogo(o.od))}</b><br>${E(o.t)}</span><span class="p-mut">${E(dzien(o.czas))}, ${E(String(+o.czas.slice(11, 13)) + o.czas.slice(13, 16))}</span></div>`).join('') +
+      L.map(z => `<label class="p-row" style="justify-content:flex-start;flex-wrap:nowrap;gap:12px;cursor:pointer;min-height:44px"><input type="checkbox" data-z="${E(z.id)}"${z.done ? ' checked' : ''} style="width:22px;height:22px;flex:none;accent-color:#9E1F50"><span style="min-width:0">${z.done ? `<s style="color:#625860">${E(z.t)}</s>` : `<b>${E(z.t)}</b>`}<br><span class="p-mut">${[z.kto, terminTxt(z), z.zrodlo].filter(Boolean).map(E).join(' · ')}</span></span></label>`).join('') ||
+      '<span class="p-mut">Brak zadań. Dodaj pierwsze przyciskiem „+ Zadanie”.</span>';
+  }
+  document.getElementById('zad-l').addEventListener('change', e => {
+    const c = e.target.closest('[data-z]'); if (!c) return;
+    const Z = Mock.zadania(), z = Z.lista.find(x => x.id === c.dataset.z);
+    Object.assign(z, { done: c.checked, doneDzien: c.checked ? Mock.iso(Mock.teraz()) : null, nowe: false }); Mock.setZadania(Z); render(); PS.refresh();
+    Mock.toast(c.checked ? 'Zrobione: ' + z.t : 'Przywrócono zadanie: ' + z.t);
+  });
+  document.getElementById('zad-add').addEventListener('click', () => PS.modal({
+    title: 'Nowe zadanie', ok: 'Dodaj',
+    body: `<fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Rodzaj</legend>${[['z', 'Zadanie dla osoby'], ['o', 'Ogłoszenie dla zespołu']].map(([k, l], i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="r" value="${k}"${i ? '' : ' checked'}>${l}</label>`).join('')}</fieldset>
+      <label class="p-lab">Treść<input class="p-in" name="t" required maxlength="140" placeholder="np. Oddzwoń do klientki w sprawie terminu"></label>
+      <div id="zad-pola" style="display:flex;gap:8px;flex-wrap:wrap"><label class="p-lab" style="flex:1 1 140px">Osoba<select class="p-in" name="k">${OSOBY.map(o => `<option>${o}</option>`).join('')}</select></label><label class="p-lab" style="flex:1 1 140px">Termin<input class="p-in" type="date" name="d" min="${Mock.iso(Mock.dzien(0))}" value="${Mock.iso(Mock.dzien(1))}"></label></div>`,
+    onOpen: f => f.querySelectorAll('[name=r]').forEach(r => r.addEventListener('change', () => { f.querySelector('#zad-pola').hidden = f.r.value === 'o'; })),
+    onOk: f => {
+      const t = f.t.value.trim(), Z = Mock.zadania(); if (!t) return false;
+      if (f.r.value === 'o') { const u = Mock.get('studioUser', null); Z.ogl.unshift({ id: 'o' + Date.now(), od: ((u && u.imie) || 'Joanna').split(' ')[0], t, czas: Mock.iso(Mock.teraz()) + 'T' + Mock.teraz().toTimeString().slice(0, 5) }); }
+      else Z.lista.unshift({ id: 'z' + Date.now(), t, kto: f.k.value, termin: f.d.value || Mock.iso(Mock.dzien(1)), nowe: true });
+      PS.log(f.r.value === 'o' ? `wysłała ogłoszenie: ${t}` : `dodała zadanie dla ${f.k.value}: ${t}`);
+      Mock.setZadania(Z); render(); PS.refresh();
+    },
+    toast: f => (f.r.value === 'o' ? 'Ogłoszenie wysłane do zespołu' : `Dodano zadanie dla: ${f.k.value}`)
+  }));
+  render();
+  if (location.hash === '#zadania') document.getElementById('zad-tab').click(); // link from the bell
 });
 </script>
 </body>

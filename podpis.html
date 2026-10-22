@@ -141,6 +141,10 @@ import { createPad } from './podpis-pad.js';
   const studio = qp.get('tryb') === 'studio', kl = (qp.get('k') || '').slice(0, 60);
   const wroc = { klientki: 'klientki.html', formularze: 'formularze.html' }[qp.get('wroc')] || 'panel.html';
   const doc = DOCS[q] ? q : 'rodo';
+  // trial mode from Formularze ("Wypróbuj podpis"): the form copy saved there, nothing is stored after signing
+  const proba = qp.get('tryb') === 'proba' && Mock.get('formularze.proba', null);
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const zamknij = e => { e && e.preventDefault(); window.close(); setTimeout(() => { location.href = 'formularze.html'; }, 200); }; // a tab opened by the panel closes, otherwise back to the panel
   const B = Mock.get('booking', {}) || {};
   $('#studio').textContent = B.studio || 'Studio Malwa';
   if (studio) {
@@ -159,6 +163,23 @@ import { createPad } from './podpis-pad.js';
   });
   $('#dt').textContent = DOCS[doc][0];
   $('#doc').innerHTML = DOCS[doc][1].map(p => `<p>${p.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))}</p>`).join('');
+  if (proba) {
+    $('header').insertAdjacentHTML('afterend', '<div role="status" style="margin:12px 20px 0;padding:12px 14px;border-radius:12px;background:#E7F2F4;color:#1E4E5A;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><span><b>Próba podpisu.</b> Tak zobaczy to klientka. Nic nie zostanie zapisane.</span><a href="formularze.html" data-wroc style="color:#1E4E5A;font-weight:700">Wróć do formularza</a></div>');
+    $('#studio').textContent = (B.studio || 'Studio Malwa') + ' · próba';
+    $('#dt').textContent = proba.n || 'Formularz';
+    if (proba.tr) $('#doc').innerHTML = `<p>${esc(proba.tr)}</p>`; else $('#doc').hidden = true;
+    const pole = (q, i) => {
+      const L = esc(q.t) + (q.r ? ' <span style="color:#A3262A">*</span>' : ''), r = q.r ? ' required' : '';
+      if (q.y === 'tak') return `<fieldset style="border:0;padding:0;margin:0"><legend style="padding:0 0 6px;font-weight:500">${L}</legend><div style="display:flex;gap:8px">${['Tak', 'Nie'].map(o => `<label class="tab" style="display:inline-flex;gap:6px;align-items:center"><input type="radio" name="q${i}"${r}> ${o}</label>`).join('')}</div></fieldset>`;
+      if (q.y === 'dlugi') return `<label style="display:flex;flex-direction:column;gap:6px">${L}<textarea class="inp" rows="2"${r}></textarea></label>`;
+      if (q.y === 'wybor') return `<label style="display:flex;flex-direction:column;gap:6px">${L}<select class="inp"${r}><option value="">Wybierz</option><option>Opcja 1</option><option>Opcja 2</option></select></label>`;
+      return `<label style="display:flex;flex-direction:column;gap:6px">${L}<input class="inp" type="${q.y === 'data' ? 'date' : 'text'}"${r}></label>`;
+    };
+    $('#doc').insertAdjacentHTML('afterend', `<div style="display:flex;flex-direction:column;gap:12px">${(proba.q || []).filter(q => q.y !== 'podpis').map(pole).join('')}</div>`); // the signature question is the pad below
+    const w = $('#wstecz'); w.removeAttribute('data-back'); w.href = 'formularze.html'; w.setAttribute('aria-label', 'Wróć do formularza');
+    [w, $('[data-wroc]'), $('#d-wroc')].forEach(a => a.addEventListener('click', zamknij));
+    $('#d-wroc').textContent = 'Wróć do formularza'; $('#pdf').hidden = true;
+  }
 
   // --- pole podpisu: palec, rysik i mysz (podpis-pad.js) ---
   const cv = $('#pad');
@@ -194,6 +215,15 @@ import { createPad } from './podpis-pad.js';
     const klientka = studio ? kl || 'Klientka' : mode === 'wpisany' ? $('#typed').value.trim() : (user.imie || 'Klientka');
     const sposob = mode === 'wpisany' ? 'wpisany' + (studio ? ' na tablecie w studiu' : '') : studio ? (pad.penSeen ? 'odręczny rysikiem w studiu' : 'odręczny na tablecie w studiu') : mode;
     const now = Mock.teraz();
+    if (proba) { // show the result like a real signature, store nothing
+      if (mode === 'odręczny') { $('#d-img').src = cv.toDataURL('image/png'); $('#d-img').hidden = false; }
+      $('#f').hidden = true; $('#done').hidden = false;
+      $('#d-doc').textContent = (proba.n || 'Formularz') + ' (próba)';
+      $('#d-kiedy').textContent = `${pad2(now.getDate())}.${pad2(now.getMonth() + 1)}.${now.getFullYear()}, ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+      $('#d-kod').textContent = 'PRÓBA, nie zapisano';
+      Mock.toast('Próba zakończona. Nic nie zapisano');
+      window.scrollTo(0, 0); return;
+    }
     // zapisujemy tylko dane o podpisie, nigdy obrazka z pola podpisu (obrazek widać raz na ekranie potwierdzenia)
     const entry = { doc, nazwa: DOCS[doc][0], klientka, data: now.toISOString(), sposob };
     if (studio && mode === 'odręczny') { $('#d-img').src = cv.toDataURL('image/png'); $('#d-img').hidden = false; }

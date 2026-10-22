@@ -41,9 +41,23 @@
 </div>
 <script src="kreator.js"></script>
 <script>
-// Length picture: a canvas the module below fills with the back-view hair photo and the chosen length level (wlosy.js poziomy).
-// Placeholders only: Kreator.ui rewrites #kreator and the side bar on every click, the module redraws after each rewrite.
-const dl = (id, size, big, label) => `<canvas data-dl="${id}" ${big ? 'data-big' : 'aria-hidden="true"'} width="${size}" height="${size}"${label ? ` role="img" aria-label="${label}"` : ''} style="display: block; width: 100%; height: auto; border-radius: ${big ? 14 : 8}px; background: #E4D9DE${big ? '' : '; margin-bottom: auto'}"></canvas>`; // thumbnails stay on top, labels at the bottom, so pictures line up whatever the text below
+// Length picture: the back-view photo zdjecia/wlosy-dlugosc.jpg (1000×1500) with the levels drawn on it in SVG.
+// Levels in 0..1000 of the photo height, calibrated once by eye: ear, shoulders, shoulder blades, waist, below the waist.
+const DL_Y = { ucho: 250, ramiona: 480, za_ramiona_lopatki: 660, za_lopatki_pas: 860, ponizej_pasa: 960 };
+const DL_N = { ucho: 'do ucha', ramiona: 'do ramion', za_ramiona_lopatki: 'do łopatek', za_lopatki_pas: 'do pasa', ponizej_pasa: 'poniżej pasa' };
+// big: the whole photo with every level and the chosen one labelled; small (tile): a crop around the chosen line, only that line
+const dl = (id, big, label) => {
+  const linie = Object.entries(DL_Y).map(([k, y]) => {
+    const Y = y * 1.5, on = k === id; if (!big && !on) return '';
+    if (!on) return `<line x1="40" x2="960" y1="${Y}" y2="${Y}" stroke="#fff" stroke-opacity=".9" stroke-width="3" stroke-dasharray="14 12"/><text x="960" y="${Y - 12}" text-anchor="end" font-size="44" font-weight="600" fill="#fff" font-family="DM Sans,sans-serif" style="paint-order:stroke;stroke:rgba(30,10,18,.45);stroke-width:8px">${DL_N[k]}</text>`;
+    const w = DL_N[k].length * 34 + 40;
+    return `<line x1="40" x2="960" y1="${Y}" y2="${Y}" stroke="#fff" stroke-width="${big ? 9 : 14}"/><line x1="40" x2="960" y1="${Y}" y2="${Y}" stroke="#9E1F50" stroke-width="${big ? 5 : 9}"/>`
+      + (big ? `<rect x="${960 - w}" y="${Y - 80}" width="${w}" height="68" rx="34" fill="#9E1F50"/><text x="940" y="${Y - 30}" text-anchor="end" font-size="50" font-weight="700" fill="#fff" font-family="DM Sans,sans-serif">${DL_N[k]}</text>` : '');
+  }).join('');
+  const top = big ? 0 : Math.max(-20, Math.min(0, 50 - DL_Y[id] * 0.12)); // tile: the chosen line near its middle
+  return `<div ${big ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'} style="position: relative; width: 100%; aspect-ratio: ${big ? '2 / 3' : '4 / 5'}; border-radius: ${big ? 14 : 8}px; overflow: hidden; background: #E4D9DE${big ? '' : '; margin-bottom: auto'}">`
+    + `<div style="position: absolute; left: 0; width: 100%; height: ${big ? 100 : 120}%; top: ${top}%"><img src="zdjecia/wlosy-dlugosc.jpg" alt="" ${big ? '' : 'loading="lazy" '}style="position: absolute; inset: 0; width: 100%; height: 100%"><svg viewBox="0 0 1000 1500" style="position: absolute; inset: 0; width: 100%; height: 100%">${linie}</svg></div></div>`; // thumbnails stay on top, labels at the bottom
+};
 const by = (list, id) => list.find(x => x.id === id);
 const damskie = w => w.dla === 'damskie';
 const svc = (c, w) => by(c.warianty, w.usluga);
@@ -51,7 +65,7 @@ const svc = (c, w) => by(c.warianty, w.usluga);
 Kreator.ui({
   kat: 'fryzjer', nazwa: 'Fryzjer',
   preview: (w, c) => (damskie(w) && !svc(c, w).bezDlugosci && !svc(c, w).sciezka && !svc(c, w).wymagaKonsultacji
-    ? `<div style="max-width: 270px; margin: 0 auto">${dl(w.dlugosc, 560, true, 'Zdjęcie włosów z zaznaczoną długością: ' + by(c.dlugosc.pasma, w.dlugosc).nazwa)}</div>`
+    ? `<div style="max-width: 270px; margin: 0 auto">${dl(w.dlugosc, true, 'Zdjęcie włosów z zaznaczoną długością: ' + by(c.dlugosc.pasma, w.dlugosc).nazwa)}</div>`
     : `<div style="color: #625860; font-size: 14px">${Kreator.esc(damskie(w) ? svc(c, w).nazwa : by(c.meskie, w.meskie).nazwa)}</div>`),
   defaults: () => ({ dla: 'damskie', meskie: 'meskie', usluga: 'kolor', dlugosc: 'ramiona', gestosc: 'geste', historia: [], dodatki: ['plex'], stylista: 'fryzjer' }),
   dalej: r => (r.sciezka === 'konsultacja' ? 'Dalej: umów bezpłatną konsultację' : r.zakres.includes('koloryzacja') ? 'Dalej: test uczuleniowy i termin' : 'Dalej: kilka pytań i termin'),
@@ -65,8 +79,8 @@ Kreator.ui({
       onChange: w => { if (!svc(c, w).koloryzacja) w.historia = []; } },
     { key: 'dlugosc', title: 'Długość włosów', nav: 'Długość', layout: 'tiles3', show: w => damskie(w) && !svc(c, w).bezDlugosci && !svc(c, w).sciezka && !svc(c, w).wymagaKonsultacji,
       // on a desktop the picture sits in the side column (preview above), so the one in the step is phone-only
-      html: w => `<div class="m-only" style="max-width: 340px; width: 100%; align-self: center">${dl(w.dlugosc, 680, true, 'Zdjęcie włosów z zaznaczoną długością: ' + by(c.dlugosc.pasma, w.dlugosc).nazwa)}</div>`,
-      options: () => c.dlugosc.pasma.map(p => ({ id: p.id, label: p.nazwa, svg: () => dl(p.id, 200, false) })),
+      html: w => `<div class="m-only" style="max-width: 340px; width: 100%; align-self: center">${dl(w.dlugosc, true, 'Zdjęcie włosów z zaznaczoną długością: ' + by(c.dlugosc.pasma, w.dlugosc).nazwa)}</div>`,
+      options: () => c.dlugosc.pasma.map(p => ({ id: p.id, label: p.nazwa, svg: () => dl(p.id, false) })),
       note: 'Salon przypisuje pasma do swoich kolumn cennika: ucho to krótkie, ramiona średnie, łopatki długie.' },
     { key: 'gestosc', sub: true, title: 'Gęstość', layout: 'tiles3', show: w => damskie(w) && !svc(c, w).bezDlugosci && !svc(c, w).sciezka && !svc(c, w).wymagaKonsultacji,
       options: () => [{ id: 'cienkie', label: 'cienkie' }, { id: 'normalne', label: 'normalne' }, { id: 'geste', label: 'gęste' }] },
@@ -88,7 +102,7 @@ Kreator.ui({
 // (zdjecia/wlosy-N.jpg, mask computed once and saved as PNG, so MediaPipe loads only for a selfie). The technique comes from the
 // chosen service. Photos stay in page memory (no storage, no upload). It reads the creator's saved choices and never changes the price.
 import { przymierzalnia, naZmiane, blad, kadr } from './twarz.js';
-import { loadPhoto, loadUrl, prepare, zMaski, paint, probka, lighterBy, poziomy, TECHNIKI } from './wlosy.js';
+import { loadPhoto, loadUrl, prepare, zMaski, paint, probka, lighterBy, TECHNIKI } from './wlosy.js';
 const ODCIENIE = [ // swatches are not in cenniki/fryzjer.json, so they live here (illustrative shades)
   { id: 'blond', nazwa: 'Blond', hex: '#E3C58E' }, { id: 'karmel', nazwa: 'Karmel', hex: '#B9773A' },
   { id: 'miedz', nazwa: 'Miedź', hex: '#B4572B' }, { id: 'braz', nazwa: 'Brąz', hex: '#5A3A28' },
@@ -169,20 +183,6 @@ $('#wlosy-sl').addEventListener('input', e => {
 
 const cennik = fetch('cenniki/fryzjer.json').then(r => r.json());
 
-// Length levels on the back-view photo zdjecia/wlosy-dlugosc.jpg (1000 px frame), calibrated once by eye:
-// ear, shoulder line, bottom of the shoulder blades, waist, and just below the hair tips (the whole hair).
-const POZIOM_Y = { ucho: 215, ramiona: 330, za_ramiona_lopatki: 520, za_lopatki_pas: 740, ponizej_pasa: 880 };
-const dlugoscFoto = loadUrl('zdjecia/wlosy-dlugosc.jpg', 1000, 1000).then(async photo => ({ photo, hair: await zMaski(photo, 'zdjecia/wlosy-dlugosc-maska.png') }));
-async function rysujDlugosc() {
-  const cv = [...document.querySelectorAll('canvas[data-dl]')]; if (!cv.length) return;
-  try {
-    const [{ photo, hair }, c] = await Promise.all([dlugoscFoto, cennik]), levels = c.dlugosc.pasma.map(p => ({ id: p.id, nazwa: p.nazwa, y: POZIOM_Y[p.id] }));
-    cv.forEach(el => poziomy(el, photo, hair, levels, el.dataset.dl, 'big' in el.dataset));
-  } catch (e) { console.warn('Zdjęcie długości niedostępne', e); cv.forEach(el => { el.style.display = 'none'; }); }
-}
-// both the steps and the side bar are rewritten by the engine
-for (const id of ['kreator', 'kreator-bar']) new MutationObserver(rysujDlugosc).observe(document.getElementById(id), { childList: true });
-rysujDlugosc();
 
 // Show the try-on only for colouring services. The engine rewrites #kreator after every choice and saves them
 // (kreator_fryzjer, no health data); the observer fires after that save.

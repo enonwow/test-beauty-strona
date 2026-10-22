@@ -24,8 +24,10 @@ export function kiedy(iso, now = Date.now()) {
   return dni === 1 ? 'wczoraj' : `${dni} dni temu`;
 }
 
-// Card built from text nodes only: feed content never goes in as HTML. Only https links are kept.
-export function karta(it, { lead = true } = {}) {
+// our own photos (zdjecia/, see ZRODLA.md) by topic, in this order of priority; the publishers' photos are never copied
+const FOTO_TEMAT = [['paznokcie', 'kat-paznokcie'], ['rzesy', 'kat-rzesy'], ['brwi', 'kat-brwi'], ['wlosy', 'kat-fryzjer'], ['pielegnacja', 'kat-kosmetyka'], ['makijaz', 'oczy-1'], ['zabiegi', 'kosmetologia-1']];
+// Card built from text nodes only: feed content never goes in as HTML. Only https links are kept. foto: a topic thumbnail on the left.
+export function karta(it, { lead = true, foto = false } = {}) {
   let url; try { url = new URL(it.url); } catch { return null; }
   if (url.protocol !== 'https:') return null;
   const a = document.createElement('a');
@@ -37,6 +39,12 @@ export function karta(it, { lead = true } = {}) {
   if (lead && it.lead) { const p = document.createElement('span'); p.className = 'nw-l'; p.textContent = it.lead; a.append(p); }
   const go = document.createElement('span'); go.className = 'nw-go'; go.textContent = `Czytaj na ${url.hostname.replace(/^www\./, '')} ↗`;
   a.append(go);
+  if (foto) {
+    const tx = document.createElement('span'); tx.className = 'nw-tx'; tx.append(...a.childNodes);
+    const img = document.createElement('img'); img.className = 'nw-f'; img.alt = ''; img.loading = 'lazy'; img.width = img.height = 112;
+    img.src = `zdjecia/${(FOTO_TEMAT.find(([t]) => it.topics?.includes(t)) || FOTO_TEMAT[4])[1]}.jpg`;
+    a.classList.add('f'); a.append(img, tx);
+  }
   a.setAttribute('aria-label', `${it.title}. ${it.source}, ${kiedy(it.published)}. Otwiera się w nowej karcie.`);
   return a;
 }

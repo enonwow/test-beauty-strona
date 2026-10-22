@@ -108,11 +108,11 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
   </div>
 
   <div class="o6 bar" style="margin-top:auto;padding:16px 20px 24px;border-top:1px solid #F0E8EC;display:flex;flex-direction:column;gap:10px">
-    <label id="zad-lab" style="display:flex;gap:10px;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;background:#FAF6F8;font-size:13px;line-height:1.35">
+    <label id="zad-lab" class="mock-only" style="display:flex;gap:10px;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;background:#FAF6F8;font-size:13px;line-height:1.35">
       <input id="zad" type="checkbox" checked style="width:22px;height:22px;margin:0;flex:none">
-      <span>Makieta: studio wymaga zaliczki (<b id="zad-kw">60</b> zł, przykładowo 30% ceny)</span>
+      <span>Makieta: studio wymaga <span id="zad-rodz">zaliczki</span> (<b id="zad-kw">60</b> zł<span id="zad-proc">, <span data-zal-proc>30</span>% ceny</span>)</span>
     </label>
-    <span style="color:#625860;font-size:12px;line-height:1.4">Bez konta i bez aplikacji. Zasady odwołania: bezpłatnie do 24 h przed wizytą. Reszta płatna w studiu. Gdy studio wymaga zaliczki, następny krok to <a href="zadatek.html">płatność BLIK</a>.</span>
+    <span data-odw style="color:#625860;font-size:12px;line-height:1.4">Bez konta i bez aplikacji. Zasady odwołania: bezpłatnie do 24 h przed wizytą. <span id="reszta-txt">Reszta płatna w studiu. </span>Gdy studio wymaga zaliczki, następny krok to <a href="zadatek.html">płatność BLIK</a>.</span>
     <button id="rez-btn" type="submit" form="rez" class="btn"><span id="btn-txt">Rezerwuję · 200 zł</span></button>
   </div>
   </div>
@@ -290,15 +290,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const STREFY = [{ strefa: 'do 10 km', oplata: 30 }, { strefa: 'do 20 km', oplata: 50 }]; // example zones
   const bliscy = Mock.get('bliscy', []) || [];
   const miejsca = (d, s) => 1 + Math.floor(d + toMin(s) / 15) % 4; // fixed mock availability: free stylists at a start time
-  const zadatek = Math.ceil((B.seria && B.seria.zaZabieg || cenaMax) * 0.3); // for a series the deposit covers one treatment
+  // payment at booking set by the studio (ustawienia.html); the mock checkbox below switches it off and back on
+  let trybOn = Mock.platnoscTryb() === 'brak' ? 'zaliczka' : Mock.platnoscTryb();
+  const kwotaOnline = max => (trybOn === 'calosc' && !B.seria ? max : Mock.zaliczka(B.seria && B.seria.zaZabieg || max)); // for a series the deposit covers one treatment
+  const zadatek = kwotaOnline(cenaMax);
   let sent = false, step = 1, test = null; // test48h: step 1 = test slot, step 2 = treatment slot
   const dur = () => (test48 && step === 1 ? testMin : b.czas);
   const minStart = () => (test && step === 2 ? test.day * 1440 + toMin(test.slot) + 48 * 60 : 0);
   // the client's own upcoming visits (any studio): a new visit for herself may not overlap them; the visit being moved does not count
-  const moje = () => (sel.dla === 'inna' ? [] : (Mock.get('visits', []) || []).filter(v => v.status === 'nadchodząca' && !v.dlaKogo && v.id !== B.visitId && v.id !== B.testVisitId && v.godzina && v.koniec && Mock.zKrotko(v.dzien))
+  const moje = () => (sel.dla === 'inna' ? [] : (Mock.get('visits', []) || []).filter(v => Mock.moja(v) && v.status === 'nadchodząca' && !v.dlaKogo && v.id !== B.visitId && v.id !== B.testVisitId && v.godzina && v.koniec && Mock.zKrotko(v.dzien))
     .map(v => ({ d: Mock.odDzis(Mock.zKrotko(v.dzien)), od: toMin(v.godzina), do: toMin(v.koniec), v })));
   const kolizja = (d, s) => moje().find(z => z.d === d && toMin(s) < z.do && z.od < toMin(s) + dur());
-  const valid = d => SLOTS[d].filter(s => toMin(s) + dur() <= 20 * 60 && d * 1440 + toMin(s) >= minStart() && miejsca(d, s) >= sel.osoby && !kolizja(d, s));
+  // Etap A: an hour disappears when another visit holds the station this service needs (cennik.html picks it, zespol.html lists them)
+  const stany = () => Mock.stanowiskaWizyty({ uslugi, usluga: b.usluga, kategoria: b.kategoria, dojazd: sel.dojazd }); // a home visit needs no station
+  const naStan = d => { const my = stany(); return !my.length ? [] : (Mock.get('visits', []) || []).filter(v => v.status === 'nadchodząca' && v.studio === b.studio && v.id !== B.visitId && v.id !== B.testVisitId && v.godzina && v.koniec
+    && Mock.zKrotko(v.dzien) && Mock.odDzis(Mock.zKrotko(v.dzien)) === d && Mock.stanowiskaWizyty(v).some(n => my.includes(n))).map(v => ({ od: toMin(v.godzina), do: toMin(v.koniec) })); };
+  const stanZajete = (d, s) => !!Mock.kolizjaStan(naStan(d), toMin(s), dur(), (Mock.get('kalendarz', { techMin: 10 }) || {}).techMin ?? 10);
+  // inside the studio's opening hours (Mock.godziny, the same as the studio page and the panel); a closed day has no hours
+  const otw = d => { const g = Mock.godziny()[Mock.weekday(Mock.dzien(d))]; return g[2] ? [0, 0] : [toMin(g[0]), toMin(g[1])]; };
+  const valid = d => SLOTS[d].filter(s => toMin(s) >= otw(d)[0] && toMin(s) + dur() <= otw(d)[1] && d * 1440 + toMin(s) >= minStart() && miejsca(d, s) >= sel.osoby && !kolizja(d, s) && !stanZajete(d, s));
   sel.day = DNI_N.find(n => valid(n).length) ?? DNI_N[0]; // start on the first day where the whole visit fits (late in the day, today may have none)
 
   // happy hours: only for the treatment itself (no test, consultation, reschedule or series); the weekday comes from the real date of the day
@@ -333,9 +343,10 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#cena-txt').textContent = cenaTxt;
   $('#czas-txt').textContent = czasTekst; $('#czas-txt2').textContent = czasTekst;
   $('#zad-kw').textContent = zadatek;
-  $('#zad').checked = Mock.get('studioZadatek', true);
-  const krokZal = () => { $('#krok-zal').hidden = $('#zad-lab').hidden || !$('#zad').checked; };
-  $('#zad').addEventListener('change', e => { Mock.set('studioZadatek', e.target.checked); krokZal(); });
+  $('#zad').checked = Mock.platnoscTryb() !== 'brak';
+  $('#zad-rodz').textContent = trybOn === 'calosc' && !B.seria ? 'płatności całości z góry' : 'zaliczki'; $('#zad-proc').hidden = trybOn === 'calosc' && !B.seria;
+  const krokZal = () => { $('#krok-zal').hidden = $('#zad-lab').hidden || !$('#zad').checked; $('#reszta-txt').hidden = !$('#zad-lab').hidden && $('#zad').checked && trybOn === 'calosc' && !B.seria; };
+  $('#zad').addEventListener('change', krokZal); // the mock switch changes only this booking; the studio's choice lives in ustawienia.html
   if (user.imie) $('#imie').value = user.imie;
   if (user.tel) $('#tel').value = user.tel;
   if (cenaMax > cenaMin && !konsult && B.powodPrzedzialu && !przeloz) { $('#powod').hidden = false; $('#powod').textContent = `Dlaczego widełki: ${String(B.powodPrzedzialu).replace(/[.\s]+$/, '')}.`; }
@@ -405,6 +416,9 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#dni').innerHTML = DNI_N.map(n => { const d = Mock.dzien(n); return `<button type="button" class="day" aria-pressed="false" data-value="${n}"><small>${n === 0 ? 'dziś' : DN[n]}</small><b>${d.getDate()}</b></button>`; }).join('');
   { const a = Mock.dzien(DNI_N[0]), z = Mock.dzien(DNI_N[DNI_N.length - 1]), M = m => Mock.MIES[m][0].toUpperCase() + Mock.MIES[m].slice(1);
     $('#mies-h').textContent = a.getMonth() === z.getMonth() ? `${M(a.getMonth())} ${a.getFullYear()}` : `${M(a.getMonth())}${a.getFullYear() !== z.getFullYear() ? ' ' + a.getFullYear() : ''} – ${Mock.MIES[z.getMonth()]} ${z.getFullYear()}`; }
+  // the team of the booked studio, not always Magda and Ewelina
+  $('#styl').innerHTML = ['Dowolna', ...Mock.studio(b.studio).zespol].map((n, i) => `<button type="button" class="chip" aria-pressed="${!i}" data-value="${n}">${n}</button>`).join('');
+  if (!Mock.studio(b.studio).zespol.includes(sel.styl)) sel.styl = 'Dowolna';
   const chip = [...document.querySelectorAll('#styl .chip')].find(c => c.dataset.value === sel.styl);
   if (chip) document.querySelectorAll('#styl .chip').forEach(c => c.setAttribute('aria-pressed', String(c === chip)));
   else sel.styl = 'Dowolna';
@@ -418,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const zost = po === null ? '' : !po ? ', ostatnia wizyta z karnetu' : ', po wizycie ' + Mock.zostalo(po);
     const dop = pr.D ? ` + ${pr.D} zł dojazdu` : '';
     $('#btn-txt').textContent = konsult ? 'Rezerwuję konsultację · 0 zł' : test48 && step === 1 ? 'Dalej: termin zabiegu' : pr.karnet ? `Rezerwuję z karnetu${dop}` : `Rezerwuję · ${rng(pr.min, pr.max)}`;
-    $('#zad-kw').textContent = Math.ceil((B.seria && B.seria.zaZabieg || pr.max) * 0.3);
+    $('#zad-kw').textContent = kwotaOnline(pr.max);
     if (!konsult) { $('#zad-lab').hidden = cenaMax === 0 || !!pr.karnet; krokZal(); } // a visit paid with a pass needs no deposit
     // price line + discount box in the summary
     if (!konsult) $('#cena-txt').innerHTML = pr.karnet ? `z karnetu${dop}${zost}` : pr.p ? `<s>${rng(pr.rMin + pr.D, pr.rMax + pr.D)}</s> <b>${rng(pr.min, pr.max)}</b>` : rng(pr.min, pr.max);
@@ -434,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ki.style.color = pr.kBlad ? '#A3262A' : pr.k ? '#1F6B47' : '#625860';
     $('#kod').setAttribute('aria-invalid', String(!!pr.kBlad));
     $('#linie').hidden = !L.length;
-    $('#linie').innerHTML = L.map(([a, c]) => `<div style="display:flex;justify-content:space-between;gap:10px"><span>${a}</span><b>${c}</b></div>`).join('');
+    $('#linie').innerHTML = L.map(([a, c]) => `<div style="display:flex;justify-content:space-between;gap:10px"><span>${Mock.esc(a)}</span><b>${c}</b></div>`).join(''); // pass names and code descriptions are typed in the panel
     $('#promo-box').hidden = !pr.p;
     if (pr.p) {
       const lo = pr.rMin - (pr.min - pr.D), hi = pr.rMax - (pr.max - pr.D);
@@ -469,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#dzien-tyt').textContent = `${dl(sel.day)}`;
     $('#sloty').innerHTML = list.map(s => { const p = promoAt(sel.day, s); return `<button type="button" class="slot" data-t="${s}" aria-pressed="${s === sel.slot}"${p ? ` aria-label="${s}, rabat ${p.rabat}%"` : ''}><b>${s}</b>${p ? `<span class="pr">−${p.rabat}%</span>` : ''}</button>`; }).join('');
     $('#hh-note').hidden = !list.some(s => promoAt(sel.day, s));
-    const kol = [...new Set(SLOTS[sel.day].map(s => kolizja(sel.day, s)).filter(Boolean))];
+    const kol = [...new Map(SLOTS[sel.day].map(s => kolizja(sel.day, s)).filter(Boolean).map(z => [z.v.id, z])).values()]; // one line per visit
     $('#kolizja').hidden = !kol.length;
     $('#kolizja').textContent = kol.length ? 'Nie pokazujemy godzin, w których masz już wizytę: ' + kol.map(z => `${z.v.dzien}, ${z.v.godzina}–${z.v.koniec} w ${z.v.studio}`).join('; ') + '.' : '';
     $('#brak').hidden = list.length > 0;
@@ -592,13 +606,13 @@ document.addEventListener('DOMContentLoaded', () => {
       bk = { ...bk, testDzien: tv.dzien, testGodzina: tv.godzina, testKoniec: tv.koniec, testVisitId: tv.id };
       const mi = visits.findIndex(v => v.id === main.id); if (mi >= 0) visits[mi].testId = tv.id;
     }
-    Mock.set('visits', visits);
+    const needZad = !przeloz && !konsult && pr.max > 0 && !pr.karnet && $('#zad').checked && !B.zadatek; // a visit paid with a pass needs no deposit
+    if (needZad) { const platnosc = { status: 'oczekuje', kwota: kwotaOnline(pr.max), rodzaj: trybOn === 'calosc' && !B.seria ? 'calosc' : 'zaliczka' }, mi = visits.findIndex(v => v.id === main.id); visits[mi].platnosc = platnosc; bk.platnosc = platnosc; }
+    if (!Mock.set('visits', visits)) { Mock.toast('Nie udało się zapisać rezerwacji: pamięć przeglądarki jest pełna. Wyczyść dane makiety w Narzędziach i spróbuj jeszcze raz.'); return; } // never confirm a visit that was not saved
     Mock.set('booking', { ...bk, visitId: main.id });
     if (uslugi && !przeloz) Mock.set('koszyk', { studio: b.studio, uslugi: [] }); // the cart is spent
     if (base.polecenie) Mock.set('polecenie', null); // the referral discount is for the first visit only
-    if (kt && kt.s.t === 'pakiet') { const l = Mock.sprzedane(); l[kt.i] = { ...l[kt.i], ile: l[kt.i].ile - 1 }; Mock.set('karnety.sprzedane', l); } // one visit used
     if (kod) Mock.setKody(Mock.kody().map(x => (x.kod === kod.kod ? { ...x, uzyto: x.uzyto + 1 } : x))); // one more use of the code
-    const needZad = !przeloz && !konsult && pr.max > 0 && !pr.karnet && $('#zad').checked && !B.zadatek; // a visit paid with a pass needs no deposit
     Mock.toast(przeloz ? 'Wizyta przełożona' : konsult ? 'Konsultacja zarezerwowana' : 'Termin zarezerwowany');
     setTimeout(() => (location.href = needZad ? 'zadatek.html' : 'potwierdzenie.html'), 600);
   });

@@ -46,7 +46,7 @@
       <section id="watek" class="p-card" aria-labelledby="w-h">
         <div class="p-top">
           <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><h2 id="w-h" class="p-h2"></h2><span id="w-info" class="p-mut"></span></div>
-          <div class="p-acts"><a class="p-btn sm" href="klientki.html">Karta klientki</a><a class="p-btn sm" href="panel.html">Kalendarz</a></div>
+          <div class="p-acts"><a class="p-btn sm" id="w-karta" href="klientki.html">Karta klientki</a><a class="p-btn sm" href="panel.html">Kalendarz</a></div>
         </div>
         <div id="wm" class="wm" aria-live="polite"></div>
         <hr class="p-sep">
@@ -117,7 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
     const w = W[sel];
     $('#w-h').textContent = sel; $('#w-info').textContent = w.info;
-    $('#wm').innerHTML = w.msgs.map(m => `<div class="msg ${m.od}">${E(m.txt)}${m.od === 'sys' ? '' : `<small>${E(m.t)}${m.k ? ` · <span class="ch">${E(m.k)}</span>` : ''}</small>`}</div>`).join('');
+    $('#w-karta').href = 'klientki.html?k=' + encodeURIComponent(sel); // open this client's card, not the first one
+    $('#wm').innerHTML = w.msgs.map(m => `<div class="msg ${m.od}">${E(m.txt)}${(m.img || []).filter(u => /^data:image\/jpeg;base64,[\w+/=]+$/.test(u)).map(u => `<img src="${u}" alt="Zdjęcie od klientki" style="display:block;max-width:160px;border-radius:10px;margin-top:6px">`).join('')}${m.od === 'sys' ? '' : `<small>${E(m.t)}${m.k ? ` · <span class="ch">${E(m.k)}</span>` : ''}</small>`}</div>`).join('');
     $('#wm').scrollTop = $('#wm').scrollHeight;
     const k = [...w.msgs].reverse().find(m => m.od === 'kl' && m.k);
     $('#kanal').value = k ? k.k : 'SMS';

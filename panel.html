@@ -24,6 +24,7 @@
         <div role="group" aria-label="Widok" style="display: flex; border: 1px solid #E4D9DE; border-radius: 10px; overflow: hidden; background: #FFFFFF">
           <span aria-current="page" style="min-height: 44px; padding: 0 14px; background: #FFFFFF; color: #9E1F50; font-weight: 700; box-shadow: inset 0 0 0 2px #9E1F50; display: flex; align-items: center">Dzień</span>
           <a href="panel-tydzien.html" style="min-height: 44px; padding: 0 14px; background: #FFFFFF; color: #1E1A1D; text-decoration: none; display: flex; align-items: center">Tydzień</a>
+          <a href="panel-tydzien.html#miesiac" style="min-height: 44px; padding: 0 14px; background: #FFFFFF; color: #1E1A1D; text-decoration: none; display: flex; align-items: center">Miesiąc</a>
         </div>
         <button type="button" class="p-btn pri" id="add-visit">+ Wizyta</button>
       </div>
@@ -59,7 +60,7 @@
     <section id="nowe" class="p-card" aria-labelledby="nowe-h">
       <div class="p-top"><h2 id="nowe-h" class="p-h2">Nowe rezerwacje</h2><a href="paznokcie.html" class="p-btn sm">Zrób rezerwację w kreatorze</a></div>
       <div id="nowe-list" style="display: flex; flex-direction: column; gap: 8px"></div>
-      <span class="p-mut">Rezerwacje klientek z kreatora i wyszukiwarki pojawiają się tu od razu po wyborze terminu. Wiersz „przykład” jest stały.</span>
+      <span class="p-mut">Rezerwacje klientek z kreatora i wyszukiwarki pojawiają się tu od razu po wyborze terminu. Wiersz „przykład” wraca po resecie makiety.</span>
     </section>
 
     <section class="p-card" aria-labelledby="wyc-h">
@@ -88,28 +89,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const parseDur = s => { const h = /(\d+)\s*h/.exec(s || ''), m = /(\d+)\s*min/.exec(s || ''); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0); };
   // gaps: [{od, dl}] = luka w bloku (np. działanie farby): od minut od startu wizyty, dl minut wolnych
   const BASE = {
-    a: { col: 1, t: '9:00', dur: 75, name: 'Anna K.', phone: '600 123 456', info: '2. wizyta · ostatnio 5 tyg. temu', kind: 'p', svc: 'Hybryda jednolita', items: [['Manicure hybrydowy', 140]], potw: true, hist: [`${dd(-3)}, 18:30 · rezerwacja z wyszukiwarki`, `${dd(-3)}, 18:30 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 9:05 · klientka odpisała TAK`] },
-    j: { col: 1, t: '10:25', dur: 40, name: 'Julia T. i Jagoda T.', phone: '600 123 456', info: 'dwie osoby naraz', kind: 'p', svc: 'Mini manicure', osoby: 2, items: [['Mini manicure × 2 osoby', 70]], przyklad: true, hist: [`${dd(-4)}, 19:00 · rezerwacja dla dwóch osób z wyszukiwarki`] },
+    a: { col: 1, t: '9:00', dur: 75, name: 'Anna K.', phone: '605 901 227', info: '2. wizyta · ostatnio 5 tyg. temu', kind: 'p', svc: 'Hybryda jednolita', items: [['Manicure hybrydowy', 140]], potw: true, hist: [`${dd(-3)}, 18:30 · rezerwacja z wyszukiwarki`, `${dd(-3)}, 18:30 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 9:05 · klientka odpisała TAK`] },
+    j: { col: 1, t: '10:25', dur: 40, name: 'Julia T. i Jagoda T.', phone: '601 442 918', info: 'dwie osoby naraz', kind: 'p', svc: 'Mini manicure', osoby: 2, items: [['Mini manicure × 2 osoby', 70]], przyklad: true, hist: [`${dd(-4)}, 19:00 · rezerwacja dla dwóch osób z wyszukiwarki`] },
     b: { col: 1, t: '11:15', dur: 110, name: 'Basia W.', phone: '600 123 456', info: '4. wizyta · ostatnio 3 tyg. temu', kind: 'p', svc: 'Hybryda M · velvet × 10', items: [['Manicure hybrydowy', 140], ['Długość M', 10], ['Velvet × 10 paz.', 50]], note: 'Lakier: nr 802, mleczny róż', potw: false, hist: [`${dd(-2)}, 21:04 · rezerwacja z linku na Instagramie`, `${dd(-2)}, 21:04 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 11:15 · przypomnienie SMS (zaplanowane)`] },
-    c: { col: 1, t: '14:00', dur: 175, name: 'Celina M.', phone: '600 123 456', info: '1. wizyta', kind: 'p', svc: 'Przedłużanie L · french', items: [['Przedłużanie (tipsy / szablon)', 200], ['Długość L', 20], ['French', 20]], smsFail: true, potw: false, hist: [`${dd(-4)}, 12:40 · rezerwacja z wyszukiwarki`, `${dd(-1)}, 8:00 · przypomnienie SMS NIE DOTARŁO (numer poza zasięgiem)`] },
-    k: { col: 1, t: '17:05', dur: 40, name: 'Karolina D.', phone: '600 123 456', info: 'wizyta u klientki', kind: 'p', svc: 'Zdjęcie hybrydy u klientki', dojazd: { adres: 'ul. Puławska 24, Warszawa', oplata: 30, strefa: 'do 10 km' }, items: [['Zdjęcie hybrydy', 20]], hist: [`${dd(-3)}, 8:20 · rezerwacja z dojazdem`] },
-    d: { col: 2, t: '9:30', dur: 90, name: 'Dorota S.', phone: '600 123 456', info: '3. wizyta · ostatnio 3 tyg. temu', kind: 'r', svc: 'Rzęsy 1:1 · uzupełnienie', items: [['Uzupełnienie rzęs 1:1', 150]], przyklad: true, hist: [`${dd(-5)}, 20:10 · rezerwacja z linku na Instagramie`, `${dd(-5)}, 20:10 · SMS z potwierdzeniem doręczony`] },
-    m: { col: 2, t: '11:15', dur: 50, nowa: true, name: 'Marta G.', phone: '600 123 456', info: 'trzy usługi w jednej wizycie', kind: 'p', svc: '3 usługi', items: [['Zdjęcie hybrydy', 20], ['Naprawa paznokcia (cena przykładowa)', 15], ['Regulacja brwi (cena przykładowa)', 40]], przyklad: true, hist: [`${dd(-3)}, 20:40 · rezerwacja z koszyka usług`] },
-    g: { col: 2, t: '12:15', dur: 60, name: 'Iza N.', phone: '600 123 456', info: '2. wizyta', kind: 'b', svc: 'Brwi: henna + regulacja', items: [['Henna + regulacja brwi', 70]], gaps: [{ od: 30, dl: 15 }], przyklad: true, hist: [`${dd(-6)}, 9:15 · rezerwacja telefoniczna`] },
-    e: { col: 2, t: '13:30', dur: 120, name: 'Ewa P.', phone: '600 123 456', info: '5. wizyta · ostatnio 4 tyg. temu', kind: 'p', svc: 'Żel · french', items: [['Żel na naturalnej płytce', 170], ['French', 20]], potw: true, faktura: { nip: '1234563218', firma: 'Ewa Pawlak Projekty sp. z o.o.' }, hist: [`${dd(-8)}, 17:55 · rezerwacja z wyszukiwarki`, `${dd(-8)}, 17:55 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 13:40 · klientka potwierdziła w aplikacji`] }
+    c: { col: 1, t: '14:00', dur: 175, name: 'Celina M.', phone: '603 118 274', info: '1. wizyta', kind: 'p', svc: 'Przedłużanie L · french', items: [['Przedłużanie (tipsy / szablon)', 200], ['Długość L', 20], ['French', 20]], smsFail: true, potw: false, hist: [`${dd(-4)}, 12:40 · rezerwacja z wyszukiwarki`, `${dd(-1)}, 8:00 · przypomnienie SMS NIE DOTARŁO (numer poza zasięgiem)`] },
+    k: { col: 1, t: '17:05', dur: 40, name: 'Karolina D.', phone: '604 220 913', info: 'wizyta u klientki', kind: 'p', svc: 'Zdjęcie hybrydy u klientki', dojazd: { adres: 'ul. Puławska 24, Warszawa', oplata: 30, strefa: 'do 10 km' }, items: [['Zdjęcie hybrydy', 20]], hist: [`${dd(-3)}, 8:20 · rezerwacja z dojazdem`] },
+    d: { col: 2, t: '9:30', dur: 90, name: 'Dorota S.', phone: '602 118 940', info: '3. wizyta · ostatnio 3 tyg. temu', kind: 'r', svc: 'Rzęsy 1:1 · uzupełnienie', items: [['Uzupełnienie rzęs 1:1', 150]], przyklad: true, hist: [`${dd(-5)}, 20:10 · rezerwacja z linku na Instagramie`, `${dd(-5)}, 20:10 · SMS z potwierdzeniem doręczony`] },
+    m: { col: 2, t: '11:15', dur: 50, nowa: true, name: 'Marta G.', phone: '605 337 120', info: 'trzy usługi w jednej wizycie', kind: 'p', svc: '3 usługi', items: [['Zdjęcie hybrydy', 20], ['Naprawa paznokcia (cena przykładowa)', 15], ['Regulacja brwi (cena przykładowa)', 40]], przyklad: true, hist: [`${dd(-3)}, 20:40 · rezerwacja z koszyka usług`] },
+    g: { col: 2, t: '12:15', dur: 60, name: 'Iza N.', phone: '606 418 552', info: '2. wizyta', kind: 'b', svc: 'Brwi: henna + regulacja', items: [['Henna + regulacja brwi', 70]], gaps: [{ od: 30, dl: 15 }], przyklad: true, hist: [`${dd(-6)}, 9:15 · rezerwacja telefoniczna`] },
+    e: { col: 2, t: '13:30', dur: 120, name: 'Ewa P.', phone: '607 512 806', info: '5. wizyta · ostatnio 4 tyg. temu', kind: 'p', svc: 'Żel · french', items: [['Żel na naturalnej płytce', 170], ['French', 20]], potw: true, faktura: { nip: '1234563218', firma: 'Ewa Pawlak Projekty sp. z o.o.' }, hist: [`${dd(-8)}, 17:55 · rezerwacja z wyszukiwarki`, `${dd(-8)}, 17:55 · SMS z potwierdzeniem doręczony`, `${dd(-1)}, 13:40 · klientka potwierdziła w aplikacji`] }
   };
-  const LOCK = [{ col: 2, a: 960, b: 1016, name: 'Blokada ręczna' }]; // stała blokada w kolumnie 2
+  // the second location (Mokotów, hair): its own sample day; a location added in the profile starts empty
+  const BASE1 = {
+    o1: { col: 1, t: '10:00', dur: 90, name: 'Marta L.', phone: '608 221 734', info: '3. wizyta · ostatnio 6 tyg. temu', kind: 'w', svc: 'Strzyżenie i modelowanie', items: [['Strzyżenie damskie', 120]], stan: 'Fotel 1', potw: true, przyklad: true, hist: [`${dd(-4)}, 19:20 · rezerwacja z wyszukiwarki`, `${dd(-1)}, 10:02 · klientka odpisała TAK`] },
+    o2: { col: 2, t: '13:00', dur: 120, name: 'Jola S.', phone: '609 334 120', info: '1. wizyta', kind: 'w', svc: 'Keratynowe prostowanie', items: [['Keratynowe prostowanie', 380]], stan: 'Fotel 2', potw: false, przyklad: true, hist: [`${dd(-2)}, 20:15 · rezerwacja z linku na Instagramie`] }
+  };
+  const BAZA = [BASE, BASE1][Mock.lok()] || {}, IM = PS.STYL.map(s => s.n);
+  const LOCK = Mock.lok() ? [] : [{ col: 2, a: 960, b: 1016, name: 'Blokada ręczna' }]; // stała blokada w kolumnie 2 (Centrum)
+  if (Mock.lok()) document.querySelector('#col2 > div').remove();
   const SHORT = [['Zdjęcie hybrydy', 15, 20], ['Naprawa paznokcia (cena przykładowa)', 10, 15], ['Parafina na dłonie (cena przykładowa)', 15, 25]]; // [nazwa, minuty, zł]
-  let S = Mock.get('panel.state', {}); // {id: {t, col, extras, paid, ok}}
+  // the sample visits that kasa.html already lists as paid start settled, so they cannot be settled twice
+  const PAID0 = Mock.lok() === 1 ? { o1: { paid: { metoda: 'karta', kwota: 120, dok: { typ: 'paragon', nr: 'paragon nr 0001' } } } } : Mock.lok() ? {} : { a: { paid: { metoda: 'gotówka', kwota: 140, dok: { typ: 'paragon', nr: 'paragon nr 0001' } } }, d: { paid: { metoda: 'karta', kwota: 150, dok: { typ: 'faktura', nr: Mock.fvNr(14) } } } };
+  let S = Mock.get('panel.state', null) || PAID0; // {id: {t, col, extras, paid, ok}}
   const save = () => Mock.set('panel.state', S);
   const st = id => (S[id] = S[id] || {});
-  let sel = 'b';
+  let sel = Mock.lok() ? 'o1' : 'b';
 
   // Wizyta klientki z Mock "visits" (także kilka usług, osoby, dojazd) -> wpis kalendarza
   function fromVisit(v) {
     const us = Array.isArray(v.uslugi) && v.uslugi.length ? v.uslugi : null;
     const price = u => Number(u.cena ?? u.cenaMin ?? 0) || 0;
-    const items = us ? us.map(u => [u.opis || u.usluga || 'Usługa', price(u)]) : [[v.opis || v.usluga || 'Wizyta', Number(v.cena) || 0]];
+    const items = us ? us.map(u => [u.opis || u.usluga || 'Usługa', price(u)]) : [[v.opis || v.usluga || 'Wizyta', (v.karnet ? v.karnet.wartosc : Number(v.cena)) || 0]]; // with a pass "cena" is only what is left to pay; the pass line below takes the service off
     const gaps = []; let cum = 0;
     (us || [{ czas: v.czas || parseDur(v.czasTekst) || 60, przerwaMin: v.przerwaMin }]).forEach(u => {
       const c = Number(u.czas) || 0;
@@ -124,17 +134,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (v.karnet) items.push([`Opłacone karnetem: ${v.karnet.n}`, -(v.karnet.wartosc || 0)]);
     if (v.kod && v.kod.rabat) items.push([`Kod ${v.kod.kod} (${v.kod.opis})`, -v.kod.rabat]);
     if (v.polecenie) items.push([`Zniżka z polecenia${v.polecenie.od ? ' (' + v.polecenie.od + ')' : ''}`, -20]);
-    return { col: v.stylistka === 'Ewelina' ? 2 : 1, t: v.godzina, dur, name: v.klientka || 'Klientka online', phone: v.tel || '600 123 456', info: [v.zrodlo === 'panel' ? 'dodana ręcznie w panelu' : 'rezerwacja online', v.dlaKogo && v.dlaKogo.imie ? 'dla: ' + v.dlaKogo.imie : '', v.polecenie ? `z polecenia${v.polecenie.od ? ': ' + v.polecenie.od : ''}` : ''].filter(Boolean).join(' · '),
-      kind: k, svc: us && us.length > 1 ? us.length + ' usługi' : items[0][0], items, gaps, osoby: v.osoby > 1 ? v.osoby : 0, dojazd: v.dojazd || null, przyklad: k !== 'p' || v.zrodlo === 'panel', potw: !!v.potwierdzona, nowa: v.zrodlo !== 'panel' && !v.potwierdzona, faktura: v.faktura || null,
+    return { col: v.stylistka === IM[1] ? 2 : 1, t: v.godzina, dur, name: v.klientka || 'Klientka online', phone: v.tel || (v.kontakt || {}).tel || 'bez telefonu', info: [v.zrodlo === 'panel' ? 'dodana ręcznie w panelu' : 'rezerwacja online', v.dlaKogo && v.dlaKogo.imie ? 'dla: ' + v.dlaKogo.imie : '', v.polecenie ? `z polecenia${v.polecenie.od ? ': ' + v.polecenie.od : ''}` : ''].filter(Boolean).join(' · '),
+      kind: k, svc: us && us.length > 1 ? us.length + ' usługi' : items[0][0], items, gaps, osoby: v.osoby > 1 ? v.osoby : 0, dojazd: v.dojazd || null, przyklad: k !== 'p' || v.zrodlo === 'panel', potw: !!v.potwierdzona || !!(S['v' + v.id] || {}).ok, nowa: v.zrodlo !== 'panel' && !v.potwierdzona && !(S['v' + v.id] || {}).ok, faktura: v.faktura || null,
       hist: [v.zrodlo === 'panel' ? 'dodana w panelu ręcznie' : 'rezerwacja online od klientki', ...(v.potwierdzona ? ['klientka potwierdziła przybycie'] : [])] };
   }
   function all() {
     const out = {};
-    Object.entries(BASE).forEach(([id, b]) => { out[id] = { gaps: [], ...b }; });
-    Mock.get('visits', []).forEach(v => {
+    Object.entries(BAZA).forEach(([id, b]) => { out[id] = { gaps: [], ...b }; });
+    Mock.get('visits', []).filter(v => Mock.lokOf(v) === Mock.lok()).forEach(v => {
       const m = /(\d{1,2})\.(\d{1,2})/.exec(v.dzien || '');
       if (!m || Mock.odDzis(Mock.zKrotko(v.dzien)) !== 0 || !v.godzina || v.status === 'odwołana' || v.status === 'odbyta') return;
-      out['v' + v.id] = fromVisit(v);
+      out['v' + v.id] = { ...fromVisit(v), usluga: v.usluga, kategoria: v.kategoria, uslugi: Array.isArray(v.uslugi) && v.uslugi.length ? v.uslugi : null, platnosc: v.platnosc || null, karnet: v.karnet || null };
     });
     Mock.get('panel.mini', []).forEach(x => { out[x.id] = { col: x.col, t: x.t, dur: x.dur, name: x.name, phone: '600 123 456', info: 'w luce po przerwie w usłudze', kind: 'p', svc: x.svc, items: [[x.svc, x.price]], gaps: [], przyklad: true, hist: ['dodana w luce w wizycie ' + x.host] }; });
     Object.entries(out).forEach(([id, o]) => { const s = st(id); if (s.t) o.t = s.t; if (s.col) o.col = s.col; });
@@ -147,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function check(id, colEl, start, dur) {
     const col = +colEl.dataset.col, V = all();
     if (start < DAY0 || start + dur > DAY1) return 'poza godzinami kalendarza (9:00–18:00).';
+    const zajeteStan = stanKolizja(id, V, start, dur); if (zajeteStan) return zajeteStan;
     const inGap = Object.entries(V).some(([k, o]) => k !== id && o.col === col && o.gaps.some(g => start >= toMin(o.t) + g.od && start + dur <= toMin(o.t) + g.od + g.dl));
     for (const tech of [0, techMin()]) {
       const end = start + dur + (tech && !inGap ? tech : 0);
@@ -155,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hit = segs(o, tech).find(([a, b]) => start < b && end > a);
         if (hit) return tech ? `za mało przerwy po wizycie: ${o.name} (${fmt(toMin(o.t))}–${fmt(toMin(o.t) + o.dur)}) wymaga ${tech} min odstępu.` : `termin zajęty przez wizytę ${o.name} (${fmt(toMin(o.t))}–${fmt(toMin(o.t) + o.dur)}).`;
       }
-      const l = LOCK.find(x => x.col === col && start < x.b && end > x.a);
+      const l = LOCK.find(x => x.col === col && start < x.b + tech && end > x.a); // the break applies after a manual block too
       if (l) return `${l.name} ${fmt(l.a)}–${fmt(l.b)}.`;
     }
     return '';
@@ -176,10 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const tags = [v.osoby ? v.osoby + ' os.' : '', v.dojazd ? 'dojazd' : '', st(id).paid ? 'rozliczona' : ''].filter(Boolean);
       const names = v.items.filter(i => !/^Dojazd/.test(i[0]) && i[1] >= 0).map(i => i[0]);
       const lines = names.length > 1 ? names.concat(`${total(id, v)} zł`) : [`${v.svc} · ${total(id, v)} zł`];
-      let cap = Math.max(0, Math.floor((h - 12) / 17) - 1);
+      let cap = Math.max(0, Math.floor((h - 12) / 17) - 1 - (PLAT(v) ? 1 : 0));
       if (v.gaps.length) cap = Math.min(cap, Math.max(0, Math.floor((v.gaps[0].od * PPM - 6) / 17) - 1)); // tekst nie wchodzi w lukę
       const shown = lines.length <= cap ? lines : cap < 1 ? [] : cap === 1 ? [v.svc] : lines.slice(0, cap - 1).concat('+' + (lines.length - cap + 1) + ' więcej');
-      b.innerHTML = `<span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fmt(toMin(v.t))} · ${E(v.name)}${tags.length ? ' · ' + tags.join(' · ') : ''}${STAN(v)}</span>` + shown.map(l => `<span style="color:${mut};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(l)}</span>`).join('');
+      b.innerHTML = `<span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fmt(toMin(v.t))} · ${E(v.name)}${tags.length ? ' · ' + tags.join(' · ') : ''}${STAN(v)}</span>${PLAT(v)}` + shown.map(l => `<span style="color:${mut};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(l)}</span>`).join('');
       colEl(v.col).append(b);
       v.gaps.forEach(g => {
         const gd = document.createElement('div'); gd.className = 'gap';
@@ -214,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'kal-wolne';
       b.style.cssText = `position:absolute;z-index:1;left:6px;right:6px;top:${(od - DAY0) * PPM + 4}px;height:${Math.min(48, (doo - od) * PPM - 8)}px;box-sizing:border-box;border:1.5px dashed #C9B6BF;border-radius:10px;background:#FFFFFF;color:#9E1F50;font:inherit;font-size:12px;font-weight:700;cursor:pointer`;
       b.textContent = `Wolne ${fmt(od)}–${fmt(doo)} · Dodaj wizytę`;
-      b.addEventListener('click', () => PS.visitModal({ done: renderAll }));
+      b.addEventListener('click', () => PS.visitModal({ done: renderAll, check: wolny, godz: fmt(od), stylistka: PS.STYL[c - 1].n }));
       colEl(c).append(b);
     });
     const ile = Object.keys(V).length, utarg = Object.entries(V).reduce((a, [id, v]) => a + total(id, v), 0), czeka = Object.values(V).filter(v => v.potw === false).length, min = W.reduce((a, w) => a + w[2] - w[1], 0);
@@ -223,13 +234,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDetail() {
-    const V = all(), v = V[sel] || V.b, s = st(sel), t = v.t, end = fmt(toMin(t) + v.dur), tot = total(sel, v);
+    const V = all(), v = V[sel] || V[sel = Object.keys(V)[0]];
+    if (!v) { document.getElementById('detail').innerHTML = '<p class="p-mut" style="margin:0">Dziś nie ma wizyt w tej lokalizacji. Dodaj pierwszą przyciskiem „+ Wizyta”.</p>'; return; }
+    const s = st(sel), t = v.t, end = fmt(toMin(t) + v.dur), tot = total(sel, v);
     const rows = v.items.map(i => `<div style="display:flex;justify-content:space-between;gap:8px${i[1] < 0 ? ';color:#1F6B47' : ''}"><span>${E(i[0])}</span><span style="white-space:nowrap">${i[1] < 0 ? '−' + -i[1] : i[1]} zł</span></div>`).join('') +
       (s.extras || []).map(i => `<div style="display:flex;justify-content:space-between;gap:8px"><span>${E(i[0])}<br><small style="color:#625860">powód: ${E(i[2])}</small></span><span>${i[1] > 0 ? '+' : ''}${i[1]} zł</span></div>`).join('');
     const gap = v.gaps[0];
     document.getElementById('detail').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:4px">
-      <span style="color:#625860;font-size:13px">${fmt(toMin(t))}–${end} · ${['Magda', 'Ewelina'][v.col - 1]} ${s.paid ? '<span class="p-badge ok">rozliczona</span>' : ''}${v.osoby ? ` <span class="p-badge blue">${v.osoby} os.</span>` : ''}${v.dojazd ? ' <span class="p-badge warn">dojazd</span>' : ''}</span>
+      <span style="color:#625860;font-size:13px">${fmt(toMin(t))}–${end} · ${IM[v.col - 1]} ${s.paid ? '<span class="p-badge ok">rozliczona</span>' : ''}${v.osoby ? ` <span class="p-badge blue">${v.osoby} os.</span>` : ''}${v.dojazd ? ' <span class="p-badge warn">dojazd</span>' : ''}</span>
       <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;overflow-wrap:anywhere">${E(v.name)}</h2>
       <span style="color:#625860">${E(v.phone)} · ${E(v.info)}</span>
       ${v.dojazd ? `<span style="color:#625860">Dojazd: ${E(v.dojazd.adres)}, ${E(v.dojazd.strefa || '')}, opłata ${E(v.dojazd.oplata)} zł</span>` : ''}
@@ -238,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
       : `<div class="p-row"><span><b>Czeka na potwierdzenie.</b> SMS „Odpisz TAK albo NIE” wysłany ${v.smsFail ? 'bez skutku' : 'dziś o 9:00'}.</span><button type="button" class="p-btn sm" data-act="ponag">Zadzwoń lub przypomnij</button></div>`}
     ${v.faktura ? `<span class="p-mut">Faktura na firmę: ${E(v.faktura.firma)}, NIP ${E(v.faktura.nip)}</span>` : ''}
     ${v.smsFail ? `<div class="p-row" style="background:#FFF1E0;color:#8A3B12"><span><b>SMS nie dotarł.</b> Numer poza zasięgiem.</span><button type="button" class="p-btn sm" data-act="sms">Wyślij ponownie</button></div>` : ''}
+    ${detailA(v)}
     <div style="border:1px solid #E4D9DE;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px">
       <h3 style="margin:0;font-size:14px;font-weight:700">${v.items.filter(i => i[1] >= 0).length > 1 ? 'Usługi w wizycie' : 'Karta stylizacji'}</h3>${rows}
       <hr class="p-sep"><div style="display:flex;justify-content:space-between;font-weight:700"><span>Razem</span><span>${tot} zł</span></div>
@@ -269,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderNew() {
-    const vs = Mock.get('visits', []).filter(v => v.status === 'nadchodząca' && !v.zrodlo);
+    const vs = Mock.get('visits', []).filter(v => v.status === 'nadchodząca' && !v.zrodlo && Mock.lokOf(v) === Mock.lok());
     const row = (v, ex) => {
       const ok = st('v' + v.id).ok, n = Array.isArray(v.uslugi) && v.uslugi.length > 1 ? v.uslugi.length : 0;
       return `<div class="p-row" data-vid="${E(v.id)}"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span><b>${E(v.klientka || 'Klientka online')}</b> ${ex ? '<span class="p-badge blue">przykład</span>' : '<span class="p-badge">z kreatora</span>'}${n ? ` <span class="p-badge">${n} usługi</span>` : ''}${v.osoby > 1 ? ` <span class="p-badge blue">${v.osoby} os.</span>` : ''}${v.dojazd ? ' <span class="p-badge warn">dojazd</span>' : ''}${ok ? ' <span class="p-badge ok">potwierdzona</span>' : ''}</span>
@@ -277,8 +291,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <span style="color:#625860;font-size:13px">${E([v.dzien, v.godzina].filter(Boolean).join(', ') || 'termin do ustalenia')} · ${E(v.stylistka || 'dowolna stylistka')} · ${E(v.studio || 'Studio Malwa')}</span></div>
         <div class="p-acts">${ok ? '' : '<button type="button" class="p-btn sm dark" data-act="ok">Potwierdź</button>'}<button type="button" class="p-btn sm" data-act="no">Odrzuć</button></div></div>`;
     };
-    document.getElementById('nowe-list').innerHTML = vs.map(v => row(v)).join('') +
-      row({ id: 'ex', klientka: 'Gosia L.', opis: 'Hybryda M', cena: 150, czasTekst: '1 h 20 min', dzien: Mock.krotko(Mock.dzien(1)), godzina: '9:00', stylistka: 'Magda' }, true);
+    document.getElementById('nowe-list').innerHTML = vs.map(v => row(v)).join('') + (st('vex').no || Mock.lok() ? '' :
+      row({ id: 'ex', klientka: 'Gosia L.', opis: 'Hybryda M', cena: 150, czasTekst: '1 h 20 min', dzien: Mock.krotko(Mock.dzien(1)), godzina: '9:00', stylistka: 'Magda' }, true));
   }
 
   function renderQuotes() {
@@ -288,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('wyc-list').innerHTML = list.slice(0, 3).map(q => `<div class="p-row"><div style="display:flex;gap:12px;align-items:center">${q.foto ? `<img src="${E(q.foto)}" alt="Zdjęcie inspiracji od klientki" width="48" height="48" style="width:48px;height:48px;border-radius:10px;object-fit:cover;flex:none">` : `<div role="img" aria-label="Zdjęcie inspiracji od klientki" style="width:48px;height:48px;border-radius:10px;background:${q.c};flex:none"></div>`}<div style="display:flex;flex-direction:column;gap:2px"><b>${E(q.k)}</b><span style="color:#625860">„${E(q.o)}”</span></div></div><a class="p-btn" href="paznokcie.html">Odtwórz w kreatorze</a></div>`).join('') || '<span class="p-mut">Wszystkie wyceny odesłane.</span>';
   }
 
-  const WAIT = [['Kinga B.', 'hybryda, chce sobotę przed południem'], ['Lena O.', 'rzęsy 2D, dowolny dzień po 16:00']];
+  const WAIT = Mock.lok() ? [['Monika P.', 'koloryzacja, chce sobotę rano']] : [['Kinga B.', 'hybryda, chce sobotę przed południem'], ['Lena O.', 'rzęsy 2D, dowolny dzień po 16:00']];
   function renderWait() {
     const sent = Mock.get('panel.wait', []);
     document.getElementById('wait-list').innerHTML = WAIT.map((w, i) => `<div class="p-row"><span><b>${E(w[0])}</b><br><span style="color:#625860">${E(w[1])}</span></span>${sent.includes(i) ? '<span class="p-badge ok">propozycja wysłana</span>' : `<button type="button" class="p-btn sm" data-wait="${i}">Zaproponuj termin</button>`}</div>`).join('');
@@ -300,20 +314,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const kal = KalDrag.attach({
     root: document.querySelector('main'), attr: 'id', cols: () => [colEl(1), colEl(2)], ppm: PPM, top0: 2, startMin: DAY0, endMin: DAY1, snap: 15,
     place: id => { const v = all()[id]; return { col: colEl(v.col), start: toMin(v.t), dur: v.dur }; },
-    check, label: id => all()[id].name, colName: c => ` · ${['Magda', 'Ewelina'][c.dataset.col - 1]}`,
-    commit: (id, c, start) => { const s = st(id); s.t = fmt(start); s.col = +c.dataset.col; save(); renderAll(); }
+    check, label: id => all()[id].name, colName: c => ` · ${IM[c.dataset.col - 1]}`,
+    commit: (id, c, start) => { const s = st(id), v = all()[id]; PS.log(`przeniosła wizytę: ${v.name}, ${v.t} → ${fmt(start)}${+c.dataset.col !== v.col ? `, do: ${IM[c.dataset.col - 1]}` : ''}`); s.t = fmt(start); s.col = +c.dataset.col; save(); renderAll(); }
   });
 
   document.getElementById('detail').addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a) return;
     const V = all(), v = V[sel], s = st(sel), tot = total(sel, v);
     if (a.dataset.act === 'sms') { Mock.toast('SMS wysłany ponownie'); }
-    if (a.dataset.act === 'prep') { const M = Mock.magazyn(); PS.modal({
+    if (a.dataset.act === 'prep') { const M = Mock.magazyn(), bezWaznej = x => (x.partie || []).length > 0 && !Mock.waznePartie(x).length; PS.modal({ // Etap A: only batches within their expiry date
       title: 'Użyty preparat', ok: 'Dodaj',
-      body: `<label class="p-lab">Produkt<select class="p-in" name="p">${M.map((x, i) => `<option value="${i}">${E(x.n)} (stan ${x.s} ${E(x.u)})</option>`).join('')}</select></label>
-        <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Ilość<input class="p-in" type="number" name="i" min="0.1" step="0.1" value="1" required></label><label class="p-lab" style="flex:2">Numer partii (z opakowania)<input class="p-in" name="partia" placeholder="np. LOT 24A19"></label></div>`,
+      body: `<label class="p-lab">Produkt<select class="p-in" name="p">${M.map((x, i) => `<option value="${i}"${bezWaznej(x) ? ' disabled' : ''}>${E(x.n)} (stan ${x.s} ${E(x.u)})${bezWaznej(x) ? ', tylko przeterminowane partie' : ''}</option>`).join('')}</select></label>
+        <div style="display:flex;gap:8px"><label class="p-lab" style="flex:1">Ilość<input class="p-in" type="number" name="i" min="0.1" step="0.1" value="1" required></label><label class="p-lab" style="flex:2" id="prep-partia"></label></div>
+        <span class="p-mut">Lista pokazuje tylko partie w terminie ważności. Przeterminowane oznaczysz w Magazynie.</span>`,
+      onOpen: f => {
+        const pole = () => { const W = Mock.waznePartie(M[+f.p.value]); f.querySelector('#prep-partia').innerHTML = W.length ? `Partia (ważna do)<select class="p-in" name="partia">${W.map(p => `<option value="${E(p.nr)}">${E(p.nr)} · ${p.wazne.split('-').reverse().join('.')}</option>`).join('')}</select>` : 'Numer partii (z opakowania)<input class="p-in" name="partia" placeholder="np. LOT 24A19">'; };
+        const first = M.findIndex(x => !bezWaznej(x)); if (first >= 0) f.p.value = String(first);
+        f.p.addEventListener('change', pole); pole();
+      },
       onOk: f => {
         const x = M[+f.p.value], il = +f.i.value; if (!(il > 0)) { Mock.toast('Wpisz ilość'); return false; }
+        if (bezWaznej(x)) { Mock.toast('Ten produkt ma tylko przeterminowane partie'); return false; }
         (s.prep = s.prep || []).push({ n: x.n, ilosc: il, u: x.u, partia: f.partia.value.trim() }); save();
         M[+f.p.value] = { ...x, s: Math.max(0, Math.round((x.s - il) * 10) / 10) }; Mock.set('magazyn', M);
         Mock.set('preparaty', [{ klientka: v.name, data: Mock.iso(Mock.teraz()), usluga: v.svc, n: x.n, ilosc: il, u: x.u, partia: f.partia.value.trim() }, ...(Mock.get('preparaty', []) || [])]);
@@ -322,36 +343,52 @@ document.addEventListener('DOMContentLoaded', () => {
       toast: f => `Dodano preparat, stan w magazynie: ${Math.max(0, M[+f.p.value].s)}`
     }); }
     if (a.dataset.act === 'ponag') { Mock.toast(`Wysłano drugi SMS z prośbą o potwierdzenie: ${v.name}`); }
-    if (a.dataset.act === 'pay') PS.modal({
+    if (a.dataset.act === 'pay') {
+      // a pass of this client: an online booking already took the service off (v.karnet), a studio visit takes off the first covered service
+      const it = v.karnet ? v.items[0] : v.items.find(i => i[1] > 0 && Mock.karnetDla(i[0], v.phone, v.name)), kUs = v.karnet ? v.usluga : it && it[0];
+      const kt = kUs ? Mock.karnetDla(kUs, v.phone, v.name) : null, kCov = it ? it[1] : 0, kBase = tot + (v.karnet ? kCov : 0);
+      const zaplacono = v.platnosc && v.platnosc.status === 'opłacona' ? +v.platnosc.kwota || 0 : 0; // paid online before the visit
+      const reszta = v.items.filter(i => i[1] > 0 && i !== it && !/^Dojazd/.test(i[0])).concat(s.extras || []).map(i => i[0]);
+      const zKar = f => !!kt && (f ? f.kz.checked : !!v.karnet); // ticked up front only when the online booking chose the pass
+      const due = f => Math.max(0, Math.round((zKar(f) ? kBase - kCov : kBase) * (1 - Math.min(100, Math.max(0, +(f ? f.rabat.value : 0) || 0)) / 100)) - zaplacono);
+      const doZap = f => `${due(f)} zł${zKar(f) && reszta.length ? ` <span style="font-weight:400;color:#625860;font-size:13px">(${E(reszta.join(', '))})</span>` : ''}`;
+      PS.modal({
       title: 'Rozlicz wizytę', ok: 'Rozlicz',
       body: `<fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Metoda płatności</legend>${['gotówka', 'karta', 'BLIK'].map((m, i) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="metoda" value="${m}"${i ? '' : ' checked'}>${m}</label>`).join('')}</fieldset>
         <label class="p-lab">Rabat (%)<input class="p-in" name="rabat" type="number" min="0" max="100" value="0"></label>
-        <div class="p-box"><span>Do zapłaty</span><b id="do-zaplaty">${tot} zł</b></div>
+        ${zaplacono ? `<div class="p-box"><span>Zapłacone online (${E(v.platnosc.rodzaj === 'calosc' ? 'całość' : 'zaliczka')})</span><b>−${zaplacono} zł</b></div>` : ''}<div class="p-box"><span>Do zapłaty</span><b id="do-zaplaty">${doZap()}</b></div>
         <fieldset style="border:0;padding:0;margin:0;display:flex;gap:6px;flex-wrap:wrap"><legend class="p-mut" style="padding:0 0 6px">Dokument</legend>${[['paragon', 'Paragon fiskalny'], ['faktura', 'Faktura']].map(([k, l]) => `<label class="p-chip" style="min-height:44px;display:flex;align-items:center;gap:6px"><input type="radio" name="dok" value="${k}"${(k === 'faktura') === !!v.faktura ? ' checked' : ''}>${l}</label>`).join('')}</fieldset>
         <div id="fv-pola" style="display:${v.faktura ? 'flex' : 'none'};flex-direction:column;gap:8px"><label class="p-lab">NIP nabywcy<input class="p-in" name="nip" inputmode="numeric" value="${E(v.faktura ? v.faktura.nip : '')}"></label><label class="p-lab">Nazwa firmy<input class="p-in" name="firma" value="${E(v.faktura ? v.faktura.firma : '')}"></label><p id="nip-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p></div>
         <span class="p-mut">Paragon drukuje kasa fiskalna studia. Fakturę wystawiamy z numeracją FV/numer/miesiąc/rok, a klientka pobierze ją w swoich wizytach.</span>`,
       onOpen: f => {
-        f.rabat.addEventListener('input', () => { f.querySelector('#do-zaplaty').textContent = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100)) + ' zł'; });
+        if (kt) f.querySelector('fieldset').insertAdjacentHTML('beforebegin', `<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;background:#EEF6F8"><label class="p-chk" style="font-weight:700"><input type="checkbox" name="kz"${v.karnet ? ' checked' : ''}> Zapłać karnetem: ${E(kt.s.n)}</label>
+          <span style="font-size:13px;color:#625860">${E(v.name)} ma ten ${kt.s.t === 'pakiet' ? `pakiet: ${Mock.zostaloZ(kt.s)}. Po rozliczeniu ${kt.s.ile - 1 ? Mock.zostanie(kt.s.ile - 1) + ' ' + (kt.s.ile - 1) : 'pakiet będzie wykorzystany'}` : 'karnet, ważny do ' + E(kt.s.do)}. ${E(kUs)} (${kCov} zł) z karnetu${reszta.length ? ', dopłata tylko za dodatki' : ''}.</span></div>`);
+        const licz = () => { f.querySelector('#do-zaplaty').innerHTML = doZap(f); };
+        f.rabat.addEventListener('input', licz); if (kt) f.kz.addEventListener('change', licz);
         f.querySelectorAll('[name=dok]').forEach(r => r.addEventListener('change', () => { f.querySelector('#fv-pola').style.display = f.dok.value === 'faktura' ? 'flex' : 'none'; }));
       },
       onOk: f => {
-        const kwota = Math.round(tot * (1 - Math.min(100, Math.max(0, +f.rabat.value || 0)) / 100)), fv = f.dok.value === 'faktura', err = f.querySelector('#nip-err');
+        const kwota = due(f), zK = kt && f.kz.checked, fv = f.dok.value === 'faktura', err = f.querySelector('#nip-err');
         if (fv && (!Mock.nipOk(f.nip.value) || !f.firma.value.trim())) { err.textContent = Mock.nipOk(f.nip.value) ? 'Wpisz nazwę firmy.' : 'Sprawdź NIP: 10 cyfr z poprawną sumą kontrolną.'; err.hidden = false; return false; }
-        const tx = Mock.get('panel.tx', []), nr = fv ? `FV/${tx.filter(x => x.dok && x.dok.typ === 'faktura').length + 15}/10/2026` : `paragon nr ${String(tx.length + 2).padStart(4, '0')}`; // kasa.html seeds FV/14 and paragon 0001
+        const tx = Mock.get('panel.tx', []), nr = fv ? Mock.fvNr(tx.filter(x => x.dok && x.dok.typ === 'faktura').length + 15) : `paragon nr ${String(tx.length + 2).padStart(4, '0')}`; // kasa.html seeds FV/14 and paragon 0001
         const dok = fv ? { typ: 'faktura', nr, nip: f.nip.value.replace(/[\s-]/g, ''), firma: f.firma.value.trim() } : { typ: 'paragon', nr };
-        s.paid = { metoda: f.metoda.value, kwota, dok }; save();
+        if (zK) Mock.odlicz(kt.i, `${kUs} · ${IM[v.col - 1]}`, 'odliczone przy rozliczeniu wizyty'); // the one place a pass loses a visit
+        s.paid = { metoda: f.metoda.value, kwota, dok, ...(zK ? { karnet: kt.s.n } : {}) }; save();
         tx.push({ id: Date.now(), t: s.t || v.t, klientka: v.name, opis: v.svc, metoda: f.metoda.value, kwota, dok }); Mock.set('panel.tx', tx);
-        renderAll(); Mock.toast(`Wizyta rozliczona: ${kwota} zł, ${f.metoda.value}, ${fv ? 'faktura ' + nr + ' wysłana do KSeF' : 'paragon wydrukowany'}`); return true;
+        renderAll(); Mock.toast(`Wizyta rozliczona: ${kwota} zł, ${f.metoda.value}, ${fv ? 'faktura ' + nr + ' wysłana do KSeF' : 'paragon wydrukowany'}${zK ? ', odliczono z karnetu' : ''}`); return true;
       }
-    });
+    }); }
     if (a.dataset.act === 'move') PS.modal({
       title: 'Przenieś wizytę', ok: 'Przenieś',
-      body: `<label class="p-lab">Stylistka<select class="p-in" name="c"><option value="1"${v.col === 1 ? ' selected' : ''}>Magda</option><option value="2"${v.col === 2 ? ' selected' : ''}>Ewelina</option></select></label>
+      body: `<label class="p-lab">Stylistka<select class="p-in" name="c">${IM.map((n, i) => `<option value="${i + 1}"${v.col === i + 1 ? ' selected' : ''}>${E(n)}</option>`).join('')}</select></label>
         <label class="p-lab">Nowa godzina (${Mock.dlugo(Mock.dzien(0)).toLowerCase()})<select class="p-in" name="t">${SLOTS.map(x => `<option${toMin(x) === toMin(v.t) ? ' selected' : ''}>${x}</option>`).join('')}</select></label>
         <p class="hh-err" id="move-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p><span class="p-mut">Klientka dostanie SMS z nową godziną. Zmianę da się cofnąć.</span>`,
       onOk: f => {
         const reason = check(sel, colEl(+f.c.value), toMin(f.t.value), v.dur), err = f.querySelector('#move-err');
-        if (reason) { err.textContent = 'Nie można przenieść: ' + reason; err.hidden = false; return false; }
+        if (reason) {
+          const wolne = IM.flatMap((n, i) => SLOTS.filter(x => !(i + 1 === v.col && toMin(x) === toMin(v.t)) && !check(sel, colEl(i + 1), toMin(x), v.dur)).map(x => [toMin(x), x, n])).sort((a, b) => Math.abs(a[0] - toMin(f.t.value)) - Math.abs(b[0] - toMin(f.t.value)))[0];
+          err.textContent = 'Nie można przenieść: ' + reason + (wolne ? ` Najbliższa wolna godzina: ${wolne[1]} (${wolne[2]}).` : ' Dziś nie ma już wolnej godziny na tę wizytę: przenieś ją na inny dzień w widoku tygodnia.'); err.hidden = false; return false;
+        }
         kal.tryMove(sel, colEl(+f.c.value), toMin(f.t.value));
       }
     });
@@ -393,17 +430,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const n = e.target.closest('[data-act="ok"],[data-act="no"]');
     if (n) {
       const id = n.closest('[data-vid]').dataset.vid;
-      if (id === 'ex') { Mock.toast('To wiersz przykładowy'); return; }
+      if (id === 'ex' && n.dataset.act === 'no') { st('vex').no = true; save(); renderNew(); Mock.toast('Rezerwacja odrzucona, klientka dostała SMS'); return; } // the sample row is not a real visit: remember the choice in panel.state
       if (n.dataset.act === 'ok') { st('v' + id).ok = true; save(); renderNew(); Mock.toast('Rezerwacja potwierdzona, klientka dostała SMS'); }
-      else { Mock.set('visits', Mock.get('visits', []).map(v => String(v.id) === id ? { ...v, status: 'odwołana' } : v)); renderAll(); Mock.toast('Rezerwacja odrzucona, klientka dostała SMS'); }
+      else { const x = (Mock.get('visits', []) || []).find(v => String(v.id) === id); PS.log(`odrzuciła rezerwację: ${x && x.klientka || 'klientka online'}, ${x && (x.opis || x.usluga) || 'wizyta'}`); Mock.set('visits', Mock.get('visits', []).map(v => String(v.id) === id ? { ...v, status: 'odwołana', ...Mock.zwrotPrzyOdwolaniu(v, true) } : v)); renderAll(); Mock.toast('Rezerwacja odrzucona, klientka dostała SMS'); } // the studio declines: always a full refund
     }
   });
 
-  document.getElementById('add-visit').addEventListener('click', () => PS.visitModal({ done: renderAll }));
+
+  // --- Etap A: online payment and the station of a visit ---
+  BASE.b.platnosc = { status: 'opłacona', kwota: 200, rodzaj: 'calosc', metoda: 'BLIK', czas: `${Mock.iso(Mock.dzien(-1))}T19:42`, nr: 'PAY-48213' };
+  BASE.j.platnosc = { status: 'opłacona', kwota: 21, rodzaj: 'zaliczka', metoda: 'BLIK', czas: `${Mock.iso(Mock.dzien(0))}T08:12`, nr: 'PAY-48377' }; // also a transaction in kasa.html
+  const KAT = { p: 'Paznokcie', r: 'Rzęsy', b: 'Brwi' }, low1 = t => t[0].toLowerCase() + t.slice(1);
+  // payment on a calendar block: its own line, the same words as the badge in the details
+  const PLAT = v => { const p = v.platnosc, b = p && Mock.PLATNOSC[p.status]; return !b || p.status === 'zwrócona' ? '' : `<span style="font-size:12px;font-weight:700;color:${b[2]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.status === 'oczekuje' ? 'czeka na płatność' : b[0]}</span>`; };
+  // station: chosen with "Zmień" (panel.state), else the service's one from the price list; a home visit needs none
+  BASE.e.stan = BASE.m.stan = 'Stanowisko 3'; // Ewelina's nails, so the sample day has no double-booked station
+  // stations of a visit: the one chosen with "Zmień" (only while it still exists in Zespół), else every service's one; a home visit needs none
+  const stanyOf = (id, o) => { const s = S[id] || {};
+    if ('stan' in s || o.stan) { const r = 'stan' in s ? s.stan : o.stan; return r && Mock.stanowiska().some(x => x.n === r) ? [r] : []; }
+    return Mock.stanowiskaWizyty({ dojazd: o.dojazd, kategoria: o.kategoria || KAT[o.kind], usluga: o.usluga, uslugi: o.uslugi || (o.usluga ? null : o.items.filter(i => i[1] >= 0 && !/^Dojazd/.test(i[0])).map(i => ({ usluga: i[0] }))) }); };
+  function stanKolizja(id, V, start, dur) {
+    const my = V[id] ? stanyOf(id, V[id]) : []; if (!my.length) return '';
+    const tech = techMin(), z = Mock.kolizjaStan(Object.entries(V).filter(([k]) => k !== id).flatMap(([k, o]) => { const sn = stanyOf(k, o).find(n => my.includes(n)); return sn ? [{ od: toMin(o.t), do: toMin(o.t) + o.dur, o, sn }] : []; }), start, dur, tech);
+    if (!z) return '';
+    const sn = z.sn, S = Mock.stanowiska().find(x => x.n === sn), co = z.o.items.length === 1 ? z.o.items[0][0] : z.o.svc;
+    return `${sn} (${Mock.stanSprzet(S)}) jest zajęte: ${z.o.name}, ${low1(co)} do ${fmt(z.do)}${tech ? ` + ${tech} min przerwy` : ''}.`;
+  }
+  const kiedyPl = c => { const m = /^\d{4}-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(c || ''); return m ? `${m[2]}.${m[1]}, ${+m[3]}:${m[4]}` : ''; };
+  function detailA(v) {
+    const p = v.platnosc, SS = stanyOf(sel, v).map(n => Mock.stanowiska().find(x => x.n === n));
+    const pl = !p ? '' : `<div class="p-row" style="flex-direction:column;align-items:flex-start;gap:6px"><span style="display:flex;gap:8px;align-items:center"><b>Płatność online</b>${Mock.platnoscBadge(p.status)}</span>
+      <span class="p-mut">${[`${p.kwota} zł`, p.rodzaj === 'calosc' ? 'całość z góry' : 'zaliczka', p.metoda, kiedyPl(p.czas), p.nr ? 'nr ' + p.nr : '', p.status === 'nieudana' && p.do ? 'termin trzymamy do ' + p.do : '', p.zwrot ? `zwrot ${p.zwrot} zł` : ''].filter(Boolean).map(E).join(' · ')}</span></div>`;
+    return pl + `<div class="p-row"><span><b>Stanowisko</b><br><span class="p-mut">${SS.length ? SS.map(S => `${E(S.n)} · ${E(Mock.stanSprzet(S, true))}`).join('<br>') : 'Bez stanowiska'}</span></span><button type="button" class="p-btn sm" data-act="stan">Zmień</button></div>`;
+  }
+  document.getElementById('detail').addEventListener('click', e => {
+    if (!e.target.closest('[data-act="stan"]')) return;
+    const v = all()[sel], cur = stanyOf(sel, v)[0];
+    PS.modal({ title: 'Stanowisko: ' + v.name, ok: 'Zapisz',
+      body: `<label class="p-lab">Stanowisko<select class="p-in" name="s"><option value="">Bez stanowiska</option>${Mock.stanowiska().map(x => `<option value="${E(x.n)}"${x.n === cur ? ' selected' : ''}>${E(x.n)} · ${E(Mock.stanSprzet(x))}</option>`).join('')}</select></label>
+        <p id="stan-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p><span class="p-mut">Stanowiska i sprzęt ustawisz w Zespole (zakładka „Sprzęt i gabinety”).</span>`,
+      onOk: f => {
+        const s = st(sel), had = 'stan' in s, prev = s.stan; s.stan = f.s.value;
+        const why = stanKolizja(sel, all(), toMin(v.t), v.dur);
+        if (why) { if (had) s.stan = prev; else delete s.stan; const err = f.querySelector('#stan-err'); err.textContent = 'Nie można zmienić: ' + why; err.hidden = false; return false; }
+        save(); PS.log(`zmieniła stanowisko wizyty ${v.name}: ${f.s.value || 'bez stanowiska'}`); renderAll();
+      },
+      toast: f => (f.s.value ? 'Wizyta na stanowisku: ' + f.s.value : 'Wizyta bez stanowiska') });
+  });
+  console.assert(low1('Henna') === 'henna' && kiedyPl('2026-10-20T08:12') === '20.10, 8:12' && kiedyPl('') === '', 'panel etap A formaty');
+
+  // a new visit from the panel goes through the same check as moving one (today's calendar only)
+  const wolny = (st, t, dur, dz) => (dz !== Mock.krotko(Mock.dzien(0)) ? '' : check('new', colEl(st === IM[1] ? 2 : 1), toMin(t), dur));
+  document.getElementById('add-visit').addEventListener('click', () => PS.visitModal({ done: renderAll, check: wolny }));
 
   if (location.hash === '#nowe') document.getElementById('nowe').scrollIntoView();
   renderAll();
-  window.addEventListener('storage', () => { S = Mock.get('panel.state', {}); renderAll(); });
+  window.addEventListener('storage', () => { S = Mock.get('panel.state', null) || PAID0; renderAll(); });
 });
 </script>
 </body>

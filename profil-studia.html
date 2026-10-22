@@ -16,7 +16,7 @@
 
   <nav id="panel-nav"></nav>
 
-  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+  <main data-lok-live style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
     <div class="p-top">
       <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Profil studia</h1><span class="p-mut">Tak klientki zobaczą Twoją stronę w wyszukiwarce i po linku z Instagrama.</span></div>
       <div class="p-acts"><a class="p-btn" href="salon.html">Zobacz stronę studia</a><button type="button" class="p-btn pri" id="save">Zapisz profil</button></div>
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function preview() {
     $('pv-nm').textContent = S.nm || 'Nazwa studia'; $('pv-ds').textContent = S.ds; $('pv-ad').textContent = adres();
-    const t = godz()[1]; // makieta: "dziś" to wtorek
+    const t = godz()[Mock.weekday(Mock.teraz())]; // today's hours
     $('pv-h').textContent = t[2] ? 'Dziś zamknięte' : `Dziś otwarte ${t[0]}–${t[1]}`;
     $('pv-ud').innerHTML = S.ud.map(u => `<span class="p-chip">${E(u)}</span>`).join('');
     $('pv-ph').innerHTML = S.ph.slice(0, 3).map(p => `<div style="flex:1;aspect-ratio:1;border-radius:8px;background:${p.c || '#E4D9DE'};overflow:hidden">${p.src ? `<img alt="" src="${p.src}" style="width:100%;height:100%;object-fit:cover">` : ''}</div>`).join('');

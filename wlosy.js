@@ -151,34 +151,3 @@ export function probka(hair, hex, w = 160, h = 100) {
   paint(cv, { base, mask, lm: hair.lm, sd: hair.sd, box: [0, 0, w, h], t0: 0, t1: h }, hex, 1);
   return cv;
 }
-
-// Length picture: a back-view hair photo with the length levels drawn on it. The chosen level is a strong accent line with a label,
-// the hair below it is faded ("cut here"), the other levels are faint. cv is square; hair = { mask } of the photo (zMaski);
-// levels = [{ y (in a 1000 px photo), nazwa, id }]; opis: draw labels for all levels (large picture), not only the line.
-export function poziomy(cv, photo, hair, levels, chosen, opis = false) {
-  const S = cv.width, k = 1000 / S, ctx = cv.getContext('2d', { willReadFrequently: true }), y0 = levels.find(l => l.id === chosen).y / k;
-  ctx.drawImage(photo, 0, 0, S, S);
-  const img = ctx.getImageData(0, Math.floor(y0), S, S - Math.floor(y0)), d = img.data;
-  for (let j = 0; j * 4 * S < d.length; j++) for (let x = 0; x < S; x++) {
-    const a = hair.mask[Math.floor((Math.floor(y0) + j) * k) * 1000 + Math.floor(x * k)] * 0.62, p = (j * S + x) * 4;
-    for (let c = 0; c < 3; c++) d[p + c] += (255 - d[p + c]) * a;
-  }
-  ctx.putImageData(img, 0, Math.floor(y0));
-  const px = Math.max(1, S / 300), font = `${Math.round(Math.max(9, S / 26))}px 'DM Sans', sans-serif`;
-  ctx.font = `700 ${font}`; ctx.textBaseline = 'middle';
-  for (const l of levels) {
-    const y = l.y / k, on = l.id === chosen;
-    if (!on && !opis) continue; // thumbnails show only their own level
-    ctx.beginPath(); ctx.moveTo(S * 0.04, y); ctx.lineTo(S * 0.96, y);
-    ctx.setLineDash(on ? [] : [4 * px, 5 * px]);
-    if (on) { ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 5.5 * px; ctx.stroke(); }
-    ctx.strokeStyle = on ? '#9E1F50' : 'rgba(255,255,255,.85)'; ctx.lineWidth = (on ? 2.8 : 1.4) * px; ctx.stroke(); ctx.setLineDash([]);
-    if (!opis) continue;
-    const tw = ctx.measureText(l.nazwa).width, pad = 7 * px, h = parseInt(font) + 6 * px;
-    if (on) { ctx.fillStyle = '#9E1F50'; ctx.beginPath(); ctx.roundRect(S * 0.04, y - h - 3 * px, tw + 2 * pad, h, 6 * px); ctx.fill(); ctx.fillStyle = '#FFFFFF'; ctx.fillText(l.nazwa, S * 0.04 + pad, y - h / 2 - 3 * px); }
-    else { // faint level: white text with a soft dark shadow, readable on the white sweater and on the wall
-      ctx.save(); ctx.fillStyle = '#FFFFFF'; ctx.font = `500 ${font}`; ctx.shadowColor = 'rgba(30,26,29,.65)'; ctx.shadowBlur = 4 * px;
-      ctx.fillText(l.nazwa, S * 0.96 - tw - 4 * px, y - parseInt(font) * 0.7); ctx.restore();
-    }
-  }
-}

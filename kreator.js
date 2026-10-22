@@ -176,7 +176,7 @@
           r.komunikaty.push({ typ: 'info', krok: 'pierwsza', tekst: `Konsultacja przed tym zabiegiem jest płatna: ${zl(k.cena)} · ${dur(k.min)}. Odliczymy ją od zabiegu, jeśli umówisz go w ciągu ${k.odliczanaDni} dni. Tutaj zabieg jest w tej samej rezerwacji, więc kwota konsultacji jest już odjęta.` });
         } else poz(r, 'Konsultacja (pierwsza wizyta)', k.cena, k.min, k.cena ? {} : { dopisek: 'bezpłatna przy zabiegu' });
       }
-      const mies = new Date().getMonth() + 1;
+      const mies = (window.Mock ? Mock.teraz() : new Date()).getMonth() + 1; // the pinned test date counts
       if (z.ostrzezenieSezon && mies >= 5 && mies <= 9) r.komunikaty.push({ typ: 'warn', krok: 'zabieg', tekst: 'Od maja do września kwasy wymagają ochrony SPF 50, kosmetolożka może zaproponować łagodniejszy zabieg.' });
       r.zakres = ['kosmetologia', z.id];
       r.usluga = 'Kosmetologia · ' + z.nazwa + (n > 1 ? ` (seria ${n})` : '');
@@ -346,7 +346,7 @@
       const r = wycen(w);
       window.Mock?.set('booking', {
         kategoria: cfg.nazwa, usluga: r.usluga, opis: r.opis, cena: r.cenaMax, cenaMin: r.cenaMin, cenaMax: r.cenaMax,
-        czas: r.minuty, czasTekst: dur(r.minuty), studio: 'Studio Malwa', powodPrzedzialu: r.powodyPrzedzialu.join(' '),
+        czas: r.minuty, czasTekst: dur(r.minuty), studio: new URLSearchParams(location.search).get('s') || 'Studio Malwa', powodPrzedzialu: r.powodyPrzedzialu.join(' '),
         pozycje: r.pozycje.map(p => ({ nazwa: p.nazwa, cena: p.cenaMax ?? p.cena, cenaMin: p.cena, min: p.min, ...(p.cenaMax > p.cena ? { warunkowa: true } : {}), ...(p.dopisek ? { dopisek: p.dopisek } : {}) })), sciezka: r.sciezka,
         testMin: 0, uwagi: r.uwagi, seria: r.seria || null, zakres: r.zakres, kat: cfg.kat,
       });

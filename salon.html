@@ -42,6 +42,8 @@ h2{margin:0;font-size:18px;font-weight:700}
 .us2 .prawa .add{margin-top:8px}
 /* phone: price, time and the button share one row under the name so the name does not break */
 @media (max-width:700px){.us2{grid-template-columns:56px minmax(0,1fr);align-items:start}.us2 .prawa{grid-column:2;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px 10px;text-align:left}.us2 .prawa .add{margin:0 0 0 auto}}
+#karn-lista .us2{grid-template-columns:minmax(0,1fr) auto} /* passes have no photo column */
+@media (max-width:700px){#karn-lista .us2{grid-template-columns:minmax(0,1fr)}#karn-lista .us2 .prawa{grid-column:1}}
 .add{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #9E1F50;background:#fff;color:#9E1F50;font:inherit;font-weight:500;cursor:pointer}
 .add[aria-pressed=true]{background:#9E1F50;color:#fff}
 .koszyk{position:sticky;bottom:0;z-index:5;background:#fff;border-top:1px solid #E4D9DE;box-shadow:0 -2px 8px rgba(30,26,29,.08);padding:12px 20px;display:flex;flex-direction:column;gap:8px}
@@ -146,7 +148,7 @@ h2{margin:0;font-size:18px;font-weight:700}
       <a href="kosmetyka.html" class="us"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:500">Kosmetyka</span><span style="color:#625860;font-size:13px">zabiegi pojedyncze i serie</span></span><span style="color:#9E1F50;font-weight:500;font-size:14px">Skonfiguruj ›</span></a>
     </section>
 
-    <section style="padding:22px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <section id="ostatnia" hidden style="padding:22px 20px 0;display:flex;flex-direction:column;gap:10px">
       <h2>Twoja ostatnia stylizacja</h2>
       <div style="border:1px solid #E4D9DE;border-radius:14px;padding:14px;display:flex;gap:12px;align-items:center">
         <img src="zdjecia/styl-velvet-burgund.jpg" alt="Velvet burgund na migdałowych paznokciach" width="52" height="52" loading="lazy" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none">
@@ -158,25 +160,10 @@ h2{margin:0;font-size:18px;font-weight:700}
       </div>
     </section>
 
-    <section style="padding:22px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <section id="kol-sec" style="padding:22px 20px 0;display:flex;flex-direction:column;gap:10px">
       <h2>Zacznij od gotowej stylizacji</h2>
-      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
-        <a href="paznokcie.html" style="display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D">
-          <img src="zdjecia/styl-micro-french.jpg" alt="Micro french na krótkich paznokciach soft square" width="600" height="450" loading="lazy" style="width:100%;height:96px;object-fit:cover;object-position:50% 78%;border-radius:12px;display:block">
-          <span style="font-weight:500;font-size:13px">Micro french</span>
-          <span style="color:#625860;font-size:12px">od 160 zł · 1 h 30</span>
-        </a>
-        <a href="paznokcie.html" style="display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D">
-          <img src="zdjecia/styl-velvet-burgund.jpg" alt="Velvet burgund na migdałowych paznokciach" width="600" height="450" loading="lazy" style="width:100%;height:96px;object-fit:cover;border-radius:12px;display:block">
-          <span style="font-weight:500;font-size:13px">Velvet burgund</span>
-          <span style="color:#625860;font-size:12px">od 190 zł · 1 h 45</span>
-        </a>
-        <a href="paznokcie.html" style="display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D">
-          <img src="zdjecia/styl-glazed-pearl.jpg" alt="Glazed pearl, perłowe paznokcie w kształcie migdała" width="600" height="450" loading="lazy" style="width:100%;height:96px;object-fit:cover;object-position:50% 78%;border-radius:12px;display:block">
-          <span style="font-weight:500;font-size:13px">Glazed pearl</span>
-          <span style="color:#625860;font-size:12px">od 190 zł · 1 h 45</span>
-        </a>
-      </div>
+      <span style="color:#625860;font-size:13px">Stylizacje tego studia. Kliknij, zobaczysz je w kreatorze i zmienisz po swojemu.</span>
+      <div id="kol" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px"></div>
     </section>
 
     <section style="margin:22px 20px 0;padding:16px;border-radius:14px;border:1px dashed #C9B6BF;display:flex;flex-direction:column;gap:10px">
@@ -271,7 +258,7 @@ h2{margin:0;font-size:18px;font-weight:700}
       <details class="zas" open><summary>Higiena i sterylizacja</summary>
         <p>Narzędzia metalowe są dezynfekowane i sterylizowane po każdej klientce, a pilniki, bufory i końcówki jednorazowe dostajesz tylko dla siebie. Stanowisko jest dezynfekowane przed każdą wizytą.</p></details>
       <details class="zas"><summary>Zasady odwołań</summary>
-        <p>Odwołanie do 24 h przed wizytą jest bezpłatne, a zaliczka wraca. Później zaliczki nie zwracamy. Gdy odwoła studio, zwracamy całość. Rezerwacje online można odstąpić w ciągu 14 dni. bezpłatnie do 24 h przed wizytą</p>
+        <p data-odw>Odwołanie do 24 h przed wizytą jest bezpłatne, a zaliczka wraca. Później zaliczki nie zwracamy. Gdy odwoła studio, zwracamy całość. Od rezerwacji online możesz odstąpić w ciągu 14 dni.</p>
 </details>
       <details class="zas"><summary>Dostępność</summary>
         <p>Wejście bez schodów, drzwi szerokości 90 cm. Winda w budynku (piętro 1). Toaleta dostępna dla osób na wózku. Prosimy o informację przy rezerwacji, jeśli potrzebujesz pomocy.</p></details>
@@ -353,10 +340,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
   const nazwa = new URLSearchParams(location.search).get('s') || 'Studio Malwa';
   const KOL = { 'Studio Malwa': '#9E1F50', 'Pracownia Lilia': '#2F5A86', 'Atelier Nude': '#5B1630', 'Lash Room Iga': '#3F6B2E', 'Salon Loft': '#8A4B12' };
-  $('#nazwa').textContent = nazwa;
+  // the own studio shows what the owner saved in Profil studia (name, address); `nazwa` stays the key bookings use
+  const P = nazwa === 'Studio Malwa' ? Mock.get('profil', {}) || {} : {}, adres = Mock.studio(nazwa).adres;
+  // the creators book in this studio
+  document.querySelectorAll('a[href^="paznokcie.html"], a[href^="rzesy.html"], a[href^="brwi.html"], a[href^="fryzjer.html"], a[href^="kosmetyka.html"]').forEach(a => { const [p, h] = a.getAttribute('href').split('#'); a.setAttribute('href', `${p}?s=${encodeURIComponent(nazwa)}${h ? '#' + h : ''}`); });
+  document.querySelectorAll('dd, .meta span').forEach(el => { if (el.textContent === 'ul. Puławska 24, lok. 3, Warszawa') el.textContent = adres; });
+  $('#dojazd').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(adres);
+  $('#nazwa').textContent = P.nm || nazwa;
+  $('#ostatnia').hidden = !((Mock.get('user', {}) || {}).zalogowana && nazwa === 'Studio Malwa'); // only a logged-in client who has been here
   $('#logo').style.background = KOL[nazwa] || '#9E1F50';
-  $('#logo').textContent = nazwa.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join(''); // initials, e.g. Studio Malwa -> SM
-  document.title = nazwa + ' – strona studia';
+  $('#logo').textContent = (P.nm || nazwa).split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join(''); // initials, e.g. Studio Malwa -> SM
+  document.title = (P.nm || nazwa) + ' – strona studia';
 
   // cart: several services in one visit (kept in Mock "koszyk"; the booking is built when the client picks a date)
   const KATALOG = [
@@ -364,8 +358,9 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'zel', kategoria: 'Paznokcie', usluga: 'Żel na naturalnej płytce', cena: 170, czas: 105, osobyMax: 1, dojazd: true },
     { id: 'tipsy', kategoria: 'Paznokcie', usluga: 'Przedłużanie (tipsy / szablon)', cena: 200, czas: 150, osobyMax: 1, dojazd: false },
     { id: 'uzup', kategoria: 'Paznokcie', usluga: 'Uzupełnienie żelu', cena: 180, czas: 120, osobyMax: 1, dojazd: false },
-    { id: 'brwi', kategoria: 'Brwi', usluga: 'Regulacja i henna brwi', cena: 70, czas: 40, osobyMax: 2, dojazd: true }
-  ].map(u => ({ ...u, opis: u.usluga, cenaMin: u.cena, cenaMax: u.cena, przerwaMin: 0 }));
+    { id: 'brwi', kategoria: 'Brwi', usluga: 'Regulacja i henna brwi', cennik: 'Henna + regulacja', cena: 70, czas: 40, osobyMax: 2, dojazd: true }
+  ].map(u => { const b = Mock.cennikPoz(u.kategoria, u.cennik || u.usluga); return b ? { ...u, cena: b[1], czas: b[2], online: b[3] !== 0, osobyMax: b[5] || u.osobyMax, dojazd: b[6] === undefined ? u.dojazd : !!b[6] } : u; }) // the studio's own prices from Cennik
+    .filter(u => u.online !== false).map(u => ({ ...u, opis: u.usluga, cenaMin: u.cena, cenaMax: u.cena, przerwaMin: 0 }));
   const B0 = Mock.get('booking', {}) || {};
   // a configured service from a creator can join the cart (only plain bookings: tests and consultations are booked on their own)
   const zKreatora = B0.opis && B0.studio === nazwa && !B0.visitId && !B0.uslugi && (!B0.sciezka || B0.sciezka === 'rezerwacja')
@@ -435,19 +430,31 @@ document.addEventListener('DOMContentLoaded', () => {
     Mock.set('polecenie', { studio: nazwa, od });
   }
 
-  // open now: same hours as the "Informacje" tab (0 = Monday)
-  const GODZ = [[9, 19], [9, 19], [9, 19], [9, 19], [9, 19], [9, 15], null];
+  // open now: the studio's opening hours (Mock.godziny, 0 = Monday); other sample studios use the same sample hours
+  const hNum = t => { const [h, m] = t.split(':'); return +h + (+m || 0) / 60; };
+  const GH = Mock.godziny(), GODZ = GH.map(([a, b, z]) => (z ? null : [hNum(a), hNum(b), a, b]));
   const otwarte = d => {
     const w = Mock.weekday(d), g = GODZ[w], h = d.getHours() + d.getMinutes() / 60;
-    if (g && h >= g[0] && h < g[1]) return { on: true, txt: `do ${g[1]}:00` };
-    if (g && h < g[0]) return { on: false, txt: `otwarcie dziś ${g[0]}:00` };
-    for (let i = 1; i <= 7; i++) { const n = GODZ[(w + i) % 7]; if (n) return { on: false, txt: `otwarcie ${i === 1 ? 'jutro' : ['w poniedziałek', 'we wtorek', 'w środę', 'w czwartek', 'w piątek', 'w sobotę', 'w niedzielę'][(w + i) % 7]} ${n[0]}:00` }; }
+    if (g && h >= g[0] && h < g[1]) return { on: true, txt: `do ${g[3]}` };
+    if (g && h < g[0]) return { on: false, txt: `otwarcie dziś ${g[2]}` };
+    for (let i = 1; i <= 7; i++) { const n = GODZ[(w + i) % 7]; if (n) return { on: false, txt: `otwarcie ${i === 1 ? 'jutro' : ['w poniedziałek', 'we wtorek', 'w środę', 'w czwartek', 'w piątek', 'w sobotę', 'w niedzielę'][(w + i) % 7]} ${n[2]}` }; }
     return { on: false, txt: '' };
   };
-  console.assert(otwarte(new Date(2026, 9, 19, 10)).txt === 'do 19:00' && otwarte(new Date(2026, 9, 24, 16)).txt === 'otwarcie w poniedziałek 9:00'
+  if (!(Mock.get('profil', {}) || {}).h) console.assert(otwarte(new Date(2026, 9, 19, 10)).txt === 'do 18:00' && otwarte(new Date(2026, 9, 24, 16)).txt === 'otwarcie w poniedziałek 9:00'
     && otwarte(new Date(2026, 9, 20, 7)).txt === 'otwarcie dziś 9:00' && otwarte(new Date(2026, 9, 19, 20)).txt === 'otwarcie jutro 9:00', 'salon otwarte');
+  // the same hours in both lists (Informacje tab and the side card): equal neighbouring days grouped, e.g. Pon–Pt
+  const DS = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sobota', 'Niedziela'], gr = [];
+  GH.forEach((g, i) => { const t = g[2] ? 'zamknięte' : `${g[0]}–${g[1]}`, l = gr[gr.length - 1]; if (l && l.t === t && i < 5) l.b = i; else gr.push({ a: i, b: i, t }); });
+  const godzHtml = gr.map(x => `<dt>${x.a === x.b ? DS[x.a] : DS[x.a] + '–' + DS[x.b]}</dt><dd>${x.t}</dd>`).join('');
+  document.querySelectorAll('dl.dl').forEach(dl => { if (/Pon–Pt/.test(dl.textContent) && !/Adres/.test(dl.textContent.split('Pon–Pt')[1] || '')) dl.innerHTML = dl.innerHTML.replace(/<dt>Pon–Pt[\s\S]*$/, godzHtml); });
   const o = otwarte(Mock.teraz());
   $('#status').innerHTML = `<b class="${o.on ? 'on' : 'off'}">${o.on ? 'Otwarte' : 'Zamknięte'}</b> ${o.txt}`;
+
+  // the studio's own styles (panel Marketing, "Kolekcje sezonowe"): only those on the profile; a click opens the creator with their settings
+  const STYLE = Mock.kolekcja().filter(k => k.on && /^(data:image\/(jpeg|png|webp);base64,[\w+/=]+|zdjecia\/[\w.-]+)$/.test(k.foto));
+  $('#kol-sec').hidden = !STYLE.length;
+  $('#kol').innerHTML = STYLE.map(k => `<a href="${Mock.kolekcjaLink(k)}" style="display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#1E1A1D"><img src="${k.foto}" alt="" style="width:100%;height:140px;object-fit:cover;border-radius:14px;display:block"><span style="font-weight:500"></span><span style="font-size:13px"><b style="color:#9E1F50">od ${+k.cena || 0} zł</b> <span style="color:#625860"></span></span></a>`).join('');
+  [...$('#kol').children].forEach((el, i) => { el.querySelector('span').textContent = STYLE[i].n; el.querySelector('span span').textContent = '· ' + STYLE[i].czas; });
 
   // passes and packages: the studio's offer, bought online and kept with the phone number
   const KARN = Mock.karnety(), uz = Mock.get('user', {}) || {};

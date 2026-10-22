@@ -9,6 +9,18 @@
 <link rel="stylesheet" href="mock.css">
 <script src="mock.js" defer></script>
 <script src="panel-shell.js" defer></script>
+<style>
+.p-tw{position:relative} /* the hidden "Akcje" header (.p-sr, absolute) stays inside the scrolling table instead of widening the phone page */
+.kz{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.kz{grid-template-columns:1fr}}
+.kz-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.kz-cal button{min-height:52px;border:1px solid #F0E8EC;border-radius:10px;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;cursor:pointer;overflow:hidden}
+.kz-cal button:disabled{cursor:default}
+.kz-cal button[aria-pressed=true]{border:2px solid #1E1A1D}
+.kz-cal span{font-size:10px;white-space:nowrap}
+@media (max-width:480px){.kz-cal span{font-size:9px}}
+.kz-i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+</style>
 </head>
 <body>
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
@@ -23,6 +35,7 @@
         <button type="button" class="p-btn sm" id="in">Wpłata do kasy</button>
         <button type="button" class="p-btn sm" id="out">Wypłata z kasy</button>
         <button type="button" class="p-btn sm dark" id="close">Zamknij dzień</button>
+        <span id="zamk" class="p-acts" hidden><span class="p-badge ok" id="zamk-t"></span><button type="button" class="p-btn sm" id="reopen" hidden>Otwórz ponownie</button></span>
       </div>
     </div>
 
@@ -40,6 +53,17 @@
       <div class="p-tw"><table class="p-tbl"><thead><tr><th>Godzina</th><th>Klientka</th><th>Za co</th><th>Metoda</th><th>Dokument</th><th style="text-align: right">Kwota</th><th><span class="p-sr">Akcje</span></th></tr></thead><tbody id="tx"></tbody></table></div>
     </section>
 
+    <section class="p-card" aria-labelledby="kz-h">
+      <div class="p-top"><h2 id="kz-h" class="p-h2">Zamknięte dni</h2><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><button type="button" class="p-btn sm" id="kz-prev" aria-label="Poprzedni miesiąc">‹</button><b id="kz-m" style="min-width:120px;text-align:center"></b><button type="button" class="p-btn sm" id="kz-next" aria-label="Następny miesiąc">›</button><button type="button" class="p-btn sm" id="kz-csv">Pobierz zestawienie (CSV)</button></span></div>
+      <div class="kz">
+        <div style="display:flex;flex-direction:column;gap:10px"><div class="kz-cal" id="kz-cal"></div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#625860"><span><i class="kz-i" style="background:#E7F3EC"></i>zamknięty, bez różnicy</span><span><i class="kz-i" style="background:#FFF1E0"></i>różnica albo niezamknięty</span><span><i class="kz-i" style="background:#FAF6F8"></i>nieczynne</span></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:0"><div id="kz-sum" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"></div>
+          <div class="p-tw"><table class="p-tbl" style="min-width:560px"><thead><tr><th>Dzień</th><th style="text-align:right">Utarg</th><th style="text-align:right">Gotówka</th><th style="text-align:right">Karta i BLIK</th><th>Szuflada</th><th>Zamknęła</th><th><span class="p-sr">Akcje</span></th></tr></thead><tbody id="kz-l"></tbody></table></div></div>
+      </div>
+      <span class="p-mut">Kliknij dzień w kalendarzu albo „Raport”, żeby zobaczyć jego transakcje. Zamknięty dzień jest tylko do odczytu; poprawkę robi właścicielka przyciskiem „Otwórz ponownie” z powodem.</span>
+    </section>
+
     <section class="p-card" aria-labelledby="gc-h">
       <h2 id="gc-h" class="p-h2">Karty podarunkowe do zrealizowania</h2>
       <form id="gcform" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end">
@@ -55,39 +79,58 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const E = PS.esc, FUND = 200;
-  document.getElementById('dzis').textContent = Mock.dlugo(Mock.dzien(0));
-  const SEED = [
+  const LK = PS.lokalizacje(), lok = Mock.lok(), mojaLok = x => Mock.lokOf(x) === lok; // the cash register of the location picked in the header
+  document.getElementById('dzis').textContent = Mock.dlugo(Mock.dzien(0)) + (LK.length > 1 ? ' · ' + (LK[lok] || LK[0]).n : '');
+  const SEED = lok === 1 ? [{ t: '10:00', k: 'Marta L.', o: 'Strzyżenie damskie (cena przykładowa)', m: 'karta', v: 120, dok: { typ: 'paragon', nr: 'paragon nr 0001' } }] : lok ? [] : [
     { t: '9:00', k: 'Anna K.', o: 'Hybryda jednolita', m: 'gotówka', v: 140, dok: { typ: 'paragon', nr: 'paragon nr 0001' } },
-    { t: '9:30', k: 'Dorota S.', o: 'Rzęsy 1:1 · uzupełnienie (cena przykładowa)', m: 'karta', v: 150, dok: { typ: 'faktura', nr: 'FV/14/10/2026', nip: '1234563218', firma: 'Dorota Sowa Fotografia' } }
+    { t: '9:30', k: 'Dorota S.', o: 'Rzęsy 1:1 · uzupełnienie (cena przykładowa)', m: 'karta', v: 150, dok: { typ: 'faktura', nr: Mock.fvNr(14), nip: '1234563218', firma: 'Dorota Sowa Fotografia' } }
   ];
   const CARDS = [{ code: 'KARTA-DEMO-1', v: 100, od: 'Basia W., na urodziny' }, { code: 'KARTA-DEMO-2', v: 200, od: 'Iza N., prezent' }];
   const zl = n => n.toLocaleString('pl-PL') + ' zł';
-  const tx = () => SEED.concat(Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota, dok: x.dok })), Mock.get('kasa.gc', []).map(x => ({ t: x.t, k: 'Klientka online', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })));
-  const dokTxt = d => (!d ? '<span class="p-mut">–</span>' : d.typ === 'faktura' ? `<span class="p-badge blue" title="${E(d.firma)}, NIP ${E(d.nip)}">${E(d.nr)}</span><br><span class="p-mut" title="Numer nadany przez Krajowy System e-Faktur">KSeF: ${E(ksef(d))}</span>` : `<span class="p-mut">${E(d.nr)}</span>`);
+  // Etap A: online prepayments made today (zadatek.html), the sample one is Julia T. from the panel calendar; a refunded one also gets its minus row
+  // shortcut: the refund has no date of its own, so it shows on the day of the payment; a real cash register books it on the refund day
+  const ONLINE_SEED = lok ? [] : [{ czas: `${Mock.iso(Mock.dzien(0))}T08:12`, klientka: 'Julia T.', opis: 'Mini manicure', platnosc: { status: 'opłacona', kwota: 21, rodzaj: 'zaliczka', metoda: 'BLIK', nr: 'PAY-48377' } }];
+  const online = () => ONLINE_SEED.concat((Mock.get('visits', []) || []).filter(v => v.platnosc && v.platnosc.czas && mojaLok(v)).map(v => ({ czas: v.platnosc.czas, klientka: v.klientka || 'Klientka online', opis: v.opis || v.usluga, platnosc: v.platnosc })))
+    .filter(x => x.czas.startsWith(Mock.iso(Mock.dzien(0))) && ['opłacona', 'zwrócona'].includes(x.platnosc.status))
+    .flatMap(x => { const p = x.platnosc, t = String(+x.czas.slice(11, 13)) + x.czas.slice(13, 16), row = { t, k: x.klientka, o: `Przedpłata online (${p.rodzaj === 'calosc' ? 'całość' : 'zaliczka'}): ${x.opis}`, m: 'online · ' + p.metoda, v: p.kwota, dok: { typ: 'online', nr: p.nr }, online: true };
+      return p.status === 'zwrócona' ? [row, { ...row, o: 'Zwrot przedpłaty: ' + x.opis, v: -p.zwrot, zw: true }] : [row]; });
+  const tx = () => SEED.concat(online(), Mock.get('panel.tx', []).map(x => ({ t: x.t, k: x.klientka, o: x.opis, m: x.metoda, v: x.kwota, dok: x.dok })), Mock.get('kasa.gc', []).filter(mojaLok).map(x => ({ t: x.t, k: 'Klientka online', o: 'Karta podarunkowa ' + x.code, m: 'karta podarunkowa', v: x.v })))
+    .sort((a, b) => min(a.t) - min(b.t)); // by hour, like a till roll
+  const min = t => { const [h, m] = String(t).split(':'); return +h * 60 + (+m || 0); };
+  const dokTxt = d => (!d ? '<span class="p-mut">–</span>' : d.typ === 'online' ? `<span class="p-mut">${E(d.nr)}</span>` : d.typ === 'faktura' ? `<span class="p-badge blue" title="${E(d.firma)}, NIP ${E(d.nip)}">${E(d.nr)}</span><br><span class="p-mut" title="Numer nadany przez Krajowy System e-Faktur">KSeF: ${E(ksef(d))}</span>` : `<span class="p-mut">${E(d.nr)}</span>`);
   const ruch = () => Mock.get('kasa.ruch', []);
   // mock KSeF number: seller NIP-date-6 characters, as the real one looks
   const ksef = d => `1234563218-${Mock.iso(Mock.dzien(0)).split('-').join('')}-${(d.nr.replace(/\W/g, '') + 'A1B2C3').slice(-6).toUpperCase()}`;
   const zwroty = () => Mock.get('kasa.zwroty', []) || [];
   const zwrocono = x => zwroty().filter(z => z.ref === x.t + '|' + x.k + '|' + x.o).reduce((a, z) => a + z.kwota, 0);
 
-  function render() {
+  // today's day as the report and the history store it: transactions, cash moves, takings, cash, what the drawer should hold
+  function dzis() {
     const T = tx().concat(zwroty().map(z => ({ t: z.t, k: z.k, o: 'Zwrot: ' + z.o, m: z.m, v: -z.kwota, zw: true }))), R = ruch();
-    const sum = f => T.filter(f).reduce((s, x) => s + x.v, 0);
-    const total = sum(() => true), got = sum(x => x.m === 'gotówka'), inn = R.filter(r => r.typ === 'wpłata').reduce((s, r) => s + r.v, 0), out = R.filter(r => r.typ === 'wypłata').reduce((s, r) => s + r.v, 0);
+    const sum = f => T.filter(f).reduce((s, x) => s + x.v, 0), g = sum(x => x.m === 'gotówka');
+    return { tx: T, ruch: R, u: sum(() => true), g, powinno: FUND + g + R.reduce((s, r) => s + (r.typ === 'wpłata' ? r.v : -r.v), 0) };
+  }
+  function render() {
+    const D = dzis(), T = D.tx, R = D.ruch, total = D.u, got = D.g;
     document.getElementById('s-utarg').textContent = zl(total);
     document.getElementById('s-n').textContent = T.length + ' transakcji';
     document.getElementById('s-got').textContent = zl(got);
     document.getElementById('s-bez').textContent = zl(total - got);
-    document.getElementById('s-kasa').textContent = zl(FUND + got + inn - out);
-    document.getElementById('tx').innerHTML = T.map(x => `<tr><td>${E(x.t)}</td><td>${E(x.k)}</td><td>${E(x.o)}</td><td><span class="p-chip">${E(x.m)}</span></td><td>${x.zw ? '<span class="p-mut">korekta</span>' : dokTxt(x.dok)}</td><td style="text-align:right;font-weight:700;color:${x.v < 0 ? '#A3262A' : '#1E1A1D'}">${zl(x.v)}</td><td>${!x.zw && x.v > 0 && x.m !== 'karta podarunkowa' ? (zwrocono(x) >= x.v ? '<span class="p-badge">zwrócono</span>' : `<button type="button" class="p-btn sm" data-zwrot="${E(x.t + '|' + x.k + '|' + x.o)}">Zwrot</button>`) : ''}</td></tr>`).join('') +
+    document.getElementById('s-kasa').textContent = zl(D.powinno);
+    document.getElementById('tx').innerHTML = T.map(x => `<tr><td>${E(x.t)}</td><td>${E(x.k)}</td><td>${E(x.o)}</td><td><span class="p-chip">${E(x.m)}</span></td><td>${x.zw ? '<span class="p-mut">korekta</span>' : dokTxt(x.dok)}</td><td style="text-align:right;font-weight:700;color:${x.v < 0 ? '#A3262A' : '#1E1A1D'}">${zl(x.v)}</td><td>${!x.zw && !x.online && x.v > 0 && x.m !== 'karta podarunkowa' ? (zwrocono(x) >= x.v ? '<span class="p-badge">zwrócono</span>' : `<button type="button" class="p-btn sm" data-zwrot="${E(x.t + '|' + x.k + '|' + x.o)}">Zwrot</button>`) : ''}</td></tr>`).join('') +
       R.map(r => `<tr><td>${E(r.t)}</td><td colspan="2">${r.typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy'}: ${E(r.o)}</td><td><span class="p-chip">gotówka</span></td><td><span class="p-mut">KW/KP</span></td><td style="text-align:right;font-weight:700;color:${r.typ === 'wpłata' ? '#1F6B47' : '#A3262A'}">${r.typ === 'wpłata' ? '+' : '−'}${zl(r.v)}</td><td></td></tr>`).join('');
     const used = Mock.get('kasa.gc', []).map(x => x.code);
     document.getElementById('gc').innerHTML = CARDS.map(c => `<div class="p-row"><span><b>${E(c.code)}</b> · ${zl(c.v)}<br><span class="p-mut">${E(c.od)}</span></span>${used.includes(c.code) ? '<span class="p-badge ok">zrealizowana</span>' : `<button type="button" class="p-btn sm" data-code="${c.code}">Zrealizuj</button>`}</div>`).join('');
-    const closed = Mock.get('kasa.zamkniety', null), bn = document.getElementById('closed');
-    bn.hidden = !closed; if (closed) bn.textContent = `Dzień zamknięty o ${closed.t}. Utarg ${zl(total)}, w szufladzie ${closed.policzono} zł${closed.roznica ? ` (różnica ${closed.roznica > 0 ? '+' : ''}${closed.roznica} zł)` : ', bez różnicy'}.`;
+    const closed = ro(), bn = document.getElementById('closed');
+    bn.hidden = !closed; if (closed) bn.textContent = `Dzień zamknięty o ${closed.t}. Utarg ${zl(closed.u)}, w szufladzie ${closed.policzono} zł${closed.roznica ? ` (różnica ${closed.roznica > 0 ? '+' : ''}${closed.roznica} zł)` : ', bez różnicy'}.`;
+    document.getElementById('close').hidden = !!closed; document.getElementById('zamk').hidden = !closed;
+    if (closed) document.getElementById('zamk-t').textContent = 'zamknięty ' + closed.t;
+    document.getElementById('reopen').hidden = !wlascicielka();
+    renderDni();
   }
   const now = () => Mock.teraz().toTimeString().slice(0, 5);
   function cash(typ) {
+    if (ro()) return Mock.toast(RO);
     PS.modal({
       title: typ === 'wpłata' ? 'Wpłata do kasy' : 'Wypłata z kasy', ok: 'Zapisz',
       body: '<label class="p-lab">Kwota (zł)<input class="p-in" type="number" min="1" name="v" required></label><label class="p-lab">Opis<input class="p-in" name="o" required placeholder="np. drobne na resztę"></label>',
@@ -97,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.getElementById('tx').addEventListener('click', e => {
     const b = e.target.closest('[data-zwrot]'); if (!b) return;
+    if (ro()) return Mock.toast(RO);
     const x = tx().find(y => y.t + '|' + y.k + '|' + y.o === b.dataset.zwrot), max = x.v - zwrocono(x);
     PS.modal({ title: 'Zwrot: ' + x.k, ok: 'Zwróć',
       body: `<div class="p-box"><span>${E(x.o)} · ${E(x.m)}</span><b>${zl(x.v)}</b></div><label class="p-lab">Kwota zwrotu (do ${max} zł)<input class="p-in" type="number" name="k" min="1" max="${max}" required value="${max}"></label><label class="p-lab">Powód<input class="p-in" name="p" required placeholder="np. reklamacja, odwołanie przez studio"></label><span class="p-mut">Zwrot idzie tą samą metodą (${E(x.m)}). Przy paragonie drukujemy korektę, przy fakturze fakturę korygującą.</span>`,
@@ -106,17 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('in').addEventListener('click', () => cash('wpłata'));
   document.getElementById('out').addEventListener('click', () => cash('wypłata'));
-  document.getElementById('close').addEventListener('click', () => {
-    const exp = document.getElementById('s-kasa').textContent;
-    const want = parseInt(exp.replace(/\D/g, ''), 10);
-    PS.modal({
-      title: 'Zamknij dzień', ok: 'Zamknij dzień', cls: 'dark',
-      body: `<div class="p-box"><span>W szufladzie powinno być</span><b>${E(exp)}</b></div><label class="p-lab">Policzone w szufladzie (zł)<input class="p-in" type="number" min="0" name="c" required value="${want}"></label><span class="p-mut">Różnicę zapiszemy w raporcie dnia.</span>`,
-      onOk: f => { Mock.set('kasa.zamkniety', { t: now(), policzono: +f.c.value, roznica: +f.c.value - want }); render(); },
-      toast: 'Dzień zamknięty, raport zapisany'
-    });
-  });
+  document.getElementById('close').addEventListener('click', () => zamknij(Mock.dzien(0)));
+  document.getElementById('reopen').addEventListener('click', () => otworz(Mock.dzien(0)));
   function redeem(code) {
+    if (ro()) return Mock.toast(RO);
     const c = CARDS.find(x => x.code === code.trim().toUpperCase());
     if (!c) { Mock.toast('Nie znaleziono karty o kodzie ' + code.trim()); return; }
     const used = Mock.get('kasa.gc', []);
@@ -124,12 +161,114 @@ document.addEventListener('DOMContentLoaded', () => {
     PS.modal({
       title: 'Zrealizuj kartę ' + c.code, ok: 'Zrealizuj',
       body: `<div class="p-box"><span>Saldo karty</span><b>${zl(c.v)}</b></div><p style="margin:0" class="p-mut">${E(c.od)}. Kwota wejdzie do dzisiejszego utargu jako płatność kartą podarunkową.</p>`,
-      onOk: () => { used.push({ code: c.code, v: c.v, t: now() }); Mock.set('kasa.gc', used); render(); },
+      onOk: () => { used.push({ code: c.code, v: c.v, t: now(), lok }); Mock.set('kasa.gc', used); render(); },
       toast: `Karta ${c.code} zrealizowana: ${c.v} zł`
     });
   }
   document.getElementById('gc').addEventListener('click', e => { const b = e.target.closest('[data-code]'); if (b) redeem(b.dataset.code); });
   document.getElementById('gcform').addEventListener('submit', e => { e.preventDefault(); redeem(document.getElementById('gccode').value); });
+
+  // --- closed days: Mock "kasa.dni" = { "2026-10-17": { t, kto, u, g, tx, ruch, powinno, policzono, roznica, lok } or { otwarty: true, powod } after "Otwórz ponownie" }
+  const RO = 'Dzień jest zamknięty. Właścicielka może go otworzyć ponownie.';
+  const dni = () => Mock.get('kasa.dni', {}) || {};
+  const ro = () => { const x = dni()[Mock.iso(Mock.dzien(0))]; return x && !x.otwarty ? x : null; };
+  const wlascicielka = () => ((Mock.get('studioUser', null) || {}).rola || 'właścicielka') === 'właścicielka';
+  const lokN = () => (PS.lokalizacje()[+Mock.get('lokalizacja', 0) || 0] || {}).n || 'Studio Malwa';
+  // sample history for past days (Sunday closed), so dates follow the pinned date: 5 days ago +5 zł, 13 days ago −10 zł, 8 days ago not closed
+  const T0 = [['9:00', 'Ewa P.', 'Hybryda jednolita', 140], ['10:30', 'Celina M.', 'Przedłużanie, french', 240], ['12:15', 'Iza N.', 'Rzęsy 1:1 · uzupełnienie', 150], ['14:00', 'Marta G.', 'Henna + regulacja', 70],
+    ['15:30', 'Basia W.', 'Pakiet 5× hybryda (karnet)', 600], ['17:00', 'Ola K.', 'Żel na naturalnej płytce', 170], ['18:15', 'Natalia W.', 'Uzupełnienie żelu', 180]], MET = ['gotówka', 'karta', 'BLIK'];
+  function probka(d) {
+    if (!d.getDay()) return null;
+    const n = Mock.odDzis(d), s = d.getDate() * 7 + d.getMonth(), r = n === -5 ? 5 : n === -13 ? -10 : 0;
+    const T = T0.filter((x, i) => !i || (s * (i + 2)) % 5 > 1).map((x, i) => ({ t: x[0], k: x[1], o: x[2], v: x[3], m: i ? MET[(s + i * i) % 3] : 'gotówka' }));
+    const R = n === -5 ? [{ typ: 'wypłata', v: 30, o: 'kwiaty na recepcję', t: '12:00' }] : [];
+    const g = T.filter(x => x.m === 'gotówka').reduce((a, x) => a + x.v, 0), powinno = FUND + g - R.reduce((a, x) => a + x.v, 0);
+    return { tx: T, ruch: R, u: T.reduce((a, x) => a + x.v, 0), g, powinno, policzono: powinno + r, roznica: r, otwarty: n === -8, kto: n % 2 ? 'Joanna M.' : 'Magda', t: (n % 2 ? '20:' : '19:') + (20 + -n % 40), lok: 'Studio Malwa – Centrum' };
+  }
+  console.assert(probka(new Date(2026, 9, 18)) === null && probka(Mock.dzien(-1)).u === probka(Mock.dzien(-1)).tx.reduce((a, x) => a + x.v, 0), 'kasa probka');
+  // a day of the till: null in the future and on closed Sundays; zam = closed (read-only)
+  function dzienKasy(d) {
+    const n = Mock.odDzis(d); if (n > 0) return null;
+    const x = dni()[Mock.iso(d)];
+    if (x && !x.otwarty) return { ...x, zam: true };
+    const p = n ? probka(d) : dzis();
+    return p && { ...p, zam: !n || x ? false : !p.otwarty };
+  }
+  const kto = () => { const n = ((Mock.get('studioUser', null) || {}).imie || 'Joanna Malec').split(/\s+/); return n[1] ? `${n[0]} ${n[1][0]}.` : n[0]; };
+  function zamknij(d) {
+    const x = dzienKasy(d);
+    PS.modal({
+      title: 'Zamknij dzień' + (Mock.odDzis(d) ? ': ' + Mock.dlugo(d) : ''), ok: 'Zamknij dzień', cls: 'dark',
+      body: `<div class="p-box"><span>W szufladzie powinno być</span><b>${zl(x.powinno)}</b></div><label class="p-lab">Policzone w szufladzie (zł)<input class="p-in" type="number" min="0" name="c" required value="${x.powinno}"></label><span class="p-mut">Różnicę zapiszemy w raporcie dnia. Zamknięty dzień jest tylko do odczytu.</span>`,
+      onOk: f => { const c = +f.c.value; Mock.set('kasa.dni', { ...dni(), [Mock.iso(d)]: { t: now(), kto: kto(), u: x.u, g: x.g, tx: x.tx, ruch: x.ruch, powinno: x.powinno, policzono: c, roznica: c - x.powinno, lok: lokN() } }); render(); },
+      toast: 'Dzień zamknięty, raport zapisany'
+    });
+  }
+  function otworz(d) {
+    PS.modal({
+      title: 'Otwórz ponownie: ' + Mock.dlugo(d), ok: 'Otwórz ponownie', cls: 'dark',
+      body: `<label class="p-lab">Powód (trafi do dziennika zmian)<input class="p-in" name="p" required maxlength="120" placeholder="np. pomyłka w metodzie płatności"></label><span class="p-mut">Po poprawkach zamknij dzień jeszcze raz.</span>`,
+      onOk: f => { const p = f.p.value.trim(); if (!p) return false; Mock.set('kasa.dni', { ...dni(), [Mock.iso(d)]: { otwarty: true, powod: p } }); PS.log(`otworzyła ponownie dzień ${Mock.dm(d)} w kasie: ${p}`); render(); },
+      toast: 'Dzień otwarty ponownie'
+    });
+  }
+  const szuf = x => !x.zam ? '<span class="p-badge warn">niezamknięty</span>' : x.roznica ? `<span class="p-badge warn">${rozn(x.roznica)}</span>` : '<span class="p-badge ok">zgadza się</span>';
+  const rozn = r => `${r > 0 ? '+' : r < 0 ? '−' : ''}${Math.abs(r)} zł`;
+  function raportHtml(d, x) {
+    return `<span class="p-mut">${x.zam ? `Zamknęła ${E(x.kto)} o ${E(x.t)} · ${E(x.lok || lokN())} · tylko do odczytu` : `${E(lokN())} · dzień niezamknięty`}</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">${[['Utarg', zl(x.u)], ['Gotówka', zl(x.g)], ['Karta i BLIK', zl(x.u - x.g)], ['Szuflada', x.zam ? rozn(x.roznica) : '—']].map(([a, b]) => `<div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">${a}</span><b>${b}</b></div>`).join('')}</div>
+      <div class="p-tw"><table class="p-tbl" style="min-width:460px"><thead><tr><th>Godz.</th><th>Klientka</th><th>Za co</th><th>Metoda</th><th style="text-align:right">Kwota</th></tr></thead><tbody>${x.tx.map(t => `<tr><td>${E(t.t)}</td><td>${E(t.k)}</td><td>${E(t.o)}</td><td>${E(t.m)}</td><td style="text-align:right">${zl(t.v)}</td></tr>`).join('') || '<tr><td colspan="5" class="p-mut">Brak transakcji</td></tr>'}</tbody></table></div>
+      <div class="p-box" style="flex-direction:column;align-items:flex-start;gap:4px"><span><b>Szuflada:</b> powinno być ${zl(x.powinno)}${x.zam ? `, policzono ${zl(x.policzono)} (${rozn(x.roznica)})` : ''}</span><span class="p-mut">Fundusz startowy ${FUND} zł${(x.ruch || []).map(r => ` · ${r.typ} ${r.v} zł „${E(r.o)}”`).join('')}</span></div>`;
+  }
+  // print through a hidden frame, so only the report is printed ("Zapisz jako PDF" in the print window gives the PDF), as in formularze.html
+  function drukuj(d, x) {
+    const fr = document.createElement('iframe'); fr.style.cssText = 'position:fixed;width:0;height:0;border:0';
+    fr.srcdoc = `<!doctype html><html lang="pl"><meta charset="utf-8"><title>Raport dnia ${Mock.iso(d)}</title><style>body{margin:20mm;font:13px/1.5 'DM Sans',sans-serif;color:#1E1A1D;display:flex;flex-direction:column;gap:12px}.p-box{padding:8px 10px;border:1px solid #E4D9DE;border-radius:8px;display:flex}.p-mut{color:#625860;font-size:12px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:6px;border-bottom:1px solid #E4D9DE}</style><body><h2 style="margin:0">Raport dnia: ${E(Mock.dlugo(d))}</h2>${raportHtml(d, x)}</body></html>`;
+    fr.onload = () => { fr.contentWindow.print(); setTimeout(() => fr.remove(), 1000); };
+    document.body.append(fr);
+  }
+  let mies = new Date(Mock.dzien(0).getFullYear(), Mock.dzien(0).getMonth(), 1), sel = null;
+  function raport(d) {
+    const x = dzienKasy(d); if (!x) return;
+    sel = Mock.iso(d); renderDni();
+    const lewy = x.zam ? (wlascicielka() ? '<button type="button" class="p-btn" data-k="ot">Otwórz ponownie</button>' : '<span></span>') : Mock.odDzis(d) ? '<button type="button" class="p-btn dark" data-k="zam">Zamknij teraz</button>' : '<span></span>';
+    const dl = PS.modal({ title: 'Raport dnia: ' + Mock.dlugo(d).toLowerCase(), noOk: true,
+      body: raportHtml(d, x) + `<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">${lewy}<span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="p-btn" data-k="dr">Drukuj</button><button type="button" class="p-btn pri" data-k="pdf">Pobierz PDF</button></span></div>`,
+      onOpen: (f, dlg) => f.addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (!b) return;
+        if (b.dataset.k === 'dr' || b.dataset.k === 'pdf') { drukuj(d, x); if (b.dataset.k === 'pdf') Mock.toast('W oknie druku wybierz „Zapisz jako PDF”'); }
+        if (b.dataset.k === 'ot') { dlg.close(); otworz(d); }
+        if (b.dataset.k === 'zam') { dlg.close(); zamknij(d); } }) });
+    dl.style.width = 'min(640px, calc(100% - 32px))';
+  }
+  const MIESW = ['w styczniu', 'w lutym', 'w marcu', 'w kwietniu', 'w maju', 'w czerwcu', 'w lipcu', 'w sierpniu', 'we wrześniu', 'w październiku', 'w listopadzie', 'w grudniu'];
+  const dniMies = () => { const out = [], ost = new Date(mies.getFullYear(), mies.getMonth() + 1, 0).getDate(); for (let i = 1; i <= ost; i++) out.push(new Date(mies.getFullYear(), mies.getMonth(), i)); return out; };
+  // days of the shown month that count: past days with data and today once closed
+  const liczone = () => dniMies().map(d => ({ d, n: Mock.odDzis(d), x: dzienKasy(d) })).filter(o => o.x && (o.n < 0 || o.x.zam));
+  function renderDni() {
+    const L = dniMies().map(d => ({ d, n: Mock.odDzis(d), x: dzienKasy(d) }));
+    document.getElementById('kz-m').textContent = `${Mock.MIES[mies.getMonth()]} ${mies.getFullYear()}`;
+    document.getElementById('kz-next').disabled = L[L.length - 1].n >= 0;
+    document.getElementById('kz-cal').innerHTML = ['pn', 'wt', 'śr', 'cz', 'pt', 'sb', 'nd'].map(x => `<span style="font-size:12px;color:#625860;text-align:center">${x}</span>`).join('') + '<span></span>'.repeat(Mock.weekday(L[0].d)) +
+      L.map(({ d, n, x }) => { const zle = x && (!x.zam || x.roznica), bg = !n ? '#9E1F50' : n > 0 ? '#fff' : !x ? '#FAF6F8' : zle ? '#FFF1E0' : '#E7F3EC', col = !n ? '#fff' : n > 0 || !x ? '#B9AEB4' : zle ? '#8A3B12' : '#1F6B47';
+        const t = !n ? 'dziś' : n > 0 ? '' : !x ? 'nieczynne' : !x.zam ? 'otwarty' : Math.round(x.u / 10) * 10 + ' zł';
+        return `<button type="button" style="background:${bg};color:${col}" data-d="${Mock.iso(d)}" aria-pressed="${sel === Mock.iso(d)}"${x ? '' : ' disabled'} aria-label="${d.getDate()} ${Mock.MIESD[d.getMonth()]}: ${t || 'jeszcze nie było'}"><b style="font-size:14px">${d.getDate()}</b><span>${t}</span></button>`; }).join('');
+    const Z = liczone(), sum = f => Z.reduce((a, o) => a + f(o.x), 0), nz = Z.filter(o => !o.x.zam).length;
+    document.getElementById('kz-sum').innerHTML = [['Utarg ' + MIESW[mies.getMonth()], zl(sum(x => x.u)), ''], ['Różnice w szufladzie', rozn(sum(x => x.zam ? x.roznica : 0)), ''], ['Niezamknięte dni', nz, nz ? 'color:#8A3B12' : '']]
+      .map(([a, b, c]) => `<div class="p-box" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="p-mut">${a}</span><b style="font-size:20px;${c}">${b}</b></div>`).join('');
+    document.getElementById('kz-l').innerHTML = Z.reverse().slice(0, 7).map(({ d, x }) => `<tr><td>${Mock.SKR[d.getDay()]}., ${Mock.dm(d)}</td><td style="text-align:right"><b>${zl(x.u)}</b></td><td style="text-align:right">${zl(x.g)}</td><td style="text-align:right">${zl(x.u - x.g)}</td><td>${szuf(x)}</td><td class="p-mut">${x.zam ? E(x.kto) + ', ' + E(x.t) : '—'}</td><td><button type="button" class="p-btn sm" data-d="${Mock.iso(d)}"${x.zam ? '' : ' data-zam'}>${x.zam ? 'Raport' : 'Zamknij teraz'}</button></td></tr>`).join('') || '<tr><td colspan="7" class="p-mut">W tym miesiącu nie ma jeszcze zamkniętych dni.</td></tr>';
+  }
+  const naDate = s => { const [y, m, d] = s.split('-'); return new Date(+y, m - 1, +d); };
+  document.getElementById('kz-cal').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) raport(naDate(b.dataset.d)); });
+  document.getElementById('kz-l').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) (b.hasAttribute('data-zam') ? zamknij : raport)(naDate(b.dataset.d)); });
+  document.getElementById('kz-prev').addEventListener('click', () => { mies = new Date(mies.getFullYear(), mies.getMonth() - 1, 1); renderDni(); });
+  document.getElementById('kz-next').addEventListener('click', () => { mies = new Date(mies.getFullYear(), mies.getMonth() + 1, 1); renderDni(); });
+  document.getElementById('kz-csv').addEventListener('click', () => {
+    const w = liczone(), csv = '﻿' + [['Dzień', 'Utarg', 'Gotówka', 'Karta i BLIK', 'Szuflada: różnica', 'Stan', 'Zamknęła', 'Godzina']]
+      .concat(w.map(({ d, x }) => [Mock.iso(d), x.u, x.g, x.u - x.g, x.zam ? x.roznica : '', x.zam ? 'zamknięty' : 'niezamknięty', x.zam ? x.kto : '', x.zam ? x.t : '']))
+      .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })), download: `kasa-${Mock.iso(mies).slice(0, 7)}.csv` });
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); Mock.toast(`Pobrano zestawienie: ${w.length} dni`);
+  });
   render();
   window.addEventListener('storage', render);
 });

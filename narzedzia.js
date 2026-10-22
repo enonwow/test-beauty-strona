@@ -5,9 +5,10 @@ const p2 = n => String(n).padStart(2, '0');
 const iso = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
 const naDzien = n => { let d = Mock.dzien(n); while (d.getDay() === 0) d = Mock.dzien(++n); return d; }; // n days ahead, skipping Sunday (closed)
 const hm = m => `${Math.floor(m / 60)}:${p2(m % 60)}`;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); // names from registration forms
 
 // roles: the same keys as ROLES in panel-shell.js (the panel hides menu items by role)
-const ROLE = [['właścicielka', 'Właścicielka'], ['menedzerka', 'Menedżerka'], ['recepcja', 'Recepcja'], ['stylistka-plus', 'Stylistka z dostępem rozszerzonym'], ['stylistka', 'Stylistka podstawowa']];
+const ROLE = Mock.get('role', null)?.map(r => [r.k, r.n]) || [['właścicielka', 'Właścicielka'], ['menedzerka', 'Menedżerka'], ['recepcja', 'Recepcja'], ['stylistka-plus', 'Stylistka z dostępem rozszerzonym'], ['stylistka', 'Stylistka podstawowa']]; // edited roles from zespol.html, else the defaults
 
 // a visit as termin.html saves it
 function wizyta(d, od, min, extra = {}) {
@@ -61,8 +62,28 @@ const SCEN = [
   ['Studio: dziś dwie rezerwacje online', 'W kalendarzu: Ola z fakturą (potwierdziła) i Ewa z polecenia (czeka na potwierdzenie).', () => {
     Mock.set('visits', [
       wizyta(Mock.dzien(0), 17 * 60, 60, { klientka: 'Ola', kontakt: { imie: 'Ola', tel: '600200300' }, stylistka: 'Ewelina', potwierdzona: true, faktura: { nip: '1234563218', firma: 'Ola Beauty' } }),
-      wizyta(Mock.dzien(0), 13 * 60 + 5, 45, { klientka: 'Ewa', kontakt: { imie: 'Ewa', tel: '600300400' }, usluga: 'Zdjęcie hybrydy', opis: 'Zdjęcie hybrydy', cena: 60, cenaMin: 60, cenaMax: 60, polecenie: { studio: 'Studio Malwa', od: 'Kasia' } })
-    ]); return 'panel.html';
+      wizyta(Mock.dzien(0), 13 * 60 + 15, 15, { klientka: 'Ewa', kontakt: { imie: 'Ewa', tel: '600300400' }, usluga: 'Zdjęcie hybrydy', opis: 'Zdjęcie hybrydy', cena: 20, cenaMin: 20, cenaMax: 20, polecenie: { studio: 'Studio Malwa', od: 'Kasia' } })
+    ]); Mock.set('lokalizacja', 0); return 'panel.html'; // the visits belong to the first location
+  }],
+  // Etap A
+  ['Płatność nieudana', 'Wizyta za 2 dni, studio bierze całość z góry, a płatność się nie udała. W „Moich wizytach” ramka z „Ponów płatność”.', () => {
+    Mock.setPlatnoscTryb('calosc'); Mock.set('user', { imie: 'Kasia', tel: '600100200', zalogowana: true });
+    const t = Mock.teraz(), za30 = new Date(t.getTime() + 30 * 60000);
+    const v = wizyta(naDzien(2), 11 * 60 + 15, 75, { platnosc: { status: 'nieudana', kwota: 140, rodzaj: 'calosc', metoda: 'BLIK', do: hm(za30.getHours() * 60 + za30.getMinutes()) } });
+    Mock.set('visits', [v]); Mock.set('booking', doBooking(v)); return 'wizyty.html';
+  }],
+  ['Przeterminowana partia', 'Magazyn z partiami: „Top bez przemywania” jest po terminie (czerwony komunikat), dwie partie kończą się w ciągu 30 dni. W panelu przy wizycie jej nie wybierzesz.', () => {
+    Mock.set('magazyn', null); Mock.set('studioUser', null); return 'magazyn.html';
+  }],
+  ['Stanowisko zajęte', 'Kasia ma na pojutrze 11:15 hennę brwi dla siostry, na leżance (Stanowisko 2). Przy rezerwacji rzęs tego dnia godzina 11:15 znika.', () => {
+    const dn = []; for (let n = 0; dn.length < 2; n++) if (Mock.dzien(n).getDay() !== 0) dn.push(n); // the second day termin.html offers
+    Mock.set('cennik.stan', null); Mock.set('zespol.stan', null); Mock.set('user', { imie: 'Kasia', tel: '600100200', zalogowana: true });
+    Mock.set('visits', [wizyta(Mock.dzien(dn[1]), 11 * 60 + 15, 60, { kategoria: 'Brwi', usluga: 'Henna + regulacja', opis: 'Henna + regulacja brwi', cena: 70, cenaMin: 70, cenaMax: 70, stylistka: 'Ewelina', dlaKogo: { imie: 'Ola', tel: '' }, klientka: 'Ola' })]);
+    Mock.set('koszyk', null); Mock.set('booking', { kategoria: 'Rzęsy', usluga: 'Uzupełnienie 1:1', opis: 'Uzupełnienie rzęs 1:1', cena: 150, cenaMin: 150, cenaMax: 150, czas: 90, czasTekst: '1 h 30 min', studio: 'Studio Malwa', kat: 'rzesy' });
+    return 'termin.html';
+  }],
+  ['Zadania zespołu', 'Zakładka „Zadania” w Zespole: ogłoszenie od właścicielki, trzy zadania do zrobienia i jedno zrobione.', () => {
+    Mock.set('zadania', null); Mock.set('studioUser', null); return 'zespol.html#zadania';
   }]
 ];
 
@@ -84,7 +105,11 @@ const CSS = `
 #narz .chk{display:flex;gap:10px;align-items:center;min-height:44px}
 #narz .chk input{width:20px;height:20px;accent-color:#9E1F50;flex:none}
 #narz .mut{color:#625860;font-size:12px;line-height:1.45;margin:0}
-#narz .stan{padding:8px 12px;border-radius:10px;background:#FAF6F8;font-size:14px}`;
+#narz .stan{padding:8px 12px;border-radius:10px;background:#FAF6F8;font-size:14px}
+#narz .kt{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;border:1px solid #E4D9DE;border-radius:10px}
+#narz .kt span{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:2px;overflow-wrap:anywhere}
+#narz .kt small{color:#625860;font-size:12px;line-height:1.45}
+#narz .kt code{font-size:12px;color:#1E1A1D;background:#FAF6F8;padding:1px 4px;border-radius:4px}`;
 
 // a scenario opened from a test link (?scen=N): prepares the data and returns the page to open
 export function scenariusz(i) { const s = SCEN[i]; return s ? s[2]() : null; }
@@ -97,7 +122,7 @@ export function otworz() {
     d = document.createElement('dialog'); d.id = 'narz'; d.setAttribute('aria-labelledby', 'narz-t'); document.body.append(d);
   }
   const t = Mock.teraz(), test = Mock.testowa(), user = Mock.get('studioUser', null) || {}, dod = Mock.get('dodatki', {}) || {};
-  const hhOn = Mock.happyHours().some(h => h.on);
+  const hhOn = Mock.happyHours().some(h => h.on), konta = Mock.konta();
   d.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2 id="narz-t">Narzędzia makiety</h2><button type="button" class="b" data-close aria-label="Zamknij">✕</button></div>
     <p class="mut">Do testów i pokazów. Zmiany działają tylko w tej przeglądarce i nie trafiają do nikogo.</p>
@@ -117,6 +142,13 @@ export function otworz() {
         <button type="button" class="b" id="n-teraz"${test ? '' : ' disabled'}>Wróć do prawdziwej daty</button>
       </div>
     </section>
+    <section aria-labelledby="n-konta">
+      <h3 id="n-konta">Konta testowe</h3>
+      <p class="mut">Do logowania klientki (Zaloguj się) i studia (panel). Konta z rejestracji też tu trafiają.</p>
+      ${konta.map((a, i) => `<div class="kt"><span><b>${esc(a.imie)}</b><small>${a.typ === 'studio' ? `Panel studia · ${esc((ROLE.find(r => r[0] === a.rola) || [, a.rola])[1])}` : 'Klientka'}</small>
+        <small>Login: ${[a.email, a.tel].filter(Boolean).map(x => `<code>${esc(x)}</code>`).join(' lub ')} · Hasło: ${a.haslo ? (a.przyklad ? `<code>${esc(a.haslo)}</code>` : 'ustawione przy rejestracji (nie pokazujemy)') : 'brak, logowanie kodem SMS'}</small></span>
+        <button type="button" class="b" data-kt="${i}">Zaloguj jako</button></div>`).join('')}
+    </section>
     <section aria-labelledby="n-scen">
       <h3 id="n-scen">Gotowe scenariusze</h3>
       <p class="mut">Każdy ustawia tylko potrzebne dane i otwiera stronę, na której to widać.</p>
@@ -130,12 +162,12 @@ export function otworz() {
     <section aria-labelledby="n-dod">
       <h3 id="n-dod">Dodatki i ustawienia studia</h3>
       <label class="chk"><input type="checkbox" id="n-podp"${dod.podpisy ? ' checked' : ''}>Podpisy elektroniczne (zgody, podpis na tablecie i na pliku)</label>
-      <label class="chk"><input type="checkbox" id="n-zal"${Mock.get('studioZadatek', true) ? ' checked' : ''}>Studio wymaga zaliczki przy rezerwacji</label>
+      <label class="chk"><input type="checkbox" id="n-zal"${Mock.platnoscTryb() !== 'brak' ? ' checked' : ''}>Studio wymaga zaliczki przy rezerwacji</label>
       <label class="chk"><input type="checkbox" id="n-hh"${hhOn ? ' checked' : ''}>Happy hours włączone</label>
     </section>
     <section aria-labelledby="n-reset">
       <h3 id="n-reset">Dane makiety</h3>
-      <p class="mut">Usuwa wizyty, konto klientki, koszyk, podpisy, wiadomości i ustawienia panelu. Data testowa też wraca do prawdziwej.</p>
+      <p class="mut">Usuwa wizyty, konto klientki, konta z rejestracji, koszyk, podpisy, wiadomości i ustawienia panelu. Data testowa też wraca do prawdziwej.</p>
       <button type="button" class="b dng" id="n-wyczysc" style="align-self:flex-start">Wyczyść dane makiety</button>
     </section>
     <section aria-labelledby="n-uw">
@@ -159,12 +191,15 @@ export function otworz() {
   }));
   d.querySelector('#n-teraz').addEventListener('click', () => { Mock.ustawDzis(null); przeladuj('Wróciła prawdziwa data'); });
   d.querySelectorAll('[data-sc]').forEach(b => b.addEventListener('click', () => { const [n, , f] = SCEN[+b.dataset.sc]; przeladuj('Scenariusz: ' + n, f()); }));
+  d.querySelectorAll('[data-kt]').forEach(b => b.addEventListener('click', () => {
+    const a = konta[+b.dataset.kt]; Mock.zaloguj(a); przeladuj('Zalogowano: ' + a.imie, a.typ === 'studio' ? 'panel.html' : 'konto.html');
+  }));
   d.querySelector('#n-r-ok').addEventListener('click', () => {
     const k = d.querySelector('#n-r').value, n = ROLE.find(r => r[0] === k)[1];
     Mock.set('studioUser', { imie: `[${n}]`, email: '', rola: k }); przeladuj('Rola: ' + n, 'panel.html');
   });
   d.querySelector('#n-podp').addEventListener('change', e => { Mock.set('dodatki', { ...(Mock.get('dodatki', {}) || {}), podpisy: e.target.checked }); przeladuj(e.target.checked ? 'Podpisy włączone' : 'Podpisy wyłączone'); });
-  d.querySelector('#n-zal').addEventListener('change', e => { Mock.set('studioZadatek', e.target.checked); Mock.toast(e.target.checked ? 'Studio wymaga zaliczki' : 'Bez zaliczki'); });
+  d.querySelector('#n-zal').addEventListener('change', e => { Mock.setPlatnoscTryb(e.target.checked ? 'zaliczka' : 'brak'); Mock.toast(e.target.checked ? 'Studio wymaga zaliczki' : 'Bez zaliczki'); });
   d.querySelector('#n-hh').addEventListener('change', e => { Mock.setHappyHours(Mock.happyHours().map(h => ({ ...h, on: e.target.checked }))); przeladuj(e.target.checked ? 'Happy hours włączone' : 'Happy hours wyłączone'); });
   const w = d.querySelector('#n-wyczysc');
   w.addEventListener('click', () => { // two clicks: deleting everything needs a second look

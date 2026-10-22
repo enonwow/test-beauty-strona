@@ -5,10 +5,12 @@
     ['Dzień pracy', [['Kalendarz', 'panel.html'], ['Wyceny', 'wyceny.html', 'badge'], ['Wiadomości', 'wiadomosci.html'], ['Klientki', 'klientki.html']]],
     ['Sprzedaż', [['Kasa', 'kasa.html'], ['Karnety i pakiety', 'karnety.html'], ['Promocje', 'promocje.html'], ['Marketing', 'marketing.html']]],
     ['Studio', [['Cennik i kreator', 'cennik.html'], ['Zespół i grafik', 'zespol.html'], ['Magazyn', 'magazyn.html'], ['Profil studia', 'profil-studia.html'], ['Formularze i zgody', 'formularze.html'], ['Opinie', 'opinie-studio.html']]],
-    ['', [['Raporty', 'raporty.html'], ['Ustawienia', 'ustawienia.html']]]
+    ['Zarządzanie', [['Raporty', 'raporty.html'], ['Ustawienia', 'ustawienia.html']]]
   ];
   // Prośby o wycenę ze stałych przykładów; wyceny.html i panel.html czytają to samo.
-  const QUOTES = [
+  const QUOTES = Mock.lok() === 1 ? [ // the hair location gets hair requests; a location added in the profile starts empty
+    { id: 'm1', klientka: 'Zosia R.', opis: 'Balejaż jak na zdjęciu, włosy do łopatek', zrodlo: 'inspiracja z Pinteresta', kolor: '#B08A5B', foto: 'zdjecia/wlosy-3-mini.jpg' }
+  ] : Mock.lok() ? [] : [
     { id: 'q1', klientka: 'Felicja R.', opis: 'Takie jak na zdjęciu, ale krótsze', zrodlo: 'inspiracja z Instagrama', kolor: '#C98C8C', foto: 'zdjecia/dlon-4-mini.jpg' },
     { id: 'q2', klientka: 'Hania Z.', opis: 'Francuz z drobnymi cyrkoniami, długość L', zrodlo: 'zdjęcie ze strony studia', kolor: '#3E2A4A', foto: 'zdjecia/styl-micro-french.jpg' }
   ];
@@ -54,7 +56,7 @@ textarea.p-in{padding:10px 12px;resize:vertical}
 .p-banner{padding:12px 14px;border-radius:12px;background:#E6F2EC;color:#1F6B47;font-weight:700}
 .p-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .pn{flex:1 1 220px;max-width:260px;box-sizing:border-box;padding:24px 16px;background:#fff;border-right:1px solid #F0E8EC;display:flex;flex-direction:column;gap:2px}
-.pn-g{padding:14px 12px 4px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#625860}
+.pn-g{margin-top:14px;padding:16px 12px 6px;border-top:1px solid #EADDE3;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9E1F50}
 .pn-a{min-height:44px;padding:0 12px;border-radius:10px;color:#1E1A1D;text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box}
 .pn-a:hover{background:#FAF6F8;color:#1E1A1D}
 .pn-a[aria-current]{background:#F6EDF1;font-weight:700}
@@ -73,13 +75,24 @@ textarea.p-in{padding:10px 12px;resize:vertical}
 @media (max-width:1023px){main button,aside button,dialog button,main select,dialog select,main input:not([type=checkbox]):not([type=radio]),dialog input:not([type=checkbox]):not([type=radio]),main a.p-btn,main a[style*=min-height]{min-height:44px !important}main button[aria-label]{min-width:44px !important}}
 .pn-ntf{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;background:#FAF6F8;text-decoration:none;color:#1E1A1D}
 .pn-ntf.new{background:#F6EDF1}
-@media (max-width:1023px){.pn{max-width:none;flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:10px 12px;border-right:0;border-bottom:1px solid #F0E8EC}.pn-g{display:none}.pn-a{white-space:nowrap;flex:none}.pn-logo{display:none !important}}
+@media (max-width:1023px){.pn{max-width:none;flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:10px 12px;border-right:0;border-bottom:1px solid #F0E8EC}.pn-g{flex:none;align-self:center;width:1px;height:28px;padding:0;margin:0 8px;border:0;background:#D9C9D0;font-size:0;overflow:hidden}.pn-logo+.pn-g{display:none}.pn-a{white-space:nowrap;flex:none}.pn-logo{display:none !important}}
 dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
 
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const file = () => location.pathname.split('/').pop() || 'paznokcie.html';
 
   // Okno z formularzem. o: {title, body (html), ok, cls, toast (tekst albo fn(form)), onOk(form, dlg) -> false zostawia okno, onOpen(form, dlg), noOk}
+  // Change log (ustawienia.html shows it): moved or rejected visits, price changes, logged-out devices. { t: ISO time, kto, co }
+  const LOG_SEED = () => { const t = Mock.teraz(), m = n => new Date(t - n * 60000).toISOString();
+    return [{ t: m(35), kto: 'Magda', co: 'przeniosła wizytę: Basia W., 10:30 → 11:15' }, { t: m(150), kto: 'Joanna', co: 'zmieniła cenę: Manicure hybrydowy, 130 → 140 zł' }, { t: m(26 * 60), kto: 'Recepcja', co: 'odrzuciła rezerwację: Ela K., prośba klientki, zaliczka zwrócona' }]; };
+  const dziennik = () => Mock.get('dziennik', null) || LOG_SEED();
+  const log = co => Mock.set('dziennik', [{ t: Mock.teraz().toISOString(), kto: ((Mock.get('studioUser', {}) || {}).imie || 'Joanna').split(' ')[0], co }, ...dziennik()].slice(0, 200));
+  // "Chrome · Windows": a rough name of this browser for the device list and the SMS step
+  const urzadzenie = (ua = navigator.userAgent) => [/Edg\//.test(ua) ? 'Edge' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Przeglądarka',
+    /iPhone|iPad/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : 'komputer'].join(' · ');
+  const kiedy = x => { const d = new Date(x), o = Mock.odDzis(d), g = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+    return (o === 0 ? 'dziś' : o === -1 ? 'wczoraj' : Mock.dm(d)) + ' ' + g; };
+
   function modal(o) {
     const d = document.createElement('dialog');
     d.setAttribute('aria-label', o.title);
@@ -100,9 +113,12 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
   }
 
 
-  // Usługi do ręcznego dodawania wizyt: ceny paznokci z pricing.json, reszta przykładowa.
-  const SVC = [['Manicure hybrydowy', 'Paznokcie', 140, 75], ['Żel na naturalnej płytce', 'Paznokcie', 170, 105], ['Przedłużanie (tipsy / szablon)', 'Paznokcie', 200, 150], ['Uzupełnienie żelu', 'Paznokcie', 180, 120],
+  // Usługi do ręcznego dodawania wizyt: ceny paznokci z pricing.json, reszta przykładowa. Druga lokalizacja (Mokotów) to fryzjer.
+  const SVC = Mock.lok() === 1 ? [['Strzyżenie damskie (cena przykładowa)', 'Włosy', 120, 60], ['Modelowanie (cena przykładowa)', 'Włosy', 90, 60], ['Koloryzacja (cena przykładowa)', 'Włosy', 320, 150],
+    ['Balejaż (cena przykładowa)', 'Włosy', 450, 180], ['Keratynowe prostowanie (cena przykładowa)', 'Włosy', 380, 120]]
+    : [['Manicure hybrydowy', 'Paznokcie', 140, 75], ['Żel na naturalnej płytce', 'Paznokcie', 170, 105], ['Przedłużanie (tipsy / szablon)', 'Paznokcie', 200, 150], ['Uzupełnienie żelu', 'Paznokcie', 180, 120],
     ['Rzęsy 1:1 (cena przykładowa)', 'Rzęsy', 150, 90], ['Brwi: henna + regulacja (cena przykładowa)', 'Brwi', 70, 45]];
+  SVC.forEach(s => { const b = Mock.cennikPoz(s[1], s[0]); if (b) { s[2] = b[1]; s[3] = b[2]; } }); // prices saved in Cennik
   const SLOTS = []; for (let m = 540; m <= 1050; m += 15) SLOTS.push(`${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`);
   // "+ Wizyta": o = {days: [[etykieta, 'wt 20.10'], ...] | null, dzien, godz, stylistka, done()}; without days: today
   function visitModal(o = {}) {
@@ -111,12 +127,17 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       title: 'Nowa wizyta', ok: 'Dodaj',
       body: `<label class="p-lab">Klientka<input class="p-in" name="kl" required placeholder="Imię i nazwisko"></label>
         <label class="p-lab">Usługa<select class="p-in" name="us">${SVC.map((s, i) => `<option value="${i}">${esc(s[0])} · ${s[2]} zł</option>`).join('')}</select></label>
-        <label class="p-lab">Stylistka<select class="p-in" name="st"><option${o.stylistka === 'Ewelina' ? '' : ' selected'}>Magda</option><option${o.stylistka === 'Ewelina' ? ' selected' : ''}>Ewelina</option></select></label>
+        <label class="p-lab">Stylistka<select class="p-in" name="st">${STYL.map(s => `<option${s.n === o.stylistka ? ' selected' : ''}>${esc(s.n)}</option>`).join('')}</select></label>
         <label class="p-lab"${o.days ? '' : ' hidden'}>Dzień<select class="p-in" name="dz">${days.map(d => `<option value="${esc(d[1])}"${d[1] === o.dzien ? ' selected' : ''}>${esc(d[0])}</option>`).join('')}</select></label>
-        <label class="p-lab">Godzina<select class="p-in" name="t">${SLOTS.map(x => `<option${x === (o.godz || '10:00') ? ' selected' : ''}>${x}</option>`).join('')}</select></label>`,
+        <label class="p-lab">Godzina<select class="p-in" name="t">${SLOTS.map(x => `<option${x === (o.godz || '10:00') ? ' selected' : ''}>${x}</option>`).join('')}</select></label>
+        <p id="nw-err" role="alert" hidden style="margin:0;padding:10px 12px;border-radius:10px;background:#FDECEC;color:#A3262A;font-size:14px;line-height:1.4"></p>`,
       onOk(f) {
         const s = SVC[+f.us.value];
-        Mock.addVisit({ kategoria: s[1], usluga: s[0], opis: s[0], cena: s[2], czas: s[3], czasTekst: window.PS.min(s[3]), studio: 'Studio Malwa', stylistka: f.st.value, dzien: f.dz.value, godzina: f.t.value, klientka: f.kl.value.trim(), status: 'nadchodząca', zrodlo: 'panel' });
+        // o.check(stylistka, godzina, minuty, dzień) from the calendar: a reason when the hour is taken, '' when free
+        const why = o.check ? o.check(f.st.value, f.t.value, s[3], f.dz.value) : '';
+        const err = f.querySelector('#nw-err'); err.hidden = !why; err.textContent = why ? 'Nie można dodać: ' + why + ' Wybierz inną godzinę albo stylistkę.' : '';
+        if (why) { f.t.focus(); return false; }
+        Mock.addVisit({ kategoria: s[1], usluga: s[0], opis: s[0], cena: s[2], czas: s[3], czasTekst: window.PS.min(s[3]), studio: 'Studio Malwa', lok: Mock.lok(), stylistka: f.st.value, dzien: f.dz.value, godzina: f.t.value, klientka: f.kl.value.trim(), status: 'nadchodząca', zrodlo: 'panel' });
         if (o.done) o.done();
       },
       toast: f => `Dodano wizytę: ${f.kl.value.trim()}, ${f.t.value}`
@@ -136,6 +157,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       list.push({ id: 'rk' + r.id, t: 'Reklamacja', d: `${r.klientka} · ${r.usluga}: ${r.opis.slice(0, 50)}${r.opis.length > 50 ? '…' : ''}`, href: 'opinie-studio.html#reklamacje', isNew: true }));
     Mock.get('visits', []).filter(v => v.status === 'nadchodząca' && !v.zrodlo).slice(0, 3).forEach(v =>
       list.push({ id: 'v' + v.id, t: 'Nowa rezerwacja', d: `${v.klientka || 'Klientka online'} · ${v.opis || v.usluga || 'wizyta'} · ${[v.dzien, v.godzina].filter(Boolean).join(' ')}`, href: 'panel.html#nowe', isNew: true }));
+    notesA(list);
     list.push(
       { id: 'n1', t: 'Nowa rezerwacja', d: `Gosia L. · hybryda M · ${Mock.krotko(Mock.dzien(1))}, 9:00`, href: 'panel.html#nowe', isNew: true },
       { id: 'n2', t: 'SMS nie dotarł', d: 'Celina M. · przypomnienie na jutro 14:00 (numer poza zasięgiem)', href: 'klientki.html', isNew: true },
@@ -143,6 +165,19 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       { id: 'n4', t: 'Niski stan w magazynie', d: 'Żel budujący: zostało 2 szt.', href: 'magazyn.html', isNew: false },
       { id: 'n5', t: 'Nowa opinia', d: 'Anna K. oceniła wizytę, czeka na odpowiedź', href: 'opinie-studio.html', isNew: false });
     return list;
+  }
+  // Etap A in the bell: expired and expiring stock batches (magazyn.html), announcements and new team tasks (zespol.html, tab "Zadania")
+  function notesA(list) {
+    const kon = [];
+    Mock.magazyn().forEach(x => (x.partie || []).filter(p => !p.utyl).forEach(p => {
+      const w = Mock.waznosc(p), d = p.wazne.split('-').reverse().slice(0, 2).join('.');
+      if (w === 'przeterminowane') list.push({ id: 'exp-' + x.n + p.nr, t: 'Przeterminowana partia', d: `${x.n}, ${p.nr}: termin minął ${d}. Nie użyjesz jej na wizycie.`, href: 'magazyn.html', isNew: true });
+      if (w === 'kończy się') kon.push(`${x.n} (${d})`);
+    }));
+    if (kon.length) list.push({ id: 'exp-k' + kon.length, t: 'Kończy się termin ważności', d: kon.join(', '), href: 'magazyn.html', isNew: false });
+    const Z = Mock.zadania();
+    Z.ogl.forEach(o => list.push({ id: 'ogl-' + o.id, t: 'Ogłoszenie ' + Mock.odKogo(o.od), d: o.t, href: 'zespol.html#zadania', isNew: true }));
+    Z.lista.filter(z => z.nowe && !z.done).forEach(z => list.push({ id: 'zad-' + z.id, t: 'Nowe zadanie dla: ' + z.kto, d: z.t, href: 'zespol.html#zadania', isNew: true }));
   }
   const readIds = () => Mock.get('panel.read', []);
   const unread = () => notes().filter(n => n.isNew && !readIds().includes(n.id)).length;
@@ -172,7 +207,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
   }
 
   // Konto w makiecie: Mock "studioUser" = { imie, email, rola }. Brak = właścicielka. Menu chowa pozycje wg roli (bez blokady adresów, to makieta).
-  // ROLES to jedyne źródło prawdy: zespol.html buduje z niego listy wyboru i tabelę „kto co widzi”.
+  // Role są danymi: Mock "role" (zespol.html je edytuje), domyślnie te pięć. PS.ROLES zawsze czyta aktualne.
   const ROLES = [
     { k: 'właścicielka', n: 'Właścicielka', hide: [] },
     { k: 'menedzerka', n: 'Menedżerka', hide: ['ustawienia.html'] },
@@ -184,13 +219,12 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
   const nazwa = () => (Mock.get('profil', {}) || {}).nm || 'Studio Malwa'; // saved by onboarding.html and profil-studia.html
   const inicjaly = n => n.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
   console.assert(inicjaly('Studio Testowe') === 'ST' && inicjaly('Studio Malwa') === 'SM', 'inicjaly');
-  const roleOf = k => ROLES.find(r => r.k === k) || ROLES[0];
+  const roles = () => Mock.get('role', null) || ROLES;
+  const setRoles = l => { Mock.set('role', l); drawNav(); refresh(); };
+  const roleOf = k => roles().find(r => r.k === k) || roles()[0];
   function logout() { Mock.set('studioUser', null); Mock.toast('Wylogowano'); setTimeout(() => { location.href = 'panel-logowanie.html'; }, 500); }
 
-  function init() {
-    const st = document.createElement('style');
-    st.textContent = CSS;
-    document.head.appendChild(st);
+  function drawNav() {
     const nav = document.getElementById('panel-nav');
     if (nav) {
       const cur = nav.dataset.active || file();
@@ -198,9 +232,17 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       nav.parentElement.style.alignContent = 'flex-start'; // when the menu wraps above the content, its row must not stretch to fill the page's min-height
       nav.setAttribute('aria-label', 'Menu panelu');
       nav.innerHTML = `<div class="pn-logo" style="display:flex;gap:10px;align-items:center;padding:0 8px 12px"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">${esc(inicjaly(nazwa()))}</div><span style="font-weight:700">${esc(nazwa())}</span></div>` +
-        NAV.map(([g, items0], i) => { const items = items0.filter(it => !roleOf((studioUser() || {}).rola).hide.includes(it[1])); return (g ? `<div class="pn-g">${g}</div>` : '<div style="flex:1 1 auto"></div><hr class="p-sep" style="margin:8px 0">') +
+        NAV.map(([g, items0], i) => { const items = items0.filter(it => !roleOf((studioUser() || {}).rola).hide.includes(it[1])); return (items.length ? `<div class="pn-g">${g}</div>` : '') +
           items.map(([l, h, b]) => `<a class="pn-a" href="${h}"${h === cur ? ' aria-current="page"' : ''}>${l}${b ? '<span class="pn-n" id="pn-quotes"></span>' : ''}</a>`).join(''); }).join('');
     }
+    return nav;
+  }
+
+  function init() {
+    const st = document.createElement('style');
+    st.textContent = CSS;
+    document.head.appendChild(st);
+    const nav = drawNav();
     const main = document.querySelector('main');
     if (main && nav) {
       main.id = main.id || 'main-content'; main.tabIndex = -1; main.style.outline = 'none';
@@ -211,9 +253,13 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       bar.innerHTML = `<details class="pn-user"><summary aria-label="Konto: ${esc(u.imie || 'Joanna Malec')}, ${esc(roleOf(u.rola).n)}"><b>${esc(u.imie || 'Joanna Malec')}</b><small>${esc(roleOf(u.rola).n)}</small></summary><div class="pn-menu"><button type="button" id="pn-out">Wyloguj</button></div></details>` +
         `<button type="button" class="pn-bell" id="pn-bell" aria-label="Powiadomienia"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i></i></button>`;
       const L = lokalizacje(), wyb = Mock.get('lokalizacja', 0) || 0;
-      if (L.length > 1) bar.insertAdjacentHTML('afterbegin', `<label class="pn-lok" style="display:flex;align-items:center;gap:6px;margin-right:auto;font-size:13px;color:#625860">Lokalizacja<select id="pn-lok" class="p-in s" style="max-width:220px">${L.map((l, i) => `<option value="${i}"${i === wyb ? ' selected' : ''}>${esc(l.n)}</option>`).join('')}</select></label>`);
+      if (L.length > 1) (document.getElementById('pn-lok-slot') || bar).insertAdjacentHTML('afterbegin', `<label class="pn-lok" style="display:flex;align-items:center;gap:6px;margin-right:auto;font-size:13px;color:#625860">Lokalizacja<select id="pn-lok" class="p-in s" style="max-width:220px">${L.map((l, i) => `<option value="${i}"${i === wyb ? ' selected' : ''}>${esc(l.n)}</option>`).join('')}</select></label>`);
       main.prepend(bar);
-      const ls = bar.querySelector('#pn-lok'); if (ls) ls.addEventListener('change', () => { Mock.set('lokalizacja', +ls.value); Mock.toast('Panel: ' + L[+ls.value].n); });
+      main.style.alignContent = "flex-start"; // a wrapping main (klientki, wiadomosci) must not spread its spare height between the rows: the top bar used to jump
+      // every page reads its data for the chosen location on load, so a switch reloads it (profil-studia switches its form in place)
+      const ls = document.getElementById('pn-lok'); if (ls) ls.addEventListener('change', () => { Mock.set('lokalizacja', +ls.value);
+        if (main.hasAttribute('data-lok-live')) return Mock.toast('Panel: ' + L[+ls.value].n);
+        Mock.set('flash', 'Panel: ' + L[+ls.value].n); location.reload(); });
       bar.querySelector('.pn-bell').addEventListener('click', openBell);
       bar.querySelector('#pn-out').addEventListener('click', logout);
       const det = bar.querySelector('details');
@@ -223,7 +269,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     refresh();
     const flash = Mock.get('flash', null); // komunikat przekazany z poprzedniej strony (np. „Witaj w zespole”)
     if (flash) { Mock.set('flash', null); Mock.toast(flash); }
-    window.addEventListener('storage', refresh);
+    window.addEventListener('storage', e => { if (e.key === 'mock.role') drawNav(); refresh(); });
   }
 
   // Płatne dodatki abonamentu: Mock "dodatki" = { podpisy: bool }, domyślnie wyłączone.
@@ -258,10 +304,27 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     });
   }
 
-  // locations: shortcut: only a label in the header, the mock does not split data per location; real data would be filtered by the chosen one
-  const LOK0 = [{ n: 'Studio Malwa – Centrum', adres: 'ul. Puławska 24, Warszawa' }, { n: 'Studio Malwa – Mokotów', adres: 'ul. Puławska 24, Warszawa' }];
+  // locations: each has its own team, hours, visits, stations and cash (Mock.lok, per-location keys in mock.js); h = [od, do, zamknięte] pn…nd, none = the profile's hours
+  const LOK0 = [{ n: 'Studio Malwa – Centrum', adres: 'ul. Puławska 24, Warszawa' }, { n: 'Studio Malwa – Mokotów', adres: 'ul. Odyńca 15, Warszawa',
+    h: [['10:00', '18:00', false], ['10:00', '18:00', false], ['10:00', '18:00', false], ['10:00', '18:00', false], ['10:00', '18:00', false], ['9:00', '14:00', false], ['9:00', '14:00', true]] }];
   const lokalizacje = () => Mock.get('lokalizacje', null) || LOK0;
-  const STYL = [{ n: 'Magda', rola: 'paznokcie', c: '#9E1F50', t: '#F8EAF0' }, { n: 'Ewelina', rola: 'rzęsy, brwi, paznokcie', c: '#2F7A8C', t: '#E7F2F4' }];
-  window.PS = { STYL, lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, zl: n => `${Math.round(n)} zł`, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
+  // team of each location: colour, services [nazwa, minuty, zł] for the sample calendar, default weekly schedule (zespol.html)
+  // shortcut: a location added in the profile borrows Centrum's team; a real panel would start it with nobody
+  const ZESPOLY = [[
+    { n: 'Magda', rola: 'paznokcie', c: '#9E1F50', t: '#F8EAF0', us: [['Hybryda', 75, 140], ['Żel · french', 120, 190], ['Przedłużanie', 150, 200], ['Velvet', 110, 200]], grafik: ['9–18', '9–18', '9–18', '9–18', '9–18', '9–14', '—'] },
+    { n: 'Ewelina', rola: 'rzęsy, brwi, paznokcie', c: '#2F7A8C', t: '#E7F2F4', us: [['Rzęsy 1:1', 90, 150], ['Laminacja brwi', 90, 120], ['Brwi', 60, 70], ['Hybryda', 75, 140]], grafik: ['9–18', '9–18', '9–18', '9–18', '9–18', '9–14', '—'] }
+  ], [
+    { n: 'Ola', rola: 'strzyżenie, modelowanie', c: '#C27A12', t: '#FBF0DF', us: [['Strzyżenie', 60, 120], ['Modelowanie', 60, 90], ['Grzywka', 30, 40]], grafik: ['10–18', '10–18', '—', '10–18', '10–18', '9–14', '—'] },
+    { n: 'Natalia', rola: 'koloryzacja, keratyna', c: '#5B4BA5', t: '#EEEBF8', us: [['Koloryzacja', 150, 320], ['Balejaż', 180, 450], ['Keratyna', 120, 380]], grafik: ['10–18', '10–18', '10–18', '10–18', 'urlop', '9–14', '—'] }
+  ]];
+  const STYL = ZESPOLY[Mock.lok()] || ZESPOLY[0];
+  // arrow keys between tabs (a page with its own keyboard handling marks its tabs with data-kt)
+  document.addEventListener('keydown', e => {
+    const t = e.target.closest && e.target.closest('[role=tab]'); if (!t || t.dataset.kt !== undefined || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+    const all = [...t.parentElement.querySelectorAll('[role=tab]')], i = all.indexOf(t), n = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+    e.preventDefault(); all[n].focus(); all[n].click();
+  });
+  window.PS = { dziennik, log, kiedy, urzadzenie, STYL, lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
+  Object.defineProperty(window.PS, 'ROLES', { get: roles }); window.PS.setRoles = setRoles; // the edited roles, not the defaults
   init();
 })();

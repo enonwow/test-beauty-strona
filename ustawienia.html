@@ -22,21 +22,36 @@
       <button type="button" data-toast="Zapisano ustawienia" style="min-height: 40px; padding: 0 16px; border-radius: 10px; border: 0; background: #9E1F50; color: #FFFFFF; font: inherit; font-weight: 700">Zapisz</button>
     </div>
 
+    <section id="bezp" aria-labelledby="bz-h" style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <h2 id="bz-h" style="margin: 0; font-size: 16px; font-weight: 700">Bezpieczeństwo</h2>
+      <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 44px">Kod SMS przy logowaniu z nowego urządzenia<input id="bz-sms" type="checkbox" style="width: 20px; height: 20px; flex: none"></label>
+      <h3 style="margin: 6px 0 0; font-size: 15px; font-weight: 700">Zalogowane urządzenia</h3>
+      <div id="bz-urz" style="display: flex; flex-direction: column; gap: 8px"></div>
+      <h3 style="margin: 6px 0 0; font-size: 15px; font-weight: 700">Dziennik zmian</h3>
+      <ul id="bz-log" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px"></ul>
+      <button type="button" class="p-btn sm" id="bz-all" style="align-self: flex-start">Cały dziennik</button>
+    </section>
+
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px; align-items: start">
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
         <h2 style="margin: 0; font-size: 16px; font-weight: 700">Zasady rezerwacji online</h2>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Najwcześniej na<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>1 h przed</option><option selected>3 h przed</option><option>dzień przed</option></select></label>
         <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Najdalej do<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>4 tygodnie</option><option selected>8 tygodni</option><option>6 miesięcy</option></select></label>
-        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Przerwa między wizytami<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>0 min</option><option selected>10 min</option><option>15 min</option></select></label>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Przerwa między wizytami<select id="u-tech" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>0 min</option><option selected>10 min</option><option>15 min</option></select></label>
         <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Potwierdzam nowe rezerwacje ręcznie</label>
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
-        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Odwołania i zaliczki</h2>
-        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Bezpłatne odwołanie do<select data-toast-change="Zapisano" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>12 h przed</option><option selected>24 h przed</option><option>48 h przed</option></select></label>
-        <label style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Zaliczka od nowych klientek</label>
-        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Kwota zaliczki<input data-toast-change="Zapisano" value="30% ceny" style="min-height: 38px; width: 100px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Płatność przy rezerwacji i odwołania</h2>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span id="pl-h" style="font-weight: 700">Klientka płaci przy rezerwacji</span>
+          <div id="pl-tryb" data-choice class="p-pills" role="group" aria-labelledby="pl-h"><button type="button" class="p-pill" data-value="brak" aria-pressed="false">Nic, płaci w studiu</button><button type="button" class="p-pill" data-value="zaliczka" aria-pressed="false">Zaliczkę</button><button type="button" class="p-pill" data-value="calosc" aria-pressed="false">Całość z góry</button></div>
+          <span class="p-mut" id="pl-opis" aria-live="polite"></span>
+        </div>
+        <label style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Bezpłatne odwołanie do<select id="u-odw" style="min-height: 38px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"><option>12 h przed</option><option selected>24 h przed</option><option>48 h przed</option></select></label>
+        <label data-zal style="display: flex; gap: 10px; align-items: center"><input data-toast-change="Zapisano" type="checkbox" checked style="width: 20px; height: 20px">Zaliczka od nowych klientek</label>
+        <label data-zal style="display: flex; justify-content: space-between; align-items: center; gap: 10px">Kwota zaliczki (% ceny)<input id="u-zal" type="number" min="5" max="100" step="5" value="30" style="min-height: 38px; width: 100px; padding: 0 8px; border-radius: 8px; border: 1px solid #C9B6BF; font: inherit"></label>
         <span style="color: #625860; font-size: 12px; line-height: 1.45">Klientka widzi zasady przed płatnością, a nie dopiero przy odwołaniu. Zwrot zaliczki jest automatyczny, jeśli odwoła w terminie.</span>
       </section>
 
@@ -119,6 +134,13 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  // settings the rest of the mock reads: break after a visit (also in Cennik), free cancellation window, deposit %
+  const uT = document.getElementById('u-tech'), uO = document.getElementById('u-odw'), uZ = document.getElementById('u-zal');
+  const tech = (Mock.get('kalendarz', { techMin: 10 }) || {}).techMin ?? 10;
+  [...uT.options].forEach(o => { o.selected = parseInt(o.text) === tech; }); [...uO.options].forEach(o => { o.selected = parseInt(o.text) === Mock.odwH(); }); uZ.value = Mock.zalProc();
+  uT.addEventListener('change', () => { Mock.set('kalendarz', { ...(Mock.get('kalendarz', {}) || {}), techMin: parseInt(uT.value) }); Mock.toast(`Zapisano: przerwa po każdej wizycie ${parseInt(uT.value)} min`); });
+  uO.addEventListener('change', () => { Mock.set('ustaw.odwH', parseInt(uO.value)); Mock.toast(`Zapisano: bezpłatne odwołanie do ${parseInt(uO.value)} h przed wizytą`); });
+  uZ.addEventListener('change', () => { const v = Math.min(100, Math.max(5, Math.round(+uZ.value || 30))); uZ.value = v; Mock.set('ustaw.zalProc', v); Mock.toast(`Zapisano: zaliczka ${v}% ceny`); });
   const banner = document.getElementById('end-banner');
   const end = Mock.get('ustawienia.koniec', null);
   if (end) { banner.textContent = 'Abonament aktywny do ' + end; banner.hidden = false; }
@@ -135,6 +157,26 @@ document.addEventListener('DOMContentLoaded', () => {
       toast: 'Dodatek włączony: podpisy elektroniczne'
     });
   });
+  // --- security: SMS code on a new device, signed-in devices, change log ---
+  const E = PS.esc, sms = document.getElementById('bz-sms'), ten = PS.urzadzenie();
+  const o = (d, h, m) => { const x = Mock.dzien(d); x.setHours(h, m); return x.toISOString(); };
+  let URZ = Mock.get('bezp.urzadzenia', null) || [{ n: 'Safari · iPhone', kto: 'Magda', t: o(-1, 18, 20) }, { n: 'Tablet recepcji · Android', kto: 'Recepcja', t: o(-3, 9, 5) }];
+  const wpis = w => `<li><b>${E(PS.kiedy(w.t))}</b> · ${E(w.kto)} ${E(w.co)}</li>`;
+  const renderBz = () => {
+    const ja = (Mock.get('studioUser', {}) || {}).imie || 'Joanna Malec';
+    document.getElementById('bz-urz').innerHTML = `<div class="p-row"><span><b>${E(ten)}</b> <span class="p-mut">· to urządzenie</span><br><span class="p-mut">${E(ja)} · teraz</span></span></div>`
+      + URZ.map((u, i) => `<div class="p-row"><span><b>${E(u.n)}</b><br><span class="p-mut">${E(u.kto)} · ${E(PS.kiedy(u.t))}</span></span><button type="button" class="p-btn sm" data-out="${i}">Wyloguj</button></div>`).join('');
+    document.getElementById('bz-log').innerHTML = PS.dziennik().slice(0, 3).map(wpis).join('');
+  };
+  sms.checked = Mock.get('bezp.sms', true);
+  sms.addEventListener('change', () => { Mock.set('bezp.sms', sms.checked); PS.log(`${sms.checked ? 'włączyła' : 'wyłączyła'} kod SMS przy logowaniu z nowego urządzenia`); renderBz(); Mock.toast(sms.checked ? 'Nowe urządzenie poprosi o kod SMS' : 'Kod SMS przy nowym urządzeniu wyłączony'); });
+  document.getElementById('bz-urz').addEventListener('click', e => { const b = e.target.closest('[data-out]'); if (!b) return;
+    const u = URZ[+b.dataset.out];
+    PS.modal({ title: 'Wylogować urządzenie?', ok: 'Wyloguj', cls: 'dark', body: `<p style="margin:0;line-height:1.45">${E(u.n)} (${E(u.kto)}) zostanie wylogowane. Żeby wrócić do panelu, ta osoba zaloguje się ponownie${sms.checked ? ', z kodem SMS' : ''}.</p>`,
+      onOk: () => { URZ.splice(URZ.indexOf(u), 1); Mock.set('bezp.urzadzenia', URZ); PS.log(`wylogowała urządzenie: ${u.n}, ${u.kto}`); renderBz(); }, toast: `Wylogowano: ${u.n}` }); });
+  document.getElementById('bz-all').addEventListener('click', () => PS.modal({ title: 'Dziennik zmian', noOk: true,
+    body: `<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto">${PS.dziennik().map(wpis).join('')}</ul><span class="p-mut">Przeniesienia i odrzucenia wizyt, zmiany cen i wylogowane urządzenia.</span>` }));
+  renderBz();
   if (location.hash === '#dodatki') document.getElementById('dodatki').scrollIntoView();
   document.getElementById('cancel').addEventListener('click', () => PS.modal({
     title: 'Zrezygnować z abonamentu?', ok: 'Potwierdzam rezygnację', cls: 'dark',
@@ -153,6 +195,17 @@ document.addEventListener('DOMContentLoaded', () => {
     title: 'Przycisk „Zarezerwuj” na Facebooku', noOk: true,
     body: '<ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;line-height:1.4"><li>Otwórz stronę firmową i wybierz „Dodaj przycisk”.</li><li>Wybierz „Zarezerwuj”.</li><li>Wklej link do profilu studia z sekcji „Strona dla klientek”.</li></ol>'
   }));
+});
+</script>
+<script>
+// Etap A: payment at booking (termin.html and zadatek.html read Mock.platnoscTryb)
+document.addEventListener('DOMContentLoaded', () => {
+  // read on every paint: the % and the hours may have just been changed above
+  const OPIS = () => ({ brak: 'Klientka rezerwuje bez płacenia online i płaci w studiu po wizycie.', zaliczka: `Zaliczka: ${Mock.zalProc()}% ceny BLIK-iem, kartą albo Apple Pay. Odwołanie do ${Mock.odwH()} h przed wizytą = pełny zwrot, później studio zatrzymuje zaliczkę.`,
+    calosc: `Całość z góry: BLIK, karta, Apple Pay. Odwołanie do ${Mock.odwH()} h przed wizytą = pełny zwrot, później studio zatrzymuje zaliczkę (${Mock.zalProc()}% ceny).` });
+  const g = document.getElementById('pl-tryb'), paint = t => { g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === t))); document.getElementById('pl-opis').textContent = OPIS()[t]; document.querySelectorAll('[data-zal]').forEach(x => (x.hidden = t !== 'zaliczka')); };
+  paint(Mock.platnoscTryb());
+  g.addEventListener('mock:choice', e => { Mock.setPlatnoscTryb(e.detail.button.dataset.value); paint(e.detail.button.dataset.value); Mock.toast('Zapisano'); }); // the same toast as every other field on this page
 });
 </script>
 </body>

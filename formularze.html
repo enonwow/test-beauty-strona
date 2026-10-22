@@ -30,11 +30,12 @@
 
       <section class="p-card" aria-label="Edytor formularza" style="flex: 3 1 360px">
         <label class="p-lab">Nazwa formularza<input class="p-in" id="nm"></label>
+        <label class="p-lab">Treść dokumentu (nad pytaniami)<textarea class="p-in" id="tr" rows="3" placeholder="np. kto jest administratorem danych, w jakim celu i jak długo je przechowujemy"></textarea></label>
         <div class="p-top"><h2 class="p-h2">Pytania</h2><button type="button" class="p-btn sm" id="addq">+ Dodaj pytanie</button></div>
         <ol id="pyt" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px"></ol>
         <fieldset style="border: 0; padding: 0; margin: 0"><legend class="p-lab" style="padding: 0 0 6px">Przypisz do usług (klientka wypełnia przed pierwszą wizytą na te usługi)</legend><div id="us" style="display: flex; gap: 6px 18px; flex-wrap: wrap"></div></fieldset>
         <div id="sign" style="padding:12px;border-radius:12px;background:#FAF6F8;display:flex;flex-direction:column;gap:10px"></div>
-        <div class="p-acts"><button type="button" class="p-btn pri" id="save">Zapisz formularz</button><button type="button" class="p-btn" id="del">Usuń formularz</button></div>
+        <div class="p-acts"><button type="button" class="p-btn" id="podglad">Podgląd dokumentu</button><button type="button" class="p-btn pri" id="save">Zapisz formularz</button><button type="button" class="p-btn" id="del">Usuń formularz</button></div>
       </section>
 
       <aside class="p-card" aria-label="Podgląd formularza" style="flex: 2 1 300px; background: #FFFFFF">
@@ -61,18 +62,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const save = () => Mock.set('formularze', F);
   const f = () => F.find(x => x.id === cur) || F[0];
   const $ = id => document.getElementById(id);
+  // text above the questions; forms saved before it existed get the sample one
+  const TR0 = { f1: 'Administratorem Twoich danych jest nasze studio. Dane przetwarzamy, żeby umawiać i realizować wizyty, przez czas korzystania z usług i 3 lata po ostatniej wizycie. Masz prawo do wglądu, poprawienia i usunięcia danych.', f2: 'Odpowiedzi pomagają dobrać klej i metodę tak, żeby zabieg był bezpieczny dla Twoich oczu. Widzi je tylko zespół studia.', f3: 'Zdjęcia publikujemy bez twarzy i bez imienia. Zgodę możesz w każdej chwili wycofać.' };
+  const tr = x => x.tr ?? TR0[x.id] ?? '';
 
   function renderList() { $('lista').innerHTML = F.map(x => `<button type="button" class="p-btn" data-id="${x.id}" aria-pressed="${x.id === cur}" style="justify-content:space-between;text-align:left;${x.id === cur ? 'background:#F6EDF1;font-weight:700' : ''}"><span>${E(x.n)}</span><span class="p-mut">${x.q.length} pyt.${PS.addon('podpisy') ? ' · ' + nPodp(x.id) + ' podp.' : ''}</span></button>`).join(''); }
   function renderEditor() {
     const x = f(); if (!x) { $('nm').value = ''; $('pyt').innerHTML = ''; $('pv').innerHTML = '<span class="p-mut">Brak formularzy.</span>'; $('us').innerHTML = ''; return; }
-    cur = x.id; $('nm').value = x.n;
+    cur = x.id; $('nm').value = x.n; $('tr').value = tr(x);
     $('pyt').innerHTML = x.q.map((q, i) => `<li class="p-row" style="align-items:flex-start"><span style="flex:1;min-width:180px"><b>${i + 1}.</b> ${E(q.t)}<br><span class="p-mut">${TYP[q.y]}${q.r ? ' · wymagane' : ''}</span></span><span class="p-acts"><button type="button" class="p-btn sm" data-up="${i}" aria-label="Przesuń pytanie ${i + 1} w górę"${i ? '' : ' disabled'}>↑</button><button type="button" class="p-btn sm dng" data-rm="${i}" aria-label="Usuń pytanie ${i + 1}">Usuń</button></span></li>`).join('') || '<span class="p-mut">Brak pytań. Dodaj pierwsze.</span>';
     $('us').innerHTML = SV.map(s => `<label class="p-chk"><input type="checkbox" data-s="${E(s)}" ${x.us.includes(s) ? 'checked' : ''}>${E(s)}</label>`).join('');
     renderPv(); renderSign();
   }
-  function renderPv() {
-    const x = f(); if (!x) return;
-    $('pv').innerHTML = `<b style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px">${E(x.n)}</b>` + x.q.map((q, i) => {
+  function renderPv() { const x = f(); if (x) $('pv').innerHTML = pvHtml(x); }
+  const pvHtml = x => `<b style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px">${E(x.n)}</b>` + (tr(x) ? `<p style="margin:0;line-height:1.45">${E(tr(x))}</p>` : '') + x.q.map((q, i) => {
       const L = `${E(q.t)}${q.r ? ' *' : ''}`;
       if (q.y === 'tak') return `<fieldset style="border:0;padding:0;margin:0"><legend style="padding:0 0 4px">${L}</legend><label class="p-chk" style="display:inline-flex;margin-right:14px"><input type="radio" name="p${i}"> Tak</label><label class="p-chk" style="display:inline-flex"><input type="radio" name="p${i}"> Nie</label></fieldset>`;
       if (q.y === 'podpis') return `<label class="p-lab">${L}<span style="height:56px;border:1px dashed #A99BA2;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#625860">podpis rysikiem lub palcem</span></label>`;
@@ -81,9 +84,48 @@ document.addEventListener('DOMContentLoaded', () => {
       if (q.y === 'wybor') return `<label class="p-lab">${L}<select class="p-in"><option>Wybierz</option><option>Opcja 1</option><option>Opcja 2</option></select></label>`;
       return `<label class="p-lab">${L}<input class="p-in"></label>`;
     }).join('');
+  // the sheet for printing or PDF: studio header, text, questions with answer space, date and signature lines
+  function arkusz(x) {
+    const P = Mock.get('profil', {}) || {}, lok = PS.lokalizacje()[+Mock.get('lokalizacja', 0) || 0] || {};
+    const pole = q => q.y === 'tak' ? '<span style="white-space:nowrap">☐ Tak &nbsp; ☐ Nie</span>' : q.y === 'dlugi' ? '' : '<span style="flex:0 0 40%;border-bottom:1px dotted #625860"></span>';
+    return `<div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #E4D9DE;padding-bottom:10px"><span><b style="font-size:15px">${E(P.nm || 'Studio Malwa')}</b><br>${E(lok.adres || P.ad || '')}</span><span style="color:#625860;text-align:right">wzór z ${Mock.dzien(0).toLocaleDateString('pl-PL')}</span></div>
+      <h3 style="margin:0;text-align:center;font-size:17px">${E(x.n)}</h3>
+      <span>Imię i nazwisko: ……………………………………… &nbsp; Telefon: ……………………</span>
+      ${tr(x) ? `<p style="margin:0">${E(tr(x))}</p>` : ''}
+      ${x.q.filter(q => q.y !== 'podpis').map((q, i) => `<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap"><span style="flex:1 1 55%"><b>${i + 1}.</b> ${E(q.t)}${q.r ? ' <span style="color:#A3262A">*</span>' : ''}</span>${pole(q)}</div>${q.y === 'dlugi' ? '<span style="display:block;height:44px;border-bottom:1px dotted #625860"></span>' : ''}`).join('')}
+      <div style="display:flex;justify-content:space-between;gap:20px;margin-top:28px"><span style="flex:1;border-top:1px solid #1E1A1D;padding-top:4px;text-align:center;color:#625860">data</span><span style="flex:2;border-top:1px solid #1E1A1D;padding-top:4px;text-align:center;color:#625860">podpis klientki</span></div>
+      ${x.q.some(q => q.r) ? '<span style="color:#625860;font-size:11px">* pole wymagane</span>' : ''}`;
   }
+  const ARK = 'display:flex;flex-direction:column;gap:14px;font:13px/1.55 \'DM Sans\',sans-serif;color:#1E1A1D';
+  // print through a hidden frame, so only the sheet is printed ("Zapisz jako PDF" in the print window gives the PDF)
+  function drukuj(x) {
+    const fr = document.createElement('iframe'); fr.style.cssText = 'position:fixed;width:0;height:0;border:0';
+    fr.srcdoc = `<!doctype html><html lang="pl"><meta charset="utf-8"><title>${E(x.n)}</title><body style="margin:24mm 20mm"><div style="${ARK}">${arkusz(x)}</div></body></html>`;
+    fr.onload = () => { fr.contentWindow.print(); setTimeout(() => fr.remove(), 1000); };
+    document.body.append(fr);
+  }
+  $('podglad').addEventListener('click', () => {
+    const x = f(); if (!x) return;
+    PS.modal({
+      title: 'Podgląd dokumentu: ' + x.n, ok: 'Drukuj',
+      body: `<div class="p-pills" role="group" aria-label="Widok"><button type="button" class="p-pill" data-w="druk" aria-pressed="true">Wydruk / PDF</button><button type="button" class="p-pill" data-w="tel" aria-pressed="false">Telefon klientki</button></div>
+        <div style="background:#F4EEF1;border-radius:12px;padding:16px;max-height:60vh;overflow:auto">
+          <div data-v="druk" style="background:#fff;margin:0 auto;max-width:560px;padding:32px 36px;box-shadow:0 2px 10px rgba(30,10,18,.12);${ARK}">${arkusz(x)}</div>
+          <div data-v="tel" style="background:#fff;margin:0 auto;max-width:360px;padding:20px;border-radius:20px;box-shadow:0 2px 10px rgba(30,10,18,.12);display:none;flex-direction:column;gap:12px">${pvHtml(x)}</div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="p-mut" style="font-size:13px;flex:1 1 100%">Wypróbuj podpis tak, jak zobaczy go klientka. Próba nie trafi do podpisanych dokumentów.</span><button type="button" class="p-btn dark" data-try>Wypróbuj podpis</button><button type="button" class="p-btn" data-pdf>Pobierz PDF</button></div>`,
+      onOpen: (fm, d) => {
+        d.style.width = 'min(720px, calc(100vw - 32px))';
+        fm.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => { fm.querySelectorAll('[data-w]').forEach(y => y.setAttribute('aria-pressed', y === b)); fm.querySelectorAll('[data-v]').forEach(v => { v.style.display = v.dataset.v === b.dataset.w ? 'flex' : 'none'; }); }));
+        fm.querySelector('[data-pdf]').addEventListener('click', () => { drukuj(x); Mock.toast('W oknie drukowania wybierz „Zapisz jako PDF”'); });
+        // a copy of the form as it is now (unsaved edits too) in a new tab, so the editor keeps its state
+        fm.querySelector('[data-try]').addEventListener('click', () => { Mock.set('formularze.proba', { ...x, tr: tr(x) }); window.open('podpis.html?tryb=proba', '_blank'); });
+      },
+      onOk: () => { drukuj(x); return false; }
+    });
+  });
   $('lista').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b) { cur = b.dataset.id; renderList(); renderEditor(); } });
   $('nm').addEventListener('input', e => { f().n = e.target.value; renderList(); renderPv(); });
+  $('tr').addEventListener('input', e => { f().tr = e.target.value; renderPv(); });
   $('pyt').addEventListener('click', e => {
     const u = e.target.closest('[data-up]'), r = e.target.closest('[data-rm]'), q = f().q;
     if (u) { const i = +u.dataset.up; [q[i - 1], q[i]] = [q[i], q[i - 1]]; renderEditor(); renderList(); }

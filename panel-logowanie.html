@@ -18,6 +18,7 @@
 .lg-lab{display:flex;flex-direction:column;gap:6px;font-weight:500}
 .lg-btn{min-height:52px;padding:0 16px;border-radius:12px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer}.lg-btn:hover{background:#7A173D}
 .lg-link{min-height:44px;padding:0 4px;border:0;background:none;color:#9E1F50;font:inherit;text-decoration:underline;cursor:pointer;align-self:flex-start}
+.lg-link:disabled{color:#625860;text-decoration:none;cursor:default}
 .lg-tab{flex:1;min-height:44px;border:0;border-radius:10px;background:transparent;color:#1E1A1D;font:inherit;cursor:pointer}
 .lg-tab[aria-selected="true"]{background:#fff;font-weight:700;box-shadow:0 1px 3px rgba(30,26,29,.15)}
 :focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
@@ -27,22 +28,22 @@
 <div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
 <main class="wrap">
   <div class="card">
-    <div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">NS</div><span style="font-weight:700">Studio Malwa</span></div>
-    <h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:26px">Zaloguj się do panelu</h1>
+    <div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">SM</div><span style="font-weight:700">Studio Malwa</span></div>
+    <h1 id="lg-h" style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:26px">Zaloguj się do panelu</h1>
 
     <div role="tablist" aria-label="Sposób logowania" style="display:flex;gap:4px;padding:4px;border-radius:14px;background:#F0E8EC">
-      <button type="button" role="tab" class="lg-tab" id="tab-pw" aria-selected="true" aria-controls="p-pw">E-mail i hasło</button>
+      <button type="button" role="tab" class="lg-tab" id="tab-pw" aria-selected="true" aria-controls="p-pw">Hasło</button>
       <button type="button" role="tab" class="lg-tab" id="tab-sms" aria-selected="false" aria-controls="p-sms">Kod SMS</button>
     </div>
 
     <form id="p-pw" role="tabpanel" aria-labelledby="tab-pw" novalidate style="display:flex;flex-direction:column;gap:14px">
-      <label class="lg-lab" for="email">Adres e-mail<input id="email" class="lg-in" type="email" autocomplete="email" inputmode="email" placeholder="np. imie@studio.pl"></label>
+      <label class="lg-lab" for="email">E-mail lub telefon<input id="email" class="lg-in" type="text" autocomplete="username" inputmode="email" placeholder="np. imie@studio.pl"></label>
       <div class="lg-lab"><label for="pw">Hasło</label>
         <div style="display:flex;gap:8px"><input id="pw" class="lg-in" type="password" autocomplete="current-password"><button type="button" id="show" class="lg-link" aria-pressed="false" aria-controls="pw" style="text-decoration:none;border:1px solid #E4D9DE;border-radius:12px;padding:0 14px;color:#1E1A1D;align-self:auto;white-space:nowrap">Pokaż</button></div>
       </div>
       <button type="button" class="lg-link" id="forgot">Nie pamiętasz hasła?</button>
       <button type="submit" class="lg-btn">Zaloguj</button>
-      <span style="color:#625860;font-size:12px">Makieta: wejdziesz z dowolnym poprawnym adresem i hasłem od 8 znaków.</span>
+      <span class="mock-only" style="color:#625860;font-size:12px">Makieta: konta testowe z hasłami są w Narzędziach makiety (pasek u góry).</span>
     </form>
 
     <form id="p-sms" role="tabpanel" aria-labelledby="tab-sms" novalidate hidden style="display:flex;flex-direction:column;gap:14px">
@@ -53,10 +54,21 @@
         <span id="count" class="lg-err" style="color:#625860" role="status"></span>
         <button type="submit" class="lg-btn">Zaloguj</button>
       </div>
-      <span style="color:#625860;font-size:12px">Makieta: kod SMS nie jest wysyłany, wpisz dowolne 6 cyfr.</span>
+      <span style="color:#625860;font-size:12px">Makieta: kod SMS nie jest wysyłany, wpisz dowolne 6 cyfr. Numer musi należeć do konta studia.</span>
     </form>
 
-    <p style="margin:0;padding-top:8px;border-top:1px solid #F0E8EC">Nie masz konta? <a href="onboarding.html">Załóż studio</a></p>
+    <form id="p-2fa" novalidate hidden style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:20px">Potwierdź, że to Ty</h2>
+      <p style="margin:0;color:#625860;line-height:1.5">Logujesz się z nowego urządzenia (<span id="urz2"></span>). Wysłaliśmy kod SMS na numer z konta, kończący się na <b id="tel2">·· 456</b>.</p>
+      <label class="lg-lab" for="code2">Kod z SMS-a (6 cyfr)<input id="code2" class="lg-in" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000 000" style="letter-spacing:.2em;text-align:center"></label>
+      <label style="display:flex;gap:10px;align-items:center;min-height:44px"><input id="pamietaj" type="checkbox" checked style="width:20px;height:20px">Zapamiętaj to urządzenie na 30 dni</label>
+      <button type="submit" class="lg-btn">Zaloguj</button>
+      <button type="button" class="lg-link" id="resend2">Nie dostałaś kodu? Wyślij ponownie</button>
+      <button type="button" class="lg-link" id="wroc2">Wróć / zmień konto</button>
+      <span style="color:#625860;font-size:12px">Makieta: wpisz dowolne 6 cyfr. Kod przy nowym urządzeniu wyłączysz w Ustawieniach, w sekcji Bezpieczeństwo.</span>
+    </form>
+
+    <p id="lg-nowe" style="margin:0;padding-top:8px;border-top:1px solid #F0E8EC">Nie masz konta? <a href="onboarding.html">Załóż studio</a></p>
   </div>
 </main>
 
@@ -81,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return !!first;
   }
   const mail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-  function enter(u) { Mock.set('studioUser', u); Mock.toast('Zalogowano'); setTimeout(() => { location.href = 'panel.html'; }, 500); }
+  function enter(a) { Mock.zaloguj(a); Mock.toast('Zalogowano'); setTimeout(() => { location.href = 'panel.html'; }, 500); }
 
   // zakładki
   const tabs = { pw: ['#tab-pw', '#p-pw'], sms: ['#tab-sms', '#p-sms'] };
@@ -95,23 +107,61 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#p-pw').addEventListener('submit', e => {
     e.preventDefault();
     const m = $('#email').value.trim(), p = $('#pw').value;
-    if (check([[$('#email'), !m ? 'Wpisz adres e-mail.' : !mail(m) ? 'Wpisz poprawny adres e-mail, np. imie@studio.pl.' : ''], [$('#pw'), !p ? 'Wpisz hasło.' : p.length < 8 ? 'Hasło ma co najmniej 8 znaków.' : '']])) return;
-    const l = m.split('@')[0].split(/[._-]/)[0];
-    enter({ imie: l.charAt(0).toUpperCase() + l.slice(1), email: m, rola: 'właścicielka' });
+    if (check([[$('#email'), !m ? 'Wpisz e-mail lub numer telefonu.' : m.includes('@') && !mail(m) ? 'Wpisz poprawny adres e-mail, np. imie@studio.pl.' : ''], [$('#pw'), !p ? 'Wpisz hasło.' : '']])) return;
+    const u = Mock.konto('studio', m);
+    if (!u || u.haslo !== p) return check([[$('#pw'), 'E-mail, telefon lub hasło się nie zgadza. Sprawdź wpis albo ustaw nowe hasło.']]);
+    if (zaufane(Mock.get('bezp.sms', true), Mock.get('bezp.zaufane', ''), Mock.iso(Mock.teraz()))) return enter(u);
+    czeka = u; krok2(true); Mock.toast('Wysłaliśmy kod SMS');
   });
+  // second step on a new device: SMS code, unless switched off in Settings or this device is remembered
+  let czeka = null;
+  const zaufane = (sms, do_, dzis) => !sms || (do_ || '') >= dzis; // do_ = last day the device is remembered
+  console.assert(zaufane(false, '', '2026-10-21') && zaufane(true, '2026-11-20', '2026-10-21') && zaufane(true, '2026-10-21', '2026-10-21')
+    && !zaufane(true, '2026-10-20', '2026-10-21') && !zaufane(true, '', '2026-10-21') && !zaufane(true, null, '2026-10-21'), 'panel-logowanie zaufane');
+  let t2 = null;
+  const odlicz = () => { let s = 60; clearInterval(t2); $('#resend2').disabled = true;
+    const tick = () => { $('#resend2').textContent = s > 0 ? `Nowy kod wyślesz za ${s} s` : 'Nie dostałaś kodu? Wyślij ponownie'; if (s-- <= 0) { clearInterval(t2); $('#resend2').disabled = false; } };
+    tick(); t2 = setInterval(tick, 1000); };
+  function krok2(on) { // the SMS step replaces the whole login form, header and sign-up link included
+    ['[role=tablist]', '#p-pw', '#lg-h', '#lg-nowe'].forEach(s => { $(s).hidden = on; }); $('#p-2fa').hidden = !on;
+    if (on) { $('#tel2').textContent = '·· ' + (czeka.tel || '456').replace(/\D/g, '').slice(-3); $('#urz2').textContent = PS.urzadzenie().replace(' · ', ', '); $('#code2').value = ''; odlicz(); $('#code2').focus(); } else { clearInterval(t2); $('#email').focus(); }
+  }
+  $('#resend2').addEventListener('click', () => { odlicz(); Mock.toast('Wysłaliśmy nowy kod SMS'); });
+  $('#wroc2').addEventListener('click', () => { czeka = null; krok2(false); });
+  $('#p-2fa').addEventListener('submit', e => {
+    e.preventDefault();
+    if (check([[$('#code2'), $('#code2').value.replace(/\D/g, '').length === 6 ? '' : 'Wpisz 6-cyfrowy kod z SMS-a.']])) return;
+    if ($('#pamietaj').checked) Mock.set('bezp.zaufane', Mock.iso(Mock.dzien(30)));
+    enter(czeka);
+  });
+  // forgotten password: the account's e-mail or phone, a code (any 6 digits in the mock), a new password, then straight into the panel
   $('#forgot').addEventListener('click', () => PS.modal({
-    title: 'Nie pamiętasz hasła?', ok: 'Wyślij link',
-    body: `<label class="p-lab" for="fe">Adres e-mail konta<input class="p-in" id="fe" name="e" type="email" autocomplete="email" value="${E($('#email').value.trim())}"></label><span class="p-mut">Wyślemy link do ustawienia nowego hasła. Link działa godzinę.</span>`,
-    onOk: f => { if (!mail(f.e.value.trim())) { f.e.setAttribute('aria-invalid', 'true'); Mock.toast('Wpisz poprawny adres e-mail'); f.e.focus(); return false; } },
-    toast: f => `Wysłaliśmy link na ${f.e.value.trim()}`
+    title: 'Nie pamiętasz hasła?', ok: 'Wyślij kod',
+    body: `<label class="p-lab" for="fe">E-mail lub telefon konta<input class="p-in" id="fe" name="e" autocomplete="username" value="${E($('#email').value.trim())}"></label><p id="fe-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p><span class="p-mut">Wyślemy kod, a potem ustawisz nowe hasło.</span>`,
+    onOk: f => {
+      const a = Mock.konto('studio', f.e.value), err = f.querySelector('#fe-err');
+      if (!a) { err.textContent = 'Nie ma konta studia z tym e-mailem ani telefonem.'; err.hidden = false; f.e.setAttribute('aria-invalid', 'true'); f.e.focus(); return false; }
+      setTimeout(() => PS.modal({
+        title: 'Ustaw nowe hasło', ok: 'Zapisz i zaloguj',
+        body: `<span class="p-mut">Kod wysłaliśmy na ${E(a.email || a.tel)}. W makiecie działa każdy 6-cyfrowy kod.</span><label class="p-lab" for="fk">Kod<input class="p-in" id="fk" name="k" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+          <label class="p-lab" for="fp">Nowe hasło (co najmniej 8 znaków)<input class="p-in" id="fp" name="p" type="password" autocomplete="new-password"></label><span style="color:#8A3B12;font-size:12px">To makieta: nie wpisuj hasła, którego używasz gdzie indziej.</span><p id="fp-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p>`,
+        onOk: g => {
+          const e2 = g.querySelector('#fp-err'), bad = !/^\d{6}$/.test(g.k.value.trim()) ? 'Wpisz 6 cyfr kodu.' : g.p.value.length < 8 ? 'Hasło ma co najmniej 8 znaków.' : '';
+          if (bad) { e2.textContent = bad; e2.hidden = false; return false; }
+          Mock.zapiszKonto({ ...a, haslo: g.p.value }); enter({ ...a, haslo: g.p.value });
+        },
+        toast: 'Ustawiono nowe hasło'
+      }), 0);
+    }
   }));
 
   // kod SMS
   let timer = null;
-  $('#code').addEventListener('input', e => { const d = e.target.value.replace(/\D/g, '').slice(0, 6); e.target.value = d.length > 3 ? d.slice(0, 3) + ' ' + d.slice(3) : d; });
+  const kod = e => { const d = e.target.value.replace(/\D/g, '').slice(0, 6); e.target.value = d.length > 3 ? d.slice(0, 3) + ' ' + d.slice(3) : d; };
+  $('#code').addEventListener('input', kod); $('#code2').addEventListener('input', kod);
   $('#send').addEventListener('click', () => {
     const t = $('#tel').value.replace(/[^\d+]/g, '');
-    if (check([[$('#tel'), !t ? 'Wpisz numer telefonu.' : t.replace(/\D/g, '').length < 9 ? 'Numer ma co najmniej 9 cyfr.' : '']])) return;
+    if (check([[$('#tel'), !t ? 'Wpisz numer telefonu.' : t.replace(/\D/g, '').length < 9 ? 'Numer ma co najmniej 9 cyfr.' : Mock.konto('studio', t) ? '' : 'Ten numer nie należy do żadnego konta studia.']])) return;
     $('#code-box').hidden = false; $('#code').focus(); Mock.toast('Wysłaliśmy kod SMS');
     let s = 30; $('#send').disabled = true; clearInterval(timer);
     const tick = () => { $('#count').textContent = s > 0 ? `Nowy kod możesz wysłać za ${s} s` : ''; if (s-- <= 0) { clearInterval(timer); $('#send').disabled = false; $('#send').textContent = 'Wyślij kod ponownie'; } };
@@ -120,7 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#p-sms').addEventListener('submit', e => {
     e.preventDefault();
     if (check([[$('#code'), $('#code').value.replace(/\D/g, '').length === 6 ? '' : 'Wpisz 6-cyfrowy kod z SMS-a.']])) return;
-    enter({ imie: 'Joanna Malec', email: '', tel: $('#tel').value.trim(), rola: 'właścicielka' });
+    const a = Mock.konto('studio', $('#tel').value);
+    if (check([[$('#tel'), a ? '' : 'Ten numer nie należy do żadnego konta studia.']])) return;
+    enter(a);
   });
 });
 </script>

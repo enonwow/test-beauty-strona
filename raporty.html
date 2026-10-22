@@ -61,8 +61,8 @@
         <table style="width: 100%; min-width: 560px; border-collapse: collapse; text-align: left">
           <thead><tr style="color: #625860; font-size: 12px"><th style="padding: 8px; font-weight: 500">Osoba</th><th style="padding: 8px; font-weight: 500">Wizyty</th><th style="padding: 8px; font-weight: 500">Utarg</th><th style="padding: 8px; font-weight: 500">Prowizja</th><th style="padding: 8px; font-weight: 500">Czas planowany / faktyczny</th></tr></thead>
           <tbody>
-            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">Magda</td><td style="padding: 10px 8px">54</td><td style="padding: 10px 8px">10 260 zł</td><td style="padding: 10px 8px">—</td><td style="padding: 10px 8px">152 h / 148 h</td></tr>
-            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">Ewelina</td><td style="padding: 10px 8px">44</td><td style="padding: 10px 8px">8140 zł</td><td style="padding: 10px 8px">3256 zł</td><td style="padding: 10px 8px">152 h / 155 h</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">Magda</td><td style="padding: 10px 8px">54</td><td style="padding: 10px 8px">10 260 zł</td><td style="padding: 10px 8px">4104 zł</td><td style="padding: 10px 8px">152 h / 148 h</td></tr>
+            <tr style="border-top: 1px solid #F0E8EC"><td style="padding: 10px 8px; font-weight: 700">Ewelina</td><td style="padding: 10px 8px">44</td><td style="padding: 10px 8px">8140 zł</td><td style="padding: 10px 8px">814 zł</td><td style="padding: 10px 8px">152 h / 155 h</td></tr>
           </tbody>
         </table>
       </div>
@@ -73,6 +73,7 @@
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="obl-h"><h2 id="obl-h" class="p-h2">Obłożenie zespołu</h2><div id="obl" style="display: flex; flex-direction: column; gap: 10px"></div><span class="p-mut">Godziny z wizytami do godzin w grafiku, ten tydzień.</span></section>
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="pop-h"><h2 id="pop-h" class="p-h2">Najpopularniejsze usługi</h2><div id="pop" style="display: flex; flex-direction: column; gap: 10px"></div></section>
       <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="pow-h"><h2 id="pow-h" class="p-h2">Powracalność i odwołania</h2><div id="pow" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"></div><span class="p-mut">Powracalność: klientki, które w ciągu 90 dni przyszły drugi raz.</span></section>
+      <section style="grid-column: 1 / -1; background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="ank-h"><h2 id="ank-h" class="p-h2">Ankiety po wizycie</h2><div id="ank" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px"></div><span class="p-mut">Odpowiedzi widzi tylko studio, nie trafiają do opinii. Uwagi są też w karcie klientki.</span></section>
     </div>
 
     <section style="background: #FFFFFF; border: 1px solid #F0E8EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px" aria-labelledby="rent-h">
@@ -106,9 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   let last = 'miesiac';
+  // the report of the location picked in the header; Mokotów has its own sample numbers (shortcut: a location added in the profile shows Centrum's)
+  const LK = PS.lokalizacje(), lok = Mock.lok(), M1 = lok === 1, gdzie = LK.length > 1 ? ' · ' + (LK[lok] || LK[0]).n : '';
   lbl.textContent = DATA.miesiac.t; sel.querySelector('[value=miesiac]').textContent = DATA.miesiac.t;
   function draw(d, text) {
-    lbl.textContent = text;
+    lbl.textContent = text + gdzie;
     document.getElementById('vs').textContent = d.vs;
     document.getElementById('chart-h').textContent = d.h;
     chart.setAttribute('aria-label', 'Wykres poglądowy: ' + d.h.toLowerCase() + ', ' + text);
@@ -126,26 +129,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }).addEventListener('close', () => { if (last !== 'zakres') sel.value = last; });
   });
   // --- business results: sample numbers plus the visits booked in this mock ---
-  const E = PS.esc, V = Mock.get('visits', []) || [];
+  const E = PS.esc, V = (Mock.get('visits', []) || []).filter(v => Mock.lokOf(v) === lok);
   const pasek = (nazwa, wart, proc, opis) => `<div style="display:flex;flex-direction:column;gap:4px"><span style="display:flex;justify-content:space-between;gap:8px"><span>${E(nazwa)}</span><b>${E(wart)}</b></span><span style="height:8px;border-radius:4px;background:#F0E8EC" role="img" aria-label="${E(nazwa)}: ${E(opis || wart)}"><span style="display:block;width:${Math.min(100, proc)}%;height:8px;border-radius:4px;background:#9E1F50"></span></span></div>`;
-  const kafel = (t, v, o) => `<div style="padding:12px;border-radius:12px;background:#FAF6F8;display:flex;flex-direction:column;gap:2px"><span class="p-mut">${E(t)}</span><b style="font-family:'Bricolage Grotesque',sans-serif;font-size:24px">${E(v)}</b><span class="p-mut">${E(o)}</span></div>`;
-  [['Magda', 31, 38], ['Ewelina', 24, 38]].forEach(([n, h, g]) => { document.getElementById('obl').insertAdjacentHTML('beforeend', pasek(n, `${Math.round(h / g * 100)}%`, h / g * 100, `${h} z ${g} godzin`)); });
-  const POP = { 'Manicure hybrydowy': 46, 'Uzupełnienie rzęs 1:1': 21, 'Żel na naturalnej płytce': 18, 'Henna + regulacja brwi': 15, 'Przedłużanie (tipsy / szablon)': 12 };
+  const kafel = (t, v, o, fs = 24) => `<div style="padding:12px;border-radius:12px;background:#FAF6F8;display:flex;flex-direction:column;gap:2px"><span class="p-mut">${E(t)}</span><b style="font-family:'Bricolage Grotesque',sans-serif;font-size:${fs}px">${E(v)}</b><span class="p-mut">${E(o)}</span></div>`;
+  if (M1) document.querySelector('tbody:not([id])').innerHTML = [['Ola', 26, '3120 zł', '1248 zł', '120 h / 118 h'], ['Natalia', 24, '6480 zł', '648 zł', '128 h / 131 h']]
+    .map(r => `<tr style="border-top: 1px solid #F0E8EC">${r.map((c, i) => `<td style="padding: 10px 8px${i ? '' : '; font-weight: 700'}">${E(c)}</td>`).join('')}</tr>`).join('');
+  (M1 ? [['Ola', 19, 32], ['Natalia', 26, 34]] : [['Magda', 31, 38], ['Ewelina', 24, 38]]).forEach(([n, h, g]) => { document.getElementById('obl').insertAdjacentHTML('beforeend', pasek(n, `${Math.round(h / g * 100)}%`, h / g * 100, `${h} z ${g} godzin`)); });
+  const POP = M1 ? { 'Strzyżenie damskie': 31, 'Koloryzacja': 14, 'Modelowanie': 9, 'Keratynowe prostowanie': 6, 'Balejaż': 5 } : { 'Manicure hybrydowy': 46, 'Uzupełnienie rzęs 1:1': 21, 'Żel na naturalnej płytce': 18, 'Henna + regulacja brwi': 15, 'Przedłużanie (tipsy / szablon)': 12 };
   V.filter(v => v.status !== 'odwołana').forEach(v => { const n = v.usluga || v.opis; if (n) POP[n] = (POP[n] || 0) + 1; });
   const top = Object.entries(POP).sort((a, b) => b[1] - a[1]).slice(0, 5);
   document.getElementById('pop').innerHTML = top.map(([n, k]) => pasek(n, Mock.plural(k, ['wizyta', 'wizyty', 'wizyt']), k / top[0][1] * 100)).join('');
-  const wszystkie = 112 + V.length, odwolane = 9 + V.filter(v => v.status === 'odwołana').length;
+  const wszystkie = (M1 ? 58 : 112) + V.length, odwolane = (M1 ? 4 : 9) + V.filter(v => v.status === 'odwołana').length;
   document.getElementById('pow').innerHTML = kafel('Powracalność', '68%', 'z 74 klientek') + kafel('Odwołane wizyty', `${Math.round(odwolane / wszystkie * 100)}%`, `${odwolane} z ${wszystkie}`);
+  const A = Mock.ankietyWynik(Mock.ankiety());
+  document.getElementById('ank').innerHTML = kafel('Odpowiedzi', String(A.n), 'z ankiet po wizycie') + kafel('Umówią się znowu', A.wroci == null ? '—' : `${A.wroci}%`, '„tak” i „raczej tak”') + kafel('Najczęstsza uwaga', A.uwaga || '—', A.razy ? Mock.plural(A.razy, ['raz', 'razy', 'razy']) : '', 17);
   // what stays from a service: price − materials − time × hourly cost of work
   const zostaje = (u, stawka) => Math.round(u[1] - u[2] - u[3] / 60 * stawka);
   console.assert(zostaje(['x', 140, 12, 75], 60) === 53 && zostaje(['x', 100, 0, 60], 100) === 0, 'raporty zostaje');
-  const USL = [['Manicure hybrydowy', 140, 12, 75], ['Żel na naturalnej płytce', 170, 22, 105], ['Przedłużanie (tipsy / szablon)', 200, 30, 150], ['Uzupełnienie rzęs 1:1', 150, 18, 90], ['Henna + regulacja brwi', 70, 6, 40]];
+  const USL = M1 ? [['Strzyżenie damskie', 120, 6, 60], ['Modelowanie', 90, 4, 60], ['Koloryzacja', 320, 55, 150], ['Balejaż', 450, 80, 180], ['Keratynowe prostowanie', 380, 70, 120]] : [['Manicure hybrydowy', 140, 12, 75], ['Żel na naturalnej płytce', 170, 22, 105], ['Przedłużanie (tipsy / szablon)', 200, 30, 150], ['Uzupełnienie rzęs 1:1', 150, 18, 90], ['Henna + regulacja brwi', 70, 6, 40]];
   const rent = () => { const st = Math.max(0, +document.getElementById('stawka').value || 0);
     document.getElementById('rent').innerHTML = USL.map(u => { const z = zostaje(u, st), m = Math.round(z / u[1] * 100);
       return `<tr><td>${E(u[0])}</td><td style="text-align:right">${u[1]} zł</td><td style="text-align:right">${u[2]} zł</td><td style="text-align:right">${Mock.dur(u[3])}</td><td style="text-align:right;font-weight:700;color:${z < 0 ? '#A3262A' : '#1E1A1D'}">${z} zł</td><td style="text-align:right">${m}%</td></tr>`; }).join(''); };
   document.getElementById('stawka').addEventListener('input', rent); rent();
   // costs this month (sample + added) against a sample turnover; the paid highlight counts as a cost too
-  const UTARG = 18400, KOS0 = [['Czynsz', 'lokal', 3200], ['Wynagrodzenia', 'zespół', 6800], ['Materiały z magazynu', 'materiały', 1450], ['Media i internet', 'lokal', 450], ['Abonament systemu', 'abonament', 99]];
+  const UTARG = M1 ? 9600 : 18400, KOS0 = M1 ? [['Czynsz', 'lokal', 2600], ['Wynagrodzenia', 'zespół', 4200], ['Materiały z magazynu', 'materiały', 980], ['Media i internet', 'lokal', 380]] : [['Czynsz', 'lokal', 3200], ['Wynagrodzenia', 'zespół', 6800], ['Materiały z magazynu', 'materiały', 1450], ['Media i internet', 'lokal', 450], ['Abonament systemu', 'abonament', 99]];
   const kosztyLista = () => KOS0.concat(Mock.get('koszty', []) || [], W.on ? [['Wyróżnienie w wyszukiwarce', 'reklama', W.st * 30]] : []);
   const zysk = (utarg, l) => utarg - l.reduce((a, k) => a + k[2], 0);
   console.assert(zysk(1000, [['a', '', 300], ['b', '', 200]]) === 500, 'raporty zysk');

@@ -30,6 +30,9 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 .vb button,.vb a{flex:1;min-height:44px;border-radius:10px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none}
 .vb .dk{background:#9E1F50;color:#fff;border-color:#9E1F50;font-weight:700}
 .vb .rd{color:#A3262A}
+.pl-bl{padding:10px 12px;border-radius:12px;background:#FDECEC;color:#A3262A;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pl-bl button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer;flex:none}
+.pl-bl button:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
 .vb a:hover{color:#1E1A1D}.vb a.dk:hover{color:#fff}
 .pot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:#FFF1E0;color:#8A3B12;font-size:14px}
 .pot button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#9E1F50;color:#fff;font:inherit;font-weight:700;cursor:pointer}
@@ -109,7 +112,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <div style="border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center">
         <img src="zdjecia/styl-velvet-burgund.jpg" alt="" width="52" height="52" loading="lazy" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
-          <span style="font-weight:500">Velvet burgund · 29 września</span>
+          <span style="font-weight:500" data-dni="-23">Velvet burgund</span>
           <span style="color:#625860;font-size:13px">Studio Malwa · 200 zł · <a href="ocena.html?s=Studio%20Malwa&amp;o=Hybryda%20M%20%C2%B7%20velvet%20%C3%97%2010">Oceń</a></span>
         </span>
         <a href="paznokcie.html" class="btn" style="min-height:44px;padding:0 12px;font-size:14px;font-weight:500">Powtórz</a>
@@ -117,7 +120,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
       <div style="border:1px solid #E4D9DE;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center">
         <img src="zdjecia/k-rzesy.jpg" alt="" width="52" height="52" loading="lazy" style="width:52px;height:52px;object-fit:cover;border-radius:12px;flex:none;background:#E4D9DE">
         <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
-          <span style="font-weight:500">Rzęsy 2D–3D, 11–12 mm, CC · 6 października</span>
+          <span style="font-weight:500" data-dni="-16">Rzęsy 2D–3D, 11–12 mm, CC</span>
           <span style="color:#625860;font-size:13px">Pracownia Lilia · uzupełnienie za ok. 3 tyg.</span>
         </span>
         <a href="rzesy.html" style="min-height:44px;padding:0 12px;border-radius:10px;border:1px solid #1E1A1D;color:#1E1A1D;text-decoration:none;font-size:14px;font-weight:500;display:flex;align-items:center">Umów</a>
@@ -169,7 +172,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
     <h2 id="odw-t" style="margin:0;font-size:18px">Odwołać wizytę?</h2>
     <p id="odw-opis" style="margin:0;font-weight:500"></p>
     <p id="odw-txt" style="margin:0;font-size:14px;line-height:1.5"></p>
-    <p style="margin:0;color:#625860;font-size:12px;line-height:1.45">Zasady: odwołanie do 24 h przed wizytą zwraca zaliczkę; później zaliczki nie zwracamy. Gdy odwoła studio, zwrot jest zawsze pełny.</p>
+    <p data-odw style="margin:0;color:#625860;font-size:12px;line-height:1.45">Zasady: odwołanie do 24 h przed wizytą zwraca zaliczkę; później zaliczki nie zwracamy. Gdy odwoła studio, zwrot jest zawsze pełny.</p>
     <div style="display:flex;gap:8px">
       <button type="button" data-close style="flex:1;min-height:48px;border-radius:12px;border:1px solid #E4D9DE;background:#fff;color:#1E1A1D;font:inherit;cursor:pointer">Zostaw wizytę</button>
       <button type="button" id="odw-ok" style="flex:1;min-height:48px;border-radius:12px;border:0;background:#A3262A;color:#fff;font:inherit;font-weight:700;cursor:pointer">Odwołaj wizytę</button>
@@ -179,6 +182,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif}
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-dni]').forEach(el => { const d = Mock.dzien(+el.dataset.dni); el.textContent += ` · ${d.getDate()} ${Mock.MIESD[d.getMonth()]}`; }); // sample styles move with the (test) date
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const MIES = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
@@ -193,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const HIST = [{ id: 'hist1', kategoria: 'Paznokcie', usluga: 'Manicure hybrydowy', opis: 'Hybryda M · velvet × 10', cena: 200, czasTekst: '1 h 50 min', studio: 'Studio Malwa', stylistka: 'Magda', dzien: Mock.krotko(pozniej(-21)), godzina: '11:15', koniec: '13:05', status: 'odbyta', dokNr: `FV/31/${String(pozniej(-21).getMonth() + 1).padStart(2, '0')}/${pozniej(-21).getFullYear()}`, faktura: { nip: '1234563218', firma: 'Pracownia Graficzna Anna Kowalczyk' } }];
 
   const all = () => {
-    const v = Mock.get('visits', []);
+    const v = (Mock.get('visits', []) || []).filter(Mock.moja);
     return v.length ? v : [{ ...SAMPLE, ...(Mock.get('wizytyPrzyklad', {}) || {}) }];
   };
   const when = v => { const d = Mock.zKrotko(v.dzien); return d ? { d: d.getDate(), m: d.getMonth(), y: d.getFullYear() } : null; };
@@ -211,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toBooking = v => {
     const t = v.testId && all().find(x => x.id === v.testId);
     return { kategoria: v.kategoria, usluga: v.usluga, opis: v.opis, cena: v.cena, czas: czasMin(v), czasTekst: v.czasTekst, studio: v.studio, stylistka: v.stylistka, dzien: v.dzien, godzina: v.godzina, koniec: v.koniec, klientka: v.klientka, zadatek: v.zadatek, visitId: v.id,
-      cenaMin: v.cenaMin, cenaMax: v.cenaMax, powodPrzedzialu: v.powodPrzedzialu, pozycje: v.pozycje, uwagi: v.uwagi, seria: v.seria, sciezka: v.sciezka, promo: v.promo, kontakt: v.kontakt, uslugi: v.uslugi, osoby: v.osoby, dlaKogo: v.dlaKogo, dojazd: v.dojazd, bazaCena: v.bazaCena, faktura: v.faktura,
+      cenaMin: v.cenaMin, cenaMax: v.cenaMax, powodPrzedzialu: v.powodPrzedzialu, pozycje: v.pozycje, uwagi: v.uwagi, seria: v.seria, sciezka: v.sciezka, promo: v.promo, kontakt: v.kontakt, uslugi: v.uslugi, osoby: v.osoby, dlaKogo: v.dlaKogo, dojazd: v.dojazd, bazaCena: v.bazaCena, faktura: v.faktura, platnosc: v.platnosc,
       ...(t ? { testDzien: t.dzien, testGodzina: t.godzina, testKoniec: t.koniec, testMin: t.czas, testVisitId: t.id } : {}) };
   };
   const cenaTxt = v => (v.cenaMin != null && v.cenaMax > v.cenaMin ? `${v.cenaMin}–${v.cenaMax}` : v.cena);
@@ -226,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const typ = { test: 'Test uczuleniowy', konsultacja: 'Konsultacja' }[v.typ];
     const tag = typ ? `<span class="badge" style="background:#F6EDF1;color:#9E1F50">${typ}</span>` : v.testId ? '<span class="badge" style="background:#F6EDF1;color:#9E1F50">Zabieg po teście</span>' : '';
     if (v.status === 'odwołana') {
-      badge = '<span class="badge" style="background:#FFF1E0;color:#8A3B12">Odwołana</span>' + (v.zwrot ? `<small style="color:#1F6B47">Zwrot zaliczki ${esc(v.zadatek)} zł: w drodze, do 5 dni roboczych</small>` : '');
+      badge = '<span class="badge" style="background:#FFF1E0;color:#8A3B12">Odwołana</span>' + (v.zwrot ? `<small style="color:#1F6B47">${v.platnosc && v.platnosc.zwrot ? `Zwrot ${esc(v.platnosc.zwrot)} zł` : `Zwrot zaliczki ${esc(v.zadatek)} zł`}: w drodze, do 5 dni roboczych</small>` : '');
       btns = `<a href="${esc(doStudia(v))}" class="dk">Zarezerwuj ponownie</a><button type="button" data-a="karta">Karta</button>`;
     } else if (v.status === 'odbyta') {
       badge = '<span class="badge" style="background:#E6F2EC;color:#1F6B47">Odbyta</span>';
@@ -239,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btns = `<button type="button" data-a="dok">${v.faktura ? 'Faktura' : 'Paragon'}</button><a href="ocena.html?s=${encodeURIComponent(v.studio || '')}&o=${encodeURIComponent(v.opis || '')}">Oceń</a><a href="${esc(KREATORY[(v.kategoria || '').toLowerCase()] || doStudia(v))}" class="dk">Powtórz</a>`;
     } else {
       if (v.typ !== 'test') { // consents signed on podpis.html (Mock "podpisy")
-        const signed = new Set((Mock.get('podpisy', []) || []).map(p => p.doc));
+        const signed = new Set((Mock.get('podpisy', []) || []).filter(Mock.mojPodpis).map(p => p.doc));
         const todo = ['rodo', ...(v.kategoria === 'Rzęsy' ? ['wywiad-rzesy'] : [])].filter(d => !signed.has(d));
         badge = todo.length ? `<small>Zgody: <a href="podpis.html?doc=${todo[0]}" style="display:inline-flex;align-items:center;min-height:44px;font-weight:500">do podpisu${todo.length > 1 ? ` (${todo.length})` : ''}</a></small>` : '<small style="color:#1F6B47">Zgody: podpisane</small>';
       }
@@ -247,13 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (h > 0 && h <= 48) badge += v.potwierdzona ? '<div class="pot ok">✓ Potwierdziłaś przybycie</div>'
         : '<div class="pot"><span>Studio prosi o potwierdzenie wizyty.</span><button type="button" data-a="potwierdz">Potwierdzam, będę</button></div>';
       if (v.faktura) badge += `<small>Faktura na: ${esc(v.faktura.firma)}, NIP ${esc(v.faktura.nip)}</small>`;
+      if (v.platnosc && v.platnosc.status === 'nieudana') badge += `<div class="pl-bl"><span><b>Płatność się nie udała.</b> Termin trzymamy do ${esc(v.platnosc.do || '')}.</span><button type="button" data-a="ponow">Ponów płatność</button></div>`;
       btns = `<button type="button" data-a="przeloz">Przełóż</button><button type="button" data-a="odwolaj" class="rd">Odwołaj</button><button type="button" data-a="karta" class="dk">Karta</button>`;
     }
     return `<div class="vc" data-id="${id}"><div class="top"><img class="sw" src="${Mock.fotoKat(v.kategoria)}" alt="" width="56" height="56"><span class="tx">
       <b>${esc(v.dzien)}, ${esc(v.godzina)}${v.koniec ? '–' + esc(v.koniec) : ''} · ${esc(v.studio)}</b>
       ${Array.isArray(v.uslugi) && v.uslugi.length > 1 ? v.uslugi.map(u => `<small>${esc(u.usluga)} · ${esc(Mock.dur(u.czas))}</small>`).join('') + `<small>Razem ${esc(cenaTxt(v))} zł</small>` : `<small>${esc(v.opis)} · ${esc(cenaTxt(v))} zł</small>`}
       ${v.osoby > 1 || v.dojazd ? `<small>${v.osoby > 1 ? `${esc(v.osoby)} osoby naraz` : ''}${v.osoby > 1 && v.dojazd ? ' · ' : ''}${v.dojazd ? `dojazd do klientki (${esc(v.dojazd.strefa)}), ${esc(v.dojazd.adres)}` : ''}</small>` : ''}
-      <small>${esc(sty)}${v.klientka ? ' · dla: ' + esc(v.klientka) : ''}</small></span></div>${tag}${badge}<div class="vb">${btns}</div></div>`;
+      <small>${esc(sty)}${v.dlaKogo && v.dlaKogo.imie ? ' · dla: ' + esc(v.dlaKogo.imie) : ''}</small>${v.platnosc ? `<small style="display:flex;gap:6px;align-items:center;margin-top:4px">Płatność: ${Mock.platnoscBadge(v.platnosc.status)}</small>` : ''}</span></div>${tag}${badge}<div class="vb">${btns}</div></div>`;
   }
 
   // calendar
@@ -312,17 +317,18 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="r"><span>Stawka VAT</span><b>23%</b></div><div class="r" style="border-top:1px solid #F0E8EC;padding-top:6px"><span>Razem brutto</span><b>${esc(cenaTxt(v))} zł</b></div>`;
       $('#dok').showModal(); return;
     }
+    if (a.dataset.a === 'ponow') { Mock.set('booking', toBooking(v)); location.href = 'zadatek.html'; return; }
     if (a.dataset.a === 'karta' || a.dataset.a === 'przeloz') {
       Mock.set('booking', toBooking(v));
       location.href = a.dataset.a === 'karta' ? 'potwierdzenie.html' : 'termin.html?przeloz=1';
     } else {
       pending = v;
       $('#odw-opis').textContent = `${v.dzien}, ${v.godzina} · ${v.studio} · ${v.opis}`;
-      const wczesnie = stamp(v) - NOW >= 24 * 3600 * 1000;
+      const wczesnie = stamp(v) - NOW >= Mock.odwH() * 3600 * 1000;
       const para = v.testId || v.zabiegId ? ' Odwołasz też powiązany ' + (v.testId ? 'test' : 'zabieg') + '.' : '';
-      $('#odw-txt').textContent = para + ' ' + (v.zadatek
-        ? (wczesnie ? `Odwołujesz więcej niż 24 h przed wizytą: zaliczka ${v.zadatek} zł wróci w ciągu 5 dni roboczych.` : `Do wizyty zostało mniej niż 24 h: zaliczki ${v.zadatek} zł nie zwracamy.`)
-        : 'Nie wpłacałaś zaliczki, więc odwołanie nic nie kosztuje.');
+      const pl = v.platnosc ? (v.platnosc.status === 'opłacona' ? v.platnosc : null) : v.zadatek ? { kwota: +v.zadatek, rodzaj: 'zaliczka' } : null;
+      $('#odw-txt').textContent = para + ' ' + (pl ? (wczesnie ? `Odwołujesz więcej niż ${Mock.odwH()} h przed wizytą: ` : `Do wizyty zostało mniej niż ${Mock.odwH()} h: `) + Mock.zwrotTekst(pl, +v.cena || 0, wczesnie) + '.'
+        : 'Nie wpłacałaś nic online, więc odwołanie nic nie kosztuje.');
       $('#odw').showModal();
     }
   });
@@ -337,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#rk').close(); pending = null; renderAll(); Mock.toast('Reklamacja wysłana do studia');
   });
   $('#odw-ok').addEventListener('click', () => {
-    if (pending) setStatus(pending.id, 'odwołana', pending.zadatek && stamp(pending) - NOW >= 24 * 3600 * 1000 ? { zwrot: true } : {}); // on time: the deposit goes back
+    if (pending) setStatus(pending.id, 'odwołana', Mock.zwrotPrzyOdwolaniu(pending, stamp(pending) - NOW >= Mock.odwH() * 3600 * 1000)); // on time: the deposit goes back
     $('#odw').close(); pending = null; renderAll(); Mock.toast('Wizyta odwołana');
   });
 });
