@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – mój grafik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Mój grafik</h1><span class="p-mut">Godziny pracy ustala właścicielka. Wolne i urlop zgłaszasz tutaj.</span></div>
+      <div class="p-acts"><button type="button" class="p-btn pri" id="prosba">Poproś o wolne</button></div>
+    </div>
+
+    <section class="p-card" aria-labelledby="ty-h">
+      <h2 id="ty-h" class="p-h2"></h2>
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Dzień</th><th>Godziny</th></tr></thead><tbody id="dni"></tbody></table></div>
+    </section>
+
+    <section class="p-card" aria-labelledby="wo-h">
+      <h2 id="wo-h" class="p-h2">Wolne i urlopy</h2>
+      <div id="moje" style="display: flex; flex-direction: column; gap: 8px"></div>
+      <span class="p-mut">Właścicielka dostaje prośbę w „Zespół i grafik” i ją akceptuje albo odrzuca.</span>
+    </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, ja = ((Mock.get('studioUser', null) || {}).imie || '').split(' ')[0], osoba = PS.STYL.find(s => s.n === ja);
+  const DNI = ['pn', 'wt', 'śr', 'cz', 'pt', 'sb', 'nd'], dzm = iso => iso.split('-').reverse().slice(0, 2).join('.');
+  const dzis = Mock.teraz(), pon = Mock.dzien(-((dzis.getDay() + 6) % 7)); // Monday of this week
+  const tydzien = DNI.map((d, i) => { const t = new Date(pon); t.setDate(pon.getDate() + i); return { d, iso: Mock.iso(t), dm: dzm(Mock.iso(t)) }; });
+  const moje = () => PS.wolne().filter(w => w.kto === ja);
+  const wolneW = iso => moje().find(w => w.status !== 'nie' && w.od <= iso && iso <= w.do);
+
+  function render() {
+    document.getElementById('ty-h').textContent = `Ten tydzień · ${tydzien[0].dm}–${tydzien[6].dm}`;
+    if (!osoba) { document.getElementById('dni').innerHTML = `<tr><td colspan="2" class="p-mut">W tej lokalizacji nie masz grafiku. Zmień lokalizację u góry.</td></tr>`; }
+    else document.getElementById('dni').innerHTML = tydzien.map((t, i) => {
+      const w = wolneW(t.iso), g = osoba.grafik[i], dz = t.iso === Mock.iso(dzis);
+      const godz = w ? (w.status === 'ok' ? `<b>${E(w.rodzaj.toLowerCase())}</b>` : `${E(g === '—' ? 'wolne' : g.replace('–', ':00–') + ':00')} <span class="p-badge warn">prośba o wolne</span>`) : g === '—' ? 'wolne' : g === 'urlop' ? 'urlop' : g.replace('–', ':00–') + ':00';
+      return `<tr${dz ? ' style="background:#FBF6F8"' : ''}><td><b>${t.d} ${t.dm}</b>${dz ? ' <span class="p-badge">dziś</span>' : ''}</td><td>${godz}</td></tr>`;
+    }).join('');
+    const L = moje().sort((a, b) => (a.od < b.od ? -1 : 1));
+    document.getElementById('moje').innerHTML = L.length ? L.map(w => `<div class="p-row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><span><b>${dzm(w.od)}${w.do !== w.od ? '–' + dzm(w.do) : ''}</b> · ${E(w.rodzaj.toLowerCase())}${w.wiad ? ` <span class="p-mut">„${E(w.wiad)}”</span>` : ''}</span>`
+      + `<span class="p-badge ${w.status === 'ok' ? 'ok' : w.status === 'czeka' ? 'warn' : ''}">${{ ok: 'zaakceptowane', czeka: 'czeka na akceptację', nie: 'odrzucone' }[w.status]}</span></div>`).join('') : '<span class="p-mut">Nie prosiłaś jeszcze o wolne.</span>';
+  }
+
+  // visits already booked for her in the chosen days: the owner decides whether to move them
+  const wizytyW = (od, doo) => (Mock.get('visits', []) || []).filter(v => v.stylistka === ja && v.status === 'nadchodząca' && v.dzien && (iso => od <= iso && iso <= doo)(Mock.iso(Mock.zKrotko(v.dzien)))).length;
+  document.getElementById('prosba').addEventListener('click', () => PS.modal({
+    title: 'Poproś o wolne', ok: 'Wyślij prośbę',
+    body: `<label class="p-lab">Rodzaj<select class="p-in" name="r"><option>Urlop</option><option>Wolne</option><option>Chorobowe</option></select></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="p-lab" style="flex:1 1 140px">Od<input class="p-in" type="date" name="od" required value="${Mock.iso(Mock.dzien(1))}"></label><label class="p-lab" style="flex:1 1 140px">Do<input class="p-in" type="date" name="do" required value="${Mock.iso(Mock.dzien(1))}"></label></div>
+      <label class="p-lab">Wiadomość dla właścicielki (opcjonalnie)<textarea class="p-in" name="w" rows="2" maxlength="200"></textarea></label>
+      <p id="pw-info" class="p-mut" style="margin:0" role="status"></p><p id="pw-err" role="alert" hidden style="margin:0;color:#A3262A;font-size:13px"></p>`,
+    onOpen: f => { const info = () => { const n = f.od.value && f.do.value ? wizytyW(f.od.value, f.do.value) : 0; f.querySelector('#pw-info').textContent = n ? `Masz ${Mock.plural(n, ['wizytę', 'wizyty', 'wizyt'])} w tym czasie: właścicielka zdecyduje, czy je przenieść.` : ''; };
+      f.addEventListener('input', info); info(); },
+    onOk: f => {
+      const err = f.querySelector('#pw-err'), od = f.od.value, doo = f.do.value;
+      const m = !od || !doo ? 'Wybierz daty.' : doo < od ? 'Data „do” jest przed „od”.' : od < Mock.iso(dzis) ? 'Wolne zgłaszasz od dziś w przód.' : '';
+      if (m) { err.textContent = m; err.hidden = false; return false; }
+      const L = PS.wolne(); L.push({ id: 'w' + Date.now(), kto: ja, rodzaj: f.r.value, od, do: doo, wiad: f.w.value.trim(), status: 'czeka' }); PS.setWolne(L);
+      PS.log(`prosi o wolne: ${f.r.value.toLowerCase()}, ${dzm(od)}${doo !== od ? '–' + dzm(doo) : ''}`); render();
+    },
+    toast: 'Prośba wysłana do właścicielki'
+  }));
+  render();
+});
+</script>
+</body>
+</html>

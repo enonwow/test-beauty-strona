@@ -42,6 +42,8 @@
     </div>
 
     <div id="tab-zespol" style="display: flex; flex-direction: column; gap: 16px">
+      <section class="p-card" aria-labelledby="wo-h"><h2 id="wo-h" class="p-h2">Prośby o wolne <span id="wo-n" class="pn-n" style="display:inline-flex;margin-left:6px;vertical-align:1px"></span></h2><div id="wo-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+        <span class="p-mut">Osoby z zespołu zgłaszają wolne w „Mój grafik”. Po akceptacji dni pokażą się w ich grafiku jako wolne.</span></section>
       <div class="p-grid">
         <section class="p-card">
           <div style="display: flex; gap: 12px; align-items: center">
@@ -179,19 +181,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const ROPT = sel => PS.ROLES.map(r => `<option value="${r.k}"${r.k === sel ? ' selected' : ''}>${E(r.n)}</option>`).join('');
   const RS = Mock.get('zespol.role', Mock.lok() ? { 1: 'menedzerka', 2: 'stylistka' } : { 1: 'stylistka-plus', 2: 'stylistka' });
   document.querySelectorAll('[data-rl]').forEach(sl => sl.addEventListener('change', () => { RS[sl.dataset.rl] = sl.value; Mock.set('zespol.role', RS); renderRole(); }));
-  const MENU = PS.NAV.flatMap(g => g[1]);
+  // leave requests from the team: accept or decline (moj-grafik.html sends them)
+  const dzm = iso => iso.split('-').reverse().slice(0, 2).join('.');
+  function renderWolne() {
+    const L = PS.wolne(), czeka = L.filter(w => w.status === 'czeka').length;
+    document.getElementById('wo-n').textContent = czeka || ''; document.getElementById('wo-n').hidden = !czeka;
+    document.getElementById('wo-lista').innerHTML = L.length ? L.map(w => `<div class="p-row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><span><b>${E(w.kto)}</b> · ${E(w.rodzaj)} · ${dzm(w.od)}${w.do !== w.od ? '–' + dzm(w.do) : ''}${w.wiad ? ` <span class="p-mut">„${E(w.wiad)}”</span>` : ''}</span>`
+      + (w.status === 'czeka' ? `<span style="display:flex;gap:6px"><button type="button" class="p-btn sm pri" data-wo="${w.id}" data-st="ok">Akceptuj</button><button type="button" class="p-btn sm" data-wo="${w.id}" data-st="nie">Odrzuć</button></span>`
+        : `<span class="p-badge ${w.status === 'ok' ? 'ok' : ''}">${w.status === 'ok' ? 'zaakceptowane' : 'odrzucone'}</span>`) + '</div>').join('') : '<span class="p-mut">Nikt nie prosi o wolne.</span>';
+  }
+  document.getElementById('wo-lista').addEventListener('click', e => {
+    const b = e.target.closest('[data-wo]'); if (!b) return;
+    const L = PS.wolne(), w = L.find(x => x.id === b.dataset.wo); w.status = b.dataset.st; PS.setWolne(L); renderWolne();
+    PS.log(`${w.status === 'ok' ? 'zaakceptowała' : 'odrzuciła'} wolne: ${w.kto}, ${dzm(w.od)}`); Mock.toast(`${w.kto}: ${w.status === 'ok' ? 'wolne zaakceptowane' : 'prośba odrzucona'}`);
+  });
+  renderWolne();
+  const MENU = PS.NAV.flatMap(g => g[1]).filter(it => !['moj-grafik.html', 'moje-wyniki.html'].includes(it[1])); // the staff's own sections are not switched per role
   // people per role: the two team cards and pending invitations
   const ile = k => Object.values(RS).concat(inv.map(c => c.r)).filter(r => r === k).length;
   function renderRole() {
     const R = PS.ROLES;
     document.querySelectorAll('[data-rl]').forEach(sl => { sl.innerHTML = ROPT(RS[sl.dataset.rl]); });
     document.getElementById('kcw').innerHTML = `<thead><tr><th scope="col">Pozycja menu</th>${R.map((r, i) => `<th scope="col" style="vertical-align:top"><span style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">${E(r.n)}${r.own ? '<span class="p-badge blue">własna</span>' : ''}<span class="p-mut" style="font-weight:400">${ile(r.k)} os.</span>${i ? `<span style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" class="p-btn sm" data-ren="${i}">${r.own ? 'Zmień' : 'Zmień nazwę'}</button>${r.own ? `<button type="button" class="p-btn sm dng" data-usun="${i}">Usuń</button>` : ''}</span>` : '<span class="p-mut" style="font-weight:400">🔒 pełny dostęp</span>'}</span></th>`).join('')}</tr></thead>
-      <tbody>${MENU.map(it => `<tr><th scope="row" style="font-weight:500">${E(it[0])}</th>${R.map((r, i) => `<td><label style="display:inline-flex;min-width:44px;min-height:44px;align-items:center;justify-content:center"><input type="checkbox" style="width:20px;height:20px;accent-color:#9E1F50" data-r="${i}" data-h="${it[1]}"${i && r.hide.includes(it[1]) ? '' : ' checked'}${i ? '' : ' disabled'} aria-label="${E(r.n)}: ${E(it[0])}"></label></td>`).join('')}</tr>`).join('')}</tbody>`;
+      <tbody>${[['inni', 'Widzi kalendarze innych osób'], ['utarg', 'Widzi utarg studia']].map(([k, l]) => `<tr><th scope="row" style="font-weight:700">${l}</th>${R.map((r, i) => `<td><label style="display:inline-flex;min-width:44px;min-height:44px;align-items:center;justify-content:center"><input type="checkbox" style="width:20px;height:20px;accent-color:#9E1F50" data-r="${i}" data-flaga="${k}"${PS.moze(k, r) ? ' checked' : ''}${i ? '' : ' disabled'} aria-label="${E(r.n)}: ${l}"></label></td>`).join('')}</tr>`).join('')}${MENU.map(it => `<tr><th scope="row" style="font-weight:500">${E(it[0])}</th>${R.map((r, i) => `<td><label style="display:inline-flex;min-width:44px;min-height:44px;align-items:center;justify-content:center"><input type="checkbox" style="width:20px;height:20px;accent-color:#9E1F50" data-r="${i}" data-h="${it[1]}"${i && r.hide.includes(it[1]) ? '' : ' checked'}${i ? '' : ' disabled'} aria-label="${E(r.n)}: ${E(it[0])}"></label></td>`).join('')}</tr>`).join('')}</tbody>`;
   }
   const kcw = document.getElementById('kcw');
   kcw.addEventListener('change', e => {
     const c = e.target.closest('[data-r]'); if (!c) return;
     const R = PS.ROLES, r = R[+c.dataset.r];
+    if (c.dataset.flaga) { r[c.dataset.flaga] = c.checked; PS.setRoles(R); return Mock.toast(`${r.n}: ${c.checked ? 'widzi' : 'nie widzi'} ${c.dataset.flaga === 'inni' ? 'kalendarzy innych osób' : 'utargu studia'}`); }
     r.hide = c.checked ? r.hide.filter(h => h !== c.dataset.h) : r.hide.concat(c.dataset.h);
     PS.setRoles(R); Mock.toast(`${r.n}: ${c.checked ? 'widzi' : 'nie widzi'} „${MENU.find(m => m[1] === c.dataset.h)[0]}”`);
   });
@@ -248,13 +266,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }));
 
   // --- pay from commission: base + turnover × rate + bonus (turnover over a threshold, % of product sales) ---
-  let PR = Mock.get('zespol.premie', { prog: 9000, kwota: 300, prod: 10 });
-  const premia = (o, r = PR) => (o.utarg > r.prog ? r.kwota : 0) + Math.round((o.produkty || 0) * r.prod / 100);
-  const doWyplaty = (o, r = PR) => Math.round(o.podstawa + o.utarg * o.proc / 100) + premia(o, r);
+  let PR = PS.premie();
+  const premia = (o, r = PR) => PS.premia(o, r), doWyplaty = (o, r = PR) => PS.doWyplaty(o, r);
   const R0 = { prog: 9000, kwota: 300, prod: 10 };
   console.assert(doWyplaty({ podstawa: 3000, utarg: 10000, proc: 10 }, R0) === 4300 && doWyplaty({ podstawa: 0, utarg: 9000, proc: 40 }, R0) === 3600 && premia({ utarg: 7200, produkty: 600 }, R0) === 60, 'zespol doWyplaty + premia');
-  let WY = Mock.get('zespol.wyn', Mock.lok() === 1 ? [{ k: 'Ola', utarg: 5400, proc: 40, podstawa: 0 }, { k: 'Natalia', utarg: 8600, proc: 10, podstawa: 3000, produkty: 400 }]
-    : [{ k: 'Magda', utarg: 10260, proc: 40, podstawa: 0 }, { k: 'Ewelina', utarg: 8140, proc: 10, podstawa: 3000, produkty: 600 }]);
+  let WY = PS.wyn();
   const zl = n => n.toLocaleString('pl-PL') + ' zł';
   const prOpis = o => { const p = premia(o), za = [o.utarg > PR.prog ? `utarg ponad ${zl(PR.prog)}` : '', o.produkty && PR.prod ? `${PR.prod}% z ${zl(o.produkty)} produktów` : ''].filter(Boolean).join(' + ');
     return (p ? `<b>+${zl(p)}</b>` : '<span class="p-mut">—</span>') + `<br><span class="p-mut" style="font-size:12px">${E(za)}${o.utarg > PR.prog ? '' : `${za ? '; ' : ''}do +${zl(PR.kwota)} brakuje ${zl(PR.prog - o.utarg)}`}</span>`; };

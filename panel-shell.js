@@ -2,7 +2,7 @@
 // Strona wstawia <nav id="panel-nav"></nav> (opcjonalnie data-active="panel.html") i ładuje mock.js, a potem ten plik (oba defer).
 (function () {
   const NAV = [
-    ['Dzień pracy', [['Kalendarz', 'panel.html'], ['Wyceny', 'wyceny.html', 'badge'], ['Wiadomości', 'wiadomosci.html'], ['Klientki', 'klientki.html']]],
+    ['Dzień pracy', [['Kalendarz', 'panel.html'], ['Wyceny', 'wyceny.html', 'badge'], ['Wiadomości', 'wiadomosci.html'], ['Klientki', 'klientki.html'], ['Mój grafik', 'moj-grafik.html'], ['Moje wyniki', 'moje-wyniki.html']]],
     ['Sprzedaż', [['Kasa', 'kasa.html'], ['Karnety i pakiety', 'karnety.html'], ['Promocje', 'promocje.html'], ['Marketing', 'marketing.html']]],
     ['Studio', [['Cennik i kreator', 'cennik.html'], ['Zespół i grafik', 'zespol.html'], ['Magazyn', 'magazyn.html'], ['Profil studia', 'profil-studia.html'], ['Formularze i zgody', 'formularze.html'], ['Opinie', 'opinie-studio.html']]],
     ['Zarządzanie', [['Raporty', 'raporty.html'], ['Ustawienia', 'ustawienia.html']]]
@@ -24,6 +24,7 @@
 .p-btn.dash{border-style:dashed;border-color:#A99BA2}
 .p-btn.sm{min-height:40px;padding:0 12px}
 .p-btn:focus-visible,.p-in:focus-visible,.pn-a:focus-visible,.p-pill:focus-visible{outline:2px solid #9E1F50;outline-offset:2px}
+main[data-brak]>:not(.pn-bar):not(.p-brak){display:none !important}
 .p-card{background:#fff;border:1px solid #F0E8EC;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .p-card>h2,.p-h2{margin:0;font-size:16px;font-weight:700}
 .p-h1{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:700}
@@ -223,6 +224,15 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
   const roles = () => Mock.get('role', null) || ROLES;
   const setRoles = l => { Mock.set('role', l); drawNav(); refresh(); };
   const roleOf = k => roles().find(r => r.k === k) || roles()[0];
+  // beyond the menu a role decides whether it sees the other people's calendars (inni) and the studio's revenue (utarg);
+  // roles saved before these switches get the defaults below, a role the owner added sees the calendars but not the revenue
+  const FLAGI = { menedzerka: { inni: true, utarg: true }, recepcja: { inni: true, utarg: false }, 'stylistka-plus': { inni: true, utarg: false }, stylistka: { inni: false, utarg: false } };
+  const rola = () => roleOf((studioUser() || {}).rola);
+  const moze = (k, r = rola()) => r.k === 'właścicielka' || (r[k] ?? (FLAGI[r.k] || { inni: true, utarg: false })[k]);
+  const TYLKO_ZESPOL = ['moj-grafik.html', 'moje-wyniki.html']; // the owner has no personal schedule or commission
+  // the column of the logged-in person when she sees only her own calendar (0 = everyone's)
+  const ja = () => { if (moze('inni')) return 0; const i = STYL.findIndex(s => s.n === (studioUser() || {}).imie); return i + 1; };
+  const widac = h => !rola().hide.includes(h) && !(rola().k === 'właścicielka' && TYLKO_ZESPOL.includes(h));
   function logout() { Mock.set('studioUser', null); Mock.toast('Wylogowano'); setTimeout(() => { location.href = 'panel-logowanie.html'; }, 500); }
 
   function drawNav() {
@@ -233,7 +243,7 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       nav.parentElement.style.alignContent = 'flex-start'; // when the menu wraps above the content, its row must not stretch to fill the page's min-height
       nav.setAttribute('aria-label', 'Menu panelu');
       nav.innerHTML = `<div class="pn-logo" style="display:flex;gap:10px;align-items:center;padding:0 8px 12px"><div style="width:36px;height:36px;border-radius:10px;background:#9E1F50;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700">${esc(inicjaly(nazwa()))}</div><span style="font-weight:700">${esc(nazwa())}</span></div>` +
-        NAV.map(([g, items0], i) => { const items = items0.filter(it => !roleOf((studioUser() || {}).rola).hide.includes(it[1])); return (items.length ? `<div class="pn-g">${g}</div>` : '') +
+        NAV.map(([g, items0], i) => { const items = items0.filter(it => widac(it[1])); return (items.length ? `<div class="pn-g">${g}</div>` : '') +
           items.map(([l, h, b]) => `<a class="pn-a" href="${h}"${h === cur ? ' aria-current="page"' : ''}>${l}${b ? '<span class="pn-n" id="pn-quotes"></span>' : ''}</a>`).join(''); }).join('');
     }
     return nav;
@@ -256,6 +266,12 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
       const L = lokalizacje(), wyb = Mock.get('lokalizacja', 0) || 0;
       if (L.length > 1) (document.getElementById('pn-lok-slot') || bar).insertAdjacentHTML('afterbegin', `<label class="pn-lok" style="display:flex;align-items:center;gap:6px;margin-right:auto;font-size:13px;color:#625860">Lokalizacja<select id="pn-lok" class="p-in s" style="max-width:220px">${L.map((l, i) => `<option value="${i}"${i === wyb ? ' selected' : ''}>${esc(l.n)}</option>`).join('')}</select></label>`);
       main.prepend(bar);
+      const plik = nav.dataset.active || file(), sekcja = NAV.flatMap(g => g[1]).find(it => it[1] === plik);
+      if (sekcja && !widac(plik)) {
+        main.dataset.brak = '';
+        const w = rola().k === 'właścicielka';
+        bar.insertAdjacentHTML('afterend', `<div class="p-card p-brak" role="alert" style="max-width:560px;margin:24px auto;align-items:flex-start;gap:12px;padding:28px"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9E1F50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><h1 class="p-h1" style="margin:0">${w ? 'Ta sekcja jest dla osób z zespołu' : `Nie masz dostępu do sekcji „${esc(sekcja[0])}”`}</h1><p style="margin:0;line-height:1.5">${w ? 'Grafik i wyniki całego zespołu znajdziesz w „Zespół i grafik” i „Raporty”.' : `Twoja rola: <b>${esc(rola().n)}</b>. Dostęp do sekcji nadaje właścicielka w Zespół i grafik → Role i uprawnienia.`}</p><a class="p-btn pri" href="panel.html">Wróć do kalendarza</a></div>`);
+      }
       main.style.alignContent = "flex-start"; // a wrapping main (klientki, wiadomosci) must not spread its spare height between the rows: the top bar used to jump
       // every page reads its data for the chosen location on load, so a switch reloads it (profil-studia switches its form in place)
       const ls = document.getElementById('pn-lok'); if (ls) ls.addEventListener('change', () => { Mock.set('lokalizacja', +ls.value);
@@ -319,7 +335,18 @@ dialog form h2{font-family:'Bricolage Grotesque',sans-serif}`;
     { n: 'Natalia', rola: 'koloryzacja, keratyna', c: '#5B4BA5', t: '#EEEBF8', us: [['Koloryzacja', 150, 320], ['Balejaż', 180, 450], ['Keratyna', 120, 380]], grafik: ['10–18', '10–18', '10–18', '10–18', 'urlop', '9–14', '—'] }
   ]];
   const STYL = ZESPOLY[Mock.lok()] || ZESPOLY[0];
-  window.PS = { dziennik, log, kiedy, urzadzenie, STYL, lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
+  // pay from commission: base + turnover × rate + bonus (turnover over a threshold, % of product sales); zespol.html edits it, moje-wyniki.html shows one person's row
+  const premie = () => Mock.get('zespol.premie', { prog: 9000, kwota: 300, prod: 10 });
+  const premia = (o, r = premie()) => (o.utarg > r.prog ? r.kwota : 0) + Math.round((o.produkty || 0) * r.prod / 100);
+  const doWyplaty = (o, r = premie()) => Math.round(o.podstawa + o.utarg * o.proc / 100) + premia(o, r);
+  const wyn = () => Mock.get('zespol.wyn', Mock.lok() === 1 ? [{ k: 'Ola', utarg: 5400, proc: 40, podstawa: 0 }, { k: 'Natalia', utarg: 8600, proc: 10, podstawa: 3000, produkty: 400 }]
+    : [{ k: 'Magda', utarg: 10260, proc: 40, podstawa: 0 }, { k: 'Ewelina', utarg: 8140, proc: 10, podstawa: 3000, produkty: 600 }]);
+  // leave requests from the team (moj-grafik.html sends, zespol.html accepts); status: czeka | ok | nie
+  const wolne = () => Mock.get('wolne', null) || [
+    { id: 'w1', kto: 'Ewelina', rodzaj: 'Urlop', od: Mock.iso(Mock.dzien(7)), do: Mock.iso(Mock.dzien(11)), wiad: 'Wyjazd rodzinny', status: 'czeka' },
+    { id: 'w2', kto: 'Magda', rodzaj: 'Wolne', od: Mock.iso(Mock.dzien(20)), do: Mock.iso(Mock.dzien(20)), wiad: '', status: 'ok' }];
+  const setWolne = l => Mock.set('wolne', l);
+  window.PS = { rola, moze, ja, FLAGI, premie, premia, doWyplaty, wyn, wolne, setWolne, dziennik, log, kiedy, urzadzenie, STYL, lokalizacje, ROLES, NAV, calImport, addon, setAddon, signUpsell, esc, modal, visitModal, SVC, SLOTS, QUOTES, newQuotes, refresh, quoteState, min: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`) };
   Object.defineProperty(window.PS, 'ROLES', { get: roles }); window.PS.setRoles = setRoles; // the edited roles, not the defaults
   init();
 })();

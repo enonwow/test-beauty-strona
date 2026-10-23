@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel studia – moje wyniki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<script src="mock.js" defer></script>
+<script src="panel-shell.js" defer></script>
+</head>
+<body>
+<div class="mock-bar">Makieta, dane przykładowe · <a href="start.html">Start</a> · <a href="salon.html">Strona studia</a> · <a href="panel.html">Panel studia</a> · <a href="dla-studiow.html">Dla studiów</a></div>
+<div style="box-sizing: border-box; min-height: 900px; background: #FAF6F8; color: #1E1A1D; font-family: 'DM Sans', sans-serif; font-size: 14px; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <nav id="panel-nav"></nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div class="p-top">
+      <div style="display: flex; flex-direction: column; gap: 2px"><h1 class="p-h1">Moje wyniki</h1><span class="p-mut">Tylko Twoje liczby w tym miesiącu. Utarg całego studia widzi właścicielka.</span></div>
+      <span class="p-mut" id="miesiac"></span>
+    </div>
+    <div id="kafle" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px"></div>
+    <section class="p-card" aria-labelledby="us-h">
+      <h2 id="us-h" class="p-h2">Najczęstsze usługi</h2>
+      <div class="p-tw"><table class="p-tbl"><thead><tr><th>Usługa</th><th style="text-align: right">Wizyty</th><th style="text-align: right">Utarg</th></tr></thead><tbody id="uslugi"></tbody></table></div>
+      <span class="p-mut">Utarg, prowizję i premię ustawia właścicielka w Zespół i grafik → Czas pracy i wynagrodzenia. Liczby wizyt i usług są przykładowe.</span>
+    </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const E = PS.esc, zl = n => n.toLocaleString('pl-PL') + ' zł', ja = ((Mock.get('studioUser', null) || {}).imie || '').split(' ')[0];
+  const o = PS.wyn().find(x => x.k === ja), osoba = PS.STYL.find(s => s.n === ja);
+  const m = Mock.MIES[Mock.teraz().getMonth()]; document.getElementById('miesiac').textContent = `${m[0].toUpperCase() + m.slice(1)} ${Mock.teraz().getFullYear()}`;
+  if (!o || !osoba) { document.getElementById('kafle').innerHTML = '<p class="p-mut" style="margin:0">W tej lokalizacji nie masz wyników. Zmień lokalizację u góry.</p>'; document.querySelector('section').hidden = true; return; }
+  // sample split of her turnover over her services (weights 40/30/20/10 %), visit counts from each service's price
+  const W = [0.4, 0.3, 0.2, 0.1], us = osoba.us.slice(0, 4).map(([n, , cena], i) => { const ut = Math.round(o.utarg * W[i] / 10) * 10; return { n, wiz: Math.max(1, Math.round(ut / cena)), ut }; });
+  const wizyty = us.reduce((a, u) => a + u.wiz, 0), prowizja = Math.round(o.utarg * o.proc / 100), premia = PS.premia(o);
+  const kaf = (v, t) => `<div class="p-card" style="padding:12px 14px;gap:2px"><b style="font-size:22px">${v}</b><span class="p-mut">${t}</span></div>`;
+  document.getElementById('kafle').innerHTML = kaf(String(wizyty), 'wizyt w tym miesiącu') + kaf(zl(o.utarg), 'utarg z Twoich usług') + kaf(zl(prowizja), `Twoja prowizja (${o.proc}%)`)
+    + (premia ? kaf('+' + zl(premia), 'premia') : '') + kaf(zl(PS.doWyplaty(o)), o.podstawa ? `do wypłaty (z podstawą ${zl(o.podstawa)})` : 'do wypłaty');
+  document.getElementById('uslugi').innerHTML = us.map(u => `<tr><td>${E(u.n)}</td><td style="text-align:right">${u.wiz}</td><td style="text-align:right">${zl(u.ut)}</td></tr>`).join('');
+  console.assert(PS.doWyplaty({ podstawa: 3000, utarg: 8140, proc: 10, produkty: 600 }, { prog: 9000, kwota: 300, prod: 10 }) === 3874, 'moje-wyniki doWyplaty');
+});
+</script>
+</body>
+</html>

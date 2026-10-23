@@ -134,7 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   console.assert(gen(new Date(2026, 9, 5)).join() === gen(new Date(2026, 9, 5)).join() && gen(new Date(2026, 9, 11)).length === 0, 'kalendarz gen'); // a Sunday: nobody in the schedule
 
-  let pok = null; // shown person (index) or null = everyone
+  const JA = PS.ja(); // a stylist without access to the others: her own week only
+  let pok = JA ? JA - 1 : null; // shown person (index) or null = everyone
   const widac = s => pok === null || pok === s;
   const widok = () => { const m = /^#(miesiac|tydzien)(?:=(-?\d+))?$/.exec(location.hash) || [0, 'tydzien', 0]; return { mies: m[1] === 'miesiac', n: +(m[2] || 0) }; };
   const idz = (mies, n) => { location.hash = (mies ? 'miesiac' : 'tydzien') + (n ? '=' + n : ''); };
@@ -145,8 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let R = {}; // key -> visit shown in the week
 
   function renderChips(mies) {
-    document.getElementById('kto').innerHTML = `<button type="button" class="chipS" data-kto="" aria-pressed="${pok === null}">Wszystkie</button>` +
-      ST.map((s, i) => `<button type="button" class="chipS" data-kto="${i}" aria-pressed="${pok === i}"><span class="dot" style="background:${s.c}"></span>${E(s.n)}</button>`).join('');
+    document.getElementById('kto').innerHTML = (JA ? '' : `<button type="button" class="chipS" data-kto="" aria-pressed="${pok === null}">Wszystkie</button>`) +
+      ST.map((s, i) => JA && i !== JA - 1 ? '' : `<button type="button" class="chipS" data-kto="${i}" aria-pressed="${pok === i}"><span class="dot" style="background:${s.c}"></span>${E(s.n)}</button>`).join('');
     document.getElementById('kto-h').textContent = mies ? 'Kolor bloku = stylistka. Kliknij osobę, żeby zobaczyć tylko jej grafik.' : 'Każda osoba ma swój kolor i swój pas w dniu. Kliknij osobę, żeby zobaczyć tylko jej grafik.';
   }
 
@@ -188,14 +189,14 @@ document.addEventListener('DOMContentLoaded', () => {
       h += `<a class="d${dz ? ' dz' : ''}" href="${href}" aria-label="${d.getDate()} ${Mock.MIESD[mies]}: ${Mock.plural(L.length, ['wizyta', 'wizyty', 'wizyt'])}"><span class="n">${d.getDate()}</span>` +
         L.slice(0, 3).map(v => `<span class="w" style="background:${ST[v.s].t}"><span class="dot" style="background:${ST[v.s].c}"></span>${fmt(v.od)} ${E(v.kto)}</span>`).join('') +
         (L.length > 3 ? `<span class="more" style="color:#625860">+${L.length - 3} więcej</span>` : '') +
-        `<span class="ft"><span>${L.length} wiz.</span><span>${zl(sum)}</span></span><div class="ob"><span style="width:${proc(L.reduce((a, v) => a + v.dl, 0), vis.length || 1)}%"></span></div></a>`;
+        `<span class="ft"><span>${L.length} wiz.</span><span>${PS.moze('utarg') ? zl(sum) : ''}</span></span><div class="ob"><span style="width:${proc(L.reduce((a, v) => a + v.dl, 0), vis.length || 1)}%"></span></div></a>`;
     }
     document.getElementById('siatka').innerHTML = h + '</div>';
     // days off: "urlop" in this week's schedule (zespol.html) that fall in the shown month
     const urlop = ST.map(s => [s.n, (G[s.n] || []).map((g, i) => (g === 'urlop' ? dDod(PON0, i) : null)).filter(d => d && d.getMonth() === mies && d.getFullYear() === m0.getFullYear())])
       .filter(([, L]) => L.length).map(([k, L]) => `${k}: ${L.map(Mock.dm).join(', ')} urlop`).join(' · ') || 'brak urlopów';
     const box = (t, v) => `<div class="p-box" style="flex-direction:column;align-items:flex-start"><span class="p-mut">${t}</span><b style="font-size:20px">${E(v)}</b></div>`;
-    document.getElementById('staty').innerHTML = box('Wizyty w miesiącu', String(wiz)) + box('Planowany utarg', zl(utarg)) + box('Obłożenie', vis.map(i => `${ST[i].n} ${proc(zaj[i], otw || 1)}%`).join(' · ')) + box('Wolne dni w grafiku', urlop);
+    document.getElementById('staty').innerHTML = box('Wizyty w miesiącu', String(wiz)) + (PS.moze('utarg') ? box('Planowany utarg', zl(utarg)) : '') + box('Obłożenie', vis.map(i => `${ST[i].n} ${proc(zaj[i], otw || 1)}%`).join(' · ')) + box('Wolne dni w grafiku', urlop);
     document.getElementById('note').hidden = true;
     document.getElementById('hint').textContent = 'Kliknij dzień, żeby otworzyć jego tydzień (dzisiejszy dzień otworzy widok dnia). Pasek pod dniem to obłożenie zespołu.';
   }

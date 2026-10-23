@@ -107,6 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const BAZA = [BASE, BASE1][Mock.lok()] || {}, IM = PS.STYL.map(s => s.n);
   const LOCK = Mock.lok() ? [] : [{ col: 2, a: 960, b: 1016, name: 'Blokada ręczna' }]; // stała blokada w kolumnie 2 (Centrum)
   if (Mock.lok()) document.querySelector('#col2 > div').remove();
+  const JA = PS.ja(); // her column alone when her role does not show the other people's calendars
+  if (JA) { ['hd', 'col'].forEach(p => { document.getElementById(p + (3 - JA)).hidden = true; }); document.getElementById('hd1').parentElement.style.gridTemplateColumns = '56px minmax(0, 1fr)';
+    document.getElementById('dzien-sum').insertAdjacentHTML('afterend', '<p class="p-mut" style="margin:0">Widzisz swój kalendarz. Kalendarze innych osób udostępnia właścicielka (Zespół i grafik → Role i uprawnienia).</p>'); }
   const SHORT = [['Zdjęcie hybrydy', 15, 20], ['Naprawa paznokcia (cena przykładowa)', 10, 15], ['Parafina na dłonie (cena przykładowa)', 15, 25]]; // [nazwa, minuty, zł]
   // the sample visits that kasa.html already lists as paid start settled, so they cannot be settled twice
   const PAID0 = Mock.lok() === 1 ? { o1: { paid: { metoda: 'karta', kwota: 120, dok: { typ: 'paragon', nr: 'paragon nr 0001' } } } } : Mock.lok() ? {} : { a: { paid: { metoda: 'gotówka', kwota: 140, dok: { typ: 'paragon', nr: 'paragon nr 0001' } } }, d: { paid: { metoda: 'karta', kwota: 150, dok: { typ: 'faktura', nr: Mock.fvNr(14) } } } };
@@ -148,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     Mock.get('panel.mini', []).forEach(x => { out[x.id] = { col: x.col, t: x.t, dur: x.dur, name: x.name, phone: '600 123 456', info: 'w luce po przerwie w usłudze', kind: 'p', svc: x.svc, items: [[x.svc, x.price]], gaps: [], przyklad: true, hist: ['dodana w luce w wizycie ' + x.host] }; });
     Object.entries(out).forEach(([id, o]) => { const s = st(id); if (s.t) o.t = s.t; if (s.col) o.col = s.col; });
+    if (JA) Object.keys(out).forEach(id => { if (out[id].col !== JA) delete out[id]; }); // a stylist without access to the others sees her own visits only
     return out;
   }
   const total = (id, v) => v.items.reduce((s, i) => s + i[1], 0) + (st(id).extras || []).reduce((s, i) => s + i[1], 0);
@@ -228,9 +232,9 @@ document.addEventListener('DOMContentLoaded', () => {
       b.addEventListener('click', () => PS.visitModal({ done: renderAll, check: wolny, godz: fmt(od), stylistka: PS.STYL[c - 1].n, miejsce: doo - od }));
       colEl(c).append(b);
     });
-    const ile = Object.keys(V).length, utarg = Object.entries(V).reduce((a, [id, v]) => a + total(id, v), 0), czeka = Object.values(V).filter(v => v.potw === false).length, min = W.reduce((a, w) => a + w[2] - w[1], 0);
+    const ile = Object.keys(V).length, utarg = Object.entries(V).reduce((a, [id, v]) => a + total(id, v), 0), czeka = Object.values(V).filter(v => v.potw === false).length, min = W.filter(w => !JA || w[0] === JA).reduce((a, w) => a + w[2] - w[1], 0);
     const kaf = (t, o) => `<div style="background:#FFFFFF;border-radius:12px;padding:10px 14px;box-shadow:0 1px 2px rgba(30,10,18,.06)"><b style="display:block;font:700 18px 'Bricolage Grotesque',sans-serif">${t}</b><span style="color:#625860;font-size:12px">${o}</span></div>`;
-    document.getElementById('dzien-sum').innerHTML = kaf(Mock.plural(ile, ['wizyta', 'wizyty', 'wizyt']), 'dziś w kalendarzu') + kaf(`${utarg} zł`, 'planowany utarg') + kaf(String(czeka), 'czekają na potwierdzenie') + kaf(min ? PS.min(min) : '0 min', 'wolnego czasu od teraz');
+    document.getElementById('dzien-sum').innerHTML = kaf(Mock.plural(ile, ['wizyta', 'wizyty', 'wizyt']), JA ? 'Twoje dziś' : 'dziś w kalendarzu') + (PS.moze('utarg') ? kaf(`${utarg} zł`, 'planowany utarg') : '') + kaf(String(czeka), 'czekają na potwierdzenie') + kaf(min ? PS.min(min) : '0 min', JA ? 'Twojego wolnego czasu' : 'wolnego czasu od teraz');
   }
 
   function renderDetail() {
