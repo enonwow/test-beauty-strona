@@ -510,11 +510,13 @@ dialog,dialog *,.kpanel{overscroll-behavior:contain}
       document.querySelectorAll('.mock-only').forEach(el => { el.style.display = 'none'; }); // mock switches and hints are for the person running the test
       const u = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-uwagi', textContent: 'Uwagi' });
       u.setAttribute('aria-label', 'Zgłoś uwagę albo problem');
-      u.addEventListener('click', () => import('./zgloszenie.js').then(m => m.otworz()).catch(() => toast('Nie udało się otworzyć formularza.')));
+      u.setAttribute('aria-haspopup', 'dialog');
+      u.addEventListener('click', () => import('./zgloszenie.js').then(m => m.menu(u)).catch(() => toast('Nie udało się otworzyć formularza.')));
       document.body.append(u);
     } else if (bar) {
       const b = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-zglos', textContent: 'Zgłoś problem' });
-      b.addEventListener('click', () => import('./zgloszenie.js').then(m => m.otworz()).catch(() => toast('Nie udało się otworzyć formularza.')));
+      b.setAttribute('aria-haspopup', 'dialog');
+      b.addEventListener('click', () => import('./zgloszenie.js').then(m => m.menu(b)).catch(() => toast('Nie udało się otworzyć formularza.')));
       const n = Object.assign(document.createElement('button'), { type: 'button', className: 'mock-zglos', textContent: 'Narzędzia' });
       n.addEventListener('click', () => import('./narzedzia.js').then(m => m.otworz()).catch(() => toast('Nie udało się otworzyć narzędzi.')));
       bar.append(' · ', b, ' ', n);
